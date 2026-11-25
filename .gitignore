@@ -1,0 +1,31 @@
+# Your library and anything recorded from it: never published
+/data/
+/backups/
+/eval/
+*.wav
+*.mp3
+*.m4a
+*.flac
+*.db
+
+# Private working notes
+/docs/
+/CLAUDE.md
+/AGENTS.md
+/CODING_STANDARDS.md
+/scripts/startup_check.py
+/backend/tests/test_startup_check.py
+/backend/tests/test_calibration_export.py
+/.claude/
+/.ignore
+/graft/
+
+# Made on each computer
+/desktop/config.json
+/backend/.venv/
+**/node_modules/
+**/__pycache__/
+/frontend/dist/
+/desktop/dist/
+*.tsbuildinfo
+.DS_Store

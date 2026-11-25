@@ -1,0 +1,7 @@
+VoiceForge
+Copyright 2026 the VoiceForge authors
+
+Licensed under the Apache License, Version 2.0 (see LICENSE).
+
+Voice models are not included. They are downloaded from Hugging Face on first use and keep their own
+licences; check them before commercial use (Fish Audio S2 Pro, for example, is non-commercial).

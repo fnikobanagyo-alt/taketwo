@@ -1,0 +1,42 @@
+{
+  "name": "voiceforge-desktop",
+  "productName": "VoiceForge",
+  "version": "2.0.0",
+  "description": "VoiceForge Studio - local voice cloning",
+  "main": "main.js",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "dist": "node write-config.js && electron-builder --mac dir --arm64",
+    "predist": "../start.sh --setup && ../backend/.venv/bin/python -B ../scripts/check.py",
+    "prestart": "node write-config.js"
+  },
+  "build": {
+    "appId": "studio.voiceforge.app",
+    "productName": "VoiceForge",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "splash.html",
+      "config.json"
+    ],
+    "mac": {
+      "category": "public.app-category.music",
+      "icon": "build/icon.png",
+      "identity": null,
+      "darkModeSupport": true,
+      "extendInfo": {
+        "NSMicrophoneUsageDescription": "VoiceForge records voice samples to clone voices."
+      }
+    }
+  },
+  "devDependencies": {
+    "electron": "^44.4.5",
+    "electron-builder": "^26.15.3"
+  },
+  "license": "Apache-2.0"
+}

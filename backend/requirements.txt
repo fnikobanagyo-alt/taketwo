@@ -1,0 +1,20 @@
+# Direct dependencies, pinned to the versions VoiceForge was tested and listened to with.
+# requirements.lock (what start.sh installs) is made from this file:
+#   uv pip compile --universal --python-version 3.11 requirements.txt -o requirements.lock
+fastapi==0.141.1
+huggingface-hub==1.33.0
+jiwer==4.0.0
+librosa==0.11.0
+mlx==0.32.2
+mlx-audio==0.5.7
+noisereduce==3.0.3
+numpy==2.4.6
+onnxruntime==1.30.0
+pydantic==2.13.5
+pyloudnorm==0.2.0
+python-multipart==0.0.32
+scipy==1.17.1
+soundfile==0.14.0
+transformers==5.17.0
+uvicorn[standard]==0.54.0
+httpx==0.28.1  # used by the tests

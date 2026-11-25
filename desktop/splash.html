@@ -1,0 +1,37 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>VoiceForge</title>
+<style>
+  :root { color-scheme: light dark; --bg: #fbf9f6; --fg: #1b1815; --fg2: #8a8178; }
+  @media (prefers-color-scheme: dark) { :root { --bg: #0b0a09; --fg: #f5f0ea; --fg2: #7b736a; } }
+  html, body { height: 100%; margin: 0; }
+  body {
+    background: var(--bg); color: var(--fg); -webkit-app-region: drag; overflow: hidden;
+    font: 13px -apple-system, BlinkMacSystemFont, "Inter", sans-serif; display: flex; align-items: center; justify-content: center;
+  }
+  .wrap { text-align: center; }
+  .orb { position: relative; width: 120px; height: 120px; margin: 0 auto 34px; border-radius: 50%; overflow: hidden;
+    box-shadow: 0 0 90px -10px rgba(255, 120, 50, .65); animation: breathe 2.2s ease-in-out infinite; }
+  .orb::before { content: ""; position: absolute; inset: -25%; filter: blur(16px);
+    background: conic-gradient(from 0deg, #ffc061, #ff7a2f, #e4486e, #ffb347, #ffc061); animation: spin 3.2s linear infinite; }
+  .orb::after { content: ""; position: absolute; inset: 0; background: radial-gradient(circle at 32% 28%, rgba(255,255,255,.75), transparent 42%); }
+  h1 { font: italic 400 44px "Instrument Serif", "New York", Georgia, serif; margin: 0; letter-spacing: -.01em; }
+  #s { margin-top: 12px; color: var(--fg2); min-height: 18px; }
+  #s.err { color: #ff6b6b; max-width: 440px; margin-left: auto; margin-right: auto; line-height: 1.5; -webkit-app-region: no-drag; user-select: text; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes breathe { 50% { transform: scale(1.05); } }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="orb"></div>
+    <h1>VoiceForge</h1>
+    <div id="s">Warming up…</div>
+  </div>
+  <script>
+    window.setStatus = (t, err) => { const s = document.getElementById("s"); s.textContent = t; s.className = err ? "err" : ""; };
+  </script>
+</body>
+</html>
