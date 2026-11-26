@@ -1,5 +1,7 @@
-# Runs the same checks a contributor runs locally (scripts/check.py) on every push and pull request.
-# Apple Silicon runner, because the engine's MLX packages only install on arm64 macOS.
+# Runs the release checks (scripts/check.py) on every push and pull request.
+# Linux runner: GitHub's Apple Silicon runners are often unavailable, and the tests never load a model.
+# MLX only installs on Apple Silicon, so it is left out here; the full install (./start.sh --setup) is
+# checked on a Mac before each release.
 name: Checks
 on:
   push:
@@ -12,8 +14,8 @@ concurrency:
   cancel-in-progress: true
 jobs:
   check:
-    runs-on: macos-15
-    timeout-minutes: 45
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -23,12 +25,15 @@ jobs:
         with:
           node-version: "22"
           cache: npm
-          cache-dependency-path: |
-            frontend/package-lock.json
-            desktop/package-lock.json
+          cache-dependency-path: frontend/package-lock.json
       - name: Install ffmpeg
-        run: brew install ffmpeg
-      - name: Install TakeTwo (packages and interface, no models)
-        run: ./start.sh --setup
+        run: sudo apt-get update -q && sudo apt-get install -y -q ffmpeg
+      - name: Install the engine's packages (without the Apple-only MLX ones)
+        run: |
+          python -m venv backend/.venv
+          grep -v -E '^mlx(-audio)?==' backend/requirements.lock > /tmp/requirements-linux.txt
+          backend/.venv/bin/python -m pip install -q --disable-pip-version-check -r /tmp/requirements-linux.txt
+      - name: Install the interface's packages
+        run: cd frontend && npm ci --silent
       - name: Run checks on a temporary library
         run: backend/.venv/bin/python -B scripts/check.py
