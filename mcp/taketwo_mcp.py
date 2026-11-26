@@ -175,7 +175,7 @@ def get_status(narration_id: str) -> dict:
     done_needs_listen is the legacy name of done_needs_review; prefer review_status.
     Also: parts_done/parts_total, eta_seconds (while rendering), queue_ahead (while queued), open_in_app
     (a link to the narration in the TakeTwo app) and, once done, parts_needing_review: each with its
-    1-based part number, text, reasons, issues, start/end seconds in the finished audio and checked_by.
+    1-based part number, text, reasons, issues, start/end seconds in the finished audio and checked_by (which automated checks found it: "take check", "final check", "script check").
     Doubtful parts are still playable; ask the user to listen to them, or call respeak_part / fix_remaining.
     """
     g = _call("GET", f"/api/generations/{_q(narration_id)}")
@@ -226,8 +226,13 @@ def get_audio(narration_id: str, format: str = "mp3", output_path: str | None = 
         title = "".join(ch for ch in (g.get("title") or "Narration").replace("…", "") if ch.isalnum() or ch in " -_,.'").strip()[:60] or "Narration"
         dest = DOWNLOADS / f"{' '.join(g['profile_name'].split())} - {title} ({narration_id}).{fmt}"
     dest.parent.mkdir(parents=True, exist_ok=True)
-    with _open(f"/api/generations/{_q(narration_id)}/audio?fmt={fmt}", timeout=120) as r, open(dest, "wb") as f:
-        shutil.copyfileobj(r, f)
+    part = dest.with_name(dest.name + ".part")  # a failed download never leaves a half file at dest
+    try:
+        with _open(f"/api/generations/{_q(narration_id)}/audio?fmt={fmt}", timeout=120) as r, open(part, "wb") as f:
+            shutil.copyfileobj(r, f)
+        os.replace(part, dest)
+    finally:
+        part.unlink(missing_ok=True)
     out = {"path": str(dest), "duration_seconds": g.get("duration"), "format": fmt, "outcome": g.get("outcome")}
     if g.get("outcome") == "needs_listen":
         out["warning"] = "Some parts failed a quality check. Ask the user to listen to parts_needing_review before using this audio."

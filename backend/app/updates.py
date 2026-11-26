@@ -131,16 +131,21 @@ def _run_update(tag: str, progress, cancel) -> None:
     progress(1.0, f"{tag[1:]} is installed. Restart TakeTwo to use it.")
 
 
+_start_lock = threading.Lock()
+
+
 def start() -> dict:
-    s = state()
-    if not s["available"]:
-        raise ValueError("No newer version to install.")
-    j = s["job"]
-    if j and j["status"] in ("queued", "running"):
-        return j
-    reason = preflight()
-    if reason:
-        raise ValueError(reason)
-    tag = s["check"]["tag"]
-    assert TAG.match(tag)  # only a validated vX.Y.Z ever reaches git
-    return worker.submit("update", lambda progress, cancel: _run_update(tag, progress, cancel), ref="update", label=f"Updating to {tag[1:]}")
+    with _start_lock:  # check and queue in one step, so two quick clicks queue one update
+        s = state()
+        if not s["available"]:
+            raise ValueError("No newer version to install.")
+        j = s["job"]
+        if j and j["status"] in ("queued", "running"):
+            return j
+        reason = preflight()
+        if reason:
+            raise ValueError(reason)
+        tag = str(s["check"].get("tag") or "")
+        if not TAG.match(tag):  # only a validated vX.Y.Z ever reaches git (an explicit check, not an assert)
+            raise ValueError("The release tag isn't a version like v2.1.0, so it wasn't installed.")
+        return worker.submit("update", lambda progress, cancel: _run_update(tag, progress, cancel), ref="update", label=f"Updating to {tag[1:]}")

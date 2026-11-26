@@ -875,6 +875,8 @@ def accept_part(gid: str, ci: int):
     g = _idle_gen(gid, ci)
     if not g["chunks"][ci].get("file"):
         raise HTTPException(400, "This part has no audio yet.")
+    if ci not in pipeline.fix_targets(g) and not g["chunks"][ci].get("accepted"):
+        raise HTTPException(400, "This part doesn't need review, so there is nothing to mark.")
     db.put_generation(pipeline.set_accepted(g, ci, True))
     return get_generation(gid)
 
@@ -906,6 +908,41 @@ def select_take(gid: str, ci: int, body: TakeBody):
     if not any(x["take"] == body.take for x in g["chunks"][ci].get("takes", [])):
         raise HTTPException(404, "That take is no longer kept.")
     return worker.submit("generate", lambda progress, cancel: pipeline.select_take(gid, ci, body.take), ref=gid, label="Switching take")
+
+
+def _reveal(target: Path) -> None:
+    """Show a file (selected) or folder in the system file manager. Mac, Windows and Linux."""
+    import platform
+    import subprocess
+
+    system = platform.system()
+    if system == "Darwin":
+        cmd = ["open", "-R", str(target)] if target.is_file() else ["open", str(target)]
+    elif system == "Windows":
+        cmd = ["explorer", f"/select,{target}"] if target.is_file() else ["explorer", str(target)]
+    else:
+        cmd = ["xdg-open", str(target.parent if target.is_file() else target)]
+    subprocess.run(cmd, check=False, timeout=10)
+
+
+@app.post("/api/generations/reveal")
+def reveal_narrations_folder():
+    """Open the folder TakeTwo keeps narrations in (one subfolder per narration)."""
+    GENERATIONS_DIR.mkdir(parents=True, exist_ok=True)
+    _reveal(GENERATIONS_DIR)
+    return {"path": str(GENERATIONS_DIR)}
+
+
+@app.post("/api/generations/{gid}/reveal")
+def reveal_narration(gid: str):
+    """Show this narration's finished audio in the file manager (its folder if nothing is rendered yet)."""
+    _live_gen(gid)
+    gdir = _item_dir(GENERATIONS_DIR, gid)
+    target = next((f for f in (gdir / "final.mp3", gdir / "final.wav") if f.exists()), gdir)
+    if not target.exists():
+        _404("This narration has no files yet")
+    _reveal(target)
+    return {"path": str(target)}
 
 
 @app.post("/api/generations/{gid}/restore")

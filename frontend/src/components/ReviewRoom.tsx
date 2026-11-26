@@ -92,7 +92,7 @@ export default function ReviewRoom({ g, busy, refresh }: { g: Generation; busy: 
             editing={editing === c.i} setEditing={(on) => setEditing(on ? c.i : null)}
             rowRef={(el) => { if (el) rows.current.set(c.i, el); else rows.current.delete(c.i); }}
             onJump={() => jump(c.i)} onAccept={() => accept(c.i)} onRespeak={(t) => respeak(c.i, t)}
-            onUnaccept={async () => { await api.unaccept(g.id, c.i); refresh(); }} refresh={refresh} />
+            onUnaccept={async () => { try { await api.unaccept(g.id, c.i); refresh(); } catch (e) { toast(`Couldn't undo: ${(e as Error).message}`, "error"); } }} refresh={refresh} />
         ))}
         {!parts.length && <div className="flex items-center justify-center gap-2 p-8 text-[13px] text-fg-2"><CheckCircle2 size={15} className="text-ok-ink" /> Nothing needs review.</div>}
       </div>

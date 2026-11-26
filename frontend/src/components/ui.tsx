@@ -226,7 +226,7 @@ export function useConfirm() {
 }
 
 // ------------------------------------------------------------------ toasts
-type ToastOpts = { action?: { label: string; run: () => void }; ms?: number };
+type ToastOpts = { action?: { label: string; run: () => void | Promise<unknown> }; ms?: number };
 type Toast = { id: number; text: ReactNode; tone: "ok" | "error" | "info" } & ToastOpts;
 const ToastCtx = createContext<(text: ReactNode, tone?: Toast["tone"], opts?: ToastOpts) => void>(() => {});
 export const useToast = () => useContext(ToastCtx);
@@ -247,7 +247,11 @@ export function ToastProvider({ children }: { children: ReactNode }) {
           <div key={t.id} className="animate-rise pointer-events-auto flex items-center gap-2.5 rounded-xl border border-line-strong bg-surface px-4 py-2.5 text-[13px] shadow-float">
             <span aria-hidden="true" className={`h-1.5 w-1.5 rounded-full ${t.tone === "error" ? "bg-danger" : t.tone === "info" ? "bg-fg-3" : "bg-ok"}`} />
             {t.text}
-            {t.action && <button className="btn btn-ghost btn-sm -my-1 -mr-2 font-semibold text-fg" onClick={() => { t.action!.run(); drop(t.id); }}>{t.action.label}</button>}
+            {t.action && <button className="btn btn-ghost btn-sm -my-1 -mr-2 font-semibold text-fg" onClick={() => {
+              drop(t.id);
+              // an Undo that fails (the engine was busy or closed) says so instead of failing silently
+              Promise.resolve().then(t.action!.run).catch((e) => push(`Couldn't undo: ${(e as Error).message}`, "error"));
+            }}>{t.action.label}</button>}
           </div>
         ))}
       </div>

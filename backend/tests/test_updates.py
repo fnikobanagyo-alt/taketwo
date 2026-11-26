@@ -113,3 +113,43 @@ class UpdateApiTests(unittest.TestCase):
     def test_only_a_vX_Y_Z_tag_is_accepted(self):
         for bad in ("v2.1", "main", "v1.0.0; rm -rf /", "--upload-pack=x"):
             self.assertIsNone(updates.parse(bad))
+
+
+class StartTests(unittest.TestCase):
+    """Regressions from the 2026-11-27 code review: one queued update, explicit tag check."""
+
+    def setUp(self):
+        self.submitted = []
+        fake_job = {"value": None}
+        state = lambda: {"available": True, "check": {"tag": self.tag}, "job": fake_job["value"]}
+
+        def submit(kind, fn, **k):
+            import time as _t
+            _t.sleep(0.05)  # widen the race window
+            fake_job["value"] = {"status": "queued", "kind": kind}
+            self.submitted.append(kind)
+            return fake_job["value"]
+        self.p = [patch.object(updates, "state", state), patch.object(updates, "preflight", return_value=None),
+                  patch.object(updates.worker, "submit", submit)]
+        for p in self.p:
+            p.start()
+
+    def tearDown(self):
+        for p in self.p:
+            p.stop()
+
+    def test_two_quick_clicks_queue_one_update(self):
+        import threading
+        self.tag = "v2.1.0"
+        ts = [threading.Thread(target=updates.start) for _ in range(2)]
+        for t in ts:
+            t.start()
+        for t in ts:
+            t.join()
+        self.assertEqual(self.submitted, ["update"])
+
+    def test_a_bad_tag_is_refused_without_assert(self):
+        self.tag = "v2.1.0; rm -rf /"
+        with self.assertRaisesRegex(ValueError, "isn't a version"):
+            updates.start()
+        self.assertEqual(self.submitted, [])

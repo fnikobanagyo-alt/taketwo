@@ -954,7 +954,7 @@ def regenerate_chunk(gen_id: str, ci: int, new_text: str | None, cancel) -> None
 
 def summarize(gen: dict) -> None:
     """The finished narration's flagged list and one-line message, from its parts as they are now."""
-    gen["flagged"] = [c["i"] for c in gen["chunks"] if c.get("status") == "flagged"]
+    gen["flagged"] = [c["i"] for c in gen["chunks"] if c.get("status") == "flagged" and not c.get("accepted")]
     todo = review(gen)
     heard = sum(1 for c in gen["chunks"] if c.get("accepted"))
     if todo:
@@ -1003,9 +1003,10 @@ def review(gen: dict, voice_pitch_hz: float | None = None) -> list[dict]:
         if fix_entities(ch.get("text") or "") != (ch.get("text") or ""):
             codes.append("web_artifact")
         codes = codes or ["final_check"]
+        found_by = [n for n, hit in (("take check", ch.get("issues")), ("final check", ch.get("final_issues")), ("script check", "web_artifact" in codes)) if hit]
         item = {"part": i + 1, "text": ch.get("text") or "", "issues": codes, "reasons": [ISSUE_LABEL.get(c, c.replace("_", " ")) for c in codes],
                 "start": spans.get(i, {}).get("start"), "end": spans.get(i, {}).get("end"), "heard": ch.get("heard") or "",
-                "pitch_hz": ch.get("pitch_hz"), "voice_pitch_hz": voice_pitch_hz, "checked_by": "checks", "take": ch.get("take", 1)}
+                "pitch_hz": ch.get("pitch_hz"), "voice_pitch_hz": voice_pitch_hz, "checked_by": found_by or ["final check"], "take": ch.get("take", 1)}
         out.append(item)
     return out
 
@@ -1028,7 +1029,7 @@ def set_accepted(gen: dict, ci: int, on: bool) -> dict:
 
 
 TAKE_FIELDS = ("text", "file", "raw_file", "context_file", "wer", "sim", "dur", "issues", "final_issues", "heard", "pitch_hz",
-               "words", "ending", "status", "chosen_seed", "accepted")
+               "words", "ending", "status", "chosen_seed")  # "Sounds fine" is not carried across a take switch
 MAX_OLD_TAKES = 3
 
 
@@ -1069,28 +1070,30 @@ def select_take(gen_id: str, ci: int, k: int) -> None:
     """Keep an earlier take of one part instead of the current one, then re-mix the narration.
     The current take is archived first, so the switch can be undone the same way."""
     gen = db.get_generation(gen_id)
+    if gen is None or gen.get("deleted_at"):
+        raise ValueError("This narration was deleted.")
     ch = gen["chunks"][ci]
     t = next((x for x in ch.get("takes", []) if x["take"] == k), None)
     if t is None:
         raise ValueError("That take is no longer kept.")
     gdir, src = GENERATIONS_DIR / gen_id, _take_dir(gen_id, ci, k)
     cur = _archive_take(gen_id, ch)
-    for f in (ch.get("context_file"),):
-        if f and not t.get("context_file"):
-            (gdir / f).unlink(missing_ok=True)
+    if ch.get("context_file") and not t.get("context_file"):
+        (gdir / ch["context_file"]).unlink(missing_ok=True)
     for f in (t.get("file"), t.get("raw_file"), t.get("context_file")):
         if f and (src / f).exists():
             os.replace(src / f, gdir / f)
     shutil.rmtree(src, ignore_errors=True)
     ch.update({f: t.get(f) for f in TAKE_FIELDS})
     ch["take"] = k
+    ch["accepted"] = None  # a person decides again for the take they now keep
     ch["audio_revision"] = int(ch.get("audio_revision", 0)) + 1
     ch["takes"] = [x for x in ch.get("takes", []) if x["take"] != k] + ([cur] if cur else [])
     s = {**db.get_settings(), **gen["settings"]}
     assemble(gen, s)
     if gen.get("status") == "done":
         summarize(gen)
-    db.put_generation(gen)
+    db.put_generation_live(gen)  # keeps a delete made while the switch ran; writes nothing if the row is gone
 
 
 def fix_remaining(gen_id: str, cancel) -> None:

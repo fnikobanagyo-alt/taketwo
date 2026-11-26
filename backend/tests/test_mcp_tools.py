@@ -165,6 +165,19 @@ class McpToolTests(unittest.TestCase):
         self.assertEqual(out["outcome"], "clean")
         self.assertNotIn("warning", out)
 
+    def test_a_failed_download_leaves_no_partial_file(self):
+        self.reply = DONE
+
+        class Broken(FakeResponse):
+            def read(self, *a):
+                raise ConnectionResetError("dropped")
+        with tempfile.TemporaryDirectory() as d, \
+                patch.object(self.m.urllib.request, "urlopen", side_effect=lambda *a, **k: Broken(b"")):
+            dest = Path(d) / "out.mp3"
+            with self.assertRaises(ConnectionResetError):
+                self.m.get_audio("g1", output_path=str(dest))
+            self.assertEqual(list(Path(d).iterdir()), [])  # neither out.mp3 nor out.mp3.part
+
 
 if __name__ == "__main__":
     unittest.main()

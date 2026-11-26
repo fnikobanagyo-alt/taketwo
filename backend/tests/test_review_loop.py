@@ -47,7 +47,7 @@ class SoundsFineTests(unittest.TestCase):
         r = self.c.get("/api/generations/acc1").json()
         self.assertEqual(r["outcome"], "needs_listen")
         item = r["review"][0]
-        self.assertEqual((item["part"], item["start"], item["end"], item["pitch_hz"], item["checked_by"]), (2, 1.5, 2.5, 180.0, "checks"))
+        self.assertEqual((item["part"], item["start"], item["end"], item["pitch_hz"], item["checked_by"]), (2, 1.5, 2.5, 180.0, ["take check"]))
 
     def test_sounds_fine_clears_the_part_and_undo_brings_it_back(self):
         r = self.c.post("/api/generations/acc1/chunks/1/accept", headers=H).json()
@@ -159,3 +159,89 @@ class SoftDeleteAndSourceTests(unittest.TestCase):
         r = self.c.get("/api/generations/search", params={"same_script": "Part 0. Part 1. Part 2."}).json()
         self.assertIn("srch1", [x["id"] for x in r])
         self.assertEqual(self.c.get("/api/generations/search", params={"q": "nothing like this"}).json(), [])
+
+
+class ReviewFixesTests(unittest.TestCase):
+    """Regressions from the 2026-11-27 code review."""
+
+    def setUp(self):
+        self.c = TestClient(main.app, base_url=LOCAL)
+
+    def respeak(self, gid):
+        def fake_run(g_id, cancel, only_chunks=None):
+            g = db.get_generation(g_id)
+            (config.GENERATIONS_DIR / g_id / "chunk_001.wav").write_bytes(b"take2")
+            g["chunks"][1].update(status="ok", issues=[], accepted=None)
+            pipeline.summarize(g)
+            db.put_generation_live(g)
+        with patch.object(pipeline, "run_generation", fake_run):
+            pipeline.regenerate_chunk(gid, 1, None, lambda: False)
+
+    def test_a_delete_during_a_take_switch_stays_deleted(self):
+        make_gen("fx1"); self.respeak("fx1")
+        with patch.object(pipeline, "assemble", side_effect=lambda g, s: db.set_generation_deleted("fx1", True)):
+            pipeline.select_take("fx1", 1, 1)
+        self.assertIn("deleted_at", db.get_generation("fx1"))
+
+    def test_a_take_switch_on_a_missing_or_deleted_narration_is_refused(self):
+        with self.assertRaisesRegex(ValueError, "deleted"):
+            pipeline.select_take("no-such-narration", 1, 1)
+
+    def test_switching_takes_clears_sounds_fine(self):
+        make_gen("fx2"); self.respeak("fx2")
+        g = db.get_generation("fx2"); g["chunks"][1]["accepted"] = {"by": "person", "at": 1}; db.put_generation(g)
+        with patch.object(pipeline, "assemble"):
+            pipeline.select_take("fx2", 1, 1)
+        self.assertFalse(db.get_generation("fx2")["chunks"][1].get("accepted"))
+
+    def test_accepted_parts_leave_the_flagged_list(self):
+        make_gen("fx3")
+        r = self.c.post("/api/generations/fx3/chunks/1/accept", headers=H).json()
+        self.assertEqual(r["flagged"], [])
+
+    def test_a_part_that_passed_cannot_be_marked(self):
+        make_gen("fx4")
+        self.assertEqual(self.c.post("/api/generations/fx4/chunks/0/accept", headers=H).status_code, 400)
+
+    def test_checked_by_names_the_check_that_found_it(self):
+        g = make_gen("fx5")
+        g["chunks"][1].update(issues=[], final_issues=["cut_off"]); db.put_generation(g)
+        self.assertEqual(self.c.get("/api/generations/fx5").json()["review"][0]["checked_by"], ["final check"])
+
+
+class RevealTests(unittest.TestCase):
+    """History's folder buttons open the file manager; nothing in the library is changed."""
+
+    def setUp(self):
+        self.c = TestClient(main.app, base_url=LOCAL)
+        make_gen("rv1")
+        (config.GENERATIONS_DIR / "rv1/final.mp3").write_bytes(b"ID3")
+
+    def test_a_narration_shows_its_audio_file_selected(self):
+        with patch("platform.system", return_value="Darwin"), patch("subprocess.run") as run:
+            r = self.c.post("/api/generations/rv1/reveal", headers=H)
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(run.call_args[0][0], ["open", "-R", str(config.GENERATIONS_DIR / "rv1/final.mp3")])
+
+    def test_windows_selects_the_file_in_explorer(self):
+        with patch("platform.system", return_value="Windows"), patch("subprocess.run") as run:
+            self.c.post("/api/generations/rv1/reveal", headers=H)
+        self.assertEqual(run.call_args[0][0][0], "explorer")
+
+    def test_the_folder_button_opens_the_narrations_folder(self):
+        with patch("platform.system", return_value="Darwin"), patch("subprocess.run") as run:
+            r = self.c.post("/api/generations/reveal", headers=H)
+        self.assertEqual(run.call_args[0][0], ["open", str(config.GENERATIONS_DIR)])
+        self.assertEqual(r.json()["path"], str(config.GENERATIONS_DIR))
+
+    def test_bad_or_deleted_ids_open_nothing(self):
+        db.set_generation_deleted("rv1", True)
+        with patch("subprocess.run") as run:
+            self.assertEqual(self.c.post("/api/generations/rv1/reveal", headers=H).status_code, 404)
+            self.assertEqual(self.c.post("/api/generations/..%2F..%2Fetc/reveal", headers=H).status_code in (400, 404), True)
+        run.assert_not_called()
+
+    def test_another_website_cannot_open_folders(self):
+        with patch("subprocess.run") as run:
+            self.assertEqual(self.c.post("/api/generations/reveal", headers={"Origin": "https://evil.example"}).status_code, 403)
+        run.assert_not_called()

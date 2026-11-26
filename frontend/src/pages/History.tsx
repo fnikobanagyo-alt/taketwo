@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { AlertTriangle, ArrowLeft, ChevronDown, History, Loader2, Play, RotateCcw, Search, Star, Trash2 } from "lucide-react";
+import { AlertTriangle, ArrowLeft, ChevronDown, FolderOpen, History, Loader2, Play, RotateCcw, Search, Star, Trash2 } from "lucide-react";
 import { api, fmtTime, timeAgo, type Generation } from "../api";
 import { usePlayer } from "../lib/player";
 import GenerationView from "../components/GenerationView";
@@ -34,6 +34,10 @@ export default function HistoryPage({ id }: { id?: string }) {
     (filter === "all" || (filter === "fav" && g.favorite) || (filter === "review" && g.outcome === "needs_listen")) &&
     ((g.title ?? "") + g.text_preview + g.profile_name).toLowerCase().includes(q.toLowerCase())));
   const play = (g: Generation) => player.play({ src: api.audioUrl(g.id, "wav", Math.round(g.updated)), title: g.title || g.profile_name, subtitle: g.profile_name, seed: g.profile_id, download: api.audioUrl(g.id, "mp3") + "&download=true" });
+  const reveal = async (g?: Generation) => {
+    try { g ? await api.revealNarration(g.id) : await api.revealNarrations(); }
+    catch (e) { toast(`Couldn't open the folder: ${(e as Error).message}`, "error"); }
+  };
   const remove = async (g: Generation) => {
     try {
       await api.deleteGeneration(g.id);
@@ -45,7 +49,8 @@ export default function HistoryPage({ id }: { id?: string }) {
 
   return (
     <div className="mx-auto max-w-5xl px-10 pb-16 pt-6">
-      <PageHeader title="History" subtitle="Every narration you've made, grouped by script, with its audio, subtitles and per-part review." />
+      <PageHeader title="History" subtitle="Every narration you've made, grouped by script, with its audio, subtitles and per-part review."
+        actions={<button className="btn btn-secondary btn-sm" onClick={() => reveal()} title="Open the folder TakeTwo keeps narrations in"><FolderOpen size={14} /> Open folder</button>} />
       <div className="mb-4 flex flex-wrap items-center gap-3">
         <div className="relative w-72">
           <Search size={15} className="absolute left-3 top-3 text-fg-3" aria-hidden="true" />
@@ -66,14 +71,14 @@ export default function HistoryPage({ id }: { id?: string }) {
           {groups.map(({ key, latest, takes }) => (
             <li key={key}>
               <Row g={latest} takes={takes.length} open={openId === latest.id} expanded={expanded === key}
-                onOpen={() => setOpenId(openId === latest.id ? null : latest.id)} onPlay={() => play(latest)} onDelete={() => remove(latest)}
+                onOpen={() => setOpenId(openId === latest.id ? null : latest.id)} onPlay={() => play(latest)} onDelete={() => remove(latest)} onReveal={() => reveal(latest)}
                 onExpand={takes.length > 1 ? () => setExpanded(expanded === key ? null : key) : undefined} />
               {openId === latest.id && <div className="border-t border-line bg-surface-2/30"><GenerationView id={latest.id} bare /></div>}
               {expanded === key && (
                 <ul className="border-t border-line bg-surface-2/30" aria-label="Earlier takes of this script">
                   {takes.slice(1).map((g) => (
                     <li key={g.id} className="border-t border-line first:border-t-0">
-                      <Row g={g} sub open={openId === g.id} onOpen={() => setOpenId(openId === g.id ? null : g.id)} onPlay={() => play(g)} onDelete={() => remove(g)} />
+                      <Row g={g} sub open={openId === g.id} onOpen={() => setOpenId(openId === g.id ? null : g.id)} onPlay={() => play(g)} onDelete={() => remove(g)} onReveal={() => reveal(g)} />
                       {openId === g.id && <div className="border-t border-line"><GenerationView id={g.id} bare /></div>}
                     </li>
                   ))}
@@ -87,8 +92,8 @@ export default function HistoryPage({ id }: { id?: string }) {
   );
 }
 
-function Row({ g, takes, sub, open, expanded, onOpen, onPlay, onDelete, onExpand }: {
-  g: Generation; takes?: number; sub?: boolean; open: boolean; expanded?: boolean; onOpen: () => void; onPlay: () => void; onDelete: () => void; onExpand?: () => void;
+function Row({ g, takes, sub, open, expanded, onOpen, onPlay, onDelete, onReveal, onExpand }: {
+  g: Generation; takes?: number; sub?: boolean; open: boolean; expanded?: boolean; onOpen: () => void; onPlay: () => void; onDelete: () => void; onReveal: () => void; onExpand?: () => void;
 }) {
   const name = g.title || g.text_preview || "Narration";
   return (
@@ -109,6 +114,7 @@ function Row({ g, takes, sub, open, expanded, onOpen, onPlay, onDelete, onExpand
       </button>
       {onExpand && <button className="btn btn-ghost btn-sm" aria-expanded={expanded} onClick={onExpand}>{takes} takes <ChevronDown size={13} className={expanded ? "rotate-180" : ""} /></button>}
       <span className="w-12 text-right font-mono text-[12px] text-fg-2">{fmtTime(g.duration)}</span>
+      <button className="icon-btn" title="Show this narration's audio file in its folder" aria-label={`Show ${name} in its folder`} disabled={g.status !== "done"} onClick={onReveal}><FolderOpen size={15} /></button>
       <button className="icon-btn" title="Delete" aria-label={`Delete ${name}`} onClick={onDelete}><Trash2 size={15} /></button>
     </div>
   );
