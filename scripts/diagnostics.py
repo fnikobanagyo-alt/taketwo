@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Print VoiceForge's bounded diagnostic snapshot without changing runtime state."""
+"""Print TakeTwo's bounded diagnostic snapshot without changing runtime state."""
 import json
 from pathlib import Path
 import urllib.error
@@ -9,7 +9,7 @@ import urllib.request
 
 def main():
     try:
-        discovery = Path.home() / 'Library/Application Support/VoiceForge/engine.json'
+        discovery = Path.home() / 'Library/Application Support/TakeTwo/engine.json'
         url = json.loads(discovery.read_text())['url']
         parsed = urllib.parse.urlsplit(url)
         if parsed.scheme != 'http' or parsed.hostname not in ('127.0.0.1', 'localhost', '::1'):

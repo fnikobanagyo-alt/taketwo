@@ -46,7 +46,7 @@ function VoiceList() {
     finally { setUpBusy(false); }
   };
   const removeVoice = async (p: Profile) => {
-    if (!confirm(`Delete "${p.name}"?\n\nThis removes the voice and its recordings from VoiceForge. Narrations you already made stay in History.`)) return;
+    if (!confirm(`Delete "${p.name}"?\n\nThis removes the voice and its recordings from TakeTwo. Narrations you already made stay in History.`)) return;
     await api.deleteProfile(p.id);
     toast(`Deleted ${p.name}`);
     setPoke((n) => n + 1);
@@ -176,7 +176,7 @@ function NewVoice() {
   return (
     <div className="mx-auto max-w-3xl px-10 pb-16 pt-6">
       <button className="btn btn-ghost btn-sm -ml-2 mb-4" onClick={() => go({ page: "voices" })}><ArrowLeft size={14} /> Voices</button>
-      <PageHeader title="Clone a" accent="voice" subtitle="Upload or record 30 seconds to 5 minutes of one person speaking naturally. VoiceForge studies all of it: more clean speech means a sharper fingerprint and better reference clips." />
+      <PageHeader title="Clone a" accent="voice" subtitle="Upload or record 30 seconds to 5 minutes of one person speaking naturally. TakeTwo studies all of it: more clean speech means a sharper fingerprint and better reference clips." />
 
       <div
         onDragOver={(e) => { e.preventDefault(); setDrag(true); }}
@@ -365,7 +365,7 @@ function VoiceDetail({ id }: { id: string }) {
     try { await api.patchProfile(id, x); await load(); toast(msg); } catch (e) { toast((e as Error).message, "error"); }
   };
   const reanalyze = async () => { await api.reanalyze(id, denoise, windowSec); setNonce((n) => n + 1); toast("Re-analyzing voice…", "info"); };
-  const del = async () => { if (confirm(`Delete "${p.name}"?\n\nThis removes the voice and its recordings from VoiceForge. Narrations you already made stay in History. This can't be undone.`)) { await api.deleteProfile(id); toast(`Deleted ${p.name}`); go({ page: "voices" }); } };
+  const del = async () => { if (confirm(`Delete "${p.name}"?\n\nThis removes the voice and its recordings from TakeTwo. Narrations you already made stay in History. This can't be undone.`)) { await api.deleteProfile(id); toast(`Deleted ${p.name}`); go({ page: "voices" }); } };
 
   return (
     <div className="mx-auto max-w-5xl px-10 pb-16 pt-6">

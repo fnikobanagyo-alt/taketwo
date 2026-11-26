@@ -16,7 +16,7 @@ from unittest.mock import patch
 import numpy as np
 
 _data = tempfile.TemporaryDirectory(prefix="voiceforge-quality-tests-")
-os.environ.setdefault("VOICEFORGE_DATA", _data.name)
+os.environ.setdefault("TAKETWO_DATA", _data.name)
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from app import audio as au, config, pipeline  # noqa: E402
 
@@ -236,7 +236,7 @@ class McpTests(unittest.TestCase):
         fastmcp.FastMCP = lambda name: types.SimpleNamespace(tool=lambda: (lambda f: f), run=lambda: None)
         mods = {"mcp": types.ModuleType("mcp"), "mcp.server": types.ModuleType("mcp.server"), "mcp.server.fastmcp": fastmcp}
         with patch.dict(sys.modules, mods):
-            spec = importlib.util.spec_from_file_location("voiceforge_mcp", Path(__file__).resolve().parents[2] / "mcp" / "voiceforge_mcp.py")
+            spec = importlib.util.spec_from_file_location("taketwo_mcp", Path(__file__).resolve().parents[2] / "mcp" / "taketwo_mcp.py")
             self.m = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(self.m)
         self.calls = []

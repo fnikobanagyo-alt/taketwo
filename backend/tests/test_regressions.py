@@ -20,7 +20,7 @@ import soundfile as sf
 
 _data = tempfile.TemporaryDirectory(prefix="voiceforge-regressions-")
 atexit.register(_data.cleanup)
-os.environ["VOICEFORGE_DATA"] = _data.name
+os.environ["TAKETWO_DATA"] = _data.name
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from app import audio as au, config, pipeline, qwen_compat, textproc
 

@@ -107,7 +107,7 @@ export default function SpeechPage({ id }: { id?: string }) {
   if (profiles && !profiles.length)
     return (
       <div className="mx-auto max-w-xl px-10 py-24">
-        <Empty icon={<Mic2 size={22} />} title="Clone a voice first" body="Upload up to 5 minutes of speech and VoiceForge will learn it, or design one from a description."
+        <Empty icon={<Mic2 size={22} />} title="Clone a voice first" body="Upload up to 5 minutes of speech and TakeTwo will learn it, or design one from a description."
           action={<div className="flex gap-2"><button className="btn btn-primary" onClick={() => go({ page: "voices", id: "new" })}>Clone a voice</button><button className="btn btn-secondary" onClick={() => go({ page: "design" })}>Design a voice</button></div>} />
       </div>
     );

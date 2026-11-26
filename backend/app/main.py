@@ -1,4 +1,4 @@
-"""VoiceForge API server."""
+"""TakeTwo (formerly VoiceForge) API server."""
 from __future__ import annotations
 
 import json
@@ -22,7 +22,7 @@ from .config import IDLE_UNLOAD_SECONDS, PIPELINE_VERSION, DESIGNS_DIR, FRONTEND
 
 MAX_SCRIPT_WORDS = 10_000
 
-app = FastAPI(title="VoiceForge", version="2.0.0")
+app = FastAPI(title="TakeTwo", version="2.0.0")
 app.add_middleware(CORSMiddleware, allow_origins=["http://localhost:5173"], allow_methods=["*"], allow_headers=["*"])
 LOCAL_HOSTS = {"127.0.0.1", "localhost", "[::1]"}
 
@@ -38,7 +38,7 @@ async def only_this_computer(request: Request, call_next):
     Origin header (MCP server, curl, other local apps) still work."""
     host, origin = request.headers.get("host", ""), request.headers.get("origin")
     if _host_name(host) not in LOCAL_HOSTS:
-        return JSONResponse({"detail": "VoiceForge only answers this computer."}, 403)
+        return JSONResponse({"detail": "TakeTwo only answers this computer."}, 403)
     if origin and request.method not in ("GET", "HEAD", "OPTIONS") and origin not in (f"http://{host}", "http://localhost:5173"):
         return JSONResponse({"detail": "Requests from other websites are not allowed."}, 403)
     if request.url.path.startswith("/api/") and any(p in (".", "..") for p in re.split(r"[/\\\\]", request.scope["path"])):
@@ -74,7 +74,8 @@ def _release_models() -> None:
 
 worker.on_idle(_release_models, IDLE_UNLOAD_SECONDS)
 
-ENGINE_FILE = Path.home() / "Library" / "Application Support" / "VoiceForge" / "engine.json"
+# Written under both names while other apps still look for VoiceForge.
+ENGINE_FILES = [Path.home() / "Library" / "Application Support" / n / "engine.json" for n in ("TakeTwo", "VoiceForge")]
 
 
 def _publish_address() -> None:
@@ -90,11 +91,13 @@ def _publish_address() -> None:
     if not 8766 <= port <= 8785:
         return  # dev or preview engines (e.g. 8790) must not redirect other apps away from the desktop app
     url = f"http://{host}:{port}"
-    try:
-        ENGINE_FILE.parent.mkdir(parents=True, exist_ok=True)
-        ENGINE_FILE.write_text(json.dumps({"url": url, "pid": os.getpid(), "started": time.time()}))
-    except OSError:
-        pass  # discovery falls back to scanning the port range
+    info = json.dumps({"url": url, "pid": os.getpid(), "started": time.time()})
+    for f in ENGINE_FILES:
+        try:
+            f.parent.mkdir(parents=True, exist_ok=True)
+            f.write_text(info)
+        except OSError:
+            pass  # discovery falls back to scanning the port range
 
 
 _publish_address()
@@ -130,7 +133,7 @@ def _404(what="Not found"):
 
 @app.get("/api/health")
 def health():
-    return {"ok": True, "loaded_engine": engines._loaded["id"]}
+    return {"ok": True, "name": "TakeTwo", "formerly": "VoiceForge", "loaded_engine": engines._loaded["id"]}
 
 
 # Same voice and same script while it is queued or rendering: the second copy is refused.
@@ -310,7 +313,7 @@ def upgrade():
         _upgrade.update(status="running", message="Upgrading mlx-audio…")
         try:
             v = catalog.upgrade_library()
-            _upgrade.update(status="done", message=f"Installed mlx-audio {v}. Restart VoiceForge to use it.")
+            _upgrade.update(status="done", message=f"Installed mlx-audio {v}. Restart TakeTwo to use it.")
         except Exception as e:  # noqa: BLE001
             _upgrade.update(status="error", message=str(e))
 
@@ -565,21 +568,21 @@ def refresh_profile(pid: str):
 
 @app.get("/api/integrations")
 def integrations():
-    """Is the VoiceForge MCP server registered in Claude Desktop and Claude Code? (read-only)"""
+    """Is the TakeTwo MCP server registered in Claude Desktop and Claude Code? (read-only)"""
     import shlex
 
     home = Path.home()
-    script = Path(__file__).resolve().parents[2] / "mcp" / "voiceforge_mcp.py"
+    script = Path(__file__).resolve().parents[2] / "mcp" / "taketwo_mcp.py"
     uv = shutil.which("uv") or str(home / ".local" / "bin" / "uv")
 
     def registered(cfg: Path) -> bool:
         try:
-            return "voiceforge" in (json.loads(cfg.read_text()).get("mcpServers") or {})
+            return bool({"taketwo", "voiceforge"} & set(json.loads(cfg.read_text()).get("mcpServers") or {}))
         except (OSError, ValueError):
             return False
 
     desktop_cfg = home / "Library" / "Application Support" / "Claude" / "claude_desktop_config.json"
-    desktop_snippet = json.dumps({"mcpServers": {"voiceforge": {"command": uv, "args": ["run", "--script", str(script)]}}}, indent=2)
+    desktop_snippet = json.dumps({"mcpServers": {"taketwo": {"command": uv, "args": ["run", "--script", str(script)]}}}, indent=2)
     return {
         "script_found": script.exists(),
         "apps": [
@@ -588,7 +591,7 @@ def integrations():
              "setup": desktop_snippet},
             {"id": "claude-code", "name": "Claude Code", "connected": registered(home / ".claude.json"),
              "how": "Run this once in Terminal, then start a new Claude Code session.",
-             "setup": f"claude mcp add --scope user voiceforge -- uv run --script {shlex.quote(str(script))}"},
+             "setup": f"claude mcp add --scope user taketwo -- uv run --script {shlex.quote(str(script))}"},
         ],
     }
 
@@ -690,7 +693,7 @@ def create_generation(req: GenRequest, request: Request = None):
             g = pipeline.create_generation(p, req.text, engine, req.language or p.get("language") or "en", req.params, s, req.speed, req.voice_settings)
         except ValueError as e:
             raise HTTPException(400, str(e))
-        if request and request.headers.get("X-VoiceForge-Client") == "mcp":
+        if request and "mcp" in (request.headers.get("X-TakeTwo-Client"), request.headers.get("X-VoiceForge-Client")):
             job = _submit_generation(g["id"], source="mcp")
         else:
             job = _submit_generation(g["id"])

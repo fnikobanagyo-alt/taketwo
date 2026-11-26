@@ -32,7 +32,7 @@ export default function HomePage() {
       <div className="relative mb-10 overflow-hidden rounded-3xl border border-line bg-surface px-10 py-12">
         <div className="pointer-events-none absolute inset-0" style={{ background: "radial-gradient(600px 420px at 88% 18%, rgba(255,150,70,.22), rgba(228,72,110,.08) 45%, transparent 75%)" }} />
         <div className="relative">
-          <div className="eyebrow">VoiceForge Studio</div>
+          <div className="eyebrow">TakeTwo Studio</div>
           <h1 className="display mt-3 text-[56px] leading-[1.02]">
             {greeting()}.<br /><em className="ember-text">What should we voice today?</em>
           </h1>

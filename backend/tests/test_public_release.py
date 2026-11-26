@@ -12,14 +12,14 @@ from pathlib import Path
 from unittest.mock import patch
 
 _data = tempfile.TemporaryDirectory(prefix="voiceforge-release-tests-")
-os.environ.setdefault("VOICEFORGE_DATA", _data.name)
+os.environ.setdefault("TAKETWO_DATA", _data.name)
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "backend"))
 from fastapi.testclient import TestClient  # noqa: E402
 from app import catalog, config, db, main  # noqa: E402
 
 if not config.DATA_DIR.resolve().is_relative_to(Path(tempfile.gettempdir()).resolve()):
-    raise unittest.SkipTest("VOICEFORGE_DATA points at a real library; these tests write and delete files")
+    raise unittest.SkipTest("TAKETWO_DATA points at a real library; these tests write and delete files")
 
 LOCAL = "http://127.0.0.1:8766"
 
@@ -46,6 +46,22 @@ class LibraryCannotBeEscapedTests(unittest.TestCase):
                 with self.assertRaises(main.HTTPException):
                     fn(bad)
         self.assertTrue(self.canary.exists())
+
+
+class FormerNameTests(unittest.TestCase):
+    def test_health_names_taketwo_and_its_former_name(self):
+        r = TestClient(main.app, base_url=LOCAL).get("/api/health").json()
+        self.assertEqual((r["name"], r["formerly"]), ("TakeTwo", "VoiceForge"))
+
+    def test_address_file_is_written_under_both_names(self):
+        self.assertEqual([f.parent.name for f in main.ENGINE_FILES], ["TakeTwo", "VoiceForge"])
+
+    def test_old_data_variable_still_works(self):
+        with patch.dict(os.environ, {"VOICEFORGE_DATA": "/old"}, clear=False):
+            os.environ.pop("TAKETWO_DATA", None)
+            self.assertEqual(config._env("DATA", "x"), "/old")
+            os.environ["TAKETWO_DATA"] = "/new"
+            self.assertEqual(config._env("DATA", "x"), "/new")
 
 
 class OnlyThisComputerTests(unittest.TestCase):

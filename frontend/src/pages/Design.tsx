@@ -44,7 +44,7 @@ export default function DesignPage() {
 
   return (
     <div className="mx-auto max-w-4xl px-10 pb-16 pt-6">
-      <PageHeader title="Voice" accent="design" subtitle="Describe a voice that doesn't exist yet: age, tone, accent, pace, mood. VoiceForge creates several takes; keep the one you like as a reusable voice." />
+      <PageHeader title="Voice" accent="design" subtitle="Describe a voice that doesn't exist yet: age, tone, accent, pace, mood. TakeTwo creates several takes; keep the one you like as a reusable voice." />
 
       <div className="card p-6">
         <label className="label">Describe the voice</label>

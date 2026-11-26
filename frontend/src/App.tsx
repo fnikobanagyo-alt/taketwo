@@ -64,7 +64,7 @@ export default function App() {
 function DownloadToasts() {
   const toast = useToast();
   useEffect(() => {
-    const f = (e: Event) => toast(<span>Saved <b>{(e as CustomEvent).detail}</b> to Downloads › VoiceForge</span>);
+    const f = (e: Event) => toast(<span>Saved <b>{(e as CustomEvent).detail}</b> to Downloads › TakeTwo</span>);
     window.addEventListener("vf-downloaded", f);
     return () => window.removeEventListener("vf-downloaded", f);
   }, [toast]);
@@ -113,7 +113,7 @@ function Sidebar({ route }: { route: Route }) {
           <AudioLines size={17} strokeWidth={2.4} className="text-[#1a0f07]" />
         </div>
         <div className="leading-tight">
-          <div className="text-[15px] font-semibold tracking-tight">VoiceForge</div>
+          <div className="text-[15px] font-semibold tracking-tight">TakeTwo</div>
           <div className="display text-[12.5px] italic text-fg-3">studio</div>
         </div>
       </div>
@@ -189,7 +189,7 @@ function EngineStatus() {
       {busy?.title && <div className="mt-1.5 truncate text-[12px] font-medium text-fg-2">{busy.title}</div>}
       {busy && <Progress value={busy.progress} className="mt-2" />}
       <div className="mt-1.5 truncate text-[11.5px] text-fg-3">
-        {s === null ? "Start VoiceForge to reconnect" : busy ? busy.message : s.loaded_engine ? `${s.loaded_engine} in memory` : "On-device · private"}
+        {s === null ? "Start TakeTwo to reconnect" : busy ? busy.message : s.loaded_engine ? `${s.loaded_engine} in memory` : "On-device · private"}
       </div>
       {(s?.duplicates ?? []).map((d) => (
         <div key={d.gid} className="mt-2 flex items-start gap-2 rounded-lg bg-accent-soft px-2.5 py-2 text-[11.5px] text-fg-2">

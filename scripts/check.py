@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run VoiceForge's release checks against a disposable library."""
+"""Run TakeTwo's release checks against a disposable library."""
 import argparse
 import os
 from pathlib import Path
@@ -23,7 +23,7 @@ def main():
     env = os.environ.copy()
     env.pop('ELECTRON_RUN_AS_NODE', None)
     with tempfile.TemporaryDirectory(prefix='voiceforge-check-') as data:
-        env['VOICEFORGE_DATA'] = data
+        env['TAKETWO_DATA'] = env['VOICEFORGE_DATA'] = data
         commands = [([npm, 'exec', '--no', '--', 'tsc', '--version'], ROOT / 'frontend')]
         if not args.preflight:
             commands += [([str(python), '-B', '-m', 'unittest', 'discover', '-s', 'backend/tests'], ROOT),

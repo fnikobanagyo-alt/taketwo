@@ -16,7 +16,7 @@ HF_API = "https://huggingface.co/api/models"
 
 
 def _get(url: str):
-    req = urllib.request.Request(url, headers={"User-Agent": "voiceforge"})
+    req = urllib.request.Request(url, headers={"User-Agent": "taketwo"})
     with urllib.request.urlopen(req, timeout=15) as r:
         return json.loads(r.read())
 

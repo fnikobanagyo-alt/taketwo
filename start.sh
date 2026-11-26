@@ -1,18 +1,18 @@
 #!/bin/zsh
-# VoiceForge launcher: checks this Mac, sets up on first run, then starts at the first free port from 8766 (up to 8785).
+# TakeTwo (formerly VoiceForge) launcher: checks this Mac, sets up on first run, then starts at the first free port from 8766 (up to 8785).
 #   ./start.sh             set up if needed and open the app
 #   ./start.sh --no-open   the same, without opening the browser
 #   ./start.sh --check     only check the requirements
 #   ./start.sh --setup     only set up (used before building the desktop app)
 set -e
 cd "$(dirname "$0")"
-export PATH="${VOICEFORGE_PATH:-$HOME/.local/bin:/opt/homebrew/bin:/usr/local/bin:$PATH}"
-fail() { echo "VoiceForge can't start: $1" >&2; exit 1 }
+export PATH="${TAKETWO_PATH:-${VOICEFORGE_PATH:-$HOME/.local/bin:/opt/homebrew/bin:/usr/local/bin:$PATH}}"
+fail() { echo "TakeTwo can't start: $1" >&2; exit 1 }
 
 # --- requirements, before anything is downloaded
 [[ "$(uname -s)" == Darwin && "$(uname -m)" == arm64 ]] || fail "it needs a Mac with Apple Silicon (M1 or newer)."
 (( $(sw_vers -productVersion | cut -d. -f1) >= 14 )) || fail "it needs macOS 14 or newer."
-PY=$(command -v python3.11) || fail "Python 3.11 is missing. Run: brew install python@3.11"  # the version VoiceForge is tested with
+PY=$(command -v python3.11) || fail "Python 3.11 is missing. Run: brew install python@3.11"  # the version TakeTwo is tested with
 { command -v ffmpeg && command -v ffprobe } >/dev/null || fail "ffmpeg is missing. Run: brew install ffmpeg"
 { command -v node && command -v npm } >/dev/null || fail "Node.js is missing. Run: brew install node"
 NODE=(${(s:.:)$(node --version | tr -d v)})
@@ -38,13 +38,14 @@ if [[ ! -f frontend/dist/index.html || -n "$(find frontend/src frontend/index.ht
 fi
 [[ "$1" == "--setup" ]] && { echo "Setup finished."; exit 0 }
 
-if [[ -z "$VOICEFORGE_PORT" ]]; then
+TAKETWO_PORT=${TAKETWO_PORT:-$VOICEFORGE_PORT}
+if [[ -z "$TAKETWO_PORT" ]]; then
   for p in {8766..8785}; do
-    lsof -nP -iTCP:$p -sTCP:LISTEN >/dev/null 2>&1 || { VOICEFORGE_PORT=$p; break; }
+    lsof -nP -iTCP:$p -sTCP:LISTEN >/dev/null 2>&1 || { TAKETWO_PORT=$p; break; }
   done
 fi
-PORT=${VOICEFORGE_PORT:?No free port from 8766 to 8785}
-echo "VoiceForge: http://127.0.0.1:$PORT (the first start takes up to a minute)"
+PORT=${TAKETWO_PORT:?No free port from 8766 to 8785}
+echo "TakeTwo: http://127.0.0.1:$PORT (the first start takes up to a minute)"
 cd backend
 if [[ "$1" != "--no-open" ]]; then
   (for i in {1..120}; do curl -s -m 1 "http://127.0.0.1:$PORT/api/health" >/dev/null && { open "http://127.0.0.1:$PORT"; break; }; sleep 1; done) &

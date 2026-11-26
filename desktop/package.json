@@ -1,8 +1,8 @@
 {
-  "name": "voiceforge-desktop",
-  "productName": "VoiceForge",
+  "name": "taketwo-desktop",
+  "productName": "TakeTwo",
   "version": "2.0.0",
-  "description": "VoiceForge Studio - local voice cloning",
+  "description": "TakeTwo (formerly VoiceForge) - local voice cloning",
   "main": "main.js",
   "private": true,
   "scripts": {
@@ -13,7 +13,7 @@
   },
   "build": {
     "appId": "studio.voiceforge.app",
-    "productName": "VoiceForge",
+    "productName": "TakeTwo",
     "directories": {
       "output": "dist",
       "buildResources": "build"
@@ -30,7 +30,7 @@
       "identity": null,
       "darkModeSupport": true,
       "extendInfo": {
-        "NSMicrophoneUsageDescription": "VoiceForge records voice samples to clone voices."
+        "NSMicrophoneUsageDescription": "TakeTwo records voice samples to clone voices."
       }
     }
   },

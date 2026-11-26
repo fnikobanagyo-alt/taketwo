@@ -1,4 +1,6 @@
-# VoiceForge
+# TakeTwo
+
+_Formerly called VoiceForge._
 
 A private voice-cloning studio that runs entirely on your Mac. It focuses on one thing: long narration
 that sounds like the cloned voice, with every part checked for dropouts, cut-off endings and wrong words.
@@ -22,8 +24,8 @@ brew install python@3.11 ffmpeg node
 ## Install and start
 
 ```bash
-git clone https://github.com/fnikobanagyo-alt/voiceforge.git
-cd voiceforge
+git clone https://github.com/fnikobanagyo-alt/taketwo.git
+cd taketwo
 ./start.sh
 ```
 
@@ -35,7 +37,7 @@ pick up updates after `git pull`. To check the requirements without installing a
 ```bash
 ./start.sh --setup
 cd desktop && npm ci && npm run dist
-ditto dist/mac-arm64/VoiceForge.app /Applications/VoiceForge.app
+ditto dist/mac-arm64/TakeTwo.app /Applications/TakeTwo.app
 ```
 
 ## Your first narration
@@ -61,7 +63,7 @@ ditto dist/mac-arm64/VoiceForge.app /Applications/VoiceForge.app
 | Fish Audio S2 Pro | Expressive, **non-commercial** licence |
 | OmniVoice | Fixed length, Apache-2.0 |
 
-Model licences are separate from VoiceForge's. Check the model's page before commercial use.
+Model licences are separate from TakeTwo's. Check the model's page before commercial use.
 
 ## Privacy and safety
 - Voices, scripts and audio stay in `data/` on your Mac. Nothing is uploaded. Model downloads and the Models
@@ -76,20 +78,20 @@ Model licences are separate from VoiceForge's. Check the model's page before com
 | "can't start: … is missing" | Run the command it shows, then `./start.sh` again |
 | Install stopped halfway | Run `./start.sh` again; it finishes the job |
 | A model download stalls | Press Download again on the Models page; it resumes |
-| Very slow rendering | Close memory-hungry apps. VoiceForge frees its models after 5 idle minutes |
+| Very slow rendering | Close memory-hungry apps. TakeTwo frees its models after 5 idle minutes |
 | Old settings cause trouble | A damaged file is moved to `data/settings.json.broken` and defaults are used |
-| Anything else | Desktop app log: `~/Library/Logs/VoiceForge/engine.log` |
+| Anything else | Desktop app log: `~/Library/Logs/TakeTwo/engine.log` |
 
 ## Use it from Claude or your own tools
 MCP server (needs [uv](https://docs.astral.sh/uv/)):
 
 ```bash
-claude mcp add --scope user voiceforge -- uv run --script "$PWD/mcp/voiceforge_mcp.py"
+claude mcp add --scope user taketwo -- uv run --script "$PWD/mcp/taketwo_mcp.py"
 ```
 
 Tools: `list_voices`, `generate_narration`, `get_status`, `get_timings`, `get_audio`.
 
-HTTP: read `~/Library/Application Support/VoiceForge/engine.json` for the address; API docs are at `<address>/docs`.
+HTTP: read `~/Library/Application Support/TakeTwo/engine.json` for the address; API docs are at `<address>/docs`.
 `GET /api/generations/<id>` returns `status`, plus `outcome` (`clean` or `needs_listen`) and `review` (each doubtful
 part with its text and reasons) once it's done.
 
@@ -98,8 +100,8 @@ part with its text and reasons) once it's done.
 backend/.venv/bin/python -B scripts/check.py     # backend tests and interface build, on temporary data
 cd frontend && npm run dev                       # live interface, with the engine running
 ```
-`backend/` is FastAPI and MLX, `frontend/` is React, `desktop/` is the Electron shell. `VOICEFORGE_DATA` points to
-another library and `VOICEFORGE_PORT` forces a port.
+`backend/` is FastAPI and MLX, `frontend/` is React, `desktop/` is the Electron shell. `TAKETWO_DATA` points to
+another library and `TAKETWO_PORT` forces a port (the old `VOICEFORGE_` names still work).
 
 ## Licence
 [Apache-2.0](LICENSE). Not affiliated with the model authors.

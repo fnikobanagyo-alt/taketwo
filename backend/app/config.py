@@ -10,7 +10,11 @@ os.environ.setdefault("HF_HUB_ETAG_TIMEOUT", "15")
 os.environ.setdefault("HF_HUB_DISABLE_TELEMETRY", "1")
 
 ROOT = Path(__file__).resolve().parents[2]
-DATA_DIR = Path(os.environ.get("VOICEFORGE_DATA", ROOT / "data"))
+def _env(name: str, default: str | Path):  # TAKETWO_* wins; VOICEFORGE_* still works (former name)
+    return os.environ.get(f"TAKETWO_{name}") or os.environ.get(f"VOICEFORGE_{name}") or default
+
+
+DATA_DIR = Path(_env("DATA", ROOT / "data"))
 PROFILES_DIR = DATA_DIR / "profiles"
 GENERATIONS_DIR = DATA_DIR / "generations"
 DESIGNS_DIR = DATA_DIR / "designs"
@@ -37,7 +41,7 @@ STT_PROCESSOR_REPO = "openai/whisper-large-v3-turbo"
 VOICE_ENCODER_REPO = "ResembleAI/chatterbox"  # only ve.safetensors (5.7 MB) is fetched
 
 # Release the voice and speech-recognition models after this many idle seconds (0 = keep them loaded).
-IDLE_UNLOAD_SECONDS = float(os.environ.get("VOICEFORGE_IDLE_UNLOAD_S", "300"))
+IDLE_UNLOAD_SECONDS = float(_env("IDLE_UNLOAD_S", "300"))
 
 DEFAULT_SETTINGS = {
     "default_engine": "qwen3-tts-1.7b",

@@ -1,4 +1,4 @@
-// VoiceForge desktop shell: owns the window, starts/stops the local engine.
+// TakeTwo (formerly VoiceForge) desktop shell: owns the window, starts/stops the local engine.
 const { app, BrowserWindow, Menu, dialog, nativeTheme, session, shell, systemPreferences } = require("electron");
 const { spawn } = require("child_process");
 const fs = require("fs");
@@ -12,8 +12,8 @@ const PREFERRED_PORT = 8766;
 let PORT = PREFERRED_PORT;
 let ORIGIN = `http://127.0.0.1:${PORT}`;
 const CONFIG = JSON.parse(fs.readFileSync(path.join(__dirname, "config.json"), "utf8"));
-const ROOT = CONFIG.root; // the voiceforge project folder (backend, frontend, data)
-const LOG_DIR = path.join(os.homedir(), "Library", "Logs", "VoiceForge");
+const ROOT = CONFIG.root; // the project folder (backend, frontend, data)
+const LOG_DIR = path.join(os.homedir(), "Library", "Logs", "TakeTwo");
 
 let win = null;
 let server = null; // child process we started (null if we attached to a running one)
@@ -45,10 +45,10 @@ function portFree(port) {
 
 async function choosePort() {
   for (let p = PREFERRED_PORT; p < PREFERRED_PORT + 20; p++) if (await portFree(p)) return p;
-  throw new Error("No free local port from 8766 to 8785. Close other local servers, then start VoiceForge again.");
+  throw new Error("No free local port from 8766 to 8785. Close other local servers, then start TakeTwo again.");
 }
 
-// Only VoiceForge's own engine counts: another server answering 200 on the same port must not pass.
+// Only TakeTwo's own engine counts: another server answering 200 on the same port must not pass.
 async function engineUp() {
   const r = await get("/api/health");
   return r.ok && r.json?.ok === true;
@@ -74,7 +74,7 @@ function startServer() {
   });
   server.on("exit", (code) => {
     server = null;
-    if (!quitting) splash(`The engine stopped unexpectedly (code ${code}). See ~/Library/Logs/VoiceForge/engine.log`, true);
+    if (!quitting) splash(`The engine stopped unexpectedly (code ${code}). See ~/Library/Logs/TakeTwo/engine.log`, true);
   });
 }
 
@@ -94,7 +94,7 @@ async function boot() {
       if (i === 40) splash("Almost there…");
     }
   }
-  if (!up) return splash("The engine didn't start. See ~/Library/Logs/VoiceForge/engine.log", true);
+  if (!up) return splash("The engine didn't start. See ~/Library/Logs/TakeTwo/engine.log", true);
   await win.loadURL(`${ORIGIN}/#/home`);
 }
 
@@ -103,7 +103,7 @@ function createWindow() {
     width: 1440, height: 920, minWidth: 1100, minHeight: 700,
     titleBarStyle: "hiddenInset", trafficLightPosition: { x: 18, y: 18 },
     vibrancy: "sidebar", visualEffectState: "followWindow", backgroundColor: "#00000000", transparent: false,
-    show: false, title: "VoiceForge",
+    show: false, title: "TakeTwo",
     webPreferences: { preload: path.join(__dirname, "preload.js"), contextIsolation: true, sandbox: true, spellcheck: true },
   });
   win.loadFile(path.join(__dirname, "splash.html"));
@@ -129,7 +129,7 @@ async function confirmQuit() {
   const { response } = await dialog.showMessageBox(win, {
     type: "warning", buttons: ["Quit", "Keep working"], defaultId: 1, cancelId: 1,
     message: "A job is still running",
-    detail: `${r.label}: ${r.message || ""}\n\nIf you quit now it pauses. Open VoiceForge again and press Resume in History to finish it.`,
+    detail: `${r.label}: ${r.message || ""}\n\nIf you quit now it pauses. Open TakeTwo again and press Resume in History to finish it.`,
   });
   return response === 0;
 }
@@ -164,9 +164,9 @@ app.whenReady().then(async () => {
   session.defaultSession.setPermissionRequestHandler((wc, perm, cb) => cb(perm === "media" && wc.getURL().startsWith(ORIGIN)));
   session.defaultSession.setPermissionCheckHandler((wc, perm, origin) => perm === "media" && (origin || "").startsWith(ORIGIN));
   if (systemPreferences.getMediaAccessStatus("microphone") === "not-determined") systemPreferences.askForMediaAccess("microphone").catch(() => {});
-  // Downloads go straight to ~/Downloads/VoiceForge and are revealed (highlighted) in Finder.
+  // Downloads go straight to ~/Downloads/TakeTwo and are revealed (highlighted) in Finder.
   session.defaultSession.on("will-download", (_e, item) => {
-    const dir = path.join(app.getPath("downloads"), "VoiceForge");
+    const dir = path.join(app.getPath("downloads"), "TakeTwo");
     fs.mkdirSync(dir, { recursive: true });
     const ext = path.extname(item.getFilename());
     const base = path.basename(item.getFilename(), ext);

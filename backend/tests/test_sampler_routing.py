@@ -10,7 +10,7 @@ from unittest.mock import patch
 import numpy as np
 
 _data = tempfile.TemporaryDirectory(prefix="vf-sampler-tests-")
-os.environ.setdefault("VOICEFORGE_DATA", _data.name)
+os.environ.setdefault("TAKETWO_DATA", _data.name)
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from app import engines, qwen_compat
 

@@ -17,7 +17,7 @@ import numpy as np
 import soundfile as sf
 
 _data = tempfile.TemporaryDirectory(prefix="voiceforge-audit-tests-")
-os.environ.setdefault("VOICEFORGE_DATA", _data.name)
+os.environ.setdefault("TAKETWO_DATA", _data.name)
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from app import audio as au, config, db, delivery, engines, main, pipeline, reference, studio, textproc, tools  # noqa: E402
 
@@ -680,7 +680,7 @@ class IntegrationsTests(unittest.TestCase):
             (home / ".claude.json").write_text("not json")  # a broken file reads as not set up
             r = main.integrations()
         self.assertEqual([a["connected"] for a in r["apps"]], [True, False])
-        self.assertIn("claude mcp add --scope user voiceforge", r["apps"][1]["setup"])
+        self.assertIn("claude mcp add --scope user taketwo", r["apps"][1]["setup"])
 
 
 class RecordingScopeTests(unittest.TestCase):

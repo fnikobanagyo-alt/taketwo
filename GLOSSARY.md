@@ -1,8 +1,12 @@
-# VoiceForge
+# TakeTwo
 
-A local app that clones a voice and reads long scripts aloud in it.
+A local app that clones a voice and reads long scripts aloud in it. Formerly called VoiceForge.
 
 ## Language
+
+**TakeTwo**:
+This app: the voice-cloning narration studio, on Mac and Windows.
+_Avoid_: VoiceForge (its former name)
 
 **Narration**:
 One script read aloud in one voice, with its finished audio. It holds the lasting outcome of the work done on it.

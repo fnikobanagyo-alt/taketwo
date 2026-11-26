@@ -85,7 +85,7 @@ export default function SettingsPage() {
 
       <ConnectApps />
 
-      <p className="mt-10 text-center text-[12px] text-fg-3">VoiceForge 2.0 · everything runs on this Mac · your voices never leave it</p>
+      <p className="mt-10 text-center text-[12px] text-fg-3">TakeTwo 2.0 (formerly VoiceForge) · everything runs on this Mac · your voices never leave it</p>
     </div>
   );
 }
@@ -97,7 +97,7 @@ function ConnectApps() {
   useEffect(() => { api.integrations().then(setData).catch(() => setData(null)); }, []);
   if (!data) return null;
   return (
-    <Section title="Connect to AI apps" note="Lets Claude list your voices and make narrations through VoiceForge (MCP). Everything stays on this Mac.">
+    <Section title="Connect to AI apps" note="Lets Claude list your voices and make narrations through TakeTwo (MCP). Everything stays on this Mac.">
       {data.apps.map((a) => (
         <div key={a.id} className="px-5 py-4">
           <div className="flex items-center justify-between gap-4">
@@ -123,7 +123,7 @@ function ConnectApps() {
           )}
         </div>
       ))}
-      {!data.script_found && <div className="px-5 py-3 text-[12px] text-warn">The MCP server file (voiceforge/mcp/voiceforge_mcp.py) is missing.</div>}
+      {!data.script_found && <div className="px-5 py-3 text-[12px] text-warn">The MCP server file (mcp/taketwo_mcp.py) is missing.</div>}
     </Section>
   );
 }

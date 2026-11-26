@@ -1,4 +1,4 @@
-// VoiceForge signature: every voice gets its own "ember orb", a deterministic
+// TakeTwo signature: every voice gets its own "ember orb", a deterministic
 // gradient derived from the voice id. It breathes and spins while that voice speaks.
 
 function hash(s: string) {

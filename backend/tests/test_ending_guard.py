@@ -13,7 +13,7 @@ import numpy as np
 import soundfile as sf
 
 _data = tempfile.TemporaryDirectory(prefix="vf-end-guard-")
-os.environ.setdefault("VOICEFORGE_DATA", _data.name)
+os.environ.setdefault("TAKETWO_DATA", _data.name)
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from app import config, ending_guard as guard, pipeline
 
