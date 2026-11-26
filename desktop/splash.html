@@ -4,30 +4,35 @@
 <meta charset="utf-8" />
 <title>TakeTwo</title>
 <style>
-  :root { color-scheme: light dark; --bg: #fbf9f6; --fg: #1b1815; --fg2: #8a8178; }
-  @media (prefers-color-scheme: dark) { :root { --bg: #0b0a09; --fg: #f5f0ea; --fg2: #7b736a; } }
+  :root { color-scheme: light dark; --bg: #fbf9f6; --fg: #1b1815; --fg2: #736b62; }
+  @media (prefers-color-scheme: dark) { :root { --bg: #0b0a09; --fg: #f5f0ea; --fg2: #9a9187; } }
   html, body { height: 100%; margin: 0; }
   body {
     background: var(--bg); color: var(--fg); -webkit-app-region: drag; overflow: hidden;
     font: 13px -apple-system, BlinkMacSystemFont, "Inter", sans-serif; display: flex; align-items: center; justify-content: center;
   }
   .wrap { text-align: center; }
-  .orb { position: relative; width: 120px; height: 120px; margin: 0 auto 34px; border-radius: 50%; overflow: hidden;
-    box-shadow: 0 0 90px -10px rgba(255, 120, 50, .65); animation: breathe 2.2s ease-in-out infinite; }
-  .orb::before { content: ""; position: absolute; inset: -25%; filter: blur(16px);
-    background: conic-gradient(from 0deg, #ffc061, #ff7a2f, #e4486e, #ffb347, #ffc061); animation: spin 3.2s linear infinite; }
-  .orb::after { content: ""; position: absolute; inset: 0; background: radial-gradient(circle at 32% 28%, rgba(255,255,255,.75), transparent 42%); }
-  h1 { font: italic 400 44px "Instrument Serif", "New York", Georgia, serif; margin: 0; letter-spacing: -.01em; }
+  .mark { display: block; width: 96px; height: 96px; margin: 0 auto 30px; border-radius: 26px;
+    box-shadow: 0 14px 34px -12px rgba(20, 12, 6, .45); animation: breathe 2.2s ease-in-out infinite; }
+  .mark .hot { animation: pulse 1.4s ease-in-out infinite; transform-origin: 50% 50%; transform-box: fill-box; }
+  h1 { font: 600 40px -apple-system, BlinkMacSystemFont, sans-serif; margin: 0; letter-spacing: -.03em; }
+  h1 em { font: italic 400 46px "New York", Georgia, serif; letter-spacing: 0; }
+  @keyframes pulse { 50% { transform: scaleY(.7); } }
+  @media (prefers-reduced-motion: reduce) { .mark, .mark .hot { animation: none; } }
   #s { margin-top: 12px; color: var(--fg2); min-height: 18px; }
   #s.err { color: #ff6b6b; max-width: 440px; margin-left: auto; margin-right: auto; line-height: 1.5; -webkit-app-region: no-drag; user-select: text; }
-  @keyframes spin { to { transform: rotate(360deg); } }
   @keyframes breathe { 50% { transform: scale(1.05); } }
 </style>
 </head>
 <body>
   <div class="wrap">
-    <div class="orb"></div>
-    <h1>TakeTwo</h1>
+    <svg class="mark" viewBox="0 0 40 40" aria-hidden="true">
+      <defs><linearGradient id="e" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffc061"/><stop offset=".48" stop-color="#ff7a2f"/><stop offset="1" stop-color="#e4486e"/></linearGradient></defs>
+      <rect width="40" height="40" rx="11" fill="#1d1a17"/>
+      <path d="M8 18v4M11.5 14v12M15 16.5v7M18.5 12v16" stroke="#f4efe9" stroke-opacity=".5" stroke-width="2.3" stroke-linecap="round"/>
+      <path class="hot" d="M21.5 12v16M25 15v10M28.5 11v18M32 17v6" stroke="url(#e)" stroke-width="2.3" stroke-linecap="round"/>
+    </svg>
+    <h1 aria-label="TakeTwo">Take<em>two</em></h1>
     <div id="s">Warming up…</div>
   </div>
   <script>

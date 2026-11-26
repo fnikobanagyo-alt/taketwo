@@ -4,6 +4,7 @@ import { api, type Status } from "./api";
 import { PlayerProvider, usePlayer } from "./lib/player";
 import { Progress, ToastProvider, useToast } from "./components/ui";
 import { onThemeChange } from "./lib/theme";
+import { Logo } from "./lib/logo";
 import HomePage from "./pages/Home";
 import SpeechPage from "./pages/Speech";
 import VoicesPage from "./pages/Voices";
@@ -109,13 +110,8 @@ function Sidebar({ route }: { route: Route }) {
   return (
     <aside className="app-sidebar grain relative flex w-[232px] shrink-0 flex-col border-r border-line bg-panel">
       <div className={`drag flex items-center gap-2.5 px-5 ${desktop ? "pb-5 pt-12" : "py-5"}`}>
-        <div className="ember flex h-8 w-8 items-center justify-center rounded-[10px] shadow-[0_4px_14px_-4px_rgba(255,110,50,.6)]">
-          <AudioLines size={17} strokeWidth={2.4} className="text-[#1a0f07]" />
-        </div>
-        <div className="leading-tight">
-          <div className="text-[15px] font-semibold tracking-tight">TakeTwo</div>
-          <div className="display text-[12.5px] italic text-fg-3">studio</div>
-        </div>
+        <Logo size={32} />
+        <div className="wordmark text-[20px] leading-none" aria-label="TakeTwo">Take<em>two</em></div>
       </div>
 
       <button onClick={() => go({ page: "speech" })} className="btn btn-ember ember no-drag mx-4 mb-4 h-10">
