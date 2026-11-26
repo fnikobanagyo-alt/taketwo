@@ -162,7 +162,7 @@ class InstallerTests(unittest.TestCase):
             sys_bin.mkdir()
             for d in ("/usr/bin", "/bin"):
                 for f in Path(d).iterdir():
-                    if f.name not in self.FAKED and not (sys_bin / f.name).exists():
+                    if f.name not in self.FAKED and not os.path.lexists(sys_bin / f.name):  # lexists: Linux has broken links
                         (sys_bin / f.name).symlink_to(f)
             path = f"{bin_dir}:{sys_bin}"
             return subprocess.run([shutil.which("zsh") or "/bin/zsh", "start.sh", "--check"], cwd=t, capture_output=True, text=True, timeout=30,
