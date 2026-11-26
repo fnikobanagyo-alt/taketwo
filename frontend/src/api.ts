@@ -52,10 +52,15 @@ export type Design = {
   id: string; description: string; text: string; language: string; count: number; status: string; error?: string;
   previews: { index: number; file: string; duration: number }[]; job?: Job | null;
 };
+export type UpdateState = {
+  current: string; available: boolean; dismissed: boolean; installed: string | null;
+  check: { checked_at: number; latest: string | null; notes: string; url: string; error: string | null } | null;
+  job: { id: string; status: "queued" | "running" | "done" | "error" | "cancelled"; progress: number; message: string; error?: string | null } | null;
+};
 export type Settings = {
   default_engine: string; max_chunk_chars: number; max_attempts: number; compare_takes: number; max_wer: number; min_speaker_similarity: number;
   max_internal_silence: number; sentence_pause_ms: number; paragraph_pause_ms: number; target_lufs: number; seed: number;
-  pronunciations: { from: string; to: string }[]; strip_citations: boolean;
+  pronunciations: { from: string; to: string }[]; strip_citations: boolean; check_updates: boolean; update_dismissed: string;
 };
 export type Discovered = { repo: string; downloads: number; likes: number; updated: string; architecture: string | null; supported: boolean; added: boolean };
 
@@ -141,6 +146,12 @@ export const api = {
   saveDesign: (id: string, index: number, name: string) => req<Profile>("POST", `/api/designs/${id}/save`, { index, name }),
 
   settings: () => req<Settings>("GET", "/api/settings"),
+  update: () => req<UpdateState>("GET", "/api/update"),
+  updateCheck: () => req<UpdateState>("POST", "/api/update/check"),
+  updateStart: () => req<UpdateState>("POST", "/api/update/start"),
+  updateCancel: () => req<UpdateState>("POST", "/api/update/cancel"),
+  updateRestart: () => req<{ restarting: boolean }>("POST", "/api/update/restart"),
+  health: () => req<{ ok: boolean; version: string }>("GET", "/api/health"),
   saveSettings: (patch: Partial<Settings>) => req<Settings>("PUT", "/api/settings", patch),
 };
 

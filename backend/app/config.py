@@ -10,6 +10,7 @@ os.environ.setdefault("HF_HUB_ETAG_TIMEOUT", "15")
 os.environ.setdefault("HF_HUB_DISABLE_TELEMETRY", "1")
 
 ROOT = Path(__file__).resolve().parents[2]
+APP_VERSION = "2.0.0"  # bump with each GitHub Release tag (v2.0.0); the update check compares against it
 def _env(name: str, default: str | Path):  # TAKETWO_* wins; VOICEFORGE_* still works (former name)
     return os.environ.get(f"TAKETWO_{name}") or os.environ.get(f"VOICEFORGE_{name}") or default
 
@@ -61,4 +62,6 @@ DEFAULT_SETTINGS = {
     "pronunciations": [],  # [{"from": "Fimbulwinter", "to": "Fimbul-winter"}]
     "strip_citations": True,
     "custom_engines": [],  # user-added HF repos
+    "check_updates": True,  # ask GitHub once at launch whether a newer release exists
+    "update_dismissed": "",  # version whose notice the user hid
 }

@@ -67,7 +67,8 @@ Model licences are separate from TakeTwo's. Check the model's page before commer
 
 ## Privacy and safety
 - Voices, scripts and audio stay in `data/` on your Mac. Nothing is uploaded. Model downloads and the Models
-  page contact Hugging Face and PyPI.
+  page contact Hugging Face and PyPI. Once at launch TakeTwo asks GitHub whether a newer release exists; turn
+  this off in Settings → Updates. Nothing about you, your voices or your scripts is sent.
 - The engine listens only on this computer and refuses changes from other websites. It has no password, so
   any program already running under your account can use it.
 - Never publish `data/`. Git ignores it, along with audio files.
@@ -81,6 +82,13 @@ Model licences are separate from TakeTwo's. Check the model's page before commer
 | Very slow rendering | Close memory-hungry apps. TakeTwo frees its models after 5 idle minutes |
 | Old settings cause trouble | A damaged file is moved to `data/settings.json.broken` and defaults are used |
 | Anything else | Desktop app log: `~/Library/Logs/TakeTwo/engine.log` |
+
+## Updates
+When a new release is out, a card in the sidebar offers it. **Update** waits for running work to finish, moves
+this copy to the release, reinstalls parts if needed and asks you to restart. Your library is never touched. If
+anything fails it stays on the old version. A copy with its own edits, or one not installed with git, is not
+updated automatically: run `git pull && ./start.sh` yourself. The desktop app's window shell only changes when
+you rebuild it (`cd desktop && npm run dist`).
 
 ## Use it from Claude or your own tools
 MCP server (needs [uv](https://docs.astral.sh/uv/)):
@@ -102,6 +110,9 @@ cd frontend && npm run dev                       # live interface, with the engi
 ```
 `backend/` is FastAPI and MLX, `frontend/` is React, `desktop/` is the Electron shell. `TAKETWO_DATA` points to
 another library and `TAKETWO_PORT` forces a port (the old `VOICEFORGE_` names still work).
+
+Publishing a release: set `APP_VERSION` in `backend/app/config.py`, commit, tag it (`git tag v2.1.0`), push the
+tag, then publish a GitHub Release for that tag. The first line of its notes shows in the update card.
 
 ## Licence
 [Apache-2.0](LICENSE). Not affiliated with the model authors.

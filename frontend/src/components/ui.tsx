@@ -30,8 +30,8 @@ export function Slider({ value, min, max, step, onChange, onCommit }: { value: n
   );
 }
 
-export function Switch({ on, onChange }: { on: boolean; onChange: (v: boolean) => void }) {
-  return <button role="switch" aria-checked={on} className="switch" data-on={on} onClick={() => onChange(!on)} />;
+export function Switch({ on, onChange, label }: { on: boolean; onChange: (v: boolean) => void; label?: string }) {
+  return <button role="switch" aria-checked={on} aria-label={label} className="switch" data-on={on} onClick={() => onChange(!on)} />;
 }
 
 // ------------------------------------------------------------------ select (custom popover)

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Check, Copy, Monitor, Moon, Plus, Sun, Trash2 } from "lucide-react";
-import { api, type Settings } from "../api";
+import { api, type Settings, type UpdateState } from "../api";
 import { getPref, setPref, type ThemePref } from "../lib/theme";
 import { PageHeader, Slider, Switch, useToast } from "../components/ui";
 
@@ -85,8 +85,44 @@ export default function SettingsPage() {
 
       <ConnectApps />
 
-      <p className="mt-10 text-center text-[12px] text-fg-3">TakeTwo 2.0 (formerly VoiceForge) · everything runs on this Mac · your voices never leave it</p>
+      <Updates on={s.check_updates} onChange={(v) => save({ check_updates: v })} />
+
+      <p className="mt-10 text-center text-[12px] text-fg-3">TakeTwo (formerly VoiceForge) · everything runs on this Mac · your voices never leave it</p>
     </div>
+  );
+}
+
+function Updates({ on, onChange }: { on: boolean; onChange: (v: boolean) => void }) {
+  const toast = useToast();
+  const [u, setU] = useState<UpdateState | null>(null);
+  const [checking, setChecking] = useState(false);
+  useEffect(() => { api.update().then(setU).catch(() => setU(null)); }, []);
+  const checkNow = async () => {
+    setChecking(true);
+    try {
+      const s = await api.updateCheck();
+      setU(s);
+      toast(s.available ? `TakeTwo ${s.check?.latest} is available: see the sidebar.` : s.check?.error ? "Couldn't reach GitHub. Try again later." : "You have the latest version.");
+    } catch (e) { toast((e as Error).message); } finally { setChecking(false); }
+  };
+  const when = u?.check ? new Date(u.check.checked_at * 1000).toLocaleString([], { dateStyle: "medium", timeStyle: "short" }) : "not yet";
+  return (
+    <Section title="Updates">
+      <div className="flex items-start justify-between gap-6 px-5 py-4">
+        <div>
+          <div className="text-[13.5px] font-medium">Check for new versions</div>
+          <p className="mt-0.5 max-w-xl text-[12.5px] text-fg-2">Once when TakeTwo opens, it asks GitHub whether a newer release exists. Nothing about you, your voices or your scripts is sent.</p>
+        </div>
+        <Switch on={on} onChange={onChange} label="Check for new versions" />
+      </div>
+      <div className="flex items-center justify-between gap-6 px-5 py-4">
+        <div>
+          <div className="text-[13.5px] font-medium">Version</div>
+          <p className="mt-0.5 text-[12.5px] text-fg-2">TakeTwo {u?.current ?? "…"} · checked {when}</p>
+        </div>
+        <button className="btn btn-secondary btn-sm" disabled={checking} onClick={checkNow}>{checking ? "Checking…" : "Check now"}</button>
+      </div>
+    </Section>
   );
 }
 

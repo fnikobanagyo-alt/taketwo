@@ -15,14 +15,14 @@ from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-from . import catalog, db, engines, pipeline, reference, tools, worker
+from . import catalog, db, engines, pipeline, reference, tools, updates, worker
 from .textproc import clean_text
 from .tools import attachment_header
-from .config import IDLE_UNLOAD_SECONDS, PIPELINE_VERSION, DESIGNS_DIR, FRONTEND_DIST, GENERATIONS_DIR, MAX_REFERENCE_SECONDS, PROFILES_DIR, TRANSCRIPTS_DIR
+from .config import APP_VERSION, IDLE_UNLOAD_SECONDS, PIPELINE_VERSION, DESIGNS_DIR, FRONTEND_DIST, GENERATIONS_DIR, MAX_REFERENCE_SECONDS, PROFILES_DIR, TRANSCRIPTS_DIR
 
 MAX_SCRIPT_WORDS = 10_000
 
-app = FastAPI(title="TakeTwo", version="2.0.0")
+app = FastAPI(title="TakeTwo", version=APP_VERSION)
 app.add_middleware(CORSMiddleware, allow_origins=["http://localhost:5173"], allow_methods=["*"], allow_headers=["*"])
 LOCAL_HOSTS = {"127.0.0.1", "localhost", "[::1]"}
 
@@ -98,6 +98,7 @@ def _publish_address() -> None:
             f.write_text(info)
         except OSError:
             pass  # discovery falls back to scanning the port range
+    updates.check_in_background()  # only the desktop/start.sh engine asks GitHub; tests and dev engines never do
 
 
 _publish_address()
@@ -133,7 +134,7 @@ def _404(what="Not found"):
 
 @app.get("/api/health")
 def health():
-    return {"ok": True, "name": "TakeTwo", "formerly": "VoiceForge", "loaded_engine": engines._loaded["id"]}
+    return {"ok": True, "name": "TakeTwo", "formerly": "VoiceForge", "version": APP_VERSION, "loaded_engine": engines._loaded["id"]}
 
 
 # Same voice and same script while it is queued or rendering: the second copy is refused.
@@ -183,6 +184,51 @@ def status():
     duplicates = [{"gid": gid, "title": _narration_progress(gid)["title"], **n} for gid, n in _dup_notices.items() if gid in active]
     return {"loaded_engine": engines._loaded["id"], "running": running, "queued": sum(1 for q in queue if q["status"] == "queued"),
             "queue": queue, "duplicates": duplicates, "max_script_words": MAX_SCRIPT_WORDS}
+
+
+@app.get("/api/update")
+def update_state():
+    return updates.state()
+
+
+@app.post("/api/update/check")
+def update_check():
+    updates.check()
+    return updates.state()
+
+
+@app.post("/api/update/start")
+def update_start():
+    try:
+        updates.start()
+    except ValueError as e:
+        raise HTTPException(409, str(e)) from None
+    return updates.state()
+
+
+@app.post("/api/update/cancel")
+def update_cancel():
+    j = updates._job()
+    if not j or j["status"] != "queued":
+        raise HTTPException(409, "Only a queued update can be cancelled; one that has started finishes or rolls back on its own.")
+    worker.cancel(j["id"])
+    return updates.state()
+
+
+@app.post("/api/update/restart")
+def update_restart():
+    """Restart this engine in place (same process id and port), so the desktop window and start.sh both keep working."""
+    if _active_jobs():
+        raise HTTPException(409, "Something is still running. Restart when the queue is empty.")
+    import os
+    import sys
+
+    def _exec():
+        time.sleep(0.6)  # let this reply reach the window first
+        os.execv(sys.executable, [sys.executable, *sys.orig_argv[1:]])
+
+    threading.Thread(target=_exec, daemon=True).start()
+    return {"restarting": True}
 
 
 @app.get("/api/diagnostics")
@@ -672,6 +718,8 @@ def create_generation(req: GenRequest, request: Request = None):
     p = db.get_profile(req.profile_id) or _404("Voice not found")
     if p.get("status") != "ready":
         raise HTTPException(400, "This voice is still being analyzed.")
+    if (why := updates.blocking_reason()):
+        raise HTTPException(409, why)
     s = db.get_settings()
     engine = req.engine or p.get("default_engine") or s["default_engine"]
     _spec_or_404(engine)

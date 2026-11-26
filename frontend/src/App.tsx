@@ -5,6 +5,7 @@ import { PlayerProvider, usePlayer } from "./lib/player";
 import { Progress, ToastProvider, useToast } from "./components/ui";
 import { onThemeChange } from "./lib/theme";
 import { Logo } from "./lib/logo";
+import { UpdateCard } from "./components/UpdateCard";
 import HomePage from "./pages/Home";
 import SpeechPage from "./pages/Speech";
 import VoicesPage from "./pages/Voices";
@@ -136,6 +137,7 @@ function Sidebar({ route }: { route: Route }) {
           </div>
         ))}
       </nav>
+      <UpdateCard />
       <EngineStatus />
     </aside>
   );

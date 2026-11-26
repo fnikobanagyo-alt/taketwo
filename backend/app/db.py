@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import json
 import math
+import re
 import sqlite3
 import threading
 import time
@@ -153,6 +154,10 @@ SETTING_RULES = {
 def _checked(patch: dict) -> dict:
     out = {}
     for k, v in patch.items():
+        if k == "check_updates" and not isinstance(v, bool):
+            raise ValueError("check_updates must be true or false")
+        if k == "update_dismissed" and not (v == "" or (isinstance(v, str) and re.fullmatch(r"\d{1,4}\.\d{1,4}\.\d{1,4}", v))):
+            raise ValueError("update_dismissed must be a version like 2.1.0")
         if k == "custom_engines" and not _custom_engines_ok(v):
             raise ValueError("custom_engines must be a list of models")
         if k in SETTING_RULES:
