@@ -20,6 +20,8 @@ jobs:
       CUDA_COMPUTE_CAP: "86"   # no GPU on the runner to detect; 86 = RTX 30-series
     steps:
       - uses: actions/checkout@v4
+      - name: Allow long paths (flash-attn's cutlass checkout has very long file names)
+        run: git config --system core.longpaths true
       - uses: Jimver/cuda-toolkit@v0.2.21
         id: cuda
         with:
