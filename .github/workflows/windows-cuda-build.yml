@@ -27,6 +27,7 @@ jobs:
           method: network
           sub-packages: '["nvcc", "cudart", "cublas", "cublas_dev", "curand", "curand_dev", "nvrtc", "nvrtc_dev", "visual_studio_integration"]'
       - uses: dtolnay/rust-toolchain@stable
+      - uses: ilammy/msvc-dev-cmd@v1   # puts cl.exe (MSVC) on PATH; nvcc needs it as the host compiler
       - name: Build (${{ matrix.features }})
         working-directory: prototypes/qwen3-tts-rs-fork
         shell: bash
