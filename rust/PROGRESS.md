@@ -7,7 +7,7 @@ The loop appends one entry per session at the bottom: date, step id, what was bu
 | Step | Status |
 |---|---|
 | S01 Workspace, safety rails, tools | done |
-| S02 Windows CUDA link proof | todo |
+| S02 Windows CUDA link proof | next |
 | S03 Text logic | todo |
 | S04 Library store, seeder, one-time copy | todo |
 | S05 Captions, timings, subtitles, review rules | todo |
@@ -39,7 +39,7 @@ The loop appends one entry per session at the bottom: date, step id, what was bu
 | G5 | not run | |
 | G6 | not run | |
 | G7 | not run | |
-| G8 | exit 0, attribution pending | S01 entry below: `g8.sh` exit 0; data/ 0 differences; App Support/VoiceForge differences are cache and storage files only, for the lead to attribute |
+| G8 | pass so far (re-run at the end) | Lead decision 2 below: `g8.sh` exit 0; data/ 0 differences; App Support/VoiceForge differences attributed to Franz's running app (browser cache and storage files) |
 
 ## Baseline for G8 (recorded 2026-11-27, before any Rust was written)
 
@@ -180,3 +180,33 @@ Questions for the lead:
    - `TAKETWO_MAX_TAKES=0` is an error.
    - The live lock file is at `<app data>/TakeTwo/engine.lock`.
 3. Safety: the plan's stop-and-clean check `pgrep -fl 'taketwo-(engine|mcp)|target/.*/taketwo'` matches 5 processes this work did not start: `.../uv/environments-v2/taketwo-mcp-<hash>/bin/python .../voiceforge/mcp/taketwo_mcp.py`. They look like Franz's own Python MCP servers. A builder told "pgrep must be empty" must not kill them. Should the pattern be tightened (for example `rust/target/.*/taketwo`)?
+
+### 2026-11-27, lead, iteration 2 decision
+State checked by command: S01 is committed, the tree is clean, `main` and `origin/main` are still `4448aaa`, and 8766 health names TakeTwo. Gates G2 to G7 have no evidence yet. Not done, not blocked on Franz.
+
+Commit hashes changed (history of 4 unpushed commits rewritten by the lead):
+- Why: `rust/PLAN.md` held the absolute home-folder path of this Mac, and the branch is about to be pushed to a public repository. The path is now `$WT` / `$MAIN` in every commit. No commit message held it.
+- Old to new: `4dd65c3` is `7e0a172`, `76ce9e0` is `3ec1042`, `00d7a88` is `12f460c`, `697ddd6` (S01) is `3442a21`. Earlier entries in this log still name the old hashes.
+- `g8.sh` now uses `FIRST_COMMIT=7e0a172`; re-run after the change: exit 0, G8 PASS.
+- The old commits are kept locally on `backup/rust-taketwo-pre-scrub`. Never push that branch.
+- Rule for every later step: no absolute home path and no private file name in any committed file.
+
+Answers to the S01 questions:
+1. Address file when isolated: yes, write `<TAKETWO_DATA>/engine.json` (S07). It is inside the temporary folder, so it is safe. In isolated mode the MCP server (S08) looks at `TAKETWO_URL` first, then only that file. It never scans ports and never reads the live address files.
+2. Confirmed: `TAKETWO_DATA` together with `--live` is refused; `TAKETWO_MAX_TAKES=0` is an error; the live lock file is `<app data>/TakeTwo/engine.lock`.
+3. Agreed. `PLAN.md` now says `pgrep -fl 'rust-taketwo/rust/target/'`, and that the Python `mcp/taketwo_mcp.py` servers are Franz's and are never stopped. Stop only your own processes, by pid.
+
+G8 attribution: data/ has 0 differences. The App Support/VoiceForge differences are browser cache, code cache, local and session storage, and one browser bookkeeping file at the top level. All of them are written by Franz's running app. None is a voice or audio file.
+
+Facts found for the next step (GitHub, read-only):
+- The prototype workflow triggers only on `prototype/qwen3-tts-rust`. On that branch the plain `cuda,audio-loading` job succeeded for `qwen_tts_cli` in about 13 minutes (runs 45869352830 and 45871279301).
+- flash-attn failed at "Filename too long" while cloning cutlass. A long-paths fix is in commit `35c80d8` on the prototype branch, which is not on this branch; its run had not concluded when checked.
+- `check.yml` runs on pushes to `main` and on pull requests only, so pushing this branch starts no Mac check.
+
+Next step: **S02 Windows CUDA link proof (push)**. It is the only gate that waits on GitHub, and Whisper and ONNX Runtime have never been built on the Windows runner. A green S02 is early evidence for G6, not G6 itself: the gate is judged again on the final commit.
+Additions to the plan text for S02:
+- `--version` in both programs must call one cheap function from each of Candle (`qwen_tts`), the Whisper binding and `ort`, so the linker cannot drop them.
+- Record the exact whisper.cpp commit and show that PR #4170 is in it.
+- `g6.sh` matches the plain job by exact name.
+- Carry the long-paths fix over from `35c80d8`.
+- First push of this branch: check `git grep -nE "/Users/[A-Za-z]" HEAD` is empty before it.

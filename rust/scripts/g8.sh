@@ -7,7 +7,7 @@
 # those are private, never paste or commit them.
 set -euo pipefail
 
-FIRST_COMMIT=4dd65c3                                   # first commit of the Rust port
+FIRST_COMMIT=7e0a172                                   # first commit of the Rust port
 BASELINE_MAIN=4448aaa9b241f2e52cfaa6c06fa98b89653be82e # main when the baseline was recorded
 
 WT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"

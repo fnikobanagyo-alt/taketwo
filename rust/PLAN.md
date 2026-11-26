@@ -3,8 +3,8 @@
 Lead: Fable 5.2. Builders: Opus, one step per session. Written 2026-11-27.
 The goal is met only when every gate command below passes when run, not when the code looks right.
 
-`WT` = `$WT` (branch `rust/taketwo`).
-`MAIN` = `$MAIN` (read-only).
+`WT` = the `rust-taketwo` git worktree, branch `rust/taketwo` (`git rev-parse --show-toplevel` inside it). Set `WT` in the shell before pasting a gate command. The absolute path is kept out of this file because the branch is pushed to a public repository.
+`MAIN` = the main checkout, the first line of `git worktree list` (read-only).
 
 ## How a builder session runs
 
@@ -80,7 +80,7 @@ Needs: nothing. Gates: G1 (start), G8 (script).
 - Create the workspace above. `git mv prototypes/qwen3-tts-rs-fork/qwen_tts` and `qwen_tts_cli` to `rust/vendor/`, with the LICENSE and `cudnn_version_shim.c`; remove the fork's own workspace files; fix `prototypes/README.md` paths. Delete the old prototype workflow only in S02.
 - `taketwo-core::paths`: the isolation table above, as code with unit tests on temp folders (isolated mode, refusal without `--live`, port refusal, address file only in live mode and range, lock file).
 - Install cmake into `rust/.tools`; write `rust/scripts/env.sh` that exports `PATH`, `TAKETWO_MODELS`, and makes a fresh temp `TAKETWO_DATA`.
-- `rust/scripts/g8.sh`: fails if the first commit of this work (`4dd65c3`) is an ancestor of `main` or `origin/main` (after `git fetch origin main`), or if 8766 health does not answer `"name":"TakeTwo"`. It then prints, without failing, how `main` moved since the baseline and the metadata differences (path, size, mtime) against `rust/.baseline/*.manifest`, for the lead to attribute: Franz's live app re-speaks, trims takes and purges on its own, and other sessions push to main.
+- `rust/scripts/g8.sh`: fails if the first commit of this work (`7e0a172`) is an ancestor of `main` or `origin/main` (after `git fetch origin main`), or if 8766 health does not answer `"name":"TakeTwo"`. It then prints, without failing, how `main` moved since the baseline and the metadata differences (path, size, mtime) against `rust/.baseline/*.manifest`, for the lead to attribute: Franz's live app re-speaks, trims takes and purges on its own, and other sessions push to main.
 - Done when: `cd rust && cargo test --workspace` passes and `rust/scripts/g8.sh` passes.
 
 ### S02 Windows CUDA link proof (push)
@@ -241,7 +241,7 @@ Each is one command whose exit code is the verdict. G5 renders audio and G6 wait
 | G7 | `cd "$WT" && python3 rust/ab/ab.py plan && python3 rust/ab/ab.py selftest && ! python3 rust/ab/ab.py render` | exit 0: 10 scripts and a take count printed; selftest OK; render refuses |
 | G8 | `cd "$WT" && rust/scripts/g8.sh` | exit 0: none of this work is on `main` or `origin/main`; 8766 health OK; the printed data differences are attributed by the lead |
 
-Stop-and-clean check after any run: `lsof -nP -iTCP -sTCP:LISTEN | grep -E ':(879[0-589])'` shows nothing of ours, and `pgrep -fl 'taketwo-(engine|mcp)|target/.*/taketwo'` is empty.
+Stop-and-clean check after any run: `lsof -nP -iTCP -sTCP:LISTEN | grep -E ':(879[0-589])'` shows nothing of ours, and `pgrep -fl 'rust-taketwo/rust/target/'` is empty. Stop only processes you started, by their pid. The Python `mcp/taketwo_mcp.py` servers and anything on 8765-8785 are Franz's: never stop them.
 
 ## Order and what can run side by side
 
