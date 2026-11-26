@@ -55,7 +55,7 @@ rust/
   ab/                      blind A/B harness
 ```
 
-- Features: `metal` (Mac), `cuda` (Windows), `flash-attn` (reported separately), `stub` (stub Voice/Transcriber/SpeakerEncoder for tests; never in a release build).
+- Features: `metal` (Mac), `cuda` (Windows), `flash-attn` (reported separately), `stub` (stub Voice/Transcriber/SpeakerEncoder for tests; never in a release build). Test targets switch `stub` on through `[dev-dependencies]`, so the plain `cargo test --workspace` runs every stub test. `cargo test --workspace` must pass from a clean checkout: no `frontend/dist`, no prebuilt sidecar (so the shell finds its engine at run time, not through a Tauri `externalBin` entry). `taketwo-mcp` has a pass-through `cuda` feature so `--features cuda` is accepted for both programs.
 - Models are read from `TAKETWO_MODELS` (dev: `rust/.models/`, git-ignored, holding symlinks to the local copies and anything converted locally). Qwen: `~/Library/Application Support/TakeTwo/models/qwen3-tts-1.7b-base`, read-only.
 - The UI is served from a folder (`--ui <dir>`, the built `frontend/dist`), not embedded, so the Windows build needs no Node.
 - Library documents are kept as `serde_json::Value` with key order preserved, so fields Rust does not know survive a round trip.
@@ -80,16 +80,18 @@ Needs: nothing. Gates: G1 (start), G8 (script).
 - Create the workspace above. `git mv prototypes/qwen3-tts-rs-fork/qwen_tts` and `qwen_tts_cli` to `rust/vendor/`, with the LICENSE and `cudnn_version_shim.c`; remove the fork's own workspace files; fix `prototypes/README.md` paths. Delete the old prototype workflow only in S02.
 - `taketwo-core::paths`: the isolation table above, as code with unit tests on temp folders (isolated mode, refusal without `--live`, port refusal, address file only in live mode and range, lock file).
 - Install cmake into `rust/.tools`; write `rust/scripts/env.sh` that exports `PATH`, `TAKETWO_MODELS`, and makes a fresh temp `TAKETWO_DATA`.
-- `rust/scripts/g8.sh`: compares `main` and `origin/main` with the baseline in PROGRESS.md, checks 8766 health, and compares file metadata (path, size, mtime) with `rust/.baseline/*.manifest`. It fails if any file that existed at baseline under `profiles/`, or any audio file anywhere, changed or vanished; it lists other differences (the live app's own database writes) for the lead.
+- `rust/scripts/g8.sh`: fails if the first commit of this work (`4dd65c3`) is an ancestor of `main` or `origin/main` (after `git fetch origin main`), or if 8766 health does not answer `"name":"TakeTwo"`. It then prints, without failing, how `main` moved since the baseline and the metadata differences (path, size, mtime) against `rust/.baseline/*.manifest`, for the lead to attribute: Franz's live app re-speaks, trims takes and purges on its own, and other sessions push to main.
 - Done when: `cd rust && cargo test --workspace` passes and `rust/scripts/g8.sh` passes.
 
 ### S02 Windows CUDA link proof (push)
 Needs: S01. Gate: G6 (early).
 - `taketwo-voice` declares its real dependencies with features: vendored `qwen_tts` (`cuda`, `flash-attn`), the whisper.cpp binding (pinned at or after PR #4170, CUDA under the same `cuda` feature), `ort`. `taketwo-engine` and `taketwo-mcp` are skeleton binaries that link them and answer `--version`.
-- `.github/workflows/windows-cuda.yml`: on push to `rust/taketwo` (paths `rust/**` and the workflow), matrix `cuda` and `cuda,flash-attn` with `fail-fast: false`, reusing what the prototype workflow learned (CUDA 12.6 toolkit sub-packages, MSVC dev cmd, PowerShell, `CUDA_COMPUTE_CAP=86`), `cargo build --release -p taketwo-engine -p taketwo-mcp --features cuda`. Remove the prototype workflow.
-- Push `rust/taketwo`, watch with `gh run watch`. Fix and push again until the plain `cuda` job is green. Record flash-attn separately.
+- `.github/workflows/windows-cuda.yml`: on push to `rust/taketwo` (paths `rust/**` and the workflow, with `paths-ignore`-style exclusion of `rust/**/*.md` so a log entry starts no build), matrix `cuda` and `cuda,flash-attn` with `fail-fast: false`, reusing what the prototype workflow learned (CUDA 12.6 toolkit sub-packages, MSVC dev cmd, PowerShell, `CUDA_COMPUTE_CAP=86`), `cargo build --release -p taketwo-engine -p taketwo-mcp --features cuda`. Remove the prototype workflow.
+- A second, cheap job in the same workflow: `cargo check --workspace --exclude taketwo` on Windows with no GPU feature, so later steps learn about Windows breaks in minutes.
+- `rust/scripts/g6.sh`: finds the newest commit on `rust/taketwo` that changed anything other than `*.md`, finds the workflow run for that commit with `gh`, and exits 0 only if the plain `cuda` job concluded `success` (exit 75 while it is still running). It prints the flash-attn result without judging it.
+- Push `rust/taketwo`. A run can take 150 minutes: poll with `g6.sh` or run `gh run watch` in the background, never in the foreground. Fix and push again until the plain `cuda` job is green. Record flash-attn separately.
 - Fallback if whisper.cpp CUDA will not link on Windows: build Whisper for CPU on Windows under `cuda`, say so in PROGRESS.md and `notes`.
-- Done when: the G6 command shows `success` for the plain `cuda` job on the pushed commit.
+- Done when: `rust/scripts/g6.sh` exits 0.
 
 ### S03 Text logic
 Needs: S01. Gate: G1.
@@ -118,8 +120,8 @@ Needs: S05. Gate: G2 (part).
 - `rust/scripts/contract.sh`: build, make a temp library, seed, start the engine on a free dev port, run `TAKETWO_URL=http://127.0.0.1:<port> python3 -m unittest discover -s contract`, stop the engine, delete the library. It fails unless the run says `Ran 33 tests` and `OK` with no skips.
 - Done when: the Health, Profiles, Generations (read), Search, TimingsAndSubtitles, Audio and SafetyGuards classes pass through `contract.sh` (run it with `-k` filters while the write side is missing).
 
-### S07 Engine: write side, worker, stub voice, lifecycle
-Needs: S06. Gate: G2 (full).
+### S07 Engine: write side, worker, stub voice, lifecycle (push)
+Needs: S06. Gate: G2 (full). Push at the end so the Windows jobs see the engine.
 - Routes: create narration (404 unknown voice, 400 empty after cleaning, 409 `duplicate_of`), cancel, resume, regenerate part, accept and its undo, select-take, fix-remaining, delete, restore, patch title/favourite, reveal (opens the file manager; not run in tests).
 - One worker thread with a queue and a cancel flag (`worker.py`), job documents, `/api/status` in today's shape, busy 409s.
 - Traits `Voice`, `Transcriber`, `SpeakerEncoder` in `taketwo-voice`; under feature `stub` a deterministic stub (tones, scripted transcripts and similarities) so queue, cancel, resume, re-speak and the 409s are tested with no model. The real pipeline arrives in S15/S16; here a narration runs through a thin placeholder that S15 replaces.
@@ -132,7 +134,7 @@ Needs: S07. Gate: G4.
 - Port `mcp/taketwo_mcp.py` with `rmcp` over stdio: `list_voices`, `generate_narration`, `get_status`, `get_timings`, `get_audio`, `get_subtitles`, `find_narration`, `respeak_part`, `fix_remaining`, `stop_narration`, `resume_narration`, `mark_sounds_fine`, with the same replies and error texts. It answers to both names (`--name taketwo|voiceforge`).
 - Finding the engine: `TAKETWO_URL`/`VOICEFORGE_URL`, then the address file under both names, then a port scan, then start `taketwo-engine` next to it with `--idle-exit 900`. In isolated mode it scans dev ports only.
 - Tests (`crates/taketwo-mcp/tests`): an rmcp client starts the binary, pinned to a seeded stub engine, and calls all 12 tools; the cases from `backend/tests/test_mcp_tools.py` are ported; one test covers "no engine answers, so start one" in isolated mode and checks it is stopped afterwards.
-- Done when: `cd rust && cargo build -p taketwo-mcp && cargo test -p taketwo-mcp --features stub` passes.
+- Done when: `cd rust && cargo build -p taketwo-mcp && cargo test -p taketwo-mcp` passes.
 
 ### S09 Tauri shell
 Needs: S07. Gate: G3.
@@ -180,23 +182,23 @@ Needs: S12. Gate: G5 (part).
 Needs: S07, S11. Gate: G1.
 - Port `profile_assets`, `_ref_pitch`, `_guarded_take`, `render_chunk` (seeds, retake rounds and budgets, the choice between takes, hard and soft issues, what is stored on the part), using the traits so tests run on the stub.
 - Tests script the stub (take 1 cut off, take 2 clean; all takes flagged; cancel mid-part; ending guard on and off) and compare the part document with what Python produces for the same scripted inputs (`rust/golden/record.py` drives `render_chunk` with patched model calls into `rust/golden/render.json`).
-- Done when: `cargo test -p taketwo-engine --features stub render_chunk` passes.
+- Done when: `cargo test -p taketwo-engine render_chunk` passes.
 
-### S16 Render pipeline B: assembly, final scan, re-speak, takes, speed
-Needs: S15. Gate: G1, G2 (still green).
+### S16 Render pipeline B: assembly, final scan, re-speak, takes, speed (push)
+Needs: S15. Gate: G1, G2 (still green). Push at the end.
 - Port `assemble` (pauses, mic match, master chain, loudness), `final_scan`, `run_generation`, `regenerate_chunk` with snapshot and restore, `select_take` with remix, `fix_remaining`, `apply_speed`, `retime`, `create_generation`, MP3 export, the WAV and subtitle files written beside the narration.
 - Replace S07's placeholder. Port the cases from `backend/tests/test_review_loop.py` and the rest of `test_regressions.py`. Add stub-engine tests for what the contract can't reach: a successful create and render, re-speak, fix-remaining, speed change, select-take of a kept take, MP3.
-- Done when: `cargo test --workspace --features stub` and `rust/scripts/contract.sh` both pass.
+- Done when: `cargo test --workspace` and `rust/scripts/contract.sh` both pass.
 
 ### S17 Voice creation
 Needs: S13, S14, S16. Gate: G5 (part).
 - Port `reference.py` (`analyze`, utterances, pause valleys, `snap_window`, window choice, `room_echo`, tips, `refresh_clips`) and the profile routes: create (multipart upload, ffmpeg decode, length limits), patch, delete, re-analyze, refresh, analysis, `make_preview`, `delivery.backfill`.
 - Without Sidon (S18) the "studio" option answers with a clear "not available yet" and the plain path is used.
 - Tests on the stub with `say`-made clips; vectors for the pure parts from `rust/golden/record.py`.
-- Done when: `cargo test -p taketwo-engine --features stub profiles` passes.
+- Done when: `cargo test -p taketwo-engine profiles` passes.
 
 ### S18 Studio restoration (Sidon)
-Needs: S17. Gate: none directly; it completes decision #4.
+Needs: S17. Gate: G5 (the smoke reports whether studio ran); it completes decision #4.
 - Port `studio.restore`: the w2v-BERT feature extractor by hand, Sidon predictor and vocoder through `ort` (fp16, local files), 20 s chunks with 1 s overlap; `noisereduce` by hand where `reference.py` uses it.
 - Check (ignored test): Rust and Python outputs on one `say` clip with added noise; record length, loudness and spectral distance. No claim about sound.
 - If it does not fit in one session, record what is left; G5 does not depend on it.
@@ -221,23 +223,23 @@ Needs: S07 (for the engine's API); can run any time after it. Gate: G7.
 ### S21 Final gate run (push)
 Needs: all. Gates: all.
 - Push `rust/taketwo`; wait for the Windows workflow on the final commit.
-- Run every gate command below in order and paste the real output tails into PROGRESS.md. Write `rust/README.md` (how to build, run in isolated mode, run the gates).
-- Done when: G1 to G8 pass on the same commit.
+- Run every gate command below in order and paste the real output tails into PROGRESS.md. That log commit changes only a `.md` file, so it starts no build and `g6.sh` still judges the last code commit. Write `rust/README.md` (how to build, run in isolated mode, run the gates).
+- Done when: G1 to G8 pass on the same code commit.
 
 ## Gate commands
 
-Run from `WT` unless shown.
+Each is one command whose exit code is the verdict. G5 renders audio and G6 waits on GitHub: run them only after their steps are done, not on every loop turn.
 
 | Gate | Command | Passes when |
 |---|---|---|
-| G1 | `cd rust && cargo test --workspace` | exit 0; the golden tests of S03, S05, S10, S11 are in the run (not ignored) |
-| G2 | `rust/scripts/contract.sh` | prints `Ran 33 tests` and `OK`, no skips |
-| G3 | `cd rust && cargo build -p taketwo && scripts/smoke_shell.sh` | exit 0; health names TakeTwo; UI served; no process or port left |
-| G4 | `cd rust && cargo build -p taketwo-mcp && cargo test -p taketwo-mcp --features stub` | exit 0; all 12 tools called |
-| G5 | `rust/scripts/synth_smoke.sh && cat rust/out/smoke/report.json` | exit 0; takes <= 20; WAV and SRT exist; timings and peak memory recorded |
-| G6 | `gh run list -R fnikobanagyo-alt/taketwo --branch rust/taketwo --workflow windows-cuda.yml --limit 1 --json databaseId,headSha,conclusion` then `gh run view <databaseId> -R fnikobanagyo-alt/taketwo --json jobs --jq '.jobs[] | {name, conclusion}'` | the plain `cuda` job is `success` on the current `git rev-parse HEAD`; flash-attn reported separately |
-| G7 | `python3 rust/ab/ab.py plan && python3 rust/ab/ab.py selftest; python3 rust/ab/ab.py render; echo "render exit $?"` | 10 scripts and a take count printed; selftest OK; render refuses (non-zero) |
-| G8 | `rust/scripts/g8.sh` | `main` and `origin/main` equal the baseline; no baseline voice or audio file changed or vanished; 8766 health OK |
+| G1 | `cd "$WT"/rust && cargo test --workspace` | exit 0 from a clean checkout; the golden and stub tests are in the run (not ignored) |
+| G2 | `cd "$WT" && rust/scripts/contract.sh` | exit 0; prints `Ran 33 tests` and `OK`, no skips |
+| G3 | `cd "$WT"/rust && cargo build -p taketwo && scripts/smoke_shell.sh` | exit 0; health names TakeTwo; UI served; no process or port left |
+| G4 | `cd "$WT"/rust && cargo build -p taketwo-mcp && cargo test -p taketwo-mcp` | exit 0; all 12 tools called |
+| G5 | `cd "$WT" && rust/scripts/synth_smoke.sh && cat rust/out/smoke/report.json` | exit 0; takes <= 20; WAV and SRT exist; timings and peak memory recorded. Exit 75 means Franz's app was busy: try later |
+| G6 | `cd "$WT" && rust/scripts/g6.sh` | exit 0: the plain `cuda` job is `success` on the newest non-`.md` commit of `rust/taketwo`; flash-attn printed separately. Exit 75: still running |
+| G7 | `cd "$WT" && python3 rust/ab/ab.py plan && python3 rust/ab/ab.py selftest && ! python3 rust/ab/ab.py render` | exit 0: 10 scripts and a take count printed; selftest OK; render refuses |
+| G8 | `cd "$WT" && rust/scripts/g8.sh` | exit 0: none of this work is on `main` or `origin/main`; 8766 health OK; the printed data differences are attributed by the lead |
 
 Stop-and-clean check after any run: `lsof -nP -iTCP -sTCP:LISTEN | grep -E ':(879[0-589])'` shows nothing of ours, and `pgrep -fl 'taketwo-(engine|mcp)|target/.*/taketwo'` is empty.
 
