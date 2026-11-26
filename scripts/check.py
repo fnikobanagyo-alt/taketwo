@@ -27,6 +27,7 @@ def main():
         commands = [([npm, 'exec', '--no', '--', 'tsc', '--version'], ROOT / 'frontend')]
         if not args.preflight:
             commands += [([str(python), '-B', '-m', 'unittest', 'discover', '-s', 'backend/tests'], ROOT),
+                         ([str(python), '-B', 'contract/seed_python.py'], ROOT),  # engine contract, own temporary library
                          ([npm, 'run', 'build'], ROOT / 'frontend')]
             if args.ui:
                 commands += [([npm, 'run', name], ROOT / 'frontend') for name in ('test:playback', 'test:recovery')]

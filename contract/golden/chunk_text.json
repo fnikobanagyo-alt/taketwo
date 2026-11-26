@@ -1,0 +1,121 @@
+[
+ {
+  "text": "Dr. Smith met Mr. Jones. They talked. Then J. R. Tolkien arrived!",
+  "max_chars": 220,
+  "chunks": [
+   {
+    "text": "Dr. Smith met Mr. Jones. They talked. Then J. R. Tolkien arrived!",
+    "pause_after": "end"
+   }
+  ]
+ },
+ {
+  "text": "First paragraph sentence one. Sentence two.\n\nSecond paragraph.",
+  "max_chars": 220,
+  "chunks": [
+   {
+    "text": "First paragraph sentence one. Sentence two.",
+    "pause_after": "paragraph"
+   },
+   {
+    "text": "Second paragraph.",
+    "pause_after": "end"
+   }
+  ]
+ },
+ {
+  "text": "One sentence here. Another sentence there. A third one now. Ok.",
+  "max_chars": 40,
+  "chunks": [
+   {
+    "text": "One sentence here.",
+    "pause_after": "sentence"
+   },
+   {
+    "text": "Another sentence there. A third one now. Ok.",
+    "pause_after": "end"
+   }
+  ]
+ },
+ {
+  "text": "This sentence is deliberately long, with several clauses; it keeps going: on and on, until it is far longer than the chunk limit allows, so the splitter must cut it at clause punctuation and then at spaces.",
+  "max_chars": 60,
+  "chunks": [
+   {
+    "text": "This sentence is deliberately long, with several clauses;",
+    "pause_after": "sentence"
+   },
+   {
+    "text": "it keeps going: on and on,",
+    "pause_after": "sentence"
+   },
+   {
+    "text": "until it is far longer than the chunk limit allows,",
+    "pause_after": "sentence"
+   },
+   {
+    "text": "so the splitter must cut it at clause punctuation and then at spaces.",
+    "pause_after": "end"
+   }
+  ]
+ },
+ {
+  "text": "Short.\nAnother line.",
+  "max_chars": 220,
+  "chunks": [
+   {
+    "text": "Short.",
+    "pause_after": "paragraph"
+   },
+   {
+    "text": "Another line.",
+    "pause_after": "end"
+   }
+  ]
+ },
+ {
+  "text": "这是一个很长的中文句子，没有空格，所以必须按字符切分。这是一个很长的中文句子，没有空格，所以必须按字符切分。这是一个很长的中文句子，没有空格，所以必须按字符切分。这是一个很长的中文句子，没有空格，所以必须按字符切分。这是一个很长的中文句子，没有空格，所以必须按字符切分。这是一个很长的中文句子，没有空格，所以必须按字符切分。",
+  "max_chars": 50,
+  "chunks": [
+   {
+    "text": "这是一个很长的中文句子，没有空格，所以必须按字符切分。这是一个很长的中文句子，没有空格，",
+    "pause_after": "sentence"
+   },
+   {
+    "text": "所以必须按字符切分。这是一个很长的中文句子，没有空格，所以必须按字符切分。这是一个很长的中文句子，",
+    "pause_after": "sentence"
+   },
+   {
+    "text": "没有空格，所以必须按字符切分。这是一个很长的中文句子，没有空格，所以必须按字符切分。",
+    "pause_after": "sentence"
+   },
+   {
+    "text": "这是一个很长的中文句子，没有空格，所以必须按字符切分。",
+    "pause_after": "end"
+   }
+  ]
+ },
+ {
+  "text": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+  "max_chars": 50,
+  "chunks": [
+   {
+    "text": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    "pause_after": "sentence"
+   },
+   {
+    "text": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    "pause_after": "sentence"
+   },
+   {
+    "text": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    "pause_after": "end"
+   }
+  ]
+ },
+ {
+  "text": "",
+  "max_chars": 220,
+  "chunks": []
+ }
+]

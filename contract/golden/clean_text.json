@@ -1,0 +1,89 @@
+[
+ {
+  "text": "Welcome to the show &amp; thanks for listening [1]. Today we talk about rivers — and the towns along them.\n\nThe Nile is long.",
+  "output": "Welcome to the show & thanks for listening. Today we talk about rivers, and the towns along them.\n\nThe Nile is long."
+ },
+ {
+  "text": "Part one is fine. Part two ends early. It&#39;s part three.",
+  "output": "Part one is fine. Part two ends early. It's part three."
+ },
+ {
+  "text": "First line here. Second line ends here.",
+  "output": "First line here. Second line ends here."
+ },
+ {
+  "text": "Not rendered yet. This one was stopped.",
+  "output": "Not rendered yet. This one was stopped."
+ },
+ {
+  "text": "A narration to delete and bring back.",
+  "output": "A narration to delete and bring back."
+ },
+ {
+  "text": "Marika&39;s book &amp; &quot;notes&quot;&nbsp;here.",
+  "output": "Marika's book & \"notes\" here."
+ },
+ {
+  "text": "As shown [2,3] and [4-6], it works [1].",
+  "output": "As shown and, it works."
+ },
+ {
+  "text": "As shown [2] here.",
+  "strip_citations": false,
+  "output": "As shown [2] here."
+ },
+ {
+  "text": "Wait — what? “Quoted” and ‘single’… done.",
+  "output": "Wait, what? \"Quoted\" and 'single'... done."
+ },
+ {
+  "text": "**Bold** _under_ # heading `code` > quote | pipe ~ tilde",
+  "output": "Bold under heading code quote pipe tilde"
+ },
+ {
+  "text": "See https://example.com/page?x=1 for more.",
+  "output": "See for more."
+ },
+ {
+  "text": "This line was hard\nwrapped in the middle of a sentence.\nA new sentence starts here.",
+  "output": "This line was hard wrapped in the middle of a sentence.\nA new sentence starts here."
+ },
+ {
+  "text": "Short Title\nBody text follows here.",
+  "output": "Short Title\nBody text follows here."
+ },
+ {
+  "text": "A long-\nhouse and a well-\nKnown name.",
+  "output": "A longhouse and a well-Known name."
+ },
+ {
+  "text": "One.\n\n\n\nTwo.",
+  "output": "One.\n\nTwo."
+ },
+ {
+  "text": "Use SQL and gif daily.",
+  "pronunciations": [
+   {
+    "from": "SQL",
+    "to": "sequel"
+   },
+   {
+    "from": "gif",
+    "to": "jif"
+   },
+   {
+    "from": "",
+    "to": "x"
+   }
+  ],
+  "output": "Use sequel and jif daily."
+ },
+ {
+  "text": "Line one\r\nLine two.\rLine three.",
+  "output": "Line one\nLine two.\nLine three."
+ },
+ {
+  "text": "   ",
+  "output": ""
+ }
+]
