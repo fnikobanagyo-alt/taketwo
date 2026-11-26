@@ -1,0 +1,43 @@
+# PROTOTYPE (map ticket #7): does the Candle Qwen3-TTS CLI build on Windows with CUDA?
+# GitHub's Windows runners have no NVIDIA GPU, so this proves the build only; sound needs a real NVIDIA PC.
+name: Windows CUDA build (prototype)
+on:
+  push:
+    branches: [prototype/qwen3-tts-rust]
+    paths: [prototypes/**, .github/workflows/windows-cuda-build.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: windows-2022
+    timeout-minutes: 150
+    strategy:
+      fail-fast: false
+      matrix:
+        features: ["cuda,audio-loading", "cuda,flash-attn,audio-loading"]
+    env:
+      CUDA_COMPUTE_CAP: "86"   # no GPU on the runner to detect; 86 = RTX 30-series
+    steps:
+      - uses: actions/checkout@v4
+      - uses: Jimver/cuda-toolkit@v0.2.21
+        id: cuda
+        with:
+          cuda: "12.6.0"
+          method: network
+          sub-packages: '["nvcc", "cudart", "cublas", "cublas_dev", "curand", "curand_dev", "nvrtc", "nvrtc_dev", "visual_studio_integration"]'
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Build (${{ matrix.features }})
+        working-directory: prototypes/qwen3-tts-rs-fork
+        shell: bash
+        run: |
+          nvcc --version
+          cargo build --release -p qwen_tts_cli --features "${{ matrix.features }}" 2>&1 | tee build.log
+          ls -la target/release/qwen-tts.exe
+      - name: Keep the build log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-log-${{ strategy.job-index }}
+          path: prototypes/qwen3-tts-rs-fork/build.log
+          if-no-files-found: ignore
