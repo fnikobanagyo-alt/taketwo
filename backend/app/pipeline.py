@@ -567,6 +567,7 @@ def render_chunk(gen: dict, ci: int, profile: dict, s: dict, regen_round: int = 
         audio_revision=int(ch.get("audio_revision", 0)) + 1, used_seeds=sorted(used_seeds), duration_budget=budget,
         pitch_hz=best.get("pitch_hz"), words=[{**w, "start": round(w["start"], 3), "end": round(w["end"], 3)} for w in words] if words else None,
         ending_guard=best.get("context"), context_file=context_fname if best.get("context") else None, chosen_seed=best["seed"],
+        accepted=None,  # "Sounds fine" belongs to the take a person heard
     )
     return ch
 
@@ -673,7 +674,8 @@ def retime(gen: dict, speed: float) -> None:
     gen["audio_rev"] = time.time()
 
 
-def create_generation(profile: dict, text: str, engine: str, language: str, params: dict, s: dict, speed: float = 1.0, voice_settings: dict | None = None) -> dict:
+def create_generation(profile: dict, text: str, engine: str, language: str, params: dict, s: dict, speed: float = 1.0, voice_settings: dict | None = None,
+                      title: str | None = None, source: str = "api") -> dict:
     import uuid
 
     cleaned = clean_text(text, s.get("pronunciations"), s.get("strip_citations", True))
@@ -686,7 +688,8 @@ def create_generation(profile: dict, text: str, engine: str, language: str, para
         "id": gid, "profile_id": profile["id"], "profile_name": profile["name"], "engine": engine, "language": language,
         "params": params, "speed": max(0.7, min(1.3, float(speed or 1.0))), "favorite": False,
         "voice_settings": {**delivery.DEFAULT_VOICE_SETTINGS, **{k: v for k, v in (voice_settings or {}).items() if k in delivery.DEFAULT_VOICE_SETTINGS}},
-        "title": " ".join(cleaned.split()[:8]) + ("…" if len(cleaned.split()) > 8 else ""),
+        "title": (title or "").strip()[:120] or " ".join(cleaned.split()[:8]) + ("…" if len(cleaned.split()) > 8 else ""),
+        "source": source if source in ("app", "mcp", "api") else "api",
         "text": text, "cleaned_text": cleaned, "status": "queued", "progress": 0.0, "message": "Queued",
         "chunks": [{"i": i, "text": c.text, "pause_after": c.pause_after, "status": "pending"} for i, c in enumerate(chunks)],
         "settings": {k: s[k] for k in ("max_chunk_chars", "max_attempts", "compare_takes", "max_wer", "min_speaker_similarity", "max_internal_silence", "sentence_pause_ms", "paragraph_pause_ms", "target_lufs", "seed")},
@@ -762,17 +765,13 @@ def run_generation(gen_id: str, cancel, only_chunks: list[int] | None = None) ->
         for ci in bad:
             gen["chunks"][ci]["final_fix"] = ci in fixed
         gen["final_scan"] = {"checked": len(gen["timeline"]), "attempted": bad, "fixed": fixed, "remaining": remaining}
-        flagged = [c["i"] for c in gen["chunks"] if c["status"] == "flagged"]
         gen["status"] = "done"
-        gen["flagged"] = flagged
         gen["retries"] = sum(max(0, len(c.get("attempts", [])) - 1) for c in gen["chunks"])
-        gen["message"] = (
-            f"Done, needs a listen: part {', '.join(str(r['part']) for r in review(gen))}." if fix_targets(gen) else "Done. All parts passed the automated checks."
-        )
+        summarize(gen)
         gen["render_seconds"] = round(time.time() - t0, 1)
     except Cancelled:
         gen["status"] = "cancelled"
-        gen["message"] = "Cancelled"
+        gen["message"] = "Stopped. Finished parts are kept; press Resume to finish the rest."
         for c in gen["chunks"]:
             if c["status"] == "running":
                 c["status"] = "pending"
@@ -918,6 +917,10 @@ def regenerate_chunk(gen_id: str, ci: int, new_text: str | None, cancel) -> None
     before = copy.deepcopy(gen)
     if new_text is not None and new_text.strip():
         ch["text"] = clean_replacement(new_text, gen, db.get_settings())
+    prev = _archive_take(gen_id, ch)  # Take 1 stays playable next to Take 2
+    if prev:
+        ch["takes"] = [*ch.get("takes", []), prev]
+        ch["take"] = max(x["take"] for x in ch["takes"]) + 1
     ch["regen_count"] = ch.get("regen_count", 0) + 1
     ch["status"] = "pending"
     names = [f"chunk_{ci:03d}.wav", f"raw_chunk_{ci:03d}.wav", f"context_chunk_{ci:03d}.wav", "final.wav", "final.mp3", "master.wav"]
@@ -938,20 +941,42 @@ def regenerate_chunk(gen_id: str, ci: int, new_text: str | None, cancel) -> None
             _restore(gdir, snap)
             before["message"] = "The re-speak was stopped. The previous text and audio were kept."
             db.put_generation_live(before)
+        else:
+            done = db.get_generation(gen_id)
+            if done:
+                _trim_takes(gen_id, done["chunks"][ci])
+                db.put_generation_live(done)
     finally:
         _discard(snap)
+        if stopped and prev:
+            shutil.rmtree(_take_dir(gen_id, ci, prev["take"]), ignore_errors=True)
+
+
+def summarize(gen: dict) -> None:
+    """The finished narration's flagged list and one-line message, from its parts as they are now."""
+    gen["flagged"] = [c["i"] for c in gen["chunks"] if c.get("status") == "flagged"]
+    todo = review(gen)
+    heard = sum(1 for c in gen["chunks"] if c.get("accepted"))
+    if todo:
+        gen["message"] = f"Done, needs review: part {', '.join(str(r['part']) for r in todo)}."
+    elif heard:
+        gen["message"] = f"Done. You marked {heard} part{'s' if heard > 1 else ''} as sounding fine; every other part passed the checks."
+    else:
+        gen["message"] = "Done. All parts passed the automated checks."
 
 
 def fix_targets(gen: dict) -> list[int]:
     """Parts that need a re-take: flagged, failing the final check, or whose script text
-    carries a web artifact (such as &39;) that the voice would read aloud."""
+    carries a web artifact (such as &39;) that the voice would read aloud. A part a person
+    marked "Sounds fine" is cleared until it is spoken again."""
     out = set((gen.get("final_scan") or {}).get("remaining") or [])
     for c in gen.get("chunks", []):
         if c.get("status") == "flagged":
             out.add(c["i"])
         if fix_entities(c.get("text") or "") != (c.get("text") or ""):
             out.add(c["i"])
-    return sorted(out)
+    by_i = {c["i"]: c for c in gen.get("chunks", [])}
+    return sorted(i for i in out if not by_i.get(i, {}).get("accepted"))
 
 
 # Plain-English reasons for the API and MCP. Must match ISSUE_LABEL in frontend/src/api.ts (a test checks).
@@ -967,8 +992,10 @@ ISSUE_LABEL = {
 }
 
 
-def review(gen: dict) -> list[dict]:
-    """Parts a person should listen to: the same parts the Fix button re-records, with their text and reasons."""
+def review(gen: dict, voice_pitch_hz: float | None = None) -> list[dict]:
+    """Parts a person should listen to: the same parts the Fix button re-records, with their text,
+    reasons, where they sit in the finished audio and what was measured."""
+    spans = {x["i"]: x for x in gen.get("timeline") or []}
     out = []
     for i in fix_targets(gen):
         ch = gen["chunks"][i]
@@ -976,15 +1003,94 @@ def review(gen: dict) -> list[dict]:
         if fix_entities(ch.get("text") or "") != (ch.get("text") or ""):
             codes.append("web_artifact")
         codes = codes or ["final_check"]
-        out.append({"part": i + 1, "text": ch.get("text") or "", "issues": codes, "reasons": [ISSUE_LABEL.get(c, c.replace("_", " ")) for c in codes]})
+        item = {"part": i + 1, "text": ch.get("text") or "", "issues": codes, "reasons": [ISSUE_LABEL.get(c, c.replace("_", " ")) for c in codes],
+                "start": spans.get(i, {}).get("start"), "end": spans.get(i, {}).get("end"), "heard": ch.get("heard") or "",
+                "pitch_hz": ch.get("pitch_hz"), "voice_pitch_hz": voice_pitch_hz, "checked_by": "checks", "take": ch.get("take", 1)}
+        out.append(item)
     return out
 
 
 def outcome(gen: dict) -> str | None:
-    """"clean" or "needs_listen" once a narration is done; None before. "done" alone never means every part passed."""
+    """"clean" or "needs_listen" (shown as "Needs review") once a narration is done; None before.
+    "done" alone never means every part passed. The value stays "needs_listen" for apps that read it."""
     if gen.get("status") != "done":
         return None
     return "needs_listen" if fix_targets(gen) else "clean"
+
+
+def set_accepted(gen: dict, ci: int, on: bool) -> dict:
+    """Mark one part "Sounds fine" (a person listened and keeps it) or undo that. Caller saves."""
+    ch = gen["chunks"][ci]
+    ch["accepted"] = {"by": "person", "at": time.time()} if on else None
+    if gen.get("status") == "done":
+        summarize(gen)
+    return gen
+
+
+TAKE_FIELDS = ("text", "file", "raw_file", "context_file", "wer", "sim", "dur", "issues", "final_issues", "heard", "pitch_hz",
+               "words", "ending", "status", "chosen_seed", "accepted")
+MAX_OLD_TAKES = 3
+
+
+def _take_dir(gid: str, ci: int, k: int) -> Path:
+    return GENERATIONS_DIR / gid / "takes" / f"{ci:03d}-{k}"
+
+
+def _archive_take(gid: str, ch: dict) -> dict | None:
+    """Copy the part's kept take (audio + what was measured) aside, so it can be heard and chosen again."""
+    gdir = GENERATIONS_DIR / gid
+    if not ch.get("file") or not (gdir / ch["file"]).exists():
+        return None
+    k = int(ch.get("take", 1))
+    d = _take_dir(gid, ch["i"], k)
+    d.mkdir(parents=True, exist_ok=True)
+    for f in (ch.get("file"), ch.get("raw_file"), ch.get("context_file")):
+        if f and (gdir / f).exists():
+            shutil.copy2(gdir / f, d / f)
+    return {**{f: ch.get(f) for f in TAKE_FIELDS}, "take": k, "archived": time.time()}
+
+
+def _trim_takes(gid: str, ch: dict) -> None:
+    for old in ch.get("takes", [])[:-MAX_OLD_TAKES]:
+        shutil.rmtree(_take_dir(gid, ch["i"], old["take"]), ignore_errors=True)
+    ch["takes"] = ch.get("takes", [])[-MAX_OLD_TAKES:]
+
+
+def take_audio(gen: dict, ci: int, k: int) -> Path | None:
+    ch = gen["chunks"][ci]
+    if k == int(ch.get("take", 1)):
+        f = GENERATIONS_DIR / gen["id"] / f"chunk_{ci:03d}.wav"
+    else:
+        f = _take_dir(gen["id"], ci, k) / f"chunk_{ci:03d}.wav"
+    return f if f.exists() else None
+
+
+def select_take(gen_id: str, ci: int, k: int) -> None:
+    """Keep an earlier take of one part instead of the current one, then re-mix the narration.
+    The current take is archived first, so the switch can be undone the same way."""
+    gen = db.get_generation(gen_id)
+    ch = gen["chunks"][ci]
+    t = next((x for x in ch.get("takes", []) if x["take"] == k), None)
+    if t is None:
+        raise ValueError("That take is no longer kept.")
+    gdir, src = GENERATIONS_DIR / gen_id, _take_dir(gen_id, ci, k)
+    cur = _archive_take(gen_id, ch)
+    for f in (ch.get("context_file"),):
+        if f and not t.get("context_file"):
+            (gdir / f).unlink(missing_ok=True)
+    for f in (t.get("file"), t.get("raw_file"), t.get("context_file")):
+        if f and (src / f).exists():
+            os.replace(src / f, gdir / f)
+    shutil.rmtree(src, ignore_errors=True)
+    ch.update({f: t.get(f) for f in TAKE_FIELDS})
+    ch["take"] = k
+    ch["audio_revision"] = int(ch.get("audio_revision", 0)) + 1
+    ch["takes"] = [x for x in ch.get("takes", []) if x["take"] != k] + ([cur] if cur else [])
+    s = {**db.get_settings(), **gen["settings"]}
+    assemble(gen, s)
+    if gen.get("status") == "done":
+        summarize(gen)
+    db.put_generation(gen)
 
 
 def fix_remaining(gen_id: str, cancel) -> None:

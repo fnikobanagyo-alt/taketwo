@@ -85,13 +85,38 @@ def put_generation_live(d: dict) -> bool:
         if r is None:
             return False
         cur = json.loads(r["doc"])
-        for k in GEN_META_KEYS:
+        for k in (*GEN_META_KEYS, "deleted_at"):  # a delete made while it rendered stays deleted
             if k in cur:
                 d[k] = cur[k]
         d["updated"] = time.time()
         _db.execute("UPDATE generations SET doc=? WHERE id=?", (json.dumps(d), d["id"]))
         _db.commit()
     return True
+
+
+def set_generation_deleted(gid: str, deleted: bool) -> dict | None:
+    """Soft delete (hidden, restorable) or restore. Files stay until purge_deleted_generations."""
+    with _lock:
+        r = _db.execute("SELECT doc FROM generations WHERE id=?", (gid,)).fetchone()
+        if r is None:
+            return None
+        doc = json.loads(r["doc"])
+        if deleted:
+            doc["deleted_at"] = time.time()
+        else:
+            doc.pop("deleted_at", None)
+        _db.execute("UPDATE generations SET doc=? WHERE id=?", (json.dumps(doc), gid))
+        _db.commit()
+    return doc
+
+
+def purge_deleted_generations(older_than_s: float) -> list[str]:
+    """Ids of soft-deleted narrations older than the cut-off, removed from the database (caller removes files)."""
+    cut = time.time() - older_than_s
+    gone = [g["id"] for g in list_generations() if g.get("deleted_at") and g["deleted_at"] < cut]
+    for gid in gone:
+        delete_generation(gid)
+    return gone
 
 
 def patch_generation_meta(gid: str, fields: dict) -> dict | None:

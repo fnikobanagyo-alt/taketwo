@@ -107,11 +107,13 @@ _publish_address()
 for _g in db.list_generations():
     if _g["status"] in ("queued", "running"):
         _g["status"] = "interrupted"
-        _g["message"] = "Interrupted (app was closed). Press Resume to finish the remaining chunks."
+        _g["message"] = "Stopped when the app closed. Finished parts are kept; press Resume to finish the rest."
         for _c in _g["chunks"]:
             if _c["status"] == "running":
                 _c["status"] = "pending"
         db.put_generation(_g)
+for _gid in db.purge_deleted_generations(older_than_s=7 * 86400):  # Undo window for deleted narrations: 7 days
+    shutil.rmtree(GENERATIONS_DIR / _gid, ignore_errors=True)
 for _p in db.list_profiles():
     if _p.get("status") in ("queued", "analyzing"):
         _p["status"] = "error"
@@ -678,6 +680,22 @@ class GenRequest(BaseModel):
     params: dict = {}
     speed: float = 1.0
     voice_settings: dict = {}
+    title: str | None = None
+
+
+def _client(request: Request | None) -> str:
+    """Where a request came from: the TakeTwo window ("app"), the MCP server ("mcp") or anything else ("api")."""
+    if request is None:
+        return "api"
+    h = request.headers.get("X-TakeTwo-Client") or request.headers.get("X-VoiceForge-Client") or ""
+    return h if h in ("app", "mcp") else "api"
+
+
+def _live_gen(gid: str) -> dict:
+    g = db.get_generation(gid)
+    if not g or g.get("deleted_at"):
+        _404()
+    return g
 
 
 def _mark_cancelled_before_start(gid: str) -> None:
@@ -738,13 +756,11 @@ def create_generation(req: GenRequest, request: Request = None):
                 "message": f"Already in the queue: this narration is {where}. It wasn't added twice.",
                 "duplicate_of": dup["gid"], "status": dup["status"], "title": dup["title"]})
         try:
-            g = pipeline.create_generation(p, req.text, engine, req.language or p.get("language") or "en", req.params, s, req.speed, req.voice_settings)
+            g = pipeline.create_generation(p, req.text, engine, req.language or p.get("language") or "en", req.params, s, req.speed,
+                                           req.voice_settings, title=req.title, source=_client(request))
         except ValueError as e:
             raise HTTPException(400, str(e))
-        if request and "mcp" in (request.headers.get("X-TakeTwo-Client"), request.headers.get("X-VoiceForge-Client")):
-            job = _submit_generation(g["id"], source="mcp")
-        else:
-            job = _submit_generation(g["id"])
+        job = _submit_generation(g["id"], source="mcp") if g.get("source") == "mcp" else _submit_generation(g["id"])
     return {**g, "job": job}
 
 
@@ -752,6 +768,8 @@ def create_generation(req: GenRequest, request: Request = None):
 def list_generations():
     out = []
     for g in db.list_generations():
+        if g.get("deleted_at"):
+            continue
         extra = {"outcome": pipeline.outcome(g), "review_count": len(pipeline.fix_targets(g)) if g.get("status") == "done" else 0}
         g = {k: v for k, v in g.items() if k not in ("chunks", "cleaned_text")} | extra
         g["text_preview"] = g.pop("text", "")[:240]
@@ -759,11 +777,40 @@ def list_generations():
     return out
 
 
+@app.get("/api/generations/search")
+def search_generations(q: str = "", voice: str = "", status: str = "", same_script: str = "", limit: int = 20):
+    """Find narrations by words in the script or title, voice name or id, and status
+    (queued, running, done, needs_review, cancelled, interrupted, error). same_script matches the
+    whole script after cleanup, as the Composer's "already narrated" notice does."""
+    s = db.get_settings()
+    want = clean_text(same_script, s.get("pronunciations"), s.get("strip_citations", True)).strip() if same_script.strip() else ""
+    out = []
+    for g in db.list_generations():
+        if g.get("deleted_at"):
+            continue
+        if voice and voice.lower() not in (g.get("profile_name", "").lower(), g.get("profile_id", "").lower()):
+            continue
+        oc = pipeline.outcome(g)
+        st = "needs_review" if oc == "needs_listen" else g.get("status")
+        if status and status != st and not (status == "done" and g.get("status") == "done"):
+            continue
+        if q and q.lower() not in (g.get("text", "") + " " + (g.get("title") or "")).lower():
+            continue
+        if want and (g.get("cleaned_text") or "").strip() != want:
+            continue
+        out.append({"id": g["id"], "title": g.get("title"), "voice": g.get("profile_name"), "profile_id": g.get("profile_id"),
+                    "status": st, "outcome": oc, "created": g.get("created"), "duration": g.get("duration"), "source": g.get("source", "api")})
+        if len(out) >= max(1, min(limit, 100)):
+            break
+    return out
+
+
 @app.get("/api/generations/{gid}")
 def get_generation(gid: str):
-    g = db.get_generation(gid) or _404()
+    g = _live_gen(gid)
     g["outcome"] = pipeline.outcome(g)
-    g["review"] = pipeline.review(g) if g["outcome"] else []
+    p = db.get_profile(g["profile_id"]) or {}
+    g["review"] = pipeline.review(g, p.get("pitch_hz")) if g["outcome"] else []
     g["job"] = worker.active_for(gid)
     if g["job"] and gid in _dup_notices:
         g["duplicate_notice"] = _dup_notices[gid]
@@ -788,7 +835,7 @@ def cancel_generation(gid: str):
 
 @app.post("/api/generations/{gid}/resume")
 def resume_generation(gid: str):
-    db.get_generation(gid) or _404()
+    _live_gen(gid)
     if worker.active_for(gid):
         raise HTTPException(409, "Already running")
     return _submit_generation(gid)
@@ -800,7 +847,7 @@ class RegenBody(BaseModel):
 
 @app.post("/api/generations/{gid}/chunks/{ci}/regenerate")
 def regenerate(gid: str, ci: int, body: RegenBody):
-    g = db.get_generation(gid) or _404()
+    g = _live_gen(gid)
     if not 0 <= ci < len(g["chunks"]):
         _404("No such chunk")
     if worker.active_for(gid):
@@ -813,9 +860,63 @@ def regenerate(gid: str, ci: int, body: RegenBody):
     return _submit_generation(gid, regen=(ci, body.text))
 
 
+def _idle_gen(gid: str, ci: int) -> dict:
+    g = _live_gen(gid)
+    if not 0 <= ci < len(g["chunks"]):
+        _404("No such part")
+    if worker.active_for(gid) or g.get("status") in ("queued", "running"):
+        raise HTTPException(409, "This narration is busy. Try again when it finishes.")
+    return g
+
+
+@app.post("/api/generations/{gid}/chunks/{ci}/accept")
+def accept_part(gid: str, ci: int):
+    """A person listened and keeps this part as it is ("Sounds fine"). It leaves review until it is spoken again."""
+    g = _idle_gen(gid, ci)
+    if not g["chunks"][ci].get("file"):
+        raise HTTPException(400, "This part has no audio yet.")
+    db.put_generation(pipeline.set_accepted(g, ci, True))
+    return get_generation(gid)
+
+
+@app.delete("/api/generations/{gid}/chunks/{ci}/accept")
+def unaccept_part(gid: str, ci: int):
+    g = _idle_gen(gid, ci)
+    db.put_generation(pipeline.set_accepted(g, ci, False))
+    return get_generation(gid)
+
+
+@app.get("/api/generations/{gid}/chunks/{ci}/takes/{k}/audio")
+def take_audio(gid: str, ci: int, k: int):
+    g = _live_gen(gid)
+    if not 0 <= ci < len(g["chunks"]):
+        _404("No such part")
+    f = pipeline.take_audio(g, ci, k) or _404("That take is no longer kept")
+    return FileResponse(f, headers={"Cache-Control": "no-store"})
+
+
+class TakeBody(BaseModel):
+    take: int
+
+
+@app.post("/api/generations/{gid}/chunks/{ci}/select-take")
+def select_take(gid: str, ci: int, body: TakeBody):
+    """Keep an earlier take of this part (Take 1 vs Take 2) and re-mix the narration."""
+    g = _idle_gen(gid, ci)
+    if not any(x["take"] == body.take for x in g["chunks"][ci].get("takes", [])):
+        raise HTTPException(404, "That take is no longer kept.")
+    return worker.submit("generate", lambda progress, cancel: pipeline.select_take(gid, ci, body.take), ref=gid, label="Switching take")
+
+
+@app.post("/api/generations/{gid}/restore")
+def restore_generation(gid: str):
+    g = db.set_generation_deleted(gid, False) or _404()
+    return g
+
+
 @app.post("/api/generations/{gid}/fix-remaining")
 def fix_remaining(gid: str):
-    g = db.get_generation(gid) or _404()
+    g = _live_gen(gid)
     if worker.active_for(gid):
         raise HTTPException(409, "This generation is busy")
     if not pipeline.fix_targets(g):
@@ -831,7 +932,7 @@ class GenPatch(BaseModel):
 
 @app.patch("/api/generations/{gid}")
 def patch_generation(gid: str, body: GenPatch):
-    g = db.get_generation(gid) or _404()
+    g = _live_gen(gid)
     fields = {}
     if body.title is not None and body.title.strip():
         fields["title"] = body.title.strip()[:120]
@@ -853,7 +954,7 @@ def patch_generation(gid: str, body: GenPatch):
 def subtitles(gid: str, fmt: str = "srt"):
     from fastapi.responses import Response
 
-    g = db.get_generation(gid) or _404()
+    g = _live_gen(gid)
     if not g.get("timeline"):
         _404("Subtitles are available once the audio is rendered")
     caps = tools.generation_captions(g)
@@ -865,7 +966,7 @@ def subtitles(gid: str, fmt: str = "srt"):
 
 @app.get("/api/generations/{gid}/timings")
 def generation_timings(gid: str):
-    g = db.get_generation(gid) or _404()
+    g = _live_gen(gid)
     if not g.get("timeline"):
         _404("Timings are available once the audio is rendered")
     return tools.generation_timings(g)
@@ -873,18 +974,18 @@ def generation_timings(gid: str):
 
 @app.delete("/api/generations/{gid}")
 def delete_generation(gid: str):
-    gdir = _item_dir(GENERATIONS_DIR, gid)
+    """Soft delete: hidden at once and restorable (Undo) for 7 days, then removed with its files."""
+    _item_dir(GENERATIONS_DIR, gid)  # validates the id
     j = worker.active_for(gid)
     if j:
-        worker.cancel(j["id"])  # a running render stops at its next save and cannot recreate the row
-    db.delete_generation(gid)
-    shutil.rmtree(gdir, ignore_errors=True)
-    return {"ok": True}
+        worker.cancel(j["id"])  # a running render stops; its save keeps the deleted mark
+    db.set_generation_deleted(gid, True)
+    return {"ok": True, "undo": f"/api/generations/{gid}/restore"}
 
 
 @app.get("/api/generations/{gid}/audio")
 def generation_audio(gid: str, fmt: str = "wav", download: bool = False):
-    g = db.get_generation(gid) or _404()
+    g = _live_gen(gid)
     f = GENERATIONS_DIR / gid / ("final.mp3" if fmt == "mp3" else "final.wav")
     if not f.exists():
         _404("Not rendered yet")
