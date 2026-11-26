@@ -1,0 +1,97 @@
+# Step S02 / gate G6 (rust/PLAN.md): do taketwo-engine and taketwo-mcp, linking Candle (qwen_tts),
+# whisper.cpp and ONNX Runtime, build with CUDA on Windows? GitHub's Windows runners have no NVIDIA GPU,
+# so this proves the build and link only; sound needs a real NVIDIA PC. rust/scripts/g6.sh reads the result.
+name: Windows CUDA build
+on:
+  push:
+    branches: [rust/taketwo]
+    paths:
+      - "rust/**"
+      - "!rust/**/*.md"   # a PROGRESS.md entry starts no build
+      - ".gitmodules"
+      - ".github/workflows/windows-cuda.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    name: build (${{ matrix.features }})   # g6.sh matches "build (cuda)" exactly
+    runs-on: windows-2022
+    timeout-minutes: 150
+    strategy:
+      fail-fast: false
+      matrix:
+        features: ["cuda", "cuda,flash-attn"]
+    env:
+      CUDA_COMPUTE_CAP: "86"   # no GPU on the runner to detect; 86 = RTX 30-series
+      CMAKE_GENERATOR: Ninja   # whisper.cpp's CUDA build: the Visual Studio generator needs VS CUDA build customizations
+    steps:
+      - name: Allow long paths (flash-attn's cutlass checkout has very long file names)
+        run: git config --system core.longpaths true
+      - uses: actions/checkout@v4
+        with:
+          submodules: true   # rust/third_party/whisper.cpp
+      - uses: Jimver/cuda-toolkit@v0.2.21
+        id: cuda
+        with:
+          cuda: "12.6.0"
+          method: network
+          sub-packages: '["nvcc", "cudart", "cublas", "cublas_dev", "curand", "curand_dev", "nvrtc", "nvrtc_dev", "visual_studio_integration"]'
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: ilammy/msvc-dev-cmd@v1   # puts cl.exe (MSVC), and VS's cmake and ninja, on PATH; nvcc needs cl as host compiler
+      - name: Build (${{ matrix.features }})
+        working-directory: rust
+        shell: pwsh   # not bash: Git's /usr/bin/link.exe would shadow MSVC's linker
+        run: |
+          nvcc --version
+          (Get-Command link.exe).Source
+          if (-not (Get-Command ninja -ErrorAction SilentlyContinue)) { choco install ninja -y --no-progress }
+          ninja --version
+          cargo build --release -p taketwo-engine -p taketwo-mcp --features "${{ matrix.features }}" 2>&1 | Tee-Object -FilePath build.log
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Run --version, or list the programs if they cannot start here
+        working-directory: rust
+        shell: pwsh
+        run: |
+          $code = 1
+          try { & target/release/taketwo-engine.exe --version; $code = $LASTEXITCODE } catch { $_ }
+          if ($code -eq 0) {
+            & target/release/taketwo-mcp.exe --version
+          } else {
+            "taketwo-engine.exe did not start here (exit $code); a CUDA build likely needs the NVIDIA driver DLL, which the runner lacks. Listing the programs instead:"
+          }
+          Get-Item target/release/taketwo-engine.exe, target/release/taketwo-mcp.exe | Select-Object Name, Length | Format-Table | Out-String
+          exit 0
+      - name: Keep the build log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-log-${{ strategy.job-index }}
+          path: rust/build.log
+          if-no-files-found: ignore
+  check:
+    name: check
+    runs-on: windows-2022
+    timeout-minutes: 60
+    env:
+      CMAKE_GENERATOR: Ninja
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: ilammy/msvc-dev-cmd@v1
+      - name: cargo check, no GPU feature
+        working-directory: rust
+        shell: pwsh
+        run: |
+          if (-not (Get-Command ninja -ErrorAction SilentlyContinue)) { choco install ninja -y --no-progress }
+          cargo check --workspace 2>&1 | Tee-Object -FilePath check.log
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Keep the check log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: check-log
+          path: rust/check.log
+          if-no-files-found: ignore
