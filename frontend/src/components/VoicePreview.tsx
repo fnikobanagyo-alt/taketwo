@@ -56,6 +56,7 @@ export default function VoicePreview({ profile, size = 28, className = "" }: { p
       role="button" tabIndex={0} onClick={toggle} onMouseDown={(e) => e.stopPropagation()}
       onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") toggle(e); }}
       title={playing ? "Pause preview" : generated ? "Play a sample spoken by this clone" : "Play the voice's reference recording (a clone sample is being prepared)"}
+      aria-label={playing ? `Pause ${profile.name} preview` : `Play ${profile.name} preview`}
       className={`relative inline-flex shrink-0 cursor-pointer items-center justify-center rounded-full transition ${playing ? "bg-invert text-invert-fg" : "bg-surface-2 text-fg-2 hover:bg-invert hover:text-invert-fg"} ${className}`}
       style={{ width: size, height: size }}
     >

@@ -1,5 +1,5 @@
 // TakeTwo signature: every voice gets its own "ember orb", a deterministic
-// gradient derived from the voice id. It breathes and spins while that voice speaks.
+// gradient derived from the voice id. It is still when idle and breathes and spins only while that voice speaks.
 
 function hash(s: string) {
   let h = 2166136261;
@@ -28,26 +28,21 @@ export function orbColors(seed: string) {
 
 export default function VoiceOrb({ seed, size = 40, active = false, className = "" }: { seed: string; size?: number; active?: boolean; className?: string }) {
   const [c1, c2, c3, rot] = orbColors(seed);
+  const shine = `radial-gradient(circle at 32% 28%, rgba(255,255,255,.7), rgba(255,255,255,0) 42%), radial-gradient(circle at 70% 80%, rgba(0,0,0,.28), rgba(0,0,0,0) 55%)`;
+  if (!active) {
+    // Idle orbs are one painted layer: no blur, no animation (lists can hold dozens of them).
+    return (
+      <div aria-hidden="true" className={`shrink-0 rounded-full ${className}`}
+        style={{ width: size, height: size, boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.08)",
+          background: `${shine}, radial-gradient(circle at 28% 72%, ${c3}, transparent 62%), radial-gradient(circle at 78% 30%, ${c2}, transparent 66%), ${c1}` }} />
+    );
+  }
   return (
-    <div
-      className={`relative shrink-0 overflow-hidden rounded-full ${className}`}
-      style={{
-        width: size, height: size,
-        boxShadow: active ? `0 0 ${size * 0.6}px -${size * 0.1}px ${c1}` : `inset 0 0 0 1px rgba(255,255,255,0.08)`,
-        animation: active ? "orb-breathe 1.6s ease-in-out infinite" : undefined,
-        transition: "box-shadow .3s",
-      }}
-    >
-      <div
-        className="absolute inset-[-25%]"
-        style={{
-          background: `conic-gradient(from ${rot}deg, ${c1}, ${c2}, ${c3}, ${c1})`,
-          filter: `blur(${Math.max(3, size / 7)}px)`,
-          animation: `orb-spin ${active ? 2.4 : 14}s linear infinite`,
-        }}
-      />
-      <div className="absolute inset-0" style={{ background: `radial-gradient(circle at 32% 28%, rgba(255,255,255,.75), rgba(255,255,255,0) 42%)` }} />
-      <div className="absolute inset-0" style={{ background: `radial-gradient(circle at 70% 80%, rgba(0,0,0,.28), rgba(0,0,0,0) 55%)` }} />
+    <div aria-hidden="true" className={`relative shrink-0 overflow-hidden rounded-full ${className}`}
+      style={{ width: size, height: size, boxShadow: `0 ${size * 0.08}px ${size * 0.5}px -${size * 0.12}px ${c1}`, animation: "orb-breathe 1.6s ease-in-out infinite" }}>
+      <div className="absolute inset-[-25%]"
+        style={{ background: `conic-gradient(from ${rot}deg, ${c1}, ${c2}, ${c3}, ${c1})`, filter: `blur(${Math.max(3, size / 7)}px)`, animation: "orb-spin 2.4s linear infinite" }} />
+      <div className="absolute inset-0" style={{ background: shine }} />
     </div>
   );
 }

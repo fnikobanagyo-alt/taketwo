@@ -3,12 +3,11 @@ import { AlertTriangle, ArrowLeft, ArrowRight, AudioWaveform, Check, Circle, Fil
 import { api, fmtTime, LANGS, timeAgo, type Profile } from "../api";
 import VoiceOrb from "../lib/orb";
 import Player from "../components/Player";
-import { Empty, InlineEdit, PageHeader, Progress, Select, Slider, Switch, useToast } from "../components/ui";
+import { Empty, InlineEdit, PageHeader, Progress, Select, Slider, Switch, useConfirm, useToast } from "../components/ui";
 import { go } from "../App";
 import VoicePreview from "../components/VoicePreview";
 
 const MAX_SECONDS = 300;
-const LATEST = 4; // keep in sync with backend PIPELINE_VERSION
 
 export default function VoicesPage({ id }: { id?: string }) {
   if (id === "new") return <NewVoice />;
@@ -20,6 +19,7 @@ export default function VoicesPage({ id }: { id?: string }) {
 
 function VoiceList() {
   const toast = useToast();
+  const [ask, confirmDialog] = useConfirm();
   const [profiles, setProfiles] = useState<Profile[] | null>(null);
   const [q, setQ] = useState("");
   const [version, setVersion] = useState(0);
@@ -39,14 +39,14 @@ function VoiceList() {
   }, [poke]);
   const outdated = (profiles ?? []).filter((p) => p.status === "ready" && (p.pipeline_version ?? 0) < version);
   const upgradeAll = async () => {
-    if (!confirm(`Update ${outdated.length} voice${outdated.length > 1 ? "s" : ""}?\n\nNothing you chose changes: names, descriptions, the reference clip in use, transcript edits and model choices all stay. Only the internal reference clips are re-cut at natural pauses (each old clip is kept as a backup), and each voice gets a fresh preview.`)) return;
+    if (!(await ask(`Update ${outdated.length} voice${outdated.length > 1 ? "s" : ""}?`, "Nothing you chose changes: names, descriptions, the reference clip in use, transcript edits and model choices all stay. Only the internal reference clips are re-cut at natural pauses (each old clip is kept as a backup), and each voice gets a fresh preview.", "Update"))) return;
     setUpBusy(true);
     try { const r = await api.upgradeAll(); toast(`Updating ${r.queued.length} voice${r.queued.length === 1 ? "" : "s"}…`, "info"); setPoke((n) => n + 1); }
     catch (e) { toast((e as Error).message, "error"); }
     finally { setUpBusy(false); }
   };
   const removeVoice = async (p: Profile) => {
-    if (!confirm(`Delete "${p.name}"?\n\nThis removes the voice and its recordings from TakeTwo. Narrations you already made stay in History.`)) return;
+    if (!(await ask(`Delete “${p.name}”?`, "This removes the voice and its recordings from TakeTwo and can't be undone. Narrations you already made stay in History.", "Delete voice"))) return;
     await api.deleteProfile(p.id);
     toast(`Deleted ${p.name}`);
     setPoke((n) => n + 1);
@@ -55,6 +55,7 @@ function VoiceList() {
 
   return (
     <div className="mx-auto max-w-6xl px-10 pb-16 pt-6">
+      {confirmDialog}
       <PageHeader
         title="Your" accent="voices"
         subtitle="Every voice is learned from up to 5 minutes of audio: transcribed, fingerprinted and checked against every line it speaks."
@@ -67,7 +68,7 @@ function VoiceList() {
         <div className="card relative mb-6 flex flex-wrap items-center justify-between gap-4 overflow-hidden border-accent/40 p-5">
           <div className="pointer-events-none absolute inset-0" style={{ background: "radial-gradient(500px 200px at 0% 0%, var(--accent-soft), transparent 70%)" }} />
           <div className="relative max-w-2xl">
-            <div className="flex items-center gap-2 text-[14px] font-semibold"><Sparkles size={15} className="text-accent" /> {outdated.length} voice{outdated.length > 1 ? "s" : ""} can be updated</div>
+            <div className="flex items-center gap-2 text-[14px] font-semibold"><Sparkles size={15} className="text-ember-ink" /> {outdated.length} voice{outdated.length > 1 ? "s" : ""} can be updated</div>
             <p className="mt-1 text-[12.5px] leading-relaxed text-fg-3">
               {outdated.map((p) => p.name).join(", ")} {outdated.length > 1 ? "were" : "was"} cloned before the latest improvements: studio restoration, cleaner word endings, delivery tags and clone-spoken previews. Updating re-analyzes each recording and saves it; names, descriptions and model choices are kept.
             </p>
@@ -91,21 +92,20 @@ function VoiceList() {
       ) : (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {list.map((p) => (
-            <button key={p.id} onClick={() => go({ page: "voices", id: p.id })} className="card group relative overflow-hidden p-5 text-left transition hover:-translate-y-0.5 hover:border-line-strong hover:shadow-float">
+            <div key={p.id} className="card group relative overflow-hidden p-5 text-left transition hover:-translate-y-0.5 hover:border-line-strong hover:shadow-float">
               <div className="flex items-start justify-between">
                 <VoiceOrb seed={p.id} size={52} active={p.status === "analyzing"} />
                 <div className="flex items-center gap-1.5">
-                  {p.status === "ready" && (p.pipeline_version ?? 0) < version && <span className="chip bg-accent-soft text-accent">Update available</span>}
+                  {p.status === "ready" && (p.pipeline_version ?? 0) < version && <span className="chip bg-accent-soft text-ember-ink">Update available</span>}
                   <StatusChip p={p} />
-                  <span role="button" tabIndex={0} title={`Delete ${p.name}`}
-                    onClick={(e) => { e.stopPropagation(); removeVoice(p); }}
-                    onKeyDown={(e) => { if (e.key === "Enter") { e.stopPropagation(); removeVoice(p); } }}
-                    className="icon-btn h-7 w-7 opacity-0 transition group-hover:opacity-100 hover:!text-danger"><Trash2 size={14} /></span>
+                  <button title={`Delete ${p.name}`} aria-label={`Delete ${p.name}`} onClick={() => removeVoice(p)}
+                    className="icon-btn relative z-10 h-7 w-7 hover:!text-danger-ink"><Trash2 size={14} /></button>
                 </div>
               </div>
               <div className="mt-4 flex items-center gap-2.5">
-                <span className="truncate text-[15px] font-semibold">{p.name}</span>
-                <VoicePreview profile={p} size={26} />
+                {/* the name is the card's link; its hit area covers the card, the buttons sit above it */}
+                <button onClick={() => go({ page: "voices", id: p.id })} className="truncate text-left text-[15px] font-semibold after:absolute after:inset-0 after:content-['']">{p.name}</button>
+                <span className="relative z-10"><VoicePreview profile={p} size={26} /></span>
               </div>
               <div className="mt-1 line-clamp-2 min-h-[36px] text-[12.5px] leading-relaxed text-fg-3">
                 {p.description || (p.status === "ready" ? `${Math.round(p.usable_speech_seconds ?? 0)}s of clean speech · ${Math.round((p.speech_rate_wps ?? 0) * 60)} wpm` : "Analyzing the recording…")}
@@ -114,7 +114,7 @@ function VoiceList() {
                 <span>{LANGS[p.language] ?? p.language}{p.designed ? " · designed" : " · cloned"}</span>
                 <span>{timeAgo(p.created)}</span>
               </div>
-            </button>
+            </div>
           ))}
           <button onClick={() => go({ page: "voices", id: "new" })} className="flex min-h-[200px] flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-line-strong text-fg-3 transition hover:border-accent hover:text-fg">
             <Plus size={20} /><span className="text-[13px]">Clone a new voice</span>
@@ -126,9 +126,9 @@ function VoiceList() {
 }
 
 function StatusChip({ p }: { p: Profile }) {
-  if (p.status === "ready") return <span className="chip bg-ok/12 text-ok"><Check size={11} /> Ready</span>;
-  if (p.status === "error") return <span className="chip bg-danger/12 text-danger">Error</span>;
-  return <span className="chip bg-accent-soft text-accent"><Loader2 size={11} className="animate-spin" /> Analyzing</span>;
+  if (p.status === "ready") return <span className="chip bg-ok/12 text-ok-ink"><Check size={11} /> Ready</span>;
+  if (p.status === "error") return <span className="chip bg-danger/12 text-danger-ink">Error</span>;
+  return <span className="chip bg-accent-soft text-ember-ink"><Loader2 size={11} className="animate-spin" /> Analyzing</span>;
 }
 
 // ------------------------------------------------------------------ new voice
@@ -145,6 +145,7 @@ function NewVoice() {
   const [busy, setBusy] = useState(false);
   const [drag, setDrag] = useState(false);
 
+  useEffect(() => () => { if (url) URL.revokeObjectURL(url); }, [url]);  // free the previous file's memory
   const pick = (f: File) => {
     setFile(f);
     setFileDur(null);
@@ -187,7 +188,7 @@ function NewVoice() {
         {file ? (
           <div>
             <div className="mb-4 flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent-soft text-accent"><FileAudio size={18} /></div>
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent-soft text-ember-ink"><FileAudio size={18} /></div>
               <div className="min-w-0 flex-1">
                 <div className="truncate text-[14px] font-medium">{file.name}</div>
                 <div className="text-[12px] text-fg-3">{(file.size / 1e6).toFixed(1)} MB{fileDur ? ` · ${fmtTime(fileDur)}` : ""}</div>
@@ -196,7 +197,7 @@ function NewVoice() {
             </div>
             <Player src={url} height={44} />
             {fileDur && fileDur > MAX_SECONDS && (
-              <div className="mt-3 flex items-center gap-2 text-[12.5px] text-warn"><AlertTriangle size={14} /> Longer than 5 minutes: the first 5:00 will be used.</div>
+              <div className="mt-3 flex items-center gap-2 text-[12.5px] text-warn-ink"><AlertTriangle size={14} /> Longer than 5 minutes: the first 5:00 will be used.</div>
             )}
           </div>
         ) : (
@@ -217,16 +218,16 @@ function NewVoice() {
 
       <div className="mt-6 grid grid-cols-3 gap-4">
         <div className="col-span-2">
-          <label className="label">Voice name</label>
-          <input className="field" value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Christopher, documentary narration" />
+          <label className="label" htmlFor="voice-name">Voice name</label>
+          <input id="voice-name" className="field" value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Christopher, documentary narration" />
         </div>
         <div>
-          <label className="label">Language</label>
-          <Select value={language} onChange={setLanguage} options={Object.entries(LANGS).map(([k, v]) => ({ value: k, label: v }))} />
+          <span className="label">Language</span>
+          <Select label="Language" value={language} onChange={setLanguage} options={Object.entries(LANGS).map(([k, v]) => ({ value: k, label: v }))} />
         </div>
       </div>
       <div className="mt-6">
-        <label className="label">Recording quality</label>
+        <span className="label">Recording quality</span>
         <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
           <QualityCard on={studio} onClick={() => setStudio(true)} icon={<Sparkles size={17} />} title="Studio quality mic" badge="Recommended"
             body="Removes room echo, background noise and cheap-mic colour before cloning, and rebuilds crisp 48 kHz detail. Clones sound like a treated studio booth, with no robotic or echoey edge." />
@@ -239,7 +240,7 @@ function NewVoice() {
               <div className="text-[13.5px] font-medium">Always reduce background noise</div>
               <div className="text-[12px] text-fg-3">Applied automatically when noise is detected. Force it for fans or hum.</div>
             </div>
-            <Switch on={denoise} onChange={setDenoise} />
+            <Switch on={denoise} onChange={setDenoise} label="Noise reduction" />
           </div>
         )}
       </div>
@@ -256,7 +257,7 @@ function QualityCard({ on, onClick, icon, title, body, badge }: { on: boolean; o
       <div className="flex items-center gap-2.5">
         <span className={`flex h-8 w-8 items-center justify-center rounded-lg ${on ? "ember text-[#1a0f07]" : "bg-surface-2 text-fg-2"}`}>{icon}</span>
         <span className="text-[14px] font-medium">{title}</span>
-        {badge && <span className="chip bg-accent-soft text-accent">{badge}</span>}
+        {badge && <span className="chip bg-accent-soft text-ember-ink">{badge}</span>}
         <span className={`ml-auto flex h-5 w-5 items-center justify-center rounded-full border ${on ? "ember border-transparent" : "border-line-strong"}`}>{on && <Check size={11} strokeWidth={3} className="text-[#1a0f07]" />}</span>
       </div>
       <p className="mt-2.5 text-[12.5px] leading-relaxed text-fg-3">{body}</p>
@@ -307,17 +308,20 @@ function Recorder({ onDone }: { onDone: (f: File) => void }) {
   };
   if (rec)
     return (
-      <button className="btn btn-secondary border-danger/40 text-danger" onClick={() => rec.stop()}>
+      <button className="btn btn-secondary border-danger/40 text-danger-ink" onClick={() => rec.stop()}>
         <Square size={12} fill="currentColor" /> Stop · <span className="font-mono">{fmtTime(secs)}</span> / 5:00
       </button>
     );
-  return <button className="btn btn-secondary" onClick={start}><Circle size={12} fill="var(--danger)" className="text-danger" /> Record</button>;
+  return <button className="btn btn-secondary" onClick={start}><Circle size={12} fill="var(--danger)" className="text-danger-ink" /> Record</button>;
 }
 
 // ------------------------------------------------------------------ detail
 
 function VoiceDetail({ id }: { id: string }) {
   const toast = useToast();
+  const [ask, confirmDialog] = useConfirm();
+  const [version, setVersion] = useState(0);
+  useEffect(() => { api.pipelineVersion().then((v) => setVersion(v.version)).catch(() => {}); }, []);
   const [p, setP] = useState<Profile | null>(null);
   const [refText, setRefText] = useState("");
   // A transcript typed by the user is kept: polling must not overwrite it with the saved text.
@@ -365,10 +369,11 @@ function VoiceDetail({ id }: { id: string }) {
     try { await api.patchProfile(id, x); await load(); toast(msg); } catch (e) { toast((e as Error).message, "error"); }
   };
   const reanalyze = async () => { await api.reanalyze(id, denoise, windowSec); setNonce((n) => n + 1); toast("Re-analyzing voice…", "info"); };
-  const del = async () => { if (confirm(`Delete "${p.name}"?\n\nThis removes the voice and its recordings from TakeTwo. Narrations you already made stay in History. This can't be undone.`)) { await api.deleteProfile(id); toast(`Deleted ${p.name}`); go({ page: "voices" }); } };
+  const del = async () => { if (await ask(`Delete “${p.name}”?`, "This removes the voice and its recordings from TakeTwo and can't be undone. Narrations you already made stay in History.", "Delete voice")) { await api.deleteProfile(id); toast(`Deleted ${p.name}`); go({ page: "voices" }); } };
 
   return (
     <div className="mx-auto max-w-5xl px-10 pb-16 pt-6">
+      {confirmDialog}
       <button className="btn btn-ghost btn-sm -ml-2 mb-5" onClick={() => go({ page: "voices" })}><ArrowLeft size={14} /> Voices</button>
 
       <div className="card relative overflow-hidden p-7">
@@ -385,7 +390,7 @@ function VoiceDetail({ id }: { id: string }) {
               <InlineEdit className="min-w-0 flex-1" value={p.name} inputClass="display text-[34px] leading-tight" onSave={(v) => patch({ name: v }, "Name saved")} />
             </div>
             {p.refresh_report && (
-              <div className="text-[12px] leading-relaxed text-ok">
+              <div className="text-[12px] leading-relaxed text-ok-ink">
                 Updated: {p.refresh_report.updated.length} reference clip{p.refresh_report.updated.length === 1 ? "" : "s"} now start and end at natural pauses
                 {p.refresh_report.trimmed?.length ? `; clip ${p.refresh_report.trimmed.map((i) => i + 1).join(", ")} ended mid-word, so its unfinished last word was trimmed` : ""}
                 {p.refresh_report.kept.length ? `; ${p.refresh_report.kept.length} left as they were` : ""}. Your chosen clip, name and transcript edits are unchanged.
@@ -399,8 +404,8 @@ function VoiceDetail({ id }: { id: string }) {
             <InlineEdit value={p.description ?? ""} placeholder="Add a description (e.g. calm documentary narrator)" inputClass="text-[13.5px] text-fg-2" onSave={(v) => patch({ description: v }, "Description saved")} />
           </div>
           <div className="flex shrink-0 gap-2">
-            {p.status === "ready" && (p.pipeline_version ?? 0) < LATEST && (
-              <button className="btn btn-secondary" disabled={!!p.job} title="Re-cut this voice's reference clips at natural pauses. Keeps your chosen clip, transcript edits, name and description." onClick={async () => {
+            {p.status === "ready" && version > 0 && (p.pipeline_version ?? 0) < version && (
+              <button className="btn btn-secondary" disabled={!!p.job} title="Re-cut this voice's reference clips at natural pauses. Keeps your chosen clip, transcript edits, name and description." aria-label="Re-cut this voice's reference clips at natural pauses. Keeps your chosen clip, transcript edits, name and description." onClick={async () => {
                 try { await api.refreshProfile(id); setNonce((n) => n + 1); toast("Updating voice…", "info"); } catch (e) { toast((e as Error).message, "error"); }
               }}>{p.job ? <Loader2 size={14} className="animate-spin" /> : <RefreshCw size={14} />} Update voice</button>
             )}
@@ -412,7 +417,7 @@ function VoiceDetail({ id }: { id: string }) {
         {busy && (
           <div className="relative mt-6">
             <div className="mb-2 flex items-center justify-between text-[13px]">
-              <span className="flex items-center gap-2"><Loader2 size={14} className="animate-spin text-accent" /> {p.job?.message || "Waiting in queue…"}</span>
+              <span className="flex items-center gap-2"><Loader2 size={14} className="animate-spin text-ember-ink" /> {p.job?.message || "Waiting in queue…"}</span>
               <span className="font-mono text-[12px] text-fg-3">{Math.round((p.job?.progress ?? 0) * 100)}%</span>
             </div>
             <Progress value={p.job?.progress ?? 0} />
@@ -420,7 +425,7 @@ function VoiceDetail({ id }: { id: string }) {
           </div>
         )}
         {p.status === "error" && (
-          <div className="relative mt-5 flex items-center justify-between gap-4 rounded-xl bg-danger/10 px-4 py-3 text-[13px] text-danger">
+          <div className="relative mt-5 flex items-center justify-between gap-4 rounded-xl bg-danger/10 px-4 py-3 text-[13px] text-danger-ink">
             {p.error}
             <button className="btn btn-secondary btn-sm" onClick={reanalyze}><RefreshCw size={13} /> Re-analyze</button>
           </div>
@@ -438,13 +443,13 @@ function VoiceDetail({ id }: { id: string }) {
           </div>
 
           {p.tips?.length ? (
-            <div className="mt-4 space-y-1.5 rounded-xl border border-warn/30 bg-warn/[0.06] px-4 py-3 text-[13px] text-warn">
+            <div className="mt-4 space-y-1.5 rounded-xl border border-warn/30 bg-warn/[0.06] px-4 py-3 text-[13px] text-warn-ink">
               {p.tips.map((t) => <div key={t} className="flex gap-2"><AlertTriangle size={15} className="mt-0.5 shrink-0" />{t}</div>)}
             </div>
           ) : null}
 
           <StudioPanel p={p} onRun={async (studio) => {
-            if (!confirm(studio ? "Restore this voice to studio quality? It re-analyzes the recording (about a minute) and picks fresh reference clips." : "Go back to the original recording's sound? It re-analyzes the recording and picks fresh reference clips.")) return;
+            if (!(await ask(studio ? "Restore to studio quality?" : "Go back to the original sound?", studio ? "It re-analyzes the recording (about a minute) and picks fresh reference clips." : "It re-analyzes the recording and picks fresh reference clips.", studio ? "Restore" : "Re-analyze"))) return;
             await api.reanalyze(id, false, windowSec, studio); setNonce((n) => n + 1); toast(studio ? "Restoring to studio quality…" : "Re-analyzing with the original sound…", "info");
           }} />
 
@@ -475,9 +480,9 @@ function VoiceDetail({ id }: { id: string }) {
             </div>
 
             <div className="card mt-4 p-5">
-              <label className="label">Transcript of the clip in use</label>
+              <label className="label" htmlFor="ref-text">Transcript of the clip in use</label>
               <p className="mb-2 text-[12px] text-fg-3">Must match the audio word for word. Fix any names Whisper misheard: a wrong word here is a common cause of odd sounds.</p>
-              <textarea className="field text-[13.5px]" rows={3} value={refText} onChange={(e) => { setRefText(e.target.value); dirtyRef.current = true; }} />
+              <textarea id="ref-text" className="field text-[13.5px]" rows={3} value={refText} onChange={(e) => { setRefText(e.target.value); dirtyRef.current = true; }} />
               <div className="mt-3 flex gap-2">
                 <button className="btn btn-primary btn-sm" disabled={refText === (p.ref_text_override?.[String(av)] || origText)} onClick={() => { dirtyRef.current = false; patch({ ref_text: refText }, "Transcript saved"); }}><Check size={13} /> Save transcript</button>
                 <button className="btn btn-ghost btn-sm" onClick={() => { dirtyRef.current = false; setRefText(p.ref_text_override?.[String(av)] || origText); }}>Revert</button>
@@ -491,9 +496,9 @@ function VoiceDetail({ id }: { id: string }) {
               <div className="mt-4">
                 <div className="mb-1 flex justify-between text-[13px]"><span>Reference length</span><span className="font-mono text-fg-2">{windowSec}s</span></div>
                 <Slider value={windowSec} min={6} max={25} step={1} onChange={setWindowSec} />
-                <p className="mt-1 text-[11.5px] text-fg-3">10–15s suits most models. Longer can help very expressive voices.</p>
+                <p className="mt-1 text-[12px] text-fg-3">10–15s suits most models. Longer can help very expressive voices.</p>
               </div>
-              <div className="mt-4 flex items-center justify-between text-[13px]">Force noise reduction <Switch on={denoise} onChange={setDenoise} /></div>
+              <div className="mt-4 flex items-center justify-between text-[13px]">Force noise reduction <Switch label="Force noise reduction" on={denoise} onChange={setDenoise}  /></div>
               <button className="btn btn-secondary btn-sm mt-5" onClick={reanalyze}><RefreshCw size={13} /> Re-analyze voice</button>
             </div>
             <div className="card p-5">
@@ -518,14 +523,14 @@ function StudioPanel({ p, onRun }: { p: Profile; onRun: (studio: boolean) => voi
       <section className="card mt-5 p-5">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h3 className="flex items-center gap-2 text-[14px] font-semibold"><Sparkles size={15} className="text-accent" /> Studio restored</h3>
+            <h3 className="flex items-center gap-2 text-[14px] font-semibold"><Sparkles size={15} className="text-ember-ink" /> Studio restored</h3>
             <p className="mt-1 text-[12.5px] text-fg-3">Echo, noise and mic colour were removed before cloning. Compare below.</p>
           </div>
           <button className="btn btn-ghost btn-sm" onClick={() => onRun(false)}>Use original sound instead</button>
         </div>
         <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
           <div><div className="mb-2 text-[12px] text-fg-3">Before · as recorded</div><Player src={api.profileAudio(p.id, p.original_file)} height={30} compact /></div>
-          <div><div className="mb-2 text-[12px] font-medium text-accent">After · studio restored</div><Player src={api.profileAudio(p.id, "studio.wav")} height={30} compact /></div>
+          <div><div className="mb-2 text-[12px] font-medium text-ember-ink">After · studio restored</div><Player src={api.profileAudio(p.id, "studio.wav")} height={30} compact /></div>
         </div>
       </section>
     );
@@ -544,7 +549,7 @@ function StudioPanel({ p, onRun }: { p: Profile; onRun: (studio: boolean) => voi
 }
 
 function DeliveryChip({ d }: { d: "expressive" | "balanced" | "calm" }) {
-  const map = { expressive: ["Expressive", "bg-accent-soft text-accent"], balanced: ["Balanced", "bg-surface-2 text-fg-2"], calm: ["Calm", "bg-ok/12 text-ok"] } as const;
+  const map = { expressive: ["Expressive", "bg-accent-soft text-ember-ink"], balanced: ["Balanced", "bg-surface-2 text-fg-2"], calm: ["Calm", "bg-ok/12 text-ok-ink"] } as const;
   return <span className={`chip ${map[d][1]}`}>{map[d][0]}</span>;
 }
 
@@ -553,7 +558,7 @@ function Stat({ label, value, hint }: { label: string; value: string; hint?: str
     <div className="card px-4 py-3.5">
       <div className="text-[12px] text-fg-3">{label}</div>
       <div className="mt-1 text-[22px] font-semibold tabular-nums tracking-tight">{value}</div>
-      {hint && <div className="text-[11.5px] text-fg-3">{hint}</div>}
+      {hint && <div className="text-[12px] text-fg-3">{hint}</div>}
     </div>
   );
 }

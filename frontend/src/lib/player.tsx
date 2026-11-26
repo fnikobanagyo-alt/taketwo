@@ -66,8 +66,11 @@ function PlayerBar({ track, wsRef, onPlaying, onClose }: { track: Track; wsRef: 
 
   useEffect(() => {
     const k = (e: KeyboardEvent) => {
-      const tag = (e.target as HTMLElement)?.tagName;
-      if (e.code === "Space" && tag !== "TEXTAREA" && tag !== "INPUT" && tag !== "SELECT") { e.preventDefault(); wsRef.current?.playPause(); }
+      // Space plays/pauses only when focus is not on something Space already operates.
+      const el = e.target as HTMLElement | null;
+      if (e.code !== "Space" || e.metaKey || e.ctrlKey || e.altKey) return;
+      if (el?.closest?.('button, a, summary, input, textarea, select, [contenteditable="true"], [role="button"], [role="switch"], [role="slider"], [role="checkbox"], [role="option"], [role="menuitem"], [role="tab"]')) return;
+      e.preventDefault(); wsRef.current?.playPause();
     };
     window.addEventListener("keydown", k);
     return () => window.removeEventListener("keydown", k);
@@ -84,20 +87,20 @@ function PlayerBar({ track, wsRef, onPlaying, onClose }: { track: Track; wsRef: 
           </div>
         </div>
         <div className="flex items-center gap-1">
-          <button className="icon-btn" onClick={() => wsRef.current?.skip(-10)} title="Back 10s"><RotateCcw size={15} /></button>
+          <button className="icon-btn" onClick={() => wsRef.current?.skip(-10)} title="Back 10s" aria-label="Back 10 seconds"><RotateCcw size={15} /></button>
           <button className="flex h-10 w-10 items-center justify-center rounded-full bg-invert text-invert-fg transition hover:opacity-85" onClick={() => wsRef.current?.playPause()} title="Play / pause (space)">
             {playing ? <Pause size={17} fill="currentColor" /> : <Play size={17} fill="currentColor" className="ml-0.5" />}
           </button>
-          <button className="icon-btn" onClick={() => wsRef.current?.skip(10)} title="Forward 10s"><RotateCw size={15} /></button>
+          <button className="icon-btn" onClick={() => wsRef.current?.skip(10)} title="Forward 10s" aria-label="Forward 10 seconds"><RotateCw size={15} /></button>
         </div>
-        <span className="w-12 text-right font-mono text-[11.5px] tabular-nums text-fg-3">{fmtTime(t)}</span>
+        <span className="w-12 text-right font-mono text-[12px] tabular-nums text-fg-3">{fmtTime(t)}</span>
         <div ref={el} className="min-w-0 flex-1 cursor-pointer" />
-        <span className="w-12 font-mono text-[11.5px] tabular-nums text-fg-3">{fmtTime(d)}</span>
+        <span className="w-12 font-mono text-[12px] tabular-nums text-fg-3">{fmtTime(d)}</span>
         <button className="btn btn-ghost btn-sm w-12 font-mono" onClick={() => setRate(rate >= 1.5 ? 0.75 : +(rate + 0.25).toFixed(2))} title="Playback speed (preview only)">
           {rate}×
         </button>
-        {track.download && <a className="icon-btn" href={track.download} title="Download"><Download size={16} /></a>}
-        <button className="icon-btn" onClick={onClose} title="Close"><X size={16} /></button>
+        {track.download && <a className="icon-btn" href={track.download} title="Download" aria-label="Download"><Download size={16} /></a>}
+        <button className="icon-btn" onClick={onClose} title="Close" aria-label="Close"><X size={16} /></button>
       </div>
     </div>
   );

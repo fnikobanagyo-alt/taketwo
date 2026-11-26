@@ -39,9 +39,9 @@ export default function ModelsPage() {
         <div>
           <div className="text-[14px] font-medium">Engine library · mlx-audio <span className="font-mono">{lib?.installed ?? "…"}</span></div>
           <div className="mt-0.5 text-[12.5px] text-fg-3">
-            New model architectures arrive through library updates. {lib?.update_available ? <span className="text-accent">Version {lib.latest} is available.</span> : lib?.latest ? "You're up to date." : ""}
+            New model architectures arrive through library updates. {lib?.update_available ? <span className="text-ember-ink">Version {lib.latest} is available.</span> : lib?.latest ? "You're up to date." : ""}
           </div>
-          {upg && upg.status !== "idle" && <div className={`mt-1 text-[12.5px] ${upg.status === "error" ? "text-danger" : "text-ok"}`}>{upg.message}</div>}
+          {upg && upg.status !== "idle" && <div className={`mt-1 text-[12.5px] ${upg.status === "error" ? "text-danger-ink" : "text-ok-ink"}`}>{upg.message}</div>}
         </div>
         <button className="btn btn-secondary" disabled={!lib?.update_available || upg?.status === "running"} onClick={async () => setUpg(await api.upgrade())}>
           {upg?.status === "running" ? <Loader2 size={15} className="animate-spin" /> : <ArrowUpCircle size={15} />} Update library
@@ -71,9 +71,9 @@ export default function ModelsPage() {
           {found.map((m) => (
             <div key={m.repo} className="flex items-center gap-4 px-5 py-3">
               <div className="min-w-0 flex-1">
-                <a href={`https://huggingface.co/${m.repo}`} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 text-[13.5px] hover:text-accent">{m.repo.replace("mlx-community/", "")} <ExternalLink size={11} className="text-fg-3" /></a>
+                <a href={`https://huggingface.co/${m.repo}`} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 text-[13.5px] hover:text-ember-ink">{m.repo.replace("mlx-community/", "")} <ExternalLink size={11} className="text-fg-3" /></a>
                 <div className="text-[12px] text-fg-3">
-                  {m.downloads.toLocaleString()} downloads · updated {m.updated?.slice(0, 10)} · {m.supported ? <span className="text-ok">supported ({m.architecture})</span> : "needs a library update"}
+                  {m.downloads.toLocaleString()} downloads · updated {m.updated?.slice(0, 10)} · {m.supported ? <span className="text-ok-ink">supported ({m.architecture})</span> : "needs a library update"}
                 </div>
               </div>
               {m.added ? <span className="chip bg-surface-2 text-fg-3"><Check size={11} /> Added</span> : <button className="btn btn-secondary btn-sm" disabled={!m.supported} onClick={() => add(m.repo)}><Plus size={13} /> Add</button>}
@@ -104,26 +104,26 @@ function EngineCard({ e, onChange }: { e: Engine; onChange: () => void }) {
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2 text-[14px] font-medium">
             {e.name}
-            {e.recommended && <span className="chip bg-accent-soft text-accent"><Star size={10} fill="currentColor" /> Recommended</span>}
+            {e.recommended && <span className="chip bg-accent-soft text-ember-ink"><Star size={10} fill="currentColor" /> Recommended</span>}
             {e.kind === "design" && <span className="chip bg-surface-2 text-fg-2">Voice Design</span>}
-            {e.loaded && <span className="chip bg-ok/12 text-ok">In memory</span>}
+            {e.loaded && <span className="chip bg-ok/12 text-ok-ink">In memory</span>}
             {e.custom && <span className="chip bg-surface-2 text-fg-3">Custom</span>}
           </div>
           <p className="mt-1.5 text-[12.5px] leading-relaxed text-fg-3">{e.description}</p>
         </div>
-        {e.custom && <button className="icon-btn" title="Remove" onClick={async () => { await api.removeCustom(e.id); onChange(); }}><Trash2 size={15} /></button>}
+        {e.custom && <button className="icon-btn" title="Remove" aria-label="Remove" onClick={async () => { await api.removeCustom(e.id); onChange(); }}><Trash2 size={15} /></button>}
       </div>
       <div className="mt-auto flex items-center justify-between gap-3 pt-4">
-        <div className="min-w-0 truncate text-[11.5px] text-fg-3">{e.license}{e.size_gb ? ` · ${e.size_gb} GB` : ""}</div>
+        <div className="min-w-0 truncate text-[12px] text-fg-3">{e.license}{e.size_gb ? ` · ${e.size_gb} GB` : ""}</div>
         {e.downloaded ? (
-          <span className="chip bg-ok/12 text-ok"><Check size={11} /> Installed</span>
+          <span className="chip bg-ok/12 text-ok-ink"><Check size={11} /> Installed</span>
         ) : prog?.status === "running" ? (
-          <div className="flex w-40 items-center gap-2"><Progress value={prog.progress} className="flex-1" /><span className="font-mono text-[11px] text-fg-3">{Math.round(prog.progress * 100)}%</span></div>
+          <div className="flex w-40 items-center gap-2"><Progress value={prog.progress} className="flex-1" /><span className="font-mono text-[12px] text-fg-3">{Math.round(prog.progress * 100)}%</span></div>
         ) : (
           <button className="btn btn-secondary btn-sm" onClick={async () => { await api.downloadEngine(e.id); setProg({ status: "running", progress: 0 }); }}><Download size={13} /> Download</button>
         )}
       </div>
-      {prog?.status === "error" && <div className="mt-2 text-[12px] text-danger">{prog.error}</div>}
+      {prog?.status === "error" && <div className="mt-2 text-[12px] text-danger-ink">{prog.error}</div>}
     </div>
   );
 }

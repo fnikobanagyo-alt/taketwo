@@ -19,8 +19,10 @@ export type Profile = {
   preview?: { file: string; engine: string; variant: number; created: number; duration: number } | null;
 };
 export type Attempt = { seed: number; temperature?: number; liveliness?: number; ref?: number; wer: number; sim: number; max_gap: number; dur: number; issues: string[]; score: number; secs: number; heard: string };
+export type Take = { take: number; text: string; wer?: number; sim?: number; dur?: number; issues?: string[]; final_issues?: string[]; heard?: string; pitch_hz?: number | null; status?: string; archived?: number };
 export type Chunk = {
   i: number; text: string; pause_after: string; status: "pending" | "running" | "ok" | "flagged";
+  accepted?: { by: "person"; at: number } | null; take?: number; takes?: Take[]; pitch_hz?: number | null;
   file?: string; audio_revision?: number; attempts?: Attempt[]; wer?: number; sim?: number; dur?: number; issues?: string[]; final_issues?: string[]; heard?: string; regen_count?: number;
 };
 export type Generation = {
@@ -33,9 +35,15 @@ export type Generation = {
   duplicate_notice?: { count: number; last: number } | null;
   /** Once done: "clean", or "needs_listen" when any part is doubtful. "done" alone never means every part passed. */
   outcome?: "clean" | "needs_listen" | null;
-  review?: { part: number; text: string; issues: string[]; reasons: string[] }[];
+  review?: ReviewItem[];
+  source?: "app" | "mcp" | "api";
   review_count?: number;
 };
+export type ReviewItem = {
+  part: number; text: string; issues: string[]; reasons: string[]; start?: number | null; end?: number | null;
+  heard?: string; pitch_hz?: number | null; voice_pitch_hz?: number | null; checked_by?: string; take?: number;
+};
+export type Found = { id: string; title: string; voice: string; profile_id: string; status: string; outcome: string | null; created: number; duration?: number; source?: string };
 export type QueueItem = {
   id: string; kind: string; label: string; status: "running" | "queued"; progress: number; message: string;
   gid?: string; title?: string; done?: number; total?: number;
@@ -76,11 +84,11 @@ export class ApiError extends Error {
 }
 
 async function req<T>(method: string, url: string, body?: unknown): Promise<T> {
-  const init: RequestInit = { method };
+  const init: RequestInit = { method, headers: { "X-TakeTwo-Client": "app" } };  // narrations remember they came from the app
   if (body instanceof FormData) init.body = body;
   else if (body !== undefined) {
     init.body = JSON.stringify(body);
-    init.headers = { "Content-Type": "application/json" };
+    init.headers = { ...init.headers, "Content-Type": "application/json" };
   }
   const r = await fetch(url, init);
   if (!r.ok) {
@@ -116,7 +124,7 @@ export const api = {
   integrations: () => req<{ script_found: boolean; apps: { id: string; name: string; connected: boolean; how: string; setup: string }[] }>("GET", "/api/integrations"),
   profileAudio: (id: string, name: string) => `/api/profiles/${id}/audio/${name}`,
 
-  generate: (body: { profile_id: string; text: string; engine?: string; language?: string; params?: Record<string, number>; speed?: number; voice_settings?: VoiceSettings }) =>
+  generate: (body: { profile_id: string; text: string; title?: string; engine?: string; language?: string; params?: Record<string, number>; speed?: number; voice_settings?: VoiceSettings }) =>
     req<Generation>("POST", "/api/generations", body),
   generations: () => req<Generation[]>("GET", "/api/generations"),
   generation: (id: string) => req<Generation>("GET", `/api/generations/${id}`),
@@ -125,6 +133,13 @@ export const api = {
   fixRemaining: (id: string) => req("POST", `/api/generations/${id}/fix-remaining`),
   regenerate: (id: string, i: number, text?: string) => req("POST", `/api/generations/${id}/chunks/${i}/regenerate`, { text }),
   deleteGeneration: (id: string) => req("DELETE", `/api/generations/${id}`),
+  restoreGeneration: (id: string) => req("POST", `/api/generations/${id}/restore`),
+  accept: (id: string, i: number) => req<Generation>("POST", `/api/generations/${id}/chunks/${i}/accept`),
+  unaccept: (id: string, i: number) => req<Generation>("DELETE", `/api/generations/${id}/chunks/${i}/accept`),
+  selectTake: (id: string, i: number, take: number) => req("POST", `/api/generations/${id}/chunks/${i}/select-take`, { take }),
+  takeAudio: (id: string, i: number, take: number, v?: number) => `/api/generations/${id}/chunks/${i}/takes/${take}/audio${v ? `?v=${v}` : ""}`,
+  findNarrations: (p: { q?: string; voice?: string; status?: string; same_script?: string; limit?: number }) =>
+    req<Found[]>("GET", "/api/generations/search?" + new URLSearchParams(Object.entries(p).filter(([, v]) => v !== undefined && v !== "").map(([k, v]) => [k, String(v)]))),
   audioUrl: (id: string, fmt = "wav", v?: number) => `/api/generations/${id}/audio?fmt=${fmt}${v ? `&v=${v}` : ""}`,
   chunkUrl: (id: string, i: number, v?: number | string) => `/api/generations/${id}/chunks/${i}/audio?v=${encodeURIComponent(v ?? 0)}`,
 

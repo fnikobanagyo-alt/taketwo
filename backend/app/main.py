@@ -743,7 +743,7 @@ def create_generation(req: GenRequest, request: Request = None):
     _spec_or_404(engine)
     words = len(req.text.split())
     if words > MAX_SCRIPT_WORDS:
-        raise HTTPException(400, f"Script is {words:,} words. The limit is {MAX_SCRIPT_WORDS:,} per generation; split it into parts.")
+        raise HTTPException(400, f"Script is {words:,} words. The limit is {MAX_SCRIPT_WORDS:,} per narration; split it into parts.")
     cleaned = clean_text(req.text, s.get("pronunciations"), s.get("strip_citations", True))
     with _create_lock:  # check and add in one step, so two quick clicks cannot both get in
         dup = _active_duplicate(p["id"], cleaned)

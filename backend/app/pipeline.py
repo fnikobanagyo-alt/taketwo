@@ -724,7 +724,7 @@ def run_generation(gen_id: str, cancel, only_chunks: list[int] | None = None) ->
         engines.load(gen["engine"])
         t0 = time.time()
         for n, ci in enumerate(todo):
-            gen["message"] = f"Chunk {ci + 1} of {len(gen['chunks'])}"
+            gen["message"] = f"Part {ci + 1} of {len(gen['chunks'])}"
             gen["chunks"][ci]["status"] = "running"
             _save(gen)
             round_ = gen["chunks"][ci].get("regen_count", 0)

@@ -94,7 +94,7 @@ export function UpdateCard() {
 }
 
 function Head({ icon, tone, children }: { icon: React.ReactNode; tone?: "ok" | "danger"; children: React.ReactNode }) {
-  const c = tone === "ok" ? "bg-ok/12 text-ok" : tone === "danger" ? "bg-danger/10 text-danger" : "bg-accent-soft text-accent";
+  const c = tone === "ok" ? "bg-ok/12 text-ok-ink" : tone === "danger" ? "bg-danger/10 text-danger-ink" : "bg-accent-soft text-ember-ink";
   return (
     <div className="flex items-center gap-2 text-[13px] font-semibold text-fg">
       <span className={`grid h-[22px] w-[22px] shrink-0 place-items-center rounded-[7px] ${c}`}>{icon}</span>

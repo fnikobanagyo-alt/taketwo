@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
-import { Check, Copy, Monitor, Moon, Plus, Sun, Trash2 } from "lucide-react";
+import { AlertTriangle, Check, Copy, Monitor, Moon, Plus, RotateCcw, Sun, Trash2 } from "lucide-react";
 import { api, type Settings, type UpdateState } from "../api";
 import { getPref, setPref, type ThemePref } from "../lib/theme";
-import { PageHeader, Slider, Switch, useToast } from "../components/ui";
+import { Empty, PageHeader, Slider, Switch, useToast } from "../components/ui";
 
 type NumKey = { [K in keyof Settings]: Settings[K] extends number ? K : never }[keyof Settings];
 
 const QC: { key: NumKey; label: string; min: number; max: number; step: number; fmt: (v: number) => string; help: string }[] = [
   { key: "max_chunk_chars", label: "Part size (per model call)", min: 100, max: 400, step: 10, fmt: (v) => `${v} chars`,
     help: "Not a script limit. Scripts can be up to 10,000 words; they are split into parts of this size and joined seamlessly. 180–250 is the sweet spot. Bigger parts make models drift, pause or garble." },
-  { key: "max_attempts", label: "Takes per part", min: 1, max: 8, step: 1, fmt: (v) => `${v}`, help: "How many times a part that fails a check is re-generated before the best take is kept and flagged." },
+  { key: "max_attempts", label: "Takes per part", min: 1, max: 8, step: 1, fmt: (v) => `${v}`, help: "How many times a part that fails a check is spoken again before the best take is kept and marked Needs review." },
   { key: "compare_takes", label: "Takes to compare", min: 1, max: 3, step: 1, fmt: (v) => (v === 1 ? "1 · fastest" : `${v} · closest match`),
     help: "Record this many clean takes of every part and keep the one that sounds most like the real voice. 2 gives a noticeably more exact clone at about twice the render time." },
   { key: "max_wer", label: "Word error tolerance", min: 0.02, max: 0.4, step: 0.01, fmt: (v) => `${Math.round(v * 100)}%`, help: "Whisper re-listens to every take. Above this share of wrong or missing words, the take is redone." },
@@ -26,8 +26,17 @@ export default function SettingsPage() {
   const toast = useToast();
   const [s, setS] = useState<Settings | null>(null);
   const [theme, setTheme] = useState<ThemePref>(getPref());
-  useEffect(() => { api.settings().then(setS); }, []);
-  if (!s) return null;
+  const [err, setErr] = useState<string | null>(null);
+  const load = () => { setErr(null); api.settings().then(setS).catch((e) => setErr((e as Error).message)); };
+  useEffect(load, []);
+  if (err)
+    return (
+      <div className="mx-auto max-w-3xl px-10 pb-16 pt-6">
+        <Empty icon={<AlertTriangle size={20} />} title="Settings couldn't load" body={`${err}. TakeTwo's engine may still be starting, or it was closed.`}
+          action={<button className="btn btn-secondary btn-sm" onClick={load}><RotateCcw size={13} /> Try again</button>} />
+      </div>
+    );
+  if (!s) return <div className="mx-auto max-w-3xl px-10 pt-6 text-[13px] text-fg-2" role="status">Loading…</div>;
 
   const save = async (patch: Partial<Settings>) => { setS(await api.saveSettings(patch)); toast("Saved"); };
   const setPron = (list: Settings["pronunciations"]) => setS({ ...s, pronunciations: list });
@@ -48,7 +57,7 @@ export default function SettingsPage() {
 
       <Section title="Appearance">
         <div className="flex items-center justify-between px-5 py-4">
-          <div><div className="text-[13.5px] font-medium">Theme</div><div className="text-[12px] text-fg-3">Match your Mac, or pick one.</div></div>
+          <div><div className="text-[13.5px] font-medium">Theme</div><div className="text-[12px] text-fg-3">Match your computer, or pick one.</div></div>
           <div className="flex gap-2">
             {([["system", Monitor, "System"], ["light", Sun, "Light"], ["dark", Moon, "Dark"]] as const).map(([v, Icon, l]) => (
               <button key={v} onClick={() => { setPref(v); setTheme(v); }} className={`btn btn-sm border ${theme === v ? "border-accent bg-accent-soft text-fg" : "border-line-strong text-fg-2 hover:bg-surface-2"}`}>
@@ -64,7 +73,7 @@ export default function SettingsPage() {
         {rows(MASTER)}
         <div className="flex items-center justify-between px-5 py-4">
           <div><div className="text-[13.5px] font-medium">Remove citation markers</div><div className="text-[12px] text-fg-3">Strips [1], [2,3] and similar so they're never read aloud.</div></div>
-          <Switch on={s.strip_citations} onChange={(v) => save({ strip_citations: v })} />
+          <Switch on={s.strip_citations} onChange={(v) => save({ strip_citations: v })} label="Remove citations" />
         </div>
       </Section>
 
@@ -76,7 +85,7 @@ export default function SettingsPage() {
               <input className="field" placeholder="Written" value={p.from} onChange={(e) => setPron(s.pronunciations.map((q, k) => (k === i ? { ...q, from: e.target.value } : q)))} onBlur={() => save({ pronunciations: s.pronunciations })} />
               <span className="text-fg-3">→</span>
               <input className="field" placeholder="Spoken" value={p.to} onChange={(e) => setPron(s.pronunciations.map((q, k) => (k === i ? { ...q, to: e.target.value } : q)))} onBlur={() => save({ pronunciations: s.pronunciations })} />
-              <button className="icon-btn" onClick={() => save({ pronunciations: s.pronunciations.filter((_, k) => k !== i) })}><Trash2 size={15} /></button>
+              <button className="icon-btn" aria-label={`Remove ${p.from || "this word"}`} onClick={() => save({ pronunciations: s.pronunciations.filter((_, k) => k !== i) })}><Trash2 size={15} /></button>
             </div>
           ))}
           <button className="btn btn-ghost btn-sm -ml-2" onClick={() => setPron([...s.pronunciations, { from: "", to: "" }])}><Plus size={14} /> Add word</button>
@@ -87,7 +96,7 @@ export default function SettingsPage() {
 
       <Updates on={s.check_updates} onChange={(v) => save({ check_updates: v })} />
 
-      <p className="mt-10 text-center text-[12px] text-fg-3">TakeTwo (formerly VoiceForge) · everything runs on this Mac · your voices never leave it</p>
+      <p className="mt-10 text-center text-[12px] text-fg-3">TakeTwo (formerly VoiceForge) · everything runs on this computer · your voices never leave it</p>
     </div>
   );
 }
@@ -133,14 +142,14 @@ function ConnectApps() {
   useEffect(() => { api.integrations().then(setData).catch(() => setData(null)); }, []);
   if (!data) return null;
   return (
-    <Section title="Connect to AI apps" note="Lets Claude list your voices and make narrations through TakeTwo (MCP). Everything stays on this Mac.">
+    <Section title="Connect to AI apps" note="Lets Claude list your voices and make narrations through TakeTwo (MCP). Everything stays on this computer.">
       {data.apps.map((a) => (
         <div key={a.id} className="px-5 py-4">
           <div className="flex items-center justify-between gap-4">
             <div className="text-[13.5px] font-medium">{a.name}</div>
             <div className="flex items-center gap-2">
               {a.connected
-                ? <span className="chip bg-ok/12 text-ok"><Check size={11} /> Connected</span>
+                ? <span className="chip bg-ok/12 text-ok-ink"><Check size={11} /> Connected</span>
                 : <span className="chip bg-surface-2 text-fg-3">Not set up</span>}
               <button className="btn btn-ghost btn-sm" onClick={() => setOpen(open === a.id ? null : a.id)}>{open === a.id ? "Hide setup" : "Setup"}</button>
             </div>
@@ -149,8 +158,8 @@ function ConnectApps() {
             <div className="mt-3">
               <p className="mb-2 text-[12px] text-fg-3">{a.how}</p>
               <div className="relative">
-                <pre className="overflow-x-auto rounded-lg bg-surface-2 p-3 pr-12 font-mono text-[11.5px] leading-relaxed text-fg-2">{a.setup}</pre>
-                <button className="icon-btn absolute right-2 top-2" title="Copy"
+                <pre className="overflow-x-auto rounded-lg bg-surface-2 p-3 pr-12 font-mono text-[12px] leading-relaxed text-fg-2">{a.setup}</pre>
+                <button className="icon-btn absolute right-2 top-2" title="Copy" aria-label="Copy"
                   onClick={() => navigator.clipboard.writeText(a.setup).then(() => toast("Copied"), () => toast("Copy failed", "error"))}>
                   <Copy size={14} />
                 </button>
@@ -159,7 +168,7 @@ function ConnectApps() {
           )}
         </div>
       ))}
-      {!data.script_found && <div className="px-5 py-3 text-[12px] text-warn">The MCP server file (mcp/taketwo_mcp.py) is missing.</div>}
+      {!data.script_found && <div className="px-5 py-3 text-[12px] text-warn-ink">The MCP server file (mcp/taketwo_mcp.py) is missing.</div>}
     </Section>
   );
 }

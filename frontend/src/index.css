@@ -20,7 +20,7 @@
   --line-strong: rgba(48, 30, 12, 0.15);
   --fg: #1b1815;
   --fg-2: #5f5851;
-  --fg-3: #978e85;
+  --fg-3: #6b635b; /* 5:1+ on every light surface (WCAG AA) */
   --invert: #1b1815;
   --invert-fg: #fbf9f6;
   --accent: #f26b1d;
@@ -32,6 +32,10 @@
   --shadow-lg: 0 2px 6px rgba(40, 25, 10, 0.06), 0 24px 60px -12px rgba(40, 25, 10, 0.22);
   --wave: #d9d2c9;
   --ember-ink: #b9471c; /* solid ember for text, 4.5:1+ on surface */
+  --ok-ink: #117a4f;
+  --warn-ink: #945600;
+  --danger-ink: #b92c2c;
+  --focus: var(--ember-ink);
   color-scheme: light;
 }
 :root[data-theme="dark"] {
@@ -44,7 +48,7 @@
   --line-strong: rgba(255, 240, 225, 0.13);
   --fg: #f5f0ea;
   --fg-2: #b4aba1;
-  --fg-3: #7b736a;
+  --fg-3: #9a9187;
   --invert: #f5f0ea;
   --invert-fg: #0b0a09;
   --accent: #ff8a3d;
@@ -56,6 +60,10 @@
   --shadow-lg: 0 2px 6px rgba(0, 0, 0, 0.4), 0 30px 70px -12px rgba(0, 0, 0, 0.7);
   --wave: #3a352f;
   --ember-ink: #ff9a5c;
+  --ok-ink: var(--ok);
+  --warn-ink: var(--warn);
+  --danger-ink: var(--danger);
+  --focus: var(--accent);
   color-scheme: dark;
 }
 
@@ -81,6 +89,10 @@
   --color-ok: var(--ok);
   --color-warn: var(--warn);
   --color-danger: var(--danger);
+  --color-ok-ink: var(--ok-ink);
+  --color-warn-ink: var(--warn-ink);
+  --color-danger-ink: var(--danger-ink);
+  --color-ember-ink: var(--ember-ink);
   --shadow-soft: var(--shadow);
   --shadow-float: var(--shadow-lg);
 }
@@ -97,7 +109,7 @@ body {
 * { scrollbar-width: thin; scrollbar-color: var(--line-strong) transparent; }
 button { cursor: pointer; }
 button:disabled { cursor: default; }
-:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 8px; }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; border-radius: 8px; }
 textarea, input, select { outline: none; }
 
 /* desktop (Electron) window chrome */
@@ -110,18 +122,13 @@ html.desktop .app-main { background: var(--bg); }
 
 /* ------------------------------------------------------------------ signature */
 .ember { background-image: linear-gradient(135deg, #ffc061 0%, #ff7a2f 48%, #e4486e 100%); }
-.ember-text {
-  background-image: linear-gradient(120deg, #ffb347 0%, #ff7a2f 45%, #e4486e 100%);
-  -webkit-background-clip: text; background-clip: text; color: transparent;
-}
 .grain::before {
   content: ""; position: absolute; inset: 0; pointer-events: none; opacity: 0.035; mix-blend-mode: overlay;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
-/* headings: plain words in the sans, the accent in a light serif italic ("Pioneering ideas") */
-.display { font-family: var(--font-sans); font-weight: 500; letter-spacing: -0.03em; }
-.display em { font-family: var(--font-serif); font-weight: 400; font-size: 1.12em; letter-spacing: -0.005em; }
-.display-home { font-family: var(--font-home); font-weight: 400; letter-spacing: -0.01em; }
+/* headings: Instrument Serif, the accent word in solid ember italic */
+.display, .display-home { font-family: var(--font-home); font-weight: 400; letter-spacing: -0.01em; }
+.display em, .display-home em { color: var(--ember-ink); }
 .ember-ink { color: var(--ember-ink); }
 .wordmark { font-family: var(--font-sans); font-weight: 600; letter-spacing: -0.025em; }
 .wordmark em { font-family: var(--font-serif); font-weight: 500; font-size: 1.14em; letter-spacing: 0; }
@@ -157,7 +164,7 @@ html.desktop .app-main { background: var(--bg); }
 .btn-secondary:hover:not(:disabled) { background: var(--surface-2); }
 .btn-ghost { color: var(--fg-2); }
 .btn-ghost:hover:not(:disabled) { background: var(--surface-2); color: var(--fg); }
-.btn-danger { color: var(--danger); }
+.btn-danger { color: var(--danger-ink); }
 .btn-danger:hover:not(:disabled) { background: color-mix(in srgb, var(--danger) 10%, transparent); }
 .icon-btn {
   display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 9px;
@@ -174,14 +181,14 @@ textarea.field { height: auto; padding: 10px 12px; line-height: 1.6; }
 .field::placeholder { color: var(--fg-3); }
 .field:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
 .label { display: block; margin-bottom: 6px; font-size: 12px; font-weight: 500; color: var(--fg-2); }
-.eyebrow { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--fg-3); }
+.eyebrow { font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--fg-3); }
 .chip {
   display: inline-flex; align-items: center; gap: 4px; height: 22px; padding: 0 8px; border-radius: 999px;
-  font-size: 11.5px; font-weight: 500; white-space: nowrap;
+  font-size: 12px; font-weight: 500; white-space: nowrap;
 }
 .kbd {
   display: inline-flex; align-items: center; height: 18px; padding: 0 5px; border-radius: 5px; font-family: var(--font-mono);
-  font-size: 10.5px; border: 1px solid currentColor; opacity: 0.55;
+  font-size: 12px; border: 1px solid currentColor; opacity: 0.7;
 }
 
 /* range slider */
@@ -205,3 +212,8 @@ input[type="range"].slider:active::-webkit-slider-thumb { transform: scale(1.15)
 }
 .switch[data-on="true"]::after { transform: translateX(15px); background: var(--invert-fg); }
 html.desktop .top-drag { height: 30px; margin-bottom: -18px; background: linear-gradient(var(--bg) 55%, transparent); }
+
+/* nothing loops forever for people who asked for less motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+}

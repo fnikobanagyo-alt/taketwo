@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { ArrowLeft, Captions, Copy, Download, Loader2, RotateCcw, Trash2, Upload } from "lucide-react";
 import { api, fmtDuration, fmtTime, LANGS, timeAgo, type Transcript } from "../api";
 import Player from "../components/Player";
-import { Empty, PageHeader, Progress, Select, useToast } from "../components/ui";
+import { Empty, PageHeader, Progress, Select, useConfirm, useToast } from "../components/ui";
 import { go } from "../App";
 
 export default function TranscribePage({ id }: { id?: string }) {
@@ -36,7 +36,7 @@ function List() {
         <div className="text-[15px] font-medium">Drop audio or video to transcribe</div>
         <div className="mt-1 text-[12.5px] text-fg-3">Any length · mp3, wav, m4a, mp4, mov, webm…</div>
         <div className="mt-5 flex items-center gap-2">
-          <Select className="w-44" value={lang} onChange={setLang} options={[{ value: "", label: "Detect language" }, ...Object.entries(LANGS).map(([k, v]) => ({ value: k, label: v }))]} />
+          <Select label="Language" className="w-44" value={lang} onChange={setLang} options={[{ value: "", label: "Detect language" }, ...Object.entries(LANGS).map(([k, v]) => ({ value: k, label: v }))]} />
           <label className="btn btn-primary cursor-pointer"><Upload size={15} /> Choose file
             <input type="file" accept="audio/*,video/*" className="hidden" onChange={(e) => e.target.files?.[0] && upload(e.target.files[0])} />
           </label>
@@ -65,6 +65,7 @@ function List() {
 
 function Detail({ id }: { id: string }) {
   const toast = useToast();
+  const [ask, confirmDialog] = useConfirm();
   const [t, setT] = useState<Transcript | null>(null);
   const [poke, setPoke] = useState(0);
   useEffect(() => {
@@ -100,19 +101,20 @@ function Detail({ id }: { id: string }) {
             <a className="btn btn-secondary btn-sm" href={api.transcriptExport(t.id, "srt")}><Download size={13} /> SRT</a>
             <a className="btn btn-secondary btn-sm" href={api.transcriptExport(t.id, "vtt")}><Download size={13} /> VTT</a>
             <a className="btn btn-secondary btn-sm" href={api.transcriptExport(t.id, "txt")}><Download size={13} /> TXT</a>
-            <button className="btn btn-danger btn-sm" onClick={async () => { if (confirm("Delete this transcript?")) { await api.deleteTranscript(t.id); go({ page: "transcribe" }); } }}><Trash2 size={13} /></button>
+            <button className="btn btn-danger btn-sm" aria-label="Delete transcript" onClick={async () => { if (await ask("Delete this transcript?", "The transcript and its captions are removed and can't be undone.")) { await api.deleteTranscript(t.id); go({ page: "transcribe" }); } }}><Trash2 size={13} /></button>
+            {confirmDialog}
           </div>
         )}
       </div>
       {running && (
         <div className="card p-5">
-          <div className="mb-2 flex justify-between text-[13px]"><span className="flex items-center gap-2"><Loader2 size={14} className="animate-spin text-accent" /> {t.job?.message || "Queued…"}</span><span className="font-mono text-fg-3">{Math.round((t.job?.progress ?? 0) * 100)}%</span></div>
+          <div className="mb-2 flex justify-between text-[13px]"><span className="flex items-center gap-2"><Loader2 size={14} className="animate-spin text-ember-ink" /> {t.job?.message || "Queued…"}</span><span className="font-mono text-fg-3">{Math.round((t.job?.progress ?? 0) * 100)}%</span></div>
           <Progress value={t.job?.progress ?? 0} />
         </div>
       )}
       {t.status === "error" && (
         <div className="card flex items-center justify-between gap-4 border-danger/40 p-4 text-[13px]">
-          <span className="text-danger">{t.error}</span>
+          <span className="text-danger-ink">{t.error}</span>
           <button className="btn btn-secondary btn-sm shrink-0" onClick={retry}><RotateCcw size={13} /> Retry</button>
         </div>
       )}
@@ -122,7 +124,7 @@ function Detail({ id }: { id: string }) {
           <div className="card divide-y divide-line">
             {t.captions?.map((c, i) => (
               <div key={i} className="flex gap-5 px-5 py-3">
-                <span className="w-14 shrink-0 pt-0.5 font-mono text-[11.5px] text-fg-3">{fmtTime(c.start)}</span>
+                <span className="w-14 shrink-0 pt-0.5 font-mono text-[12px] text-fg-3">{fmtTime(c.start)}</span>
                 <p className="text-[14px] leading-relaxed">{c.text}</p>
               </div>
             ))}

@@ -31,3 +31,11 @@ _Avoid_: Cancelled, interrupted
 **Needs review**:
 A part whose kept take failed a quality check, or a narration that has such parts. The narration is still complete and playable.
 _Avoid_: Flagged
+
+**Sounds fine**:
+A person's decision, after listening, to keep a part that needs review as it is. The part stops needing review until it is spoken again.
+_Avoid_: Approve, dismiss, accept
+
+**Earlier take**:
+A part's previous kept take, held after a re-speak so the two can be heard side by side and either one kept.
+_Avoid_: Backup, version

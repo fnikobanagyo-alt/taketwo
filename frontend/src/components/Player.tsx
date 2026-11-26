@@ -46,9 +46,9 @@ export default function Player({ src, height = 40, compact = false }: { src: str
       <div className="min-w-0 flex-1">
         {/* The waveform container stays mounted so a later source can load after an error. */}
         <div ref={el} className={`w-full cursor-pointer ${error ? "hidden" : ""}`} />
-        {error && <div className="text-xs text-danger">Could not load audio</div>}
+        {error && <div className="text-xs text-danger-ink">Could not load audio</div>}
       </div>
-      <div className="shrink-0 text-right font-mono text-[11px] tabular-nums text-fg-3">
+      <div className="shrink-0 text-right font-mono text-[12px] tabular-nums text-fg-3">
         {fmtTime(time)} / {fmtTime(dur)}
       </div>
     </div>
