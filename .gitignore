@@ -29,3 +29,11 @@
 /desktop/dist/
 *.tsbuildinfo
 .DS_Store
+
+# Rust port: made on each computer, or private
+/rust/target/
+/rust/.baseline/
+/rust/.models/
+/rust/.tools/
+/rust/out/
+/rust/ab/private/
