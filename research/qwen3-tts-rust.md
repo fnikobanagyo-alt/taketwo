@@ -181,7 +181,7 @@ VoiceForge's `backend/app/qwen_compat.py` works around two things in mlx-audio 0
 
 "No such counting found" means a search for `> 0`, `!= 0`, `gt(0)` and `ne(0)` length counting in each crate's Qwen code found nothing (searched 2026-11-26).
 
-**Verdict.** None of the Rust options is known to have bug (a). All of them copy the official proportional cut (b). That is safe only if their decoders return exactly `frames × 1920`, which nobody has verified at runtime. In our fork, replace the cut with `ref_frames × 1920` and assert the decoded length. This is the same rule `qwen_compat.py` enforces.
+**Verdict.** None of the Rust options I read is known to have bug (a). For `qwen_tts`, the tokenizer `decode` returns the decoder output with no length trim based on code values ([tokenizer/v2/mod.rs L207-L211](https://github.com/danielclough/qwen3-tts-rs/blob/4fc1a5da82f1bb8a69fd6e615662913dac54b37e/qwen_tts/src/audio/tokenizer/v2/mod.rs#L207-L211)). Every cloning port I read (`qwen_tts`, TrevorS, `wavekat-tts`, second-state) copies the official proportional cut (b). darkautism was not read. That is safe only if their decoders return exactly `frames × 1920`, which nobody has verified at runtime. In our fork, replace the cut with `ref_frames × 1920` and assert the decoded length. This is the same rule `qwen_compat.py` enforces.
 
 ## Not verified
 
