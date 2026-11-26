@@ -30,11 +30,13 @@ jobs:
       - uses: ilammy/msvc-dev-cmd@v1   # puts cl.exe (MSVC) on PATH; nvcc needs it as the host compiler
       - name: Build (${{ matrix.features }})
         working-directory: prototypes/qwen3-tts-rs-fork
-        shell: bash
+        shell: pwsh   # not bash: Git's /usr/bin/link.exe would shadow MSVC's linker
         run: |
           nvcc --version
-          cargo build --release -p qwen_tts_cli --features "${{ matrix.features }}" 2>&1 | tee build.log
-          ls -la target/release/qwen-tts.exe
+          (Get-Command link.exe).Source
+          cargo build --release -p qwen_tts_cli --features "${{ matrix.features }}" 2>&1 | Tee-Object -FilePath build.log
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          Get-Item target/release/qwen-tts.exe | Select-Object Name, Length
       - name: Keep the build log
         if: always()
         uses: actions/upload-artifact@v4
