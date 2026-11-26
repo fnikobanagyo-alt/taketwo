@@ -4,5 +4,22 @@ description = "TakeTwo models behind traits (voice, transcriber, speaker encoder
 version.workspace = true
 edition.workspace = true
 license.workspace = true
+build = "build.rs"
+
+[features]
+default = []
+# One switch for every GPU piece: Candle (qwen_tts) and whisper.cpp both build for CUDA.
+cuda = ["qwen_tts/cuda"]
+flash-attn = ["cuda", "qwen_tts/flash-attn"]
+# Metal for Candle only; whisper.cpp stays on CPU on the Mac until S13 decides.
+metal = ["qwen_tts/metal"]
 
 [dependencies]
+qwen_tts = { path = "../../vendor/qwen_tts" }
+candle-core = "0.9"
+# download-binaries: ort-sys fetches pyke's prebuilt ONNX Runtime at build time and links it
+# statically on macOS arm64 and Windows x64, so no DLL ships beside the exe for the CPU provider.
+ort = { version = "=2.0.0-rc.15", default-features = false, features = ["std", "download-binaries", "copy-dylibs", "tls-native", "api-31"] }
+
+[build-dependencies]
+cmake = "0.1"

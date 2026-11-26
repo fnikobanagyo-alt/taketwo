@@ -4,4 +4,9 @@ version.workspace = true
 edition.workspace = true
 license.workspace = true
 
+[features]
+cuda = ["taketwo-voice/cuda"]
+flash-attn = ["taketwo-voice/flash-attn"]
+
 [dependencies]
+taketwo-voice = { path = "../taketwo-voice" }

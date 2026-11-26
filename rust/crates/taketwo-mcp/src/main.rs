@@ -2,6 +2,7 @@
 fn main() {
     if std::env::args().nth(1).as_deref() == Some("--version") {
         println!("taketwo-mcp {}", env!("CARGO_PKG_VERSION"));
+        println!("{}", taketwo_voice::link_report());
         return;
     }
     eprintln!("taketwo-mcp: not built yet; only --version works in this skeleton");
