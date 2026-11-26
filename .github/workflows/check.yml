@@ -1,0 +1,34 @@
+# Runs the same checks a contributor runs locally (scripts/check.py) on every push and pull request.
+# Apple Silicon runner, because the engine's MLX packages only install on arm64 macOS.
+name: Checks
+on:
+  push:
+    branches: [main]
+  pull_request:
+permissions:
+  contents: read
+concurrency:
+  group: checks-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  check:
+    runs-on: macos-14
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: |
+            frontend/package-lock.json
+            desktop/package-lock.json
+      - name: Install ffmpeg
+        run: brew install ffmpeg
+      - name: Install TakeTwo (packages and interface, no models)
+        run: ./start.sh --setup
+      - name: Run checks on a temporary library
+        run: backend/.venv/bin/python -B scripts/check.py

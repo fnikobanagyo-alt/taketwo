@@ -6,6 +6,17 @@ A private voice-cloning studio that runs entirely on your Mac. It focuses on one
 that sounds like the cloned voice, with every part checked for dropouts, cut-off endings and wrong words.
 Inspired by [Voicebox](https://github.com/jamiepine/voicebox).
 
+![Checks](https://github.com/fnikobanagyo-alt/taketwo/actions/workflows/check.yml/badge.svg)
+
+![The review room: the narration's waveform with the part that needs review shaded, and that part's reason with Sounds fine, Re-speak and Edit words](.github/assets/review.png)
+
+| Home | |
+|---|---|
+| ![Studio Desk home: resume a draft, jump to what needs review, recent scripts and voices](.github/assets/home.png) | Every part of a narration is checked for cut-off endings, wrong words, stray sounds and voice drift. What the checks doubt lands in the review room for you to hear and keep, re-speak or edit. |
+
+See [CHANGELOG.md](CHANGELOG.md) for what's new, [CONTRIBUTING.md](CONTRIBUTING.md) to help, and
+[SECURITY.md](SECURITY.md) to report a problem privately.
+
 > **Use it responsibly.** Clone only your own voice, or a voice whose owner has given you permission. Don't
 > use it to impersonate, deceive or harass anyone. Follow the laws where you live and label synthetic speech
 > where that is expected.
@@ -42,7 +53,7 @@ ditto dist/mac-arm64/TakeTwo.app /Applications/TakeTwo.app
 
 ## Your first narration
 1. **Voices → Clone a voice.** Add 1 to 5 minutes of one person speaking, in a quiet room.
-2. **Text to Speech.** Choose the voice, paste a script (up to 10,000 words) and press Generate.
+2. **Text to Speech.** Choose the voice, paste a script (up to 10,000 words) and press Narrate.
 3. **Listen.** A narration ends as *Done*, or *Done, needs a listen* with the doubtful parts listed. The checks
    are good but not perfect, so listen before publishing. Any part can be re-spoken on its own.
 4. **Export** WAV, MP3, SRT, VTT or the script.

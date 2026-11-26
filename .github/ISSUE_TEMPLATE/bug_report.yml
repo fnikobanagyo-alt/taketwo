@@ -1,0 +1,36 @@
+name: Bug report
+description: Something in TakeTwo doesn't work as it should
+labels: [needs-triage]
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for reporting. Please don't attach recordings of anyone's voice without their permission.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you did, what you expected, and what happened instead.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: "1. Open Text to Speech\n2. …"
+  - type: input
+    id: version
+    attributes:
+      label: TakeTwo version
+      description: Settings → Updates shows it.
+      placeholder: "2.0.0"
+  - type: input
+    id: mac
+    attributes:
+      label: Computer
+      placeholder: "MacBook Pro M3, 18 GB, macOS 15.2"
+  - type: textarea
+    id: log
+    attributes:
+      label: Log (optional)
+      description: The end of ~/Library/Logs/TakeTwo/engine.log, or the output of `./start.sh`. Remove anything private.
+      render: text
