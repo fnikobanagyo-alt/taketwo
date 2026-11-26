@@ -1,0 +1,17 @@
+# TakeTwo Rust workspace. GPU features (metal, cuda, flash-attn) are opt-in per crate,
+# so a plain `cargo test --workspace` needs no GPU and no model.
+[workspace]
+members = [
+    "vendor/qwen_tts",
+    "vendor/qwen_tts_cli",
+    "crates/taketwo-core",
+    "crates/taketwo-voice",
+    "crates/taketwo-engine",
+    "crates/taketwo-mcp",
+]
+resolver = "3"
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+license = "Apache-2.0"

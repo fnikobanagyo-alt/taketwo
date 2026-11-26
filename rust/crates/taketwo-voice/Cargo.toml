@@ -1,0 +1,8 @@
+[package]
+name = "taketwo-voice"
+description = "TakeTwo models behind traits (voice, transcriber, speaker encoder, restorer)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]

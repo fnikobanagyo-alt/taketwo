@@ -3376,6 +3376,26 @@ dependencies = [
 ]
 
 [[package]]
+name = "taketwo-core"
+version = "0.1.0"
+dependencies = [
+ "dirs",
+ "tempfile",
+]
+
+[[package]]
+name = "taketwo-engine"
+version = "0.1.0"
+
+[[package]]
+name = "taketwo-mcp"
+version = "0.1.0"
+
+[[package]]
+name = "taketwo-voice"
+version = "0.1.0"
+
+[[package]]
 name = "tar"
 version = "0.4.44"
 source = "registry+https://github.com/rust-lang/crates.io-index"

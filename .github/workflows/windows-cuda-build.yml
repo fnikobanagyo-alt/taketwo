@@ -4,7 +4,7 @@ name: Windows CUDA build (prototype)
 on:
   push:
     branches: [prototype/qwen3-tts-rust]
-    paths: [prototypes/**, .github/workflows/windows-cuda-build.yml]
+    paths: [prototypes/**, rust/**, .github/workflows/windows-cuda-build.yml]
   workflow_dispatch:
 permissions:
   contents: read
@@ -29,7 +29,7 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
       - uses: ilammy/msvc-dev-cmd@v1   # puts cl.exe (MSVC) on PATH; nvcc needs it as the host compiler
       - name: Build (${{ matrix.features }})
-        working-directory: prototypes/qwen3-tts-rs-fork
+        working-directory: rust
         shell: pwsh   # not bash: Git's /usr/bin/link.exe would shadow MSVC's linker
         run: |
           nvcc --version
@@ -42,5 +42,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: build-log-${{ strategy.job-index }}
-          path: prototypes/qwen3-tts-rs-fork/build.log
+          path: rust/build.log
           if-no-files-found: ignore

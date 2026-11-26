@@ -1,12 +1,12 @@
 # PROTOTYPE: Qwen3-TTS voice cloning in Rust (map ticket #7)
 
 Throwaway. Answers one question: does a Candle (Rust) Qwen3-TTS 1.7B clone sound as good as today's MLX engine?
-Not for main. `qwen3-tts-rs-fork/` is danielclough/qwen3-tts-rs at 4fc1a5da (MIT OR Apache-2.0; its LICENSE file
+Not for main. The fork now lives in `rust/vendor/` (moved there in step S01 of `rust/PLAN.md`): danielclough/qwen3-tts-rs at 4fc1a5da (MIT OR Apache-2.0; its LICENSE file
 says MIT, Copyright Microsoft, kept as is).
 
 ## Run (Apple Silicon)
 ```bash
-cd prototypes/qwen3-tts-rs-fork
+cd rust
 cargo build --release -p qwen_tts_cli --features metal,accelerate,audio-loading
 target/release/qwen-tts --model-path "$HOME/Library/Application Support/TakeTwo/models/qwen3-tts-1.7b-base" \
   --device metal --dtype bf16 --seed 1234 --temperature 0.7 --top-p 0.9 --top-k 40 --repetition-penalty 1.05 \

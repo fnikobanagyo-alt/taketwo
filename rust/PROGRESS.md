@@ -6,7 +6,7 @@ The loop appends one entry per session at the bottom: date, step id, what was bu
 
 | Step | Status |
 |---|---|
-| S01 Workspace, safety rails, tools | todo |
+| S01 Workspace, safety rails, tools | done |
 | S02 Windows CUDA link proof | todo |
 | S03 Text logic | todo |
 | S04 Library store, seeder, one-time copy | todo |
@@ -32,14 +32,14 @@ The loop appends one entry per session at the bottom: date, step id, what was bu
 
 | Gate | Status | Evidence |
 |---|---|---|
-| G1 | not run | |
+| G1 | pass (start) | S01 entry below: `cargo test --workspace` exit 0, 143 run, 0 failed |
 | G2 | not run | |
 | G3 | not run | |
 | G4 | not run | |
 | G5 | not run | |
 | G6 | not run | |
 | G7 | not run | |
-| G8 | not run | |
+| G8 | exit 0, attribution pending | S01 entry below: `g8.sh` exit 0; data/ 0 differences; App Support/VoiceForge differences are cache and storage files only, for the lead to attribute |
 
 ## Baseline for G8 (recorded 2026-11-27, before any Rust was written)
 
@@ -65,3 +65,118 @@ The loop appends one entry per session at the bottom: date, step id, what was bu
 - No gate has evidence yet. Not done, not blocked on Franz.
 - Next step: **S01 Workspace, safety rails, tools**. Every other step needs it, and it starts G1 and gives the G8 script.
 - Builder must hand back: `cd rust && cargo test --workspace` passing, `rust/scripts/g8.sh` exiting 0, one commit, a log entry here with the real output.
+
+### 2026-11-27, builder (Opus), S01 Workspace, safety rails, tools
+Built:
+- Cargo workspace `rust/Cargo.toml` (resolver 3, one `rust/target`). Members: `vendor/qwen_tts`, `vendor/qwen_tts_cli`, `crates/taketwo-core`, `crates/taketwo-voice` (empty lib), `crates/taketwo-engine` and `crates/taketwo-mcp` (mains that answer `--version`, otherwise exit 2). No GPU feature is on by default.
+- The fork was moved with `git mv` to `rust/vendor/`: `qwen_tts`, `qwen_tts_cli`, `LICENSE`, `cudnn_version_shim.c`, plus `README.md`, `TESTS.md`, the png, `.gitignore` and the fork's own `.github/release.yml`.
+  - These extras moved because `qwen_tts/Cargo.toml` has `readme = "../README.md"` and the fork's release.yml builds the shim from the fork root. `prototypes/qwen3-tts-rs-fork/` is now gone.
+  - The fork's `Cargo.toml` was removed. Its `Cargo.lock` became `rust/Cargo.lock`, so the listened-to versions are kept: a diff shows only the 4 taketwo crates added and no version moved.
+  - No vendored source was changed.
+- `prototypes/README.md` paths now point at `rust/`. `.github/workflows/windows-cuda-build.yml` changed only in `working-directory: rust`, the artifact path `rust/build.log` and `rust/**` in the paths filter.
+- `taketwo-core::paths` holds the isolation table as code. Every function takes its base folders as parameters.
+  - `Mode::resolve`: `TAKETWO_DATA` means isolated, `--live` means live, neither is refused, both together are refused, and empty counts as unset.
+  - `library_dir`, `lock_file` and `address_files` all sit under the data folder when isolated. When live they are under `<app data>/TakeTwo/library`, `<app data>/TakeTwo/engine.lock` and `engine.json` under TakeTwo and VoiceForge.
+  - `default_ports`: isolated uses 8790-8795, 8798 and 8799; live uses 8766-8785.
+  - `check_port` refuses 8765-8785 outside live mode.
+  - `publish_address` writes only in live mode and only for ports 8766-8785, ignoring write errors, as `_publish_address` does. The JSON matches Python's `json.dumps`: `{"url": "http://h:p", "pid": n, "started": <float repr>}`.
+  - `EngineLock` is an OS file lock (`File::try_lock`) with the pid written inside for people to read. The OS frees it when the process dies, so a stale lock is taken over.
+  - `parse_max_takes`: unset or empty means no cap. 0, negative or non-numeric values are errors.
+  - `live_app_data_root()` (`dirs::data_local_dir`) is the only function that looks at the real home, and no test calls it.
+- Tests:
+  - 14 unit tests cover each rule: port boundaries 8764/8765/8766/8785/8786, an address file never written when isolated even when handed live paths, the exact JSON, and the second lock failing then freeing on drop.
+  - `tests/stale_lock.rs` runs a real child process that takes the lock and exits while holding it, then checks the parent takes the lock over.
+  - It lives in its own test binary. The first version spawned the child from the unit-test binary, and the lock test failed once in 5 runs (the lock was still held after drop).
+  - Hypothesis, not proven: a fork from one test briefly shares another test's lock descriptor. Since the move, 25 repeated runs and every full run have passed.
+  - S07 should keep this in mind, because the engine will spawn ffmpeg while it holds the lock.
+  - The tests read the pid only after the lock is released, because Windows blocks reads of an exclusively locked file.
+- cmake 4.4.5 is installed in `rust/.tools/venv` (uv, PyPI `cmake`), with only `rust/.tools/bin/cmake` symlinked so that `python3` is not shadowed.
+- `rust/scripts/env.sh` (bash or zsh, no `set -e`/`exit`/`cd`) does three things:
+  - Puts `rust/.tools/bin` on PATH.
+  - Exports `TAKETWO_MODELS=rust/.models`, with a symlink `qwen3-tts-1.7b-base` to the converted model for read-only use.
+  - Exports a fresh `mktemp -d` `TAKETWO_DATA`.
+  It never sets `--live`.
+- `rust/scripts/g8.sh` (read-only apart from `git fetch origin main`) works in two parts.
+  - It fails on any of three conditions:
+    - `4dd65c3` is on `main` or `origin/main`. Any `merge-base` exit other than 1 also fails.
+    - 8766 health lacks `"name":"TakeTwo"`.
+  - It then prints how main moved since `4448aaa` and the metadata differences against `rust/.baseline/*.manifest`, in the same `path|size|mtime`, C-sorted format.
+    - The format was calibrated: data/ re-listed against its baseline gave 0 differing lines.
+    - The default output is counts only, per top-level folder and audio/other. `--names` prints the private paths; never paste that output.
+
+Commands and real results:
+```
+$ cd rust && cargo test --workspace   (real output, filtered to Running/test result lines; 143 tests run, 1 ignored = the child helper)
+     Running unittests src/lib.rs (…
+test result: ok. 116 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.69s
+     Running tests/integration_tests.rs (…
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running unittests src/main.rs (…
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running unittests src/lib.rs (…
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running tests/stale_lock.rs (…
+test result: ok. 1 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running unittests src/main.rs (…
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running unittests src/main.rs (…
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running unittests src/lib.rs (…
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+   Doc-tests qwen_tts
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+   Doc-tests taketwo_core
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+   Doc-tests taketwo_voice
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+exit 0
+
+$ rust/scripts/g8.sh                           # exit 0 (verbatim)
+ok: Rust port is not on main (4448aaa)
+ok: Rust port is not on origin/main (4448aaa)
+ok: 8766 health: {"ok":true,"name":"TakeTwo","formerly":"VoiceForge","version":"2.0.0","loaded_engine":null}
+
+--- for the lead to attribute (does not fail the gate) ---
+main since baseline 4448aaa: 0 new commit(s)
+origin/main since baseline 4448aaa: 0 new commit(s)
+data/: 0 added, 0 removed, 0 changed (size or mtime)
+App Support/VoiceForge: 7 added, 0 removed, 22 changed (size or mtime)
+  added Cache/ other: 5
+  added Code Cache/ other: 1
+  added GraphiteDawnCache/ other: 1
+  changed (top-level file) other: 1
+  changed Cache/ other: 8
+  changed Code Cache/ other: 1
+  changed DawnGraphiteCache/ other: 1
+  changed DawnWebGPUCache/ other: 1
+  changed GPUCache/ other: 1
+  changed GraphiteDawnCache/ other: 4
+  changed Local Storage/ other: 3
+  changed Session Storage/ other: 2
+
+G8 PASS
+
+$ source rust/scripts/env.sh && cmake --version && test -d "$TAKETWO_DATA" && test -d rust/vendor/qwen_tts && test ! -e prototypes/qwen3-tts-rs-fork/qwen_tts   # exit 0
+cmake version 4.4.5
+
+$ rust/target/debug/taketwo-engine --version  -> taketwo-engine 0.1.0 ; taketwo-mcp --version -> taketwo-mcp 0.1.0
+```
+No engine was started, no port was bound, no model was run, nothing was pushed.
+
+The G8 fail path was also checked with a throwaway copy, since deleted. It used `FIRST_COMMIT=4448aaa` and health on unused port 8798. It printed `FAIL ... is on main`, `FAIL ... is on origin/main`, `FAIL: 8766 health did not name TakeTwo: no answer` and `G8 FAIL`, and exited 1.
+
+Not done / notes:
+- The vendored crates print 3 `unused dependency` warnings (`candle-transformers`, `float8`, `tracing-appender`). They were left as they are; this step does not change the vendored crate.
+- `env.sh` makes a new temporary folder each time it is sourced and does not clean it up. About 4 empty `$TMPDIR/taketwo-data.*` folders from this session are left; a safety check refused their removal.
+- `scripts/check.py` was not run. It runs the Python and React checks, and this step changed neither. Its `npm run build` could also write caches into the symlinked `node_modules` of the main checkout.
+- The lock is untested on Windows. While it is held, the "another engine" error shows an empty pid there.
+- Hindsight was unreachable, so no `retain` was made.
+- cmake is 4.x. If whisper.cpp's `cmake_minimum_required` is too old for cmake 4 (S02/S13), set `CMAKE_POLICY_VERSION_MINIMUM=3.5` for that build.
+
+Questions for the lead:
+1. Isolated mode gives the address file the path `<TAKETWO_DATA>/engine.json`, but by the rule `publish_address` never writes it. Should S07/S08 write it when isolated so the MCP "start an engine" test can find a dev engine, or should discovery stay on `TAKETWO_URL` and the dev-port scan?
+2. These choices were not in the plan; please confirm or change them:
+   - `TAKETWO_DATA` together with `--live` is refused.
+   - `TAKETWO_MAX_TAKES=0` is an error.
+   - The live lock file is at `<app data>/TakeTwo/engine.lock`.
+3. Safety: the plan's stop-and-clean check `pgrep -fl 'taketwo-(engine|mcp)|target/.*/taketwo'` matches 5 processes this work did not start: `.../uv/environments-v2/taketwo-mcp-<hash>/bin/python .../voiceforge/mcp/taketwo_mcp.py`. They look like Franz's own Python MCP servers. A builder told "pgrep must be empty" must not kill them. Should the pattern be tightened (for example `rust/target/.*/taketwo`)?
