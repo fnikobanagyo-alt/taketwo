@@ -4,6 +4,7 @@ from __future__ import annotations
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -149,13 +150,23 @@ class InstallerTests(unittest.TestCase):
         for line in names.values():
             self.assertIn(re.sub(r"\[.*\]", "", line).lower().replace("_", "-"), lock.lower().replace("_", "-"))
 
+    FAKED = {"uname", "sw_vers", "ffmpeg", "ffprobe", "npm", "node", "python3.11"}
+
     def _start(self, bin_dir, **env):
         with tempfile.TemporaryDirectory() as t:
             (Path(t) / "start.sh").write_text((ROOT / "start.sh").read_text())
             for d in ("backend", "frontend"):
                 (Path(t) / d).mkdir()
-            return subprocess.run(["/bin/zsh", "start.sh", "--check"], cwd=t, capture_output=True, text=True, timeout=30,
-                                  env={"HOME": t, "PATH": f"{bin_dir}:/usr/bin:/bin", "VOICEFORGE_PATH": f"{bin_dir}:/usr/bin:/bin", **env})
+            # The system tools start.sh needs, minus the ones each case fakes or removes (Linux has ffmpeg in /usr/bin).
+            sys_bin = Path(t) / "sysbin"
+            sys_bin.mkdir()
+            for d in ("/usr/bin", "/bin"):
+                for f in Path(d).iterdir():
+                    if f.name not in self.FAKED and not (sys_bin / f.name).exists():
+                        (sys_bin / f.name).symlink_to(f)
+            path = f"{bin_dir}:{sys_bin}"
+            return subprocess.run([shutil.which("zsh") or "/bin/zsh", "start.sh", "--check"], cwd=t, capture_output=True, text=True, timeout=30,
+                                  env={"HOME": t, "PATH": path, "TAKETWO_PATH": path, "VOICEFORGE_PATH": path, **env})
 
     def _bin(self, t, **scripts):
         for name, body in scripts.items():
