@@ -59,3 +59,9 @@ The loop appends one entry per session at the bottom: date, step id, what was bu
 - Wrote `rust/PLAN.md` (21 steps, 8 gate commands) and this file. No Rust written.
 - Found: no cmake, no Homebrew, no `cargo tauri`; no ggml Whisper model on disk (only MLX weights); swap already high (8.9 of 10 GB); 40 GB disk free; ports 8796 and 8797 busy.
 - Open for Franz, only if S13 fails: approve one download of `ggml-large-v3-turbo.bin` (1.6 GB).
+
+### 2026-11-27, lead, iteration 1 decision
+- State checked by command: branch `rust/taketwo` at `76ce9e0`, only planning commits; `rust/` holds `PLAN.md`, `PROGRESS.md` and the git-ignored `.baseline/`. No Rust workspace yet. `main` and `origin/main` still `4448aaa`; `git diff --stat rust/taketwo main -- backend/app mcp` empty; 8766 health answers `"name":"TakeTwo"`; cargo 1.100.0, uv present, cmake absent; 41 GB disk free.
+- No gate has evidence yet. Not done, not blocked on Franz.
+- Next step: **S01 Workspace, safety rails, tools**. Every other step needs it, and it starts G1 and gives the G8 script.
+- Builder must hand back: `cd rust && cargo test --workspace` passing, `rust/scripts/g8.sh` exiting 0, one commit, a log entry here with the real output.
