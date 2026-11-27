@@ -7,10 +7,11 @@ signals and outputs, `.f64` for firwin2 taps). Functions: delivery.ltas, deliver
 taps inside it), studio.expander, studio.de_ess, studio.master_chain, pipeline._processed_edge_issues.
 Signals are synthetic and seeded; the Rust tests read these files and never regenerate a signal.
 No bare NaN is written: a missing band is `null`, other non-finite numbers are "nan"/"inf"/"-inf" strings.
-Knife edges: every level mask a case depends on records `margin_db` (distance of any level to its threshold)
-and must be at least 0.01 dB; every mic_match curve value records its distance to a rounding tie (>= 1e-6 dB).
+Knife edges: every frame-level mask a case depends on records `margin_db` (distance of any level to its threshold)
+and must be at least 0.01 dB; de_ess's per-sample loud mask must be at least 1e-6 dB (see MIN_SAMPLE_MARGIN_DB);
+every mic_match curve value records its distance to a rounding tie (>= 1e-6 dB).
 Safety: the data folder is a fresh temporary folder (checked before any app import), Hugging Face is offline,
-no model module is imported, and ffmpeg can never run.
+no model library is loaded (pipeline imports the lazy app.ml, which loads none), and ffmpeg can never run.
 """
 from __future__ import annotations
 
