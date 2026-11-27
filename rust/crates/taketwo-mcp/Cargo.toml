@@ -21,3 +21,4 @@ taketwo-core = { path = "../taketwo-core" }
 [dev-dependencies]
 rmcp = { version = "3.12", default-features = false, features = ["client", "transport-child-process"] }
 tempfile = "3"
+tokio = { version = "1", features = ["rt", "macros", "time", "process"] }
