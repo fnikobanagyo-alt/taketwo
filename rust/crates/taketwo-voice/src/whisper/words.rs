@@ -285,7 +285,7 @@ mod tests {
         let path = concat!(env!("CARGO_MANIFEST_DIR"), "/../../golden/whisper_words.json");
         let golden: Value = serde_json::from_str(&std::fs::read_to_string(path).unwrap()).unwrap();
         let cases = golden["cases"].as_array().unwrap();
-        assert_eq!(cases.len(), 16, "case count in whisper_words.json");
+        assert_eq!(cases.len(), 17, "case count in whisper_words.json");
         for c in cases {
             let name = c["name"].as_str().unwrap();
             let eot = c["eot"].as_i64().unwrap() as i32;

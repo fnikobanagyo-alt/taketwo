@@ -214,8 +214,11 @@ impl Transcriber for WhisperCpp {
                 }
                 let probs: Vec<f64> = text.iter().map(|t| t.p as f64).collect();
                 let al = words::alignment(&tokens, eot, &language, &jumps, &probs);
-                let (lists, last) = words::add_word_timestamps(&mut times, al, 0.0, last_speech);
-                last_speech = last;
+                let (lists, _) = words::add_word_timestamps(&mut times, al, 0.0, last_speech);
+                // generate() carries _get_end: the window's last word end, else its last segment end
+                if let Some(end) = lists.iter().rev().find_map(|ws| ws.last().map(|w| w.end)).or(times.last().map(|t| t.end)) {
+                    last_speech = end;
+                }
                 word_lists = lists;
             }
             let base = segments.len() - (b - a);

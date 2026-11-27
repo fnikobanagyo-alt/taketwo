@@ -85,12 +85,16 @@ def canned_dtw(jumps: list[int]):
     return lambda x: (np.array(rows), np.array(cols))
 
 
-def case(name, language, segments, jumps, probs, seek=0, last_speech=0.0):
-    """segments: [(start, end, text)]; jumps: audio-token index (20 ms) where each token starts, plus eot."""
+def case(name, language, segments, jumps, probs, seek=0, last_speech=0.0, changed=None, split_char=False):
+    """segments: [(start, end, text)]; jumps: audio-token index (20 ms) where each token starts, plus eot.
+    changed=(word, key, raw): the rule under test must move that word's time away from its raw value.
+    split_char: some token must not decode alone as UTF-8 (a character split across tokens)."""
     tok = HFTokenizerWrapper(PROCESSOR.tokenizer, multilingual=True, num_languages=100, language=language)
     segs, all_text = [], []
     for start, end, text in segments:
-        ids = tok.encode(text)
+        # a list is a token sequence given piece by piece (each piece must be one token)
+        ids = [one for piece in text for one in tok.encode(piece)] if isinstance(text, list) else tok.encode(text)
+        assert not isinstance(text, list) or len(ids) == len(text), (name, ids)
         all_text += ids
         ts0 = tok.timestamp_begin + round((start - seek * 0.01) / 0.02)
         ts1 = tok.timestamp_begin + round((end - seek * 0.01) / 0.02)
@@ -108,6 +112,18 @@ def case(name, language, segments, jumps, probs, seek=0, last_speech=0.0):
         segments=segs, model=FakeModel(probs), tokenizer=tok, mel=mx.zeros((3000, 128)),
         num_frames=num_frames, last_speech_timestamp=last_speech,
     )
+    out_words = {w["word"]: w for sg in segs for w in sg["words"]}
+    if changed:
+        word, key, raw = changed
+        assert abs(out_words[word][key] - raw) > 1e-9, (name, word, key, out_words[word][key], raw)
+    if split_char:
+        def bad(b):
+            try:
+                b.decode("utf-8")
+                return False
+            except UnicodeDecodeError:
+                return True
+        assert any(bad(ID_TO_BYTES[i]) for i in all_text), name
     return {
         "name": name,
         "language": language,
@@ -135,7 +151,7 @@ def main() -> None:
         case("numbers", "en", [(0.0, 3.0, " It cost 1,250 dollars in 2024, about 3.5%.")], "even", "flat"),
         case("contractions", "en", [(0.0, 2.5, " Don't stop, it's fine, we'll see.")], "even", "flat"),
         case("space before punctuation", "en", [(0.0, 3.0, ' He said " yes " and - then - left .')], "even", "flat"),
-        case("multi-byte characters split across tokens", "en", [(0.0, 3.0, " Café naïve 🎉 party ünd Ωmega.")], "even", "flat"),
+        case("multi-byte characters split across tokens", "en", [(0.0, 3.0, " Café naïve 🎉 party ünd Ωmega.")], "even", "flat", split_char=True),
         case("no-space language (ja)", "ja", [(0.0, 3.0, "こんにちは、世界。今日はいい天気です。")], "even", "flat"),
         case("no-space language (zh)", "zh", [(0.0, 3.0, "你好，世界。我们走吧！")], "even", "flat"),
     ]
@@ -143,32 +159,45 @@ def main() -> None:
     # over-long word right after a sentence end: alignment start is pulled to end - max_duration
     t = " Okay. Wonderful things happen here."
     n = n_tokens(t)
-    j = [0, 10, 20, 25] + [100 + 10 * k for k in range(n - 3)]
-    cases.append(case("over-long word at a sentence start", "en", [(0.0, 3.0, t)], j[: n + 1], "flat"))
+    j = [0, 10, 20, 100] + [110 + 10 * k for k in range(n - 3)]
+    cases.append(case("over-long word at a sentence start", "en", [(0.0, 3.0, t)], j[: n + 1], "flat",
+                      changed=(" Wonderful", "start", 0.4)))
 
     # over-long sentence-end mark: its end is cut to start + max_duration
-    t = " We stop here. Then go."
-    n = n_tokens(t)
-    j = [0, 10, 20, 30, 33] + [90 + 10 * k for k in range(n - 4)]
-    cases.append(case("over-long sentence end mark", "en", [(0.0, 3.0, t)], j[: n + 1], "flat"))
+    # (a lone "." merges into the word before it and its time is dropped; after a " " token it stays
+    # a word of its own, " .", so the cut is visible: tokens " We", " stop", " here", " ", ".", " Then", " go", ".")
+    t = [" We", " stop", " here", " ", ".", " Then", " go", "."]
+    j = [0, 10, 20, 30, 40, 100, 110, 120, 130]
+    cases.append(case("over-long sentence end mark", "en", [(0.0, 3.0, t)], j, "flat",
+                      changed=(" .", "end", 2.0)))
 
     # pause before the last word, which runs long past the segment end
     t = " I waited and then finally"
     n = n_tokens(t)
     j = [10 * k for k in range(n)] + [10 * (n - 1) + 120]
-    cases.append(case("pause before the last word", "en", [(0.0, 1.2, t)], j, "flat"))
+    cases.append(case("pause before the last word", "en", [(0.0, 1.2, t)], j, "flat",
+                      changed=(" finally", "end", 0.2 * (n - 1) + 2.4)))
 
     # first word after a long pause, longer than twice the median: start pulled in
     t = " Afterwards everything was quiet again."
     n = n_tokens(t)
     j = [0, 60] + [60 + 10 * k for k in range(1, n)]
-    cases.append(case("long first word after a pause", "en", [(4.0, 8.0, t)], j[: n + 1], "flat", seek=300, last_speech=0.5))
+    cases.append(case("long first word after a pause", "en", [(4.0, 8.0, t)], j[: n + 1], "flat", seek=300, last_speech=0.5,
+                      changed=(" Afterwards", "start", 3.0)))
+
+    # first and second word both long after a pause: they share a boundary
+    t = " Hello everybody out there."
+    n = n_tokens(t)
+    j = [0, 80, 160] + [160 + 10 * k for k in range(1, n - 1)]
+    cases.append(case("two long words after a pause", "en", [(0.0, 4.0, t)], j[: n + 1], "flat",
+                      changed=(" everybody", "start", 1.6)))
 
     # the segment start is much later than the first word's DTW start
     t = " Late start of a segment."
     n = n_tokens(t)
     j = [0] + [100 + 10 * k for k in range(n)]
-    cases.append(case("segment start preferred", "en", [(1.6, 3.0, t)], j, "flat"))
+    cases.append(case("segment start preferred", "en", [(1.6, 3.0, t)], j, "flat", last_speech=1.9,
+                      changed=(" Late", "start", 0.0)))
 
     # two segments in one window, varied probabilities
     a, b = " First part is here.", " Second part follows, too."

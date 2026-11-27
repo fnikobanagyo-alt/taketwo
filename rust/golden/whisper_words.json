@@ -1735,11 +1735,11 @@
     0.0,
     0.2,
     0.4,
-    0.5,
     2.0,
     2.2,
     2.4,
-    2.6
+    2.6,
+    2.8
    ],
    "token_probs": [
     0.9,
@@ -1762,7 +1762,7 @@
    "segments_out": [
     {
      "start": 0.0,
-     "end": 2.4,
+     "end": 2.6,
      "words": [
       {
        "word": " Okay.",
@@ -1772,26 +1772,26 @@
       },
       {
        "word": " Wonderful",
-       "start": 0.4,
-       "end": 0.5,
+       "start": 1.6,
+       "end": 2.0,
        "probability": 0.8999989032745361
       },
       {
        "word": " things",
-       "start": 0.5,
-       "end": 2.0,
+       "start": 2.0,
+       "end": 2.2,
        "probability": 0.8999978303909302
       },
       {
        "word": " happen",
-       "start": 2.0,
-       "end": 2.2,
+       "start": 2.2,
+       "end": 2.4,
        "probability": 0.8999980092048645
       },
       {
        "word": " here.",
-       "start": 2.2,
-       "end": 2.4,
+       "start": 2.4,
+       "end": 2.6,
        "probability": 0.8999979496002197
       }
      ]
@@ -1832,6 +1832,12 @@
      ]
     },
     {
+     "id": 220,
+     "bytes": [
+      32
+     ]
+    },
+    {
      "id": 13,
      "bytes": [
       46
@@ -1867,12 +1873,14 @@
     0.2,
     0.4,
     0.6,
-    0.66,
-    1.8,
+    0.8,
     2.0,
-    2.2
+    2.2,
+    2.4,
+    2.6
    ],
    "token_probs": [
+    0.9,
     0.9,
     0.9,
     0.9,
@@ -1887,13 +1895,13 @@
     {
      "start": 0.0,
      "end": 3.0,
-     "n_text_tokens": 7
+     "n_text_tokens": 8
     }
    ],
    "segments_out": [
     {
      "start": 0.0,
-     "end": 2.0,
+     "end": 2.4,
      "words": [
       {
        "word": " We",
@@ -1908,21 +1916,27 @@
        "probability": 0.8999982476234436
       },
       {
-       "word": " here.",
+       "word": " here",
        "start": 0.4,
        "end": 0.6,
        "probability": 0.8999979496002197
       },
       {
+       "word": " .",
+       "start": 0.8,
+       "end": 1.2,
+       "probability": 0.8999978303909302
+      },
+      {
        "word": " Then",
-       "start": 1.4,
-       "end": 1.8,
+       "start": 2.0,
+       "end": 2.2,
        "probability": 0.8999980092048645
       },
       {
        "word": " go.",
-       "start": 1.8,
-       "end": 2.0,
+       "start": 2.2,
+       "end": 2.4,
        "probability": 0.8999978303909302
       }
      ]
@@ -2190,6 +2204,121 @@
    ]
   },
   {
+   "name": "two long words after a pause",
+   "language": "en",
+   "eot": 50257,
+   "tokens": [
+    {
+     "id": 2425,
+     "bytes": [
+      32,
+      72,
+      101,
+      108,
+      108,
+      111
+     ]
+    },
+    {
+     "id": 2201,
+     "bytes": [
+      32,
+      101,
+      118,
+      101,
+      114,
+      121,
+      98,
+      111,
+      100,
+      121
+     ]
+    },
+    {
+     "id": 484,
+     "bytes": [
+      32,
+      111,
+      117,
+      116
+     ]
+    },
+    {
+     "id": 456,
+     "bytes": [
+      32,
+      116,
+      104,
+      101,
+      114,
+      101
+     ]
+    },
+    {
+     "id": 13,
+     "bytes": [
+      46
+     ]
+    }
+   ],
+   "jump_times": [
+    0.0,
+    1.6,
+    3.2,
+    3.4,
+    3.6,
+    3.8
+   ],
+   "token_probs": [
+    0.9,
+    0.9,
+    0.9,
+    0.9,
+    0.9
+   ],
+   "time_offset": 0.0,
+   "last_speech_timestamp": 0.0,
+   "segments_in": [
+    {
+     "start": 0.0,
+     "end": 4.0,
+     "n_text_tokens": 5
+    }
+   ],
+   "segments_out": [
+    {
+     "start": 2.3999999999999995,
+     "end": 3.6,
+     "words": [
+      {
+       "word": " Hello",
+       "start": 2.3999999999999995,
+       "end": 2.8,
+       "probability": 0.8999980092048645
+      },
+      {
+       "word": " everybody",
+       "start": 2.8,
+       "end": 3.2,
+       "probability": 0.8999980092048645
+      },
+      {
+       "word": " out",
+       "start": 3.2,
+       "end": 3.4,
+       "probability": 0.8999978303909302
+      },
+      {
+       "word": " there.",
+       "start": 3.4,
+       "end": 3.6,
+       "probability": 0.8999978303909302
+      }
+     ]
+    }
+   ]
+  },
+  {
    "name": "segment start preferred",
    "language": "en",
    "eot": 50257,
@@ -2268,7 +2397,7 @@
     0.9
    ],
    "time_offset": 0.0,
-   "last_speech_timestamp": 0.0,
+   "last_speech_timestamp": 1.9,
    "segments_in": [
     {
      "start": 1.6,
@@ -2278,12 +2407,12 @@
    ],
    "segments_out": [
     {
-     "start": 1.5999999999999996,
+     "start": 1.6,
      "end": 2.8,
      "words": [
       {
        "word": " Late",
-       "start": 1.5999999999999996,
+       "start": 1.6,
        "end": 2.0,
        "probability": 0.8999992609024048
       },
