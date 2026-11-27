@@ -7,6 +7,7 @@
 
 use ort::logging::LogLevel;
 use ort::session::Session;
+use ort::session::builder::AutoDevicePolicy;
 use ort::value::Tensor;
 use realfft::RealFftPlanner;
 use std::path::{Path, PathBuf};
@@ -156,6 +157,12 @@ impl Sidon {
             Session::builder(&env)
                 .map_err(|e| err(name, e))?
                 .with_log_level(LogLevel::Error)
+                .map_err(|e| err(name, e))?
+                // the CPU provider only, as Python; ort's default policy registers CoreML on macOS, which fails
+                // on the vocoder
+                .with_auto_device(AutoDevicePolicy::PreferCPU)
+                .map_err(|e| err(name, e))?
+                .with_execution_providers([ort::ep::CPU::default().build()])
                 .map_err(|e| err(name, e))?
                 .commit_from_file(&path)
                 .map_err(|e| err(name, e))
