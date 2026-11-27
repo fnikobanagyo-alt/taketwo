@@ -1266,7 +1266,7 @@ Acceptance commands, all must exit 0 (WT is the worktree root; quote it):
 - `cd "$WT/rust" && source scripts/env.sh >/dev/null && set -o pipefail && cargo test -p taketwo-core audio 2>&1 | tee /dev/stderr | grep -c 'test result: ok. [1-9]' >/dev/null` (`grep -c` reads all the output, so `tee` is not cut off)
 - `cd "$WT" && HF_HUB_OFFLINE=1 backend/.venv/bin/python -B rust/golden/record_audio.py && git diff --exit-code -- rust/golden && test -z "$(git status --porcelain -- rust/golden)"`
 - `cd "$WT" && test -s rust/golden/audio.json && test "$(du -sk rust/golden/audio | cut -f1)" -le 8192`
-- `cd "$WT" && pv() { git show "$1:rust/Cargo.lock" | awk '/^name = /{n=$3} /^version = /{print n, $3}' | sort -u; } && test -z "$(comm -23 <(pv f4e5664) <(pv HEAD))"` (every package and version locked at `f4e5664` is still locked; new ones may be added)
+- `cd "$WT" && pv() { git show "${1}:rust/Cargo.lock" | awk '/^name = /{n=$3} /^version = /{print n, $3}' | sort -u; } && test -z "$(comm -23 <(pv f4e5664) <(pv HEAD))"` (every package and version locked at `f4e5664` is still locked; new ones may be added)
 - `cd "$WT" && test -z "$(git diff --stat f4e5664..HEAD -- rust/crates/taketwo-engine rust/crates/taketwo-mcp rust/crates/taketwo rust/crates/taketwo-voice rust/third_party .github)"`
 - `cd "$WT/rust" && ! cargo tree -p taketwo-mcp -e normal | grep -q -i -e taketwo-voice -e candle -e whisper -e qwen`
 - `cd "$WT" && rust/scripts/contract.sh`
