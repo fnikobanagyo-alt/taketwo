@@ -11,7 +11,8 @@ the tensor names, which tensors stay f32, and the f16 rule. Differences from tha
 by the MLX layout: names mlp1/mlp2 -> mlp.0/mlp.2; conv weights are channels-last (out, k, in) in
 MLX and go back to PyTorch's (out, in, k) (axes 1 and 2 swapped); encoder.positional_embedding is
 not stored by MLX (mlx-audio computes it) and is computed here with the same sinusoids formula in
-float32; the alignment_heads tensor is not a weight (mlx-audio ignores it) and is skipped.
+float32; the alignment_heads tensor is not a weight (mlx-audio ignores it) and is skipped; the local
+vocab.json is sorted by key, so tokens are written in id order (whisper.cpp assigns ids by position).
 Mel filters: the filterbank mlx-audio really uses (mlx_audio.utils.mel_filters, slaney), compared
 with transformers' WhisperFeatureExtractor built from the local preprocessor_config.json.
 """
@@ -60,8 +61,12 @@ def vocab_tokens(vocab_json: Path) -> dict[bytes, int]:
         del raw["<|endoftext|>"]
     tokens = {bytes([byte_decoder[c] for c in token]): int(idx) for token, idx in raw.items()}
     assert len(tokens) == len(raw), "two vocab entries decode to the same bytes"
-    ids = list(tokens.values())
-    assert ids == list(range(len(ids))), "vocab.json order is not id order (position must equal id)"
+    # This vocab.json is sorted by key, not id. The reference writes dict order, which would give
+    # wrong ids here; write in id order (what its tiktoken path produces) and check ids are 0..n-1.
+    in_file_order = list(tokens.values()) == sorted(tokens.values())
+    print(f"vocab.json in id order: {in_file_order}; writing in id order")
+    tokens = dict(sorted(tokens.items(), key=lambda kv: kv[1]))
+    assert list(tokens.values()) == list(range(len(tokens))), "vocab ids are not 0..n-1"
     return tokens
 
 

@@ -75,6 +75,7 @@ def main() -> None:
             "seconds": secs,
             "transcript": r,
             "normalized_words": [ml.normalize_for_wer(w["word"]) for w in words],
+            "normalized_text": ml.normalize_for_wer("".join(w["word"] for w in words)),
         }
         print(f"{key}: {secs:.2f} s, {len(words)} words, language {r['language']}", flush=True)
     # ru_maxrss is bytes on macOS
