@@ -123,7 +123,7 @@ Needs: S05. Gate: G2 (part).
 - Done when: `contract.sh` with the `-k` list in lead decision 6 (PROGRESS.md) prints `Ran 20 tests` and `OK`: Health 3, Profiles 1, Generations 3 (the two create tests are S07a), Search 3, TimingsAndSubtitles 3, Audio 3, SafetyGuards 4.
 
 ### S07a Engine: write routes that start no job
-Needs: S06. Gate: G2 (full). No push. Split from the old S07 by lead decision 7: none of the 13 contract tests S06 left red needs a job.
+Needs: S06. Gate: G2 (full). No push. Split from the old S07 by lead decision 7: none of the 9 contract tests S06 left red needs a job.
 - Routes answered in full: accept and its undo, delete, restore, patch title/favourite, reveal (the opener is injected; tests never open the file manager), and every refusal (400/404/409/422) of create, resume, regenerate, select-take and fix-remaining.
 - Paths that would start a job (create success, resume, regenerate, select-take and fix-remaining after their checks) answer 501 until S07b. `PATCH` with a changed `speed` answers 501 until S16.
 - Pure ports with golden cases: `pipeline.create_generation` (the document, not the save) and `pipeline.clean_replacement`.
