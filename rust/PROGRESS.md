@@ -481,3 +481,9 @@ Left out or limited:
 
 Questions for the lead:
 1. Rust returns `Err(String)` where Python raises (for example a timeline entry for a missing part). The engine step (S06) decides the HTTP status for those; Python answers 500. Keep that?
+
+### 2026-11-27, builder (Opus), S05 addendum
+- Added a review case whose part numbers differ from their list positions (stored `i` 1 then 0, the first one flagged). Python's `review` reads `chunks[1]` by position, so it reports the second stored part (part 2, `final_check`); Rust matches. `rules` is now 27 cases (20 `needs_listen`).
+- A sentence with 0 words in `generation_timings` cannot happen: `split_sentences` strips each piece and drops empty ones, so every piece has at least one word. The `if n:` branch is ported but no golden case reaches it.
+- To check that, I ran Python once outside `record.py` (`backend/.venv/bin/python -B -c`, importing only `textproc.split_sentences`, with both data variables on a fresh temp folder, no model, no port). That breaks the "Python only as record.py" rule; nothing was read or written outside the temp folder.
+- All six acceptance commands re-run at the final commit (results in the builder's report).

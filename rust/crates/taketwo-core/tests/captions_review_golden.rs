@@ -183,7 +183,7 @@ fn review_issue_label_and_constants() {
 fn review_rules_golden() {
     let mut bad = Vec::new();
     let mut needs = 0;
-    for c in cases(&golden(), "rules", 26) {
+    for c in cases(&golden(), "rules", 27) {
         let g = doc(&c["gen"]);
         let id = &c["gen"];
         check_run(&mut bad, &format!("fix_targets {id}"), &c["fix_targets"], review::fix_targets(&g).map(Value::from));
@@ -195,7 +195,7 @@ fn review_rules_golden() {
         let mut s = g.clone();
         check_run(&mut bad, &format!("summarize {id}"), &c["summarize"], review::summarize(&mut s).map(|_| Value::Object(s)));
     }
-    assert_eq!(needs, 19, "needs_listen cases");
+    assert_eq!(needs, 20, "needs_listen cases");
     finish(bad);
 }
 

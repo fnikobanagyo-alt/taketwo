@@ -642,6 +642,9 @@ def review_cases() -> list[dict]:
         {"id": "s05nokeys", "status": "done", "chunks": [{"i": 0, "text": "A.", "status": "ok"}, {"i": 1, "text": "B.", "status": "flagged"}]},
         g([_chunk(), _chunk()], timeline=tl3, final_scan={"remaining": [5]}),  # Python raises IndexError in review()
         g([_chunk(), flagged()], timeline=tl3, status="cancelled"),
+        # part numbers that differ from list positions: review() reads gen["chunks"][i] by position
+        {"id": "s05order", "status": "done", "timeline": tl3,
+         "chunks": [{**flagged("Stored first, part 1."), "i": 1}, {**_chunk("Stored second, part 0."), "i": 0}]},
     ]
 
 
