@@ -25,23 +25,23 @@ The loop appends one entry per session at the bottom: date, step id, what was bu
 | S15 Render pipeline A | done (no push; `taketwo_core::render`, 47 golden render cases + 6 widen vectors bit-equal, 27 ported tests; `5dc3606`) |
 | S16 Render pipeline B | done, accepted (lead decision 20; core `render::narration` + 15 tests, real renderer, speed, mp3, lock kept, nvcuda delay-load; pushed `27ccff9`, Windows run 46005807959 still running when read: the delay-load is unproven) |
 | S17 Voice creation | done, accepted (lead decision 21; core `reference` + `noisereduce` + `render::preview`, profile routes and jobs, `tests/reference.rs` 10, `tests/profiles.rs` 11, one real Whisper + encoder load; studio falls back to the plain path; not pushed, `43ed39d`) |
-| S18 Studio restoration (Sidon) | todo (no gate needs it; still owed under decision #4) |
+| S18 Studio restoration (Sidon) | code done (pushed `30f414f`, Windows `check` and `build (cuda)` green, run 46027445383; `sidon_parity` features within 4.8e-7); G5 not met: the studio smoke's analysis ended "Could not find a clean stretch of speech" (0 takes), Python does the same on a short say clip |
 | S19 Real synthesis smoke | done (`22ade0f`, pushed; one attempt, 2 takes of 10, exit 0; no quality claim, Franz listens) |
 | S20 Blind A/B harness | done (not rendered: waits for Franz's OK) |
-| S21 Final gate run | done (G1-G8 pass on code commit `22ade0f`; S18 Sidon now required by Franz, so S21 runs again after S18) |
+| S21 Final gate run | run again on `30f414f`: G1, G2, G3, G4, G6, G7, G8 pass; G5 fails (no `report.json`) |
 
 ## Gate status
 
 | Gate | Status | Evidence |
 |---|---|---|
-| G1 | pass at `22ade0f` | S19+S21 entry below: exit 0, 38 result lines, 400 passed, 0 failed, 5 ignored (real-model tests) |
-| G2 | pass at `22ade0f` | S19+S21 entry below: `Ran 33 tests`, `OK`, exit 0 |
-| G3 | pass at `22ade0f` | S19+S21 entry below: `G3 PASS`, exit 0 |
-| G4 | pass at `22ade0f` | S19+S21 entry below: exit 0 (22 unit + 7 integration tests) |
-| G5 | pass at `22ade0f` (attempt 1 of 2, 2 takes) | S19+S21 entry below: `synth_smoke.sh` exit 0, `report.json`; no quality claim, Franz listens |
-| G6 | pass at `22ade0f` | Run 46017204365: `build (cuda)` success, `check` success; `cuda,flash-attn` still running when read (reported separately) |
-| G7 | pass at `22ade0f` | S19+S21 entry below: 10 scripts, `takes, most: 480`, `AB SELFTEST PASS` (engine b, Rust, renders first), render exit 3 |
-| G8 | pass at `22ade0f` | S19+S21 entry below: `G8 PASS`, exit 0 |
+| G1 | pass at `30f414f` | S18 entry below: exit 0, 39 result lines, 409 passed, 0 failed, 6 ignored |
+| G2 | pass at `30f414f` | S18 entry below: exit 0 |
+| G3 | pass at `30f414f` | S18 entry below: `G3 PASS`, exit 0 |
+| G4 | pass at `30f414f` | S18 entry below: exit 0 (22 unit + 7 integration tests) |
+| G5 | not met at `30f414f` (studio experiment: attempt 1 of 2, 0 takes, failed in the analysis) | S18 entry below: no `rust/out/smoke/report.json`; the S19 result (studio off) is kept in `rust/out/smoke-s19/` |
+| G6 | pass at `30f414f` | Run 46027445383: `build (cuda)` success, `check` success; `cuda,flash-attn` still running when read (reported separately) |
+| G7 | pass at `30f414f` | S18 entry below: `AB SELFTEST PASS`, render refused |
+| G8 | pass at `30f414f` | S18 entry below: `G8 PASS`, exit 0 |
 
 ## Baseline for G8 (recorded 2026-11-27, before any Rust was written)
 
@@ -2506,3 +2506,41 @@ Acceptance commands (the lead runs them in a plain shell; `WT` is the worktree; 
 - `cd "$WT/rust" && source scripts/env.sh >/dev/null && cargo test -p taketwo-voice --test sidon_parity -- --list 2>/dev/null | grep -q sidon_parity` (the test exists; the lead does not run it)
 - `cd "$WT" && test -z "$(git diff --name-only origin/rust/taketwo rust/taketwo | grep -v '\.md$')" && git diff --quiet 22ade0f -- contract/test_contract.py contract/golden backend mcp && test -z "$(git ls-files rust/out rust/target rust/.models rust/ab/private)" && test -z "$(git status --porcelain | grep -v -e 'backend/.venv' -e 'frontend/node_modules')"`
 - `cd "$WT" && grep -Eq 'S18.*done' rust/PLAN.md rust/PROGRESS.md; lsof -nP -iTCP -sTCP:LISTEN | grep -E ':(879[0-589])'; pgrep -fl 'rust-taketwo/rust/target/'` (S18 marked done; the last two show nothing of ours)
+
+### 2026-11-28, builder (Opus), S18 Studio restoration (Sidon) + S21 again (one push, `30f414f`)
+
+**Built** (commits `6b42b4f`, `35a1067`, `225058c`, `30f414f`):
+- `env.sh` links `sidon-predictor.onnx` and `sidon-vocoder.onnx` from `models--soniqo--Sidon-ONNX/snapshots/*/fp16/` into `rust/.models/sidon/` with `find -path` (symlinks; nothing copied, no download).
+- `taketwo-core`: `Restorer` trait beside `SpeakerEncoder` (`render/models.rs`); `studio.rs` = `studio.restore` line for line (16 kHz, high-pass 50 Hz, peak 0.9, one segment when n <= step + ov, else 20 s windows with 1 s overlap, linspace ramps, `/ max(w, 1e-4)`, progress `(k+1)/len(starts)`, cancel checked before each window); 5 unit tests with fake restorers. `reference::Models.restorer: Option<&mut dyn Restorer>`; `STUDIO_RESTORATION` deleted; studio runs when a restorer is present and `available()`. `analyze` studio branch in Python's order (progress text at 0.08 and 0.08 + 0.1p, `studio.wav` at 48 kHz, resample back, `room_echo_after_db`, ltas on the restored audio, no denoise, studio tips). Fallback tip is the lead's text. New core test: studio branch with a fake restorer (studio true, `studio.wav` 48 kHz, one progress step, a failing restorer is a job error); the fallback test also covers a restorer whose files are missing. The engine stub test `a_studio_request_is_stored_false_with_the_tip_and_denoise_is_kept` proves the stub path.
+- `taketwo-voice/src/sidon.rs`: SeamlessM4T feature extractor ported from `feature_extraction_seamless_m4t.py` and `audio_utils` (`mel_filter_bank` kaldi in mel space, povey window, `spectrogram` with DC removal, pre-emphasis, complex64 storage, mel floor, ln; per-bin normalisation ddof 1; pad to an even frame count with 1.0; two frames per row), 0.5 s tail pad and `[: len*3]` trim; `ort` sessions with errors-only logs and the CPU provider only. Sessions open on the first segment and are dropped when the job ends (`real.rs` `voice_tools` makes a `Sidon` per job). Sidon files are not in `check_files` / `can_preview`.
+- **Tensor types read from the sessions** (all float32; the fp16 weights stay inside the graphs): predictor `input_features: Tensor<f32>(1, T, 160)` -> `features: Tensor<f32>(LayerNormalizationfeatures_dim_0, T, 1024)`; vocoder `features: Tensor<f32>(1, T, 1024)` -> `audio: Tensor<f32>(1, M)`. No conversion at the edge.
+- **Found while running:** ort 2.0.0-rc.15's default device policy registers the CoreML provider on macOS; the vocoder then fails ("Unable to compute the prediction"). Fixed with `AutoDevicePolicy::PreferCPU` plus an explicit CPU provider (as Python's `CPUExecutionProvider`).
+- `rust/scripts/sidon_python_ref.py`, ignored test `sidon_parity` (`taketwo-voice/tests/sidon_parity.rs`).
+- Words: README (studio is in, what it needs), PLAN.md S17/S18, `synth_smoke.sh` comments; the report gains `room_echo_db` and `room_echo_after_db`; the `studio_tip` lookup finds the new fallback tip (dry run on the stub engine).
+
+**`sidon_parity`** (`cargo test -p taketwo-voice --test sidon_parity -- --ignored --nocapture`, 8766 idle first, Python then Rust): `say` clip 5.13 s (not 6 s) + white noise (fixed LCG, about -40 dBFS).
+- Gate: features largest absolute difference 4.77e-7 (281 rows, even frame count) and 4.77e-7 (280 rows, clip minus 160 samples, odd frame count padded); output length equal (246342 samples). PASS.
+- Reported only: waveform largest absolute difference 0.0517, RMS difference 0.00267; integrated loudness Rust -21.820 LUFS, Python -21.820 LUFS; Rust load 0.50 s, restore 1.82 s, peak RSS 1.80 GB (debug test binary); Python load 0.58 s, restore 1.36 s, peak RSS 1.69 GB. ONNX Runtime: Rust 1.31.0 (ort rc.15 prebuilt), Python onnxruntime 1.30.0, transformers 5.17.0.
+
+**Local gates before the push** (all on `30f414f`): `cargo test --workspace` exit 0; `contract.sh` `Ran 33 tests` / `OK`; `cargo build -p taketwo && scripts/smoke_shell.sh` `G3 PASS`; `cargo test -p taketwo-mcp` 22 + 7 passed; G7 `AB SELFTEST PASS`, render refused; `g8.sh` `G8 PASS`; `cargo build --release -p taketwo-engine --features metal` finished. Pushed `rust/taketwo` 22ade0f..30f414f (only that branch). Windows run 46027445383: `check` success (15:58Z), `build (cuda)` success (16:19Z), `build (cuda,flash-attn)` in progress when read (reported only).
+
+**Studio smoke (G5)**: `mv rust/out/smoke rust/out/smoke-s19` (S19 WAV kept for Franz), then `rust/scripts/synth_smoke.sh` once on `30f414f`, 8766 idle. Exit 1: `synth_smoke: the analysis ended error: Could not find a clean stretch of speech. Try a clearer recording.` Engine log: `job ... failed: ValueError: Could not find a clean stretch of speech. Try a clearer recording.`, 8.98 s real, peak RSS 2836430848 bytes. `attempts.json`: attempt 1, 0 takes, failed. No `report.json`. **G5 not met.** No second attempt: no bug in our code was found (below), and the rules allow a second attempt only after a pushed fix of one.
+
+Diagnosis (outside the smoke, no takes, 8766 idle before each process; `say` clips only, Franz's clip was not read again):
+- 14.65 s `say` clip (the S17 `analyze_real` text), studio on: Rust `analyze` fails with the same message; Python's own `reference.analyze` (worktree `backend/`, identical to `main`) fails with the same message. Studio off: both pass (Rust 1 clip, Python 1 clip). Python trace: the single candidate window (3.46-14.44 s, total 14.65 s) gets `snap_window -> None` with studio on, `(3.44, 14.629)` with studio off (no end pause found in the restored tail). Cause measured only to that point.
+- 43.57 s `say` clip (text x3, the windowed cross-fade path), studio on: Rust passes (`studio` true, `room_echo_db` -31.4, `room_echo_after_db` -29.5, 1 clip, 23.6 s, peak RSS 3.31 GB); Python passes (`room_echo_db` -31.4, `room_echo_after_db` -29.5, 2 clips). Studio off: Rust 1 clip (11 utterances), Python 2 clips (10 utterances): the clip-count difference is on the plain path too (Whisper segmentation), not from S18.
+- Reading: the smoke's reference clip is short and cut close to its last word; the studio path then finds no clean window, in Python as in Rust. Changing the smoke input is the lead's call.
+
+**Final gate run (S21 again) on `30f414f`** (= `origin/rust/taketwo`), after `build (cuda)` ended:
+- G1 `cd rust && source scripts/env.sh && cargo test --workspace`: exit 0; 39 result lines, 409 passed, 0 failed, 6 ignored. PASS.
+- G2 `contract.sh | grep 'Ran 33 tests'` and `grep -x OK`: exit 0. PASS.
+- G3 `cargo build -p taketwo && scripts/smoke_shell.sh`: `(end of HOME WRITES)` / `G3 PASS`. PASS.
+- G4 `cargo build -p taketwo-mcp && cargo test -p taketwo-mcp`: 22 passed, 7 passed, exit 0. PASS.
+- G5 `python3 -c "...json.load(open('rust/out/smoke/report.json'))..."`: `FileNotFoundError: [Errno 2] No such file or directory: 'rust/out/smoke/report.json'`. FAIL (not met).
+- G6 `rust/scripts/g6.sh`: `gate job: build (cuda): completed success 2026-11-27T15:43:39Z 2026-11-27T16:19:49Z` / `G6 PASS`. PASS.
+- G7 `ab.py plan && ab.py selftest && ! ab.py render`: `AB SELFTEST PASS`; render: `Rendering waits for Franz's OK`. PASS.
+- G8 `g8.sh` + main/origin main at `4448aaa` + 8766 health names TakeTwo: `G8 PASS`, exit 0. PASS.
+
+**Owed:** G5 with studio on (needs the lead's ruling on the smoke input: attempt 2 of the studio experiment is unused, 20 takes left). Sidon on the finished narration, a GPU provider for ort: not in this step.
+
+**Rule slips:** commit `6b42b4f` left `taketwo-engine` not compiling (fixed in the next commit, never pushed alone). Two diagnostic Python scripts were first written to the session scratchpad (outside `rust/target`), then moved to `rust/target/s18-diag-py/`. The two-run Python loop of the 14.65 s diagnosis checked 8766 once for both runs. The parity clip is 5.13 s, not about 6 s. `analyze_real.rs` was edited temporarily for the diagnosis (kept folder, longer text, studio off) and restored; `rust/out/analyze_real.json` restored to its S17 content. No wiki receipt or HANDOFFS note (outside the worktree).

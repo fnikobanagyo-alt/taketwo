@@ -247,7 +247,7 @@ Needs: S13, S14, S16. Gate: G5 (part).
 
 ### S18 Studio restoration (Sidon)
 Needs: S17. Gate: G5 (the smoke reports whether studio ran); it completes decision #4.
-Status: S18 done (lead decision 22): `taketwo-core::studio` (`restore`), the `Restorer` seam, `taketwo-voice::sidon` (ort, CPU provider, hand-ported feature extractor), the `analyze` studio branch; a studio request without the Sidon files (`<models>/sidon/sidon-predictor.onnx`, `sidon-vocoder.onnx`) runs the plain path with a first tip naming them. Parity: the ignored test `sidon_parity`.
+Status: S18 code done, G5 not met (studio smoke attempt 1 ended in the analysis, see PROGRESS.md; lead decision 22): `taketwo-core::studio` (`restore`), the `Restorer` seam, `taketwo-voice::sidon` (ort, CPU provider, hand-ported feature extractor), the `analyze` studio branch; a studio request without the Sidon files (`<models>/sidon/sidon-predictor.onnx`, `sidon-vocoder.onnx`) runs the plain path with a first tip naming them. Parity: the ignored test `sidon_parity`.
 - Port `studio.restore`: the w2v-BERT feature extractor by hand, Sidon predictor and vocoder through `ort` (fp16, local files), 20 s chunks with 1 s overlap (`noisereduce` moved to S17). No gate needs this step; if the gates pass first it stays owed under decision #4 and the final report says so.
 - Check (ignored test): Rust and Python outputs on one `say` clip with added noise; record length, loudness and spectral distance. No claim about sound.
 - If it does not fit in one session, record what is left; G5 does not depend on it.
