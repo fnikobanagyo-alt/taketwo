@@ -1,0 +1,2 @@
+# Synthetic parity vectors (record_audio.py); the root .gitignore ignores *.wav for real audio
+!audio/*.wav
