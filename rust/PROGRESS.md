@@ -26,22 +26,22 @@ The loop appends one entry per session at the bottom: date, step id, what was bu
 | S16 Render pipeline B | done, accepted (lead decision 20; core `render::narration` + 15 tests, real renderer, speed, mp3, lock kept, nvcuda delay-load; pushed `27ccff9`, Windows run 46005807959 still running when read: the delay-load is unproven) |
 | S17 Voice creation | done, accepted (lead decision 21; core `reference` + `noisereduce` + `render::preview`, profile routes and jobs, `tests/reference.rs` 10, `tests/profiles.rs` 11, one real Whisper + encoder load; studio falls back to the plain path; not pushed, `43ed39d`) |
 | S18 Studio restoration (Sidon) | todo (no gate needs it; still owed under decision #4) |
-| S19 Real synthesis smoke | todo |
+| S19 Real synthesis smoke | done (`22ade0f`, pushed; one attempt, 2 takes of 10, exit 0; no quality claim, Franz listens) |
 | S20 Blind A/B harness | done (not rendered: waits for Franz's OK) |
-| S21 Final gate run | todo |
+| S21 Final gate run | done (G1-G8 pass on code commit `22ade0f`; S18 Sidon now required by Franz, so S21 runs again after S18) |
 
 ## Gate status
 
 | Gate | Status | Evidence |
 |---|---|---|
-| G1 | pass at `43ed39d` (judge again on the final commit) | Lead decision 21 below: `cargo test --workspace` exit 0, 38 result lines all ok, 400 passed, 0 failed, 5 ignored (the real-model tests) |
-| G2 | 33 of 33 at `31b1140` (judge again at the end; without `--stub-renderer` the paths that start a job still answer 501 until S16) | Lead decision 10 below: `contract.sh`, `Ran 33 tests`, `OK`, exit 0 |
-| G3 | pass at `cbdc9b1` | S09 entry below: `smoke_shell.sh` checks a-i ok, `G3 PASS`, exit 0 (hidden window, page load fired) |
-| G4 | pass for wav and mp3 (S16 added `get_audio_saves_the_mp3`; judge again at the end) | S08 entry below: `cargo test -p taketwo-mcp` from no prebuilt engine, exit 0 (27 tests) |
-| G5 | not run | |
-| G6 | plain `cuda` success on `ae905d1` (run 45993201520: `check` success, `build (cuda)` success; `cuda,flash-attn` still running when read, reported separately), so the vendored conv edits of S12 are confirmed on CUDA; judge again on the final commit | Lead decision 19 below: `gh run view 45993201520` |
-| G7 | pass at `8b6eed6` (judge again after S16/S17 if the voice-copy route changes) | S20 entry below: `plan` 10 scripts and `takes, most: 480`; `selftest` `AB SELFTEST PASS`; `render` exit 3 |
-| G8 | pass so far (re-run at the end) | Lead decision 9 below: `g8.sh` `G8 PASS`, exit 0 at `1f5b85b`. Data differences are Franz's own app use, information only |
+| G1 | pass at `22ade0f` | S19+S21 entry below: exit 0, 38 result lines, 400 passed, 0 failed, 5 ignored (real-model tests) |
+| G2 | pass at `22ade0f` | S19+S21 entry below: `Ran 33 tests`, `OK`, exit 0 |
+| G3 | pass at `22ade0f` | S19+S21 entry below: `G3 PASS`, exit 0 |
+| G4 | pass at `22ade0f` | S19+S21 entry below: exit 0 (22 unit + 7 integration tests) |
+| G5 | pass at `22ade0f` (attempt 1 of 2, 2 takes) | S19+S21 entry below: `synth_smoke.sh` exit 0, `report.json`; no quality claim, Franz listens |
+| G6 | pass at `22ade0f` | Run 46017204365: `build (cuda)` success, `check` success; `cuda,flash-attn` still running when read (reported separately) |
+| G7 | pass at `22ade0f` | S19+S21 entry below: 10 scripts, `takes, most: 480`, `AB SELFTEST PASS` (engine b, Rust, renders first), render exit 3 |
+| G8 | pass at `22ade0f` | S19+S21 entry below: `G8 PASS`, exit 0 |
 
 ## Baseline for G8 (recorded 2026-11-27, before any Rust was written)
 
@@ -2361,3 +2361,89 @@ Acceptance commands (the lead runs them in a plain shell; `WT` is the worktree; 
 - `cd "$WT" && test -z "$(git diff --name-only origin/rust/taketwo rust/taketwo | grep -v '\.md$')" && git diff --quiet 43ed39d -- contract/test_contract.py contract/golden backend mcp` (every code commit is pushed; the contract and the Python are untouched)
 - `cd "$WT" && grep -q 'take ' rust/out/smoke/engine.log && grep -Eq 'S19.*done' rust/PROGRESS.md && grep -Eq 'S21.*done' rust/PROGRESS.md`
 - `lsof -nP -iTCP -sTCP:LISTEN | grep -E ':(879[0-589])' ; pgrep -fl 'rust-taketwo/rust/target/'` shows nothing of ours
+
+### 2026-11-27 22:35, Franz: S18 is required (relayed by the coordinator)
+Franz wants **S18 Studio restoration (Sidon)** in the first Rust version. It is now part of the goal: **the goal is NOT met until S18 is built and accepted** ("Restore to studio quality" works through the Rust engine: the Sidon ONNX restoration via `ort`, CPU first, with the studio fallback rules from `backend/app/reference.py` / `studio.py`), even if every other gate already passes.
+- **Order:** build S18 next (after the S19/S21 session in progress), then run the final gate run (S21) again on the final commit, including `cargo test --workspace`, `contract.sh` and one Windows run.
+- **Testing:** keep it light, as Franz asked earlier: focused tests and one real Sidon load on a `say` clip; no new golden recorders unless unavoidable.
+- **Unchanged:** the safety rules, no Sidon model download (if the model is not already on this Mac, stop and say which file is needed), and no merge to main by the loop. The coordinator merges after the independent check.
+
+### 2026-11-27, builder (Opus), S19 + S21: real synthesis smoke, push, final gate run
+Start: tree clean apart from the two symlinks; 14 GB free (13 GB after the release build); 8766 idle. `TAKETWO_DATA` was set to a folder under `rust/target` before every `source scripts/env.sh`, so env.sh made no `$TMPDIR` folder; that folder is deleted.
+
+**Built (code commit `22ade0f`, pushed to `rust/taketwo` only):**
+- `taketwo-engine/src/real.rs`, `Capped`: one stderr line per synthesis call, `take N of M` (`take N` with no cap). Nothing new in `/api/status` or any reply.
+- `rust/scripts/synth_smoke.sh` (bash 3.2, curl, python3 standard library). It does the following:
+  - Exits 75 when 8766 is not idle, and asks again right before the engine starts.
+  - Sends 8766 only GETs, through one `source_get` function: `/api/status`, `/api/profiles`, and one clip. The clip is the active reference WAV of the first ready English voice, never the long original, and is saved as `reference.wav`.
+  - Starts the release `metal` engine on the first free dev port under `/usr/bin/time -l`. It takes the engine pid from the ready line, because `$!` is `time`.
+  - Waits for the analysis job by id, then for an idle `/api/status` (the preview). Preview takes are the `take` lines counted at that point.
+  - Renders the fixed three-sentence narration (20-minute limit, then a stop) and fetches the WAV, SRT, timings and narration document.
+  - Stops the engine by pid, waits on `time`, checks the port is free, and writes `report.json`.
+  - An EXIT trap stops the engine and deletes `rust/target/smoke-tmp` on every path, and records a failed attempt's takes.
+  - `rust/out/smoke/attempts.json` is the ledger. A third attempt, or a start after 20 takes, is refused before any model loads, and the cap of a second attempt is `min(10, 20 - used)`.
+  - `SMOKE_OUT`/`SMOKE_CLIP`/`SMOKE_ENGINE`/`SMOKE_ENGINE_ARGS` allow a model-free dry run.
+- `rust/ab/ab.py render`: engine b (Rust) renders before engine a (Python), per lead decision 12.
+- `rust/README.md`: build, isolated mode, the eight gates, what is not in 1.0 (Sidon owed under decision #4, PLAN's "Not in this plan"), and Windows built by CI only, never run on an NVIDIA PC.
+
+**Dry run before the real one** (debug engine, `--stub-renderer`, a `say` clip, output under `rust/target`; no model, not an attempt): the whole flow ran end to end. It exited 1 because the stub's WAV is 0.5 s, which the script correctly refuses as under 1 s. The first try with a short `say` clip ended in "Could not find a clean stretch of speech", which the script reported with the engine's text and exit 1. Both times the trap left no process, no port and no `smoke-tmp`.
+
+**Local gates before the push, on `22ade0f`'s tree:**
+- `cargo test --workspace` exit 0 (400 passed, 0 failed, 5 ignored).
+- `contract.sh` `Ran 33 tests`/`OK`.
+- `cargo build -p taketwo && scripts/smoke_shell.sh` `G3 PASS`.
+- `cargo test -p taketwo-mcp` exit 0.
+- G7 command exit 0.
+- `g8.sh` `G8 PASS`.
+- `cargo build --release -p taketwo-engine --features metal` exit 0.
+
+**The smoke (G5): attempt 1 of 2, exit 0, 2 takes of 10, 2 of 20 in all.** The output of `cat rust/out/smoke/report.json`, numbers only:
+```
+"attempt": 1, "takes_preview": 1, "takes_narration": 1, "takes_this_attempt": 2, "takes_total": 2, "take_cap": 10,
+"seconds": {"engine_start": 0.6, "analysis": 16.6, "preview": 45.2, "narration": 20.6}, "model_load_lines": [],
+"audio_seconds": 10.65, "peak_rss_bytes": 4094361600,
+"parts": [{"part": 0, "status": "ok", "issues": [], "takes": 1, "takes_kept": 0}],
+"outcome": "clean", "review": 0, "narration_status": "done", "studio": false,
+"studio_tip": "Studio restoration is not in TakeTwo 1.0 yet, so the plain clean-up was used (high-pass, noise reduction when needed, loudness).",
+"denoised": false, "voice_preview": true, "reference_clip_seconds": 10.93, "commit": "22ade0f80afdaa2e47e54efbf7ebada7201f3e28",
+"note": "no quality claim; Franz listens"
+```
+- `engine.log` holds `take 1 of 10` (preview) and `take 2 of 10` (narration).
+- Files: `narration.wav` 511244 bytes, `narration.srt` 251 bytes, `timings.json` 1463 bytes.
+- Afterwards: no dev-port listener, no `rust/target` process, and no `rust/target/smoke-tmp`.
+- **Peak memory:** 4.09 GB is `time -l`'s maximum resident set size. It is a measurement; Metal buffers may not be counted in it. The engine logs no model-load line, so the load time is inside the analysis and preview phases.
+- **Not judged:** the WAV is a copy of Franz's voice and stays in the git-ignored `rust/out/smoke/` for Franz to hear. No claim is made about the sound.
+
+**Final gate run (S21), all on code commit `22ade0f`, run after Windows `build (cuda)` ended:**
+- G1 `cd rust && source scripts/env.sh >/dev/null && cargo test --workspace`: exit 0; 38 result lines, 400 passed, 0 failed, 5 ignored.
+- G2 `rust/scripts/contract.sh`: exit 0; `Rust engine ready on 127.0.0.1:8790`, `Ran 33 tests in 0.071s`, `OK`.
+- G3 `cargo build -p taketwo && scripts/smoke_shell.sh`: exit 0; tail `e ok: shell exited 0 by itself; engine gone, port free, engine.json gone, engine.lock released` / `f ok: after kill -9 of shell …, engine … gone and port free` / `h ok: no dev port listening, no rust/target process` / `HOME WRITES: (end of HOME WRITES)` / `G3 PASS`.
+- G4 `cargo build -p taketwo-mcp && cargo test -p taketwo-mcp`: exit 0; `test result: ok. 22 passed` and `test result: ok. 7 passed`.
+- G5 `cat rust/out/smoke/report.json`: the report above (not a second render).
+- G6 `rust/scripts/g6.sh`: exit 0.
+  ```
+  target: 22ade0f S19: take log line per synthesis call, synth_smoke.sh (G5), ab.py renders the Rust engine first, rust/README.md
+  run 46017204365 on 22ade0f: in_progress
+  info, not judged: build (cuda,flash-attn): in_progress
+  info, not judged: check: completed success 2026-11-27T14:34:53Z 2026-11-27T14:45:36Z
+  gate job: build (cuda): completed success 2026-11-27T14:34:53Z 2026-11-27T15:13:39Z
+  G6 PASS
+  ```
+  This push was the first Windows compile of S17's multer and profile routes (`check` and `build (cuda)` both green). The flash-attn job was still running when read; it is reported separately and is not the gate.
+- G7 `ab.py plan && ab.py selftest && ! ab.py render`: exit 0. Output: `scripts: 10` (voices: 5), `takes, most: 480`. In the selftest `engine b: script 1 done` comes before `engine a: script 1 done`. Then `AB SELFTEST PASS`, and render printed `Rendering waits for Franz's OK (480 takes at most, …)` with exit 3.
+- G8 `rust/scripts/g8.sh`: exit 0.
+  - `ok: Rust port is only on rust/taketwo (local and GitHub)`.
+  - `ok: no process of this work has a file open under data/ or App Support/VoiceForge (1 other process(es) do: Franz's app)`.
+  - `ok: 8766 health: {"ok":true,"name":"TakeTwo",...}`.
+  - `G8 PASS`.
+  - Information only: `data/` 34 added, 3 changed, which is Franz's own app use.
+
+**Still owed:**
+- **S18, Studio restoration (Sidon).** Franz's note of 22:35, relayed by the coordinator and added to this file during this session, makes S18 required. S21 must run again after it.
+- **Windows** has never run on an NVIDIA GPU. CI proves build and link only.
+- **The blind A/B render** waits for Franz's OK.
+- **Franz listens** to `rust/out/smoke/narration.wav`.
+
+**Rule slips:** none that I know of. Notes:
+- The coordinator's S18 note was already in the working copy, uncommitted. It is committed with this entry, unchanged.
+- The preview used one take, not three, as `make_preview` allows: it stops at the first take with no hard issue (`render/preview.rs`).
