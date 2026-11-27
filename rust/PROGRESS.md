@@ -406,8 +406,12 @@ Left out or limited:
 - Python's `json` reads `NaN`/`Infinity`; serde_json refuses them. A stored document with one fails to load in Rust, and a settings file with one is moved to `.broken`. Marked `shortcut:`. Python writes NaN only if one reaches a document, which the rules prevent for settings.
 - Integers above 2^64 in a document lose precision (no `arbitrary_precision`).
 - The one-time copy does not follow a folder symlink inside the source (`shortcut:` comment).
-- Seed WAVs are compared by header and sample count, not sample values (sin can differ in the last bit across platforms).
+- Seed WAVs: header, sample count, byte size, and the first 32 samples of each file within 1 (sin can differ in the last bit across platforms). An amplitude change from 8000 to 8100 made the test fail.
 - The doc column text is compact serde_json, not Python's `", "` / ensure_ascii style; Python reads it back the same.
 
+- `Cargo.lock`: restored to the `44de88b` pins and re-resolved; only new packages were added, plus `thiserror` 2.0.18 to 2.0.21, which `rusqlite` 0.43 requires (via `sqlite-wasm-rs`; `cargo update --precise 2.0.18` is refused).
+- Where NaN can come from (grep of the worktree's `backend/app`, no library opened): `delivery.ltas` returns `nan` for bands above 0.92 x Nyquist, and `reference.py` writes those bands to `profiles/<id>/mic.json` with plain `json.dumps`. So every voice's `mic.json` likely holds `NaN`, which serde_json can't read: the step that ports mic matching must read it with a NaN-tolerant parser. No path that puts NaN into a database document was found; `loudness` can return `-inf`, but it is not stored.
+
 Questions for the lead:
-1. Should `startup_repairs` fail on a document that serde_json can't read (today), or skip it and report it, so one odd row can't stop the engine?
+1. One unreadable document (for example a NaN value) makes `list_profiles`/`list_generations` fail for the whole table, so the startup repairs and every list fail too. Keep that (loud), or skip the row and report it?
+2. The one-time copy copies the database bytes. If VoiceForge is running and writing at that moment, the copy can catch it mid-write. When it is wired in, should it use SQLite's backup API on a read-only connection instead, or require VoiceForge to be closed?

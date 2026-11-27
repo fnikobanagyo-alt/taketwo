@@ -34,7 +34,7 @@ The Rust engine has its own seeder, which produces the same observable state fro
 - the same ids, texts, statuses, timelines, `words` and `created` order;
 - a WAV at each chunk's `file`, a `final.wav` for each narration with a `file`, and nothing for `ctpending01`.
 
-Seed a fresh temporary library with it (from the repository root, after `cd rust && cargo build -p taketwo-engine`):
+Seed a fresh temporary library with it (from the repository root, after `cd rust && source scripts/env.sh && cargo build -p taketwo-engine`; `env.sh` puts the cmake the build needs on `PATH`):
 
 ```sh
 D=$(mktemp -d) && TAKETWO_DATA="$D" rust/target/debug/taketwo-engine seed --fixture contract/fixture.json

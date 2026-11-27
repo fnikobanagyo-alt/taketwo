@@ -24,10 +24,12 @@ fn walk(root: &Path, dir: &Path, out: &mut Vec<Value>) {
             out.push(json!({"path": format!("{rel}/")}));
             walk(root, &p, out);
         } else if rel.ends_with(".wav") {
-            let r = hound::WavReader::open(&p).unwrap();
+            let mut r = hound::WavReader::open(&p).unwrap();
             let s = r.spec();
+            let head: Vec<i16> = r.samples::<i16>().take(32).map(Result::unwrap).collect();
             out.push(json!({"path": rel, "channels": s.channels, "sample_width": s.bits_per_sample / 8,
-                            "rate": s.sample_rate, "frames": r.duration(), "bytes": std::fs::metadata(&p).unwrap().len()}));
+                            "rate": s.sample_rate, "frames": r.duration(), "bytes": std::fs::metadata(&p).unwrap().len(),
+                            "first_samples": head}));
         } else {
             out.push(json!({"path": rel}));
         }
@@ -59,7 +61,17 @@ fn seed_matches_python_golden() {
 
     let mut got = Vec::new();
     walk(&data, &data, &mut got);
-    assert_eq!(sorted(got), sorted(files.clone()), "file list and WAV headers");
+    let (mut got, mut want) = (sorted(got), sorted(files.clone()));
+    // The first samples may differ by 1 where sin() differs in its last bit between platforms.
+    for (g, w) in got.iter_mut().zip(want.iter_mut()) {
+        if let (Some(gs), Some(ws)) = (g.as_object_mut().unwrap().shift_remove("first_samples"), w.as_object_mut().unwrap().shift_remove("first_samples")) {
+            let (gs, ws) = (gs.as_array().unwrap().clone(), ws.as_array().unwrap().clone());
+            assert_eq!(gs.len(), 32, "{}", g["path"]);
+            assert!(gs.len() == ws.len() && gs.iter().zip(&ws).all(|(a, b)| (a.as_i64().unwrap() - b.as_i64().unwrap()).abs() <= 1),
+                    "{} samples: rust {gs:?} python {ws:?}", g["path"]);
+        }
+    }
+    assert_eq!(got, want, "file list and WAV headers");
     let lib = Library::open(&data).unwrap();
     let docs = |v: Vec<taketwo_core::library::Doc>| v.into_iter().map(Value::Object).collect::<Vec<_>>();
     assert_eq!(without_updated(&docs(lib.list_profiles().unwrap())), without_updated(profiles));

@@ -20,6 +20,7 @@ import os
 import random
 import shutil
 import sqlite3
+import struct
 import subprocess
 import sys
 import tempfile
@@ -462,8 +463,10 @@ def seed_child() -> None:
             files.append({"path": rel + "/"})
         elif f.suffix == ".wav":
             with wave.open(str(f)) as w:
+                head = list(struct.unpack("<32h", w.readframes(32)))  # catches a wrong frequency or amplitude
                 files.append({"path": rel, "channels": w.getnchannels(), "sample_width": w.getsampwidth(),
-                              "rate": w.getframerate(), "frames": w.getnframes(), "bytes": f.stat().st_size})
+                              "rate": w.getframerate(), "frames": w.getnframes(), "bytes": f.stat().st_size,
+                              "first_samples": head})
         else:
             files.append({"path": rel})
     print(json.dumps({"files": files, "profiles": db.list_profiles(), "generations": db.list_generations()}, allow_nan=False))
