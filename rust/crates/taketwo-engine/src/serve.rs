@@ -128,6 +128,12 @@ pub fn run(args: &[String]) -> Result<(), String> {
     if let Some(r) = real {
         let _ = r.worker.set(state.worker.clone());
     }
+    // main.py at import: voices without a clone-spoken preview get one in the background
+    match api::queue_startup_previews(&state) {
+        Ok(0) => {}
+        Ok(n) => eprintln!("taketwo-engine: queued {n} voice preview(s)"),
+        Err(e) => eprintln!("taketwo-engine: voice previews not queued: {e}"),
+    }
     let app = api::router(state.clone());
     publish(&mode, Path::new(""), port, started);
     let stop = Arc::new(tokio::sync::Notify::new());

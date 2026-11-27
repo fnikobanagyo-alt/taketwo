@@ -3,6 +3,9 @@
 //! routes. Without a renderer (in-process tests) every path that would start a job answers 501; `serve` always
 //! has one (the real renderer, or the stub with `--stub-renderer`). A speed change re-times the finished audio (S16).
 
+mod profiles;
+pub use profiles::queue_startup_previews;
+
 use crate::files;
 use crate::render::Renderer;
 use crate::worker::{self, Ids, JobError, Worker};
@@ -30,6 +33,8 @@ pub const APP_VERSION: &str = "2.0.0";
 pub const PIPELINE_VERSION: i64 = 4;
 pub const MAX_SCRIPT_WORDS: i64 = 10_000;
 pub const NOT_YET: &str = "Not in TakeTwo 1.0 yet.";
+/// The largest voice upload accepted (a 5-minute sample in any common format fits easily).
+pub const UPLOAD_LIMIT: usize = 1 << 30;
 const LOCAL_HOSTS: [&str; 3] = ["127.0.0.1", "localhost", "[::1]"];
 const DEV_UI_ORIGIN: &str = "http://localhost:5173";
 
@@ -422,17 +427,6 @@ async fn put_settings(State(st): St, body: Bytes) -> Response {
 async fn list_profiles(State(st): St) -> Response {
     match st.lib.list_profiles() {
         Ok(v) => ok_json(Value::Array(v.into_iter().map(Value::Object).collect())),
-        Err(e) => ise(e),
-    }
-}
-
-async fn get_profile(State(st): St, Path(pid): Path<String>) -> Response {
-    match st.lib.get_profile(&pid) {
-        Ok(Some(mut p)) => {
-            p.insert("job".into(), Value::Null); // no jobs before S07
-            ok_json(Value::Object(p))
-        }
-        Ok(None) => detail(404, "Not found"),
         Err(e) => ise(e),
     }
 }
@@ -1410,8 +1404,8 @@ fn method_not_allowed() -> Response {
 }
 
 /// POST on `/api/profiles/{pid}`: only `upgrade-all` exists there, as in Python.
-async fn profile_post(Path(pid): Path<String>) -> Response {
-    if pid == "upgrade-all" { not_yet() } else { method_not_allowed() }
+async fn profile_post(State(st): St, Path(pid): Path<String>, body: Bytes) -> Response {
+    if pid == "upgrade-all" { profiles::upgrade_all(st, body).await } else { method_not_allowed() }
 }
 
 /// POST on `/api/generations/{gid}`: only `reveal` exists there.
@@ -1492,12 +1486,13 @@ pub fn router(state: Arc<AppState>) -> Router {
         .route("/api/catalog/upgrade", get(|| async { not_yet() }).post(|| async { not_yet() }))
         .route("/api/catalog/discover", get(|| async { not_yet() }))
         .route("/api/integrations", get(integrations))
-        .route("/api/profiles", get(list_profiles).post(|| async { not_yet() }))
-        .route("/api/profiles/{pid}", get(get_profile).post(profile_post).patch(|| async { not_yet() }).delete(delete_checked))
+        // an upload may be a 5-minute WAV: far over axum's 2 MB default (streamed to disk, never held whole)
+        .route("/api/profiles", get(list_profiles).post(profiles::create_profile).layer(axum::extract::DefaultBodyLimit::max(UPLOAD_LIMIT)))
+        .route("/api/profiles/{pid}", get(profiles::get_profile).post(profile_post).patch(profiles::patch_profile).delete(profiles::delete_profile))
         .route("/api/profiles/{pid}/analysis", get(get_analysis))
         .route("/api/profiles/{pid}/preview", get(profile_preview))
-        .route("/api/profiles/{pid}/reanalyze", post(|| async { not_yet() }))
-        .route("/api/profiles/{pid}/refresh", post(|| async { not_yet() }))
+        .route("/api/profiles/{pid}/reanalyze", post(profiles::reanalyze))
+        .route("/api/profiles/{pid}/refresh", post(profiles::refresh_profile))
         .route("/api/profiles/{pid}/audio/{name}", get(profile_audio))
         .route("/api/generations", get(list_generations).post(create_generation))
         .route(

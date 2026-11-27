@@ -4,7 +4,9 @@
 //! error naming it. They are released after `IDLE_UNLOAD_SECONDS` without a job, as main.py `_release_models`.
 //! `TAKETWO_MAX_TAKES` caps the synthesis calls of one engine run.
 
-use crate::render::{Cancel, Renderer};
+use crate::render::{bridged, job_error, preview_with, Cancel, Renderer};
+use taketwo_core::reference;
+use taketwo_core::render::preview::Preview;
 use crate::worker::{self, Ids, JobError, Worker};
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
@@ -102,23 +104,6 @@ pub fn models_dir() -> PathBuf {
         .unwrap_or_else(|| dirs::data_local_dir().unwrap_or_default().join("TakeTwo").join("models"))
 }
 
-/// Sets its flag when dropped (also while a panic unwinds).
-struct SetOnDrop<'a>(&'a AtomicBool);
-
-impl Drop for SetOnDrop<'_> {
-    fn drop(&mut self) {
-        self.0.store(true, Ordering::SeqCst);
-    }
-}
-
-fn job_error(e: RenderError) -> Result<(), JobError> {
-    match e {
-        RenderError::Cancelled => Ok(()), // run_generation saves a stop as a status
-        RenderError::Value(m) => Err(JobError::new("ValueError", m)),
-        RenderError::Other(m) => Err(JobError::new("RuntimeError", m)),
-    }
-}
-
 impl RealRenderer {
     /// Nothing is loaded here. A thread releases the models after `idle` without a job.
     pub fn new(models: &Path, cap: Option<u32>, idle: Duration) -> Arc<RealRenderer> {
@@ -179,21 +164,7 @@ impl RealRenderer {
     fn with_models(&self, lib: &Library, cancel: Cancel, f: impl FnOnce(&mut Ctx, &mut Models) -> Result<(), RenderError>) -> Result<(), JobError> {
         let mut guard = self.models.lock().unwrap_or_else(|p| p.into_inner());
         let m = &mut *guard;
-        let flag = AtomicBool::new(false);
-        let done = AtomicBool::new(false);
-        let out = std::thread::scope(|sc| {
-            // set `done` on every exit, a panic included, so the watcher ends and the panic reaches the worker
-            let _done = SetOnDrop(&done);
-            // the models read an AtomicBool; only another thread can flip it during a long take
-            sc.spawn(|| {
-                while !done.load(Ordering::SeqCst) {
-                    if cancel() {
-                        flag.store(true, Ordering::SeqCst);
-                        return;
-                    }
-                    std::thread::sleep(Duration::from_millis(50));
-                }
-            });
+        let out = bridged(cancel, |flag| {
             let phase = self.phase();
             let mut clock = worker::wall_clock;
             let mut nonce = || u32::from_str_radix(&(self.ids)()[..8], 16).unwrap_or(0);
@@ -205,7 +176,7 @@ impl RealRenderer {
                 voice: &mut voice,
                 transcriber: &mut m.whisper,
                 encoder: &mut m.encoder,
-                cancel: &flag,
+                cancel: flag,
                 nonce: &mut nonce,
                 load: &mut load,
                 pitch_cache: &mut m.pitch_cache,
@@ -235,6 +206,36 @@ impl Renderer for RealRenderer {
         let r = narration::select_take(&mut cx, gid, ci, take);
         *self.last_job.lock().unwrap_or_else(|p| p.into_inner()) = Instant::now();
         r.or_else(job_error)
+    }
+    fn voice_tools(&self, cancel: Cancel, f: &mut dyn FnMut(&mut reference::Models) -> Result<(), RenderError>) -> Result<(), JobError> {
+        let mut guard = self.models.lock().unwrap_or_else(|p| p.into_inner());
+        let m = &mut *guard;
+        // the analysis needs Whisper and the encoder only; a missing file is named before anything loads
+        if let Some(f) = self.files[1..].iter().find(|f| !f.exists()) {
+            return Err(JobError::new("RuntimeError", format!("A model file TakeTwo needs is missing: {}. Put it in the models folder (TAKETWO_MODELS) and try again.", f.display())));
+        }
+        let out = bridged(cancel, |flag| f(&mut reference::Models { transcriber: &mut m.whisper, encoder: &mut m.encoder, cancel: flag }));
+        *self.last_job.lock().unwrap_or_else(|p| p.into_inner()) = Instant::now();
+        out.or_else(job_error)
+    }
+    fn preview(&self, lib: &Library, pid: &str, cancel: Cancel) -> Result<Preview, JobError> {
+        let downloaded = self.can_preview();
+        let mut guard = self.models.lock().unwrap_or_else(|p| p.into_inner());
+        let m = &mut *guard;
+        let phase = self.phase();
+        // the preview's takes go through the take cap, as a narration's do
+        let out = bridged(cancel, |flag| {
+            let mut voice = Capped { inner: &mut m.qwen, used: &self.used, cap: self.cap };
+            preview_with(lib, pid, &mut voice, &mut m.whisper, &mut m.encoder, flag, &mut m.pitch_cache, &phase, downloaded)
+        });
+        *self.last_job.lock().unwrap_or_else(|p| p.into_inner()) = Instant::now();
+        match out {
+            Ok(p) => Ok(p),
+            Err(e) => job_error(e).map(|_| Preview::Nothing),
+        }
+    }
+    fn can_preview(&self) -> bool {
+        Self::check_files(&self.files).is_ok()
     }
 }
 

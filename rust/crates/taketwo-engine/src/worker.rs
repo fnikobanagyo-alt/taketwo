@@ -237,6 +237,20 @@ impl Worker {
         false
     }
 
+    /// worker.py's `progress(p, msg)` for the job the thread runs now: progress, `last_progress_at`, and the
+    /// message when one is given.
+    pub fn progress(&self, p: f64, msg: &str) {
+        let mut inner = self.lock();
+        let Some(id) = inner.current.clone() else { return };
+        if let Some(j) = inner.job(&id) {
+            j.set("progress", p);
+            j.set("last_progress_at", wall_clock());
+            if !msg.is_empty() {
+                j.set("message", msg);
+            }
+        }
+    }
+
     /// worker.py `phase`: annotate a blocking step of the job the thread runs now.
     pub fn phase<T>(&self, name: &str, f: impl FnOnce() -> T) -> T {
         let id = self.lock().current.clone();

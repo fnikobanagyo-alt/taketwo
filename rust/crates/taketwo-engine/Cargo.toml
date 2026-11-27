@@ -10,7 +10,7 @@ metal = ["taketwo-voice/metal"]
 flash-attn = ["taketwo-voice/flash-attn"]
 
 [dependencies]
-axum = "0.8"
+axum = { version = "0.8", features = ["multipart"] }
 dirs = "6"
 form_urlencoded = "1"
 hound = "3.5"
