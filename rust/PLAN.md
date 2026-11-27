@@ -150,9 +150,9 @@ Needs: S07b. Gate: G4. No push. Binding detail: lead decision 9 in PROGRESS.md.
 
 ### S09 Tauri shell (push)
 Needs: S07b. Gate: G3. Binding detail: lead decision 10 in PROGRESS.md (live mode stays off, the engine lock stands in for single instance, the smoke's checks, the Windows `check` job excludes the shell and reports it separately).
-- `crates/taketwo`: Tauri 2, single instance, starts `taketwo-engine` as a sidecar, waits for health, opens the window at the engine's address (`WebviewUrl::External`), stops the engine when the window closes. What `desktop/main.js` does today, minus updates.
-- Build the UI in the worktree: `cd frontend && npm run build` (uses the symlinked `node_modules`; `frontend/dist` is git-ignored).
-- `rust/scripts/smoke_shell.sh`: isolated mode, temp library seeded with the fixture, a fixed dev port, start the built shell, check `/api/health` says `"name":"TakeTwo"`, check `GET /` returns the React page and one `/assets/*` file, quit the shell, check that the engine process is gone and the port is free.
+- `crates/taketwo`: Tauri 2, one shell per library through the engine's lock file (no single-instance plugin yet), starts `taketwo-engine serve --exit-with-stdin` as a child found beside the program, waits for health, opens the window at the engine's address (`WebviewUrl::External`), stops the engine when the window closes. What `desktop/main.js` does today, minus updates.
+- Build the UI in the worktree: `cd frontend && npm run build -- --configLoader runner` (uses the symlinked `node_modules`; the flag keeps vite from writing its temp config file there; `frontend/dist` is git-ignored).
+- `rust/scripts/smoke_shell.sh`: isolated mode, temp library seeded with the fixture, a free dev port, hidden shells only, checks a to i of lead decision 10 (health, page and asset, parentage, page load, second-shell refusal, close and `kill -9` paths, refusals, leftovers, home-folder report). It removes a `frontend/dist` it built itself. A clean engine exit now removes `engine.lock` as well as `engine.json`.
 - Done when: `cargo build -p taketwo && rust/scripts/smoke_shell.sh` passes.
 
 ### S10 Audio DSP with Python parity vectors
