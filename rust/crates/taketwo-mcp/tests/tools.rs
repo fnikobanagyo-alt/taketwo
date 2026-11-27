@@ -97,6 +97,7 @@ fn start_stub_engine(lib: &Lib, gate: &Path) -> Engine {
         .args(["serve", "--stub-renderer"])
         .env("TAKETWO_DATA", &lib.data)
         .env("TAKETWO_STUB_GATE", gate)
+        .env("TAKETWO_MODELS", no_models(lib))
         .env("HOME", lib.home())
         .env_remove("TAKETWO_URL")
         .env_remove("VOICEFORGE_URL")
@@ -119,10 +120,52 @@ fn start_stub_engine(lib: &Lib, gate: &Path) -> Engine {
     e
 }
 
+/// An empty models folder for every engine a test starts: no test may load a model.
+fn no_models(lib: &Lib) -> PathBuf {
+    let d = lib.home().join("no-models");
+    std::fs::create_dir_all(&d).unwrap();
+    d
+}
+
+/// One raw HTTP request to a test engine (no Origin header, as a local tool).
+fn http(port: u16, method: &str, path: &str, body: &str) -> String {
+    use std::io::{Read, Write};
+    let mut s = std::net::TcpStream::connect(("127.0.0.1", port)).unwrap();
+    write!(s, "{method} {path} HTTP/1.1\r\nHost: 127.0.0.1:{port}\r\nContent-Type: application/json\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{body}", body.len()).unwrap();
+    let mut out = String::new();
+    s.read_to_string(&mut out).unwrap();
+    out
+}
+
+/// get_audio with format mp3 (G4): a speed change makes final.mp3 (S16), and the tool saves it.
+#[tokio::test]
+async fn get_audio_saves_the_mp3() {
+    let ok_ffmpeg = Command::new(std::env::var_os("TAKETWO_FFMPEG").filter(|p| !p.is_empty()).unwrap_or_else(|| "ffmpeg".into()))
+        .arg("-version").output().is_ok_and(|o| o.status.success());
+    if !ok_ffmpeg {
+        println!("get_audio_saves_the_mp3: ffmpeg is not on PATH; the engine cannot make final.mp3 here");
+        return;
+    }
+    let lib = Lib::seeded();
+    let gate = lib.home().join("gate");
+    std::fs::create_dir(&gate).unwrap();
+    let gdir = lib.data.join("generations").join("ctclean01");
+    std::fs::copy(gdir.join("final.wav"), gdir.join("master.wav")).unwrap();
+    let engine = start_stub_engine(&lib, &gate);
+    let answer = http(engine.port, "PATCH", "/api/generations/ctclean01", r#"{"speed": 1.1}"#);
+    assert!(answer.starts_with("HTTP/1.1 200"), "{answer}");
+    let c = connect(&lib, Some(&format!("http://127.0.0.1:{}", engine.port)), &[]).await;
+    let mp3 = lib.home().join("out").join("n.mp3");
+    let a = ok(&c, "get_audio", json!({"narration_id": "ctclean01", "format": "mp3", "output_path": mp3})).await;
+    assert_eq!((&a["path"], &a["format"], &a["outcome"]), (&json!(mp3), &json!("mp3"), &json!("clean")));
+    assert_eq!(std::fs::read(&mp3).unwrap(), std::fs::read(gdir.join("final.mp3")).unwrap());
+    assert!(!lib.home().join("out").join("n.mp3.part").exists());
+}
+
 /// The MCP program as a child of an rmcp client. `url` pins TAKETWO_URL (None: removed).
 fn mcp_command(lib: &Lib, url: Option<&str>, args: &[&str]) -> tokio::process::Command {
     let mut c = tokio::process::Command::new(mcp_bin());
-    c.args(args).env("TAKETWO_DATA", &lib.data).env("HOME", lib.home()).env_remove("VOICEFORGE_URL").env_remove("TAKETWO_STUB_GATE");
+    c.args(args).env("TAKETWO_DATA", &lib.data).env("HOME", lib.home()).env("TAKETWO_MODELS", no_models(lib)).env_remove("VOICEFORGE_URL").env_remove("TAKETWO_STUB_GATE");
     match url {
         Some(u) => c.env("TAKETWO_URL", u),
         None => c.env_remove("TAKETWO_URL"),
@@ -355,7 +398,7 @@ async fn all_twelve_tools() {
           &format!("output_path must end in .wav to match format='wav' (got '{}').", bad.display())).await;
     fails(&c, "get_audio", json!({"narration_id": "ctpending01", "format": "wav", "output_path": out_dir.join("p.wav")}),
           "The narration is not finished yet (status: cancelled). Check get_status first.").await;
-    // MP3 is made in S16: until then the engine answers 404, a clean error, and no .part file is left.
+    // A narration without final.mp3 (the fixture has none): the engine answers 404, a clean error, no .part file.
     let mp3 = out_dir.join("n.mp3");
     let e = fails(&c, "get_audio", json!({"narration_id": "ctclean01", "output_path": mp3}), "").await;
     assert!(e.contains("TakeTwo returned 404: "), "{e}");

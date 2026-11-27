@@ -13,6 +13,9 @@ mkdir "$DATA/library"
 export TAKETWO_DATA="$DATA/library"
 source "$WT/rust/scripts/env.sh" >/dev/null   # keeps this TAKETWO_DATA
 LIB="$TAKETWO_DATA"
+# The shells' engines get an empty models folder: this smoke never loads a model.
+export TAKETWO_MODELS="$DATA/no-models"
+mkdir "$TAKETWO_MODELS"
 PIDS=()
 BUILT_UI=""
 UI="$WT/frontend/dist"
@@ -136,15 +139,17 @@ answers "$PORT" || fail "d: the first shell's engine stopped answering"
 kill -0 "$S1" 2>/dev/null || fail "d: the first shell is gone before its close time (checks a-d took too long)"
 echo "d ok: second shell exited $rc with the engine's refusal; the first still answers"
 
-# e. The window closes by itself after CLOSE_MS: shell exits 0, engine gone, port free, files gone.
+# e. The window closes by itself after CLOSE_MS: shell exits 0, engine gone, port free, address gone, lock released.
 wait_for 60 exited "$S1" || fail "e: the shell did not exit after its close time"
 wait "$S1"; rc=$?
 [ $rc -eq 0 ] || fail "e: the shell exited $rc, not 0; it said: $(cat "$DATA/run1.err")"
 wait_for 10 gone "$E1" || fail "e: engine $E1 still runs 10 s after the shell exited"
 wait_for 10 port_free "$PORT" || fail "e: port $PORT still listening"
 [ -e "$LIB/engine.json" ] && fail "e: engine.json left behind"
-[ -e "$LIB/engine.lock" ] && fail "e: engine.lock left behind"
-echo "e ok: shell exited 0 by itself; engine gone, port free, engine.json and engine.lock gone"
+# The lock file stays (lead decision 11); it must be released, so another engine on this library can take it.
+python3 -c 'import fcntl, sys; f = open(sys.argv[1], "a"); fcntl.flock(f, fcntl.LOCK_EX | fcntl.LOCK_NB)' "$LIB/engine.lock" 2>/dev/null \
+    || fail "e: engine.lock is still held after the engine exited"
+echo "e ok: shell exited 0 by itself; engine gone, port free, engine.json gone, engine.lock released"
 
 # f. Run 2: kill -9 the shell; the engine follows (its standard input closes).
 start_shell "$DATA/run2.err" -- --port "$PORT" --ui "$UI"

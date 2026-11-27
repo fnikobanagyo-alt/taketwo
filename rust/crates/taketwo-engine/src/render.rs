@@ -9,7 +9,7 @@ use std::path::PathBuf;
 use std::time::Duration;
 use taketwo_core::library::{Doc, Library, is_plain_name};
 
-pub type Cancel<'a> = &'a dyn Fn() -> bool;
+pub type Cancel<'a> = &'a (dyn Fn() -> bool + Sync);
 
 pub trait Renderer: Send + Sync {
     /// pipeline.run_generation: render the parts that are not `ok` (or only `only`).

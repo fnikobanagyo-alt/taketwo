@@ -6,6 +6,7 @@ license.workspace = true
 
 [features]
 cuda = ["taketwo-voice/cuda"]
+metal = ["taketwo-voice/metal"]
 flash-attn = ["taketwo-voice/flash-attn"]
 
 [dependencies]

@@ -1,7 +1,7 @@
 //! The HTTP API, ported from backend/app/main.py: the same routes, status codes, `{"detail": ...}` texts
 //! and JSON key order. S06 is the read side, S07a the writes that start no job, S07b the worker and its
-//! routes. Without a renderer (the default `serve`) every path that would start a job answers 501;
-//! a speed change answers 501 until S16.
+//! routes. Without a renderer (in-process tests) every path that would start a job answers 501; `serve` always
+//! has one (the real renderer, or the stub with `--stub-renderer`). A speed change re-times the finished audio (S16).
 
 use crate::files;
 use crate::render::Renderer;
@@ -21,6 +21,7 @@ use std::sync::{Arc, Mutex};
 use taketwo_core::library::{self, Doc, Library, is_plain_name};
 use taketwo_core::text::py;
 use taketwo_core::pipeline::{self, Fail, NewNarration};
+use taketwo_core::render::{RenderError, narration};
 use taketwo_core::{captions, review};
 use tower_http::cors::{AllowHeaders, AllowMethods, AllowOrigin, CorsLayer};
 
@@ -328,12 +329,13 @@ async fn list_engines() -> Response {
     let p = |key: &str, label: &str, default: Value, min: Value, max: Value, step: Value, help: &str| {
         json!({"key": key, "label": label, "default": default, "min": min, "max": max, "step": step, "help": help})
     };
+    let d = taketwo_core::render::QWEN_SAMPLER_DEFAULTS;
     let params = vec![
-        p("temperature", "Temperature", json!(0.7), json!(0.1), json!(1.2), json!(0.05),
+        p("temperature", "Temperature", json!(d[0].1), json!(0.1), json!(1.2), json!(0.05),
           "Lower = steadier, more consistent delivery. Higher = more expressive but riskier."),
-        p("top_p", "Top-p", json!(0.9), json!(0.5), json!(1.0), json!(0.01), ""),
-        p("top_k", "Top-k", json!(40), json!(5), json!(100), json!(1), ""),
-        p("repetition_penalty", "Repetition penalty", json!(1.05), json!(1.0), json!(2.0), json!(0.05),
+        p("top_p", "Top-p", json!(d[1].1), json!(0.5), json!(1.0), json!(0.01), ""),
+        p("top_k", "Top-k", json!(d[2].1 as i64), json!(5), json!(100), json!(1), ""),
+        p("repetition_penalty", "Repetition penalty", json!(d[3].1), json!(1.0), json!(2.0), json!(0.05),
           "Lower = less suppression of repeated sound codes. Higher = fewer loops. Changes can affect pronunciation."),
     ];
     ok_json(json!([{
@@ -1132,7 +1134,7 @@ async fn patch_generation(State(st): St, Path(gid): Path<String>, body: Bytes) -
     if let Some(r) = finish_422(Vec::new(), Some(&f)) {
         return r;
     }
-    let g = match live_gen(&st.lib, &gid) {
+    let mut g = match live_gen(&st.lib, &gid) {
         Ok(g) => g,
         Err(r) => return r,
     };
@@ -1148,7 +1150,18 @@ async fn patch_generation(State(st): St, Path(gid): Path<String>, body: Bytes) -
         if st.worker.active_for(&gid).is_some() {
             return detail(409, GEN_BUSY);
         }
-        return not_yet(); // S16: retime (Python re-times the finished audio here); nothing is changed
+        let x = speed.unwrap_or(1.0);
+        let clamped = if x > 1.3 { 1.3 } else if x < 0.7 { 0.7 } else { x }; // max(0.7, min(1.3, speed))
+        let mut clock = worker::wall_clock;
+        match narration::retime(&st.lib.generations_dir(), &mut g, clamped, &mut clock, &taketwo_core::render::no_phase) {
+            Ok(()) => {}
+            Err(RenderError::Value(m)) => return detail(400, &m),
+            Err(e) => return ise(e.message().to_string()),
+        }
+        // no render is running, so the whole document is safe to write
+        if let Err(e) = st.lib.put_generation(&mut g) {
+            return ise(e);
+        }
     }
     let doc = if fields.is_empty() { st.lib.get_generation(&gid) } else { st.lib.patch_generation_meta(&gid, &fields) };
     match doc {

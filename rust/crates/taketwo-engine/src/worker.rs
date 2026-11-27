@@ -21,7 +21,7 @@ impl JobError {
 }
 
 /// The job's work, given its cancel check (true once cancel was asked; the first call acknowledges it).
-pub type Work = Box<dyn FnOnce(&dyn Fn() -> bool) -> Result<(), JobError> + Send>;
+pub type Work = Box<dyn FnOnce(&(dyn Fn() -> bool + Sync)) -> Result<(), JobError> + Send>;
 /// Runs when a job is cancelled before it starts.
 pub type OnCancel = Box<dyn FnOnce() + Send>;
 /// 32 hex digits, as `uuid.uuid4().hex`; job ids are its first 10.

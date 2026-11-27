@@ -430,8 +430,8 @@ fn snapshot(e: &Engine) -> (Vec<(String, Vec<u8>)>, Vec<Value>, Vec<Value>) {
     (files, docs(e.state.lib.list_generations().unwrap()), docs(e.state.lib.list_profiles().unwrap()))
 }
 
-/// The paths that would start a job (S07b) or re-time the audio (S16) answer 501 after their checks
-/// and change nothing: no folder, no file, no document.
+/// Without a renderer, the paths that would start a job answer 501 after their checks and change nothing:
+/// no folder, no file, no document. (A speed change re-times without a renderer: `speed_change_retimes_over_http`.)
 #[tokio::test]
 async fn job_paths_answer_501_and_change_nothing() {
     let e = engine(None, None);
@@ -440,7 +440,7 @@ async fn job_paths_answer_501_and_change_nothing() {
     g["chunks"][1].as_object_mut().unwrap().insert("takes".into(), serde_json::json!([{"take": 1, "text": "Part two ends early."}]));
     e.setup.put_generation(&mut g).unwrap();
     let before = snapshot(&e);
-    let cases: [(&str, &str, Option<&str>); 9] = [
+    let cases: [(&str, &str, Option<&str>); 7] = [
         ("POST", "/api/generations", Some(r#"{"profile_id": "ctvoice01", "text": "Hello there. A new narration."}"#)),
         ("POST", "/api/generations", Some(r#"{"profile_id": "ctvoice01", "text": "Hi.", "engine": "qwen3-tts-1.7b", "speed": 2, "title": "T"}"#)),
         ("POST", "/api/generations/ctpending01/resume", None),
@@ -448,8 +448,6 @@ async fn job_paths_answer_501_and_change_nothing() {
         ("POST", "/api/generations/ctreview01/chunks/1/regenerate", Some(r#"{"text": "Part two, said again."}"#)),
         ("POST", "/api/generations/ctreview01/chunks/1/select-take", Some(r#"{"take": 1}"#)),
         ("POST", "/api/generations/ctreview01/fix-remaining", None),
-        ("PATCH", "/api/generations/ctclean01", Some(r#"{"speed": 1.0, "title": "Not saved", "favorite": true}"#)),
-        ("PATCH", "/api/generations/ctreview01", Some(r#"{"speed": 1.3}"#)),
     ];
     for (m, p, body) in cases {
         let a = send(&e.app, m, p, &[("host", "127.0.0.1:8790"), ("origin", "http://127.0.0.1:8790")], body).await;
@@ -459,6 +457,39 @@ async fn job_paths_answer_501_and_change_nothing() {
     // An equal speed is ignored, so the edit goes through.
     let a = send(&e.app, "PATCH", "/api/generations/ctclean01", &LOCAL, Some(r#"{"speed": 1.2505, "title": "Saved"}"#)).await;
     assert_eq!((a.status, json(&a)["title"].as_str()), (200, Some("Saved")));
+}
+
+/// main.py `patch_generation` with a new speed: 400 without `master.wav` (nothing changed); otherwise the speed
+/// (clamped to 0.7-1.3), timeline and duration change, final.wav and final.mp3 are re-made, and the MP3 downloads.
+#[tokio::test]
+async fn speed_change_retimes_over_http() {
+    let e = engine(None, None);
+    let before = snapshot(&e);
+    let a = send(&e.app, "PATCH", "/api/generations/ctclean01", &LOCAL, Some(r#"{"speed": 1.2, "title": "Not saved"}"#)).await;
+    assert_eq!((a.status, json(&a)), (400, serde_json::json!({"detail": "Re-render this generation to change its speed."})));
+    assert!(snapshot(&e) == before, "a refused speed change changes nothing");
+    let ok = std::process::Command::new(taketwo_core::audio::ffmpeg::program()).arg("-version").output().is_ok_and(|o| o.status.success());
+    if !ok {
+        println!("speed_change_retimes_over_http: ffmpeg is not on PATH; the re-timed export cannot be made here");
+        return;
+    }
+    let gdir = e.state.lib.generations_dir().join("ctclean01");
+    std::fs::copy(gdir.join("final.wav"), gdir.join("master.wav")).unwrap();
+    let old = e.state.lib.get_generation("ctclean01").unwrap().unwrap();
+    let a = send(&e.app, "PATCH", "/api/generations/ctclean01", &LOCAL, Some(r#"{"speed": 2, "title": "Faster"}"#)).await;
+    assert_eq!(a.status, 200, "{}", String::from_utf8_lossy(&a.body));
+    let g = json(&a);
+    let k = old["speed"].as_f64().unwrap_or(1.0) / 1.3;
+    assert_eq!((g["speed"].as_f64(), g["title"].as_str()), (Some(1.3), Some("Faster")), "clamped to 1.3");
+    let r3 = |x: f64| (x * 1000.0).round() / 1000.0;
+    assert_eq!(g["timeline"][0]["start"].as_f64(), Some(r3(old["timeline"][0]["start"].as_f64().unwrap() * k)));
+    assert!(gdir.join("final.mp3").is_file());
+    let a = send(&e.app, "GET", "/api/generations/ctclean01/audio?fmt=mp3", &LOCAL, None).await;
+    assert_eq!(a.status, 200);
+    assert_eq!(a.headers["content-type"], "audio/mpeg");
+    assert_eq!(a.body, std::fs::read(gdir.join("final.mp3")).unwrap());
+    let a = send(&e.app, "PATCH", "/api/generations/ctclean01", &LOCAL, Some(r#"{"speed": 1.3}"#)).await;
+    assert_eq!(a.status, 200, "an equal speed is not a change");
 }
 
 #[tokio::test]

@@ -49,7 +49,10 @@ fn wt() -> PathBuf {
 
 fn command(home: &Path, data: &Path, args: &[&str]) -> Command {
     let mut c = Command::new(env!("CARGO_BIN_EXE_taketwo-engine"));
-    c.arg("serve").args(args).env_remove("VOICEFORGE_DATA").env_remove("TAKETWO_STUB_GATE")
+    // an empty models folder: no test here may load a model
+    let models = home.join("no-models");
+    std::fs::create_dir_all(&models).unwrap();
+    c.arg("serve").args(args).env_remove("VOICEFORGE_DATA").env_remove("TAKETWO_STUB_GATE").env("TAKETWO_MODELS", &models)
         .env("TAKETWO_DATA", data).env("HOME", home).current_dir(home)
         .stdout(Stdio::piped()).stderr(Stdio::piped());
     c
@@ -108,9 +111,12 @@ fn idle_exit_stops_by_itself_and_frees_port_and_lock() {
     assert!(status.success(), "{status:?}");
     assert!(t0.elapsed() >= Duration::from_millis(1500), "not before the idle time");
     assert!(!data.join("engine.json").exists(), "a clean exit removes the address file");
-    assert!(!data.join("engine.lock").exists(), "a clean exit removes the lock file");
     drop(TcpListener::bind(("127.0.0.1", e.port)).expect("the port is free again"));
+    // the lock file stays (lead decision 11) but is released: a second engine on this folder takes it
     drop(EngineLock::acquire(&data.join("engine.lock")).expect("the lock is free again"));
+    let mut again = start(command(tmp.path(), &data, &["--idle-exit", "1"]));
+    let status = again.exits_within(Duration::from_secs(15)).unwrap_or_else(|| panic!("still running; stderr: {}", again.stderr_text()));
+    assert!(status.success(), "a second engine on the same folder started and stopped: {status:?}");
 }
 
 fn post(port: u16, path: &str, body: &str) -> String {

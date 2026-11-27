@@ -28,7 +28,9 @@ trap cleanup EXIT INT TERM
 BIN="$WT/rust/target/debug/taketwo-engine"
 "$BIN" seed --fixture "$WT/contract/fixture.json" >/dev/null || exit 2
 
-"$BIN" serve >"$LOG" 2>&1 &
+# An empty models folder (env.sh points TAKETWO_MODELS at the real ones): the contract never loads a model.
+mkdir "$DATA/no-models"
+TAKETWO_MODELS="$DATA/no-models" "$BIN" serve >"$LOG" 2>&1 &
 PID=$!
 PORT=""
 for _ in $(seq 1 300); do   # 30 s

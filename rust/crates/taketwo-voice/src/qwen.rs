@@ -24,10 +24,8 @@ pub const MODEL_DIR: &str = "qwen3-tts-1.7b-base";
 /// The engine ids this voice answers to (engines.py `qwen3-tts-1.7b`).
 pub const ENGINES: [&str; 1] = ["qwen3-tts-1.7b"];
 
-/// The `qwen3` family's parameter defaults (engines.py `_QWEN_PARAMS`).
-/// shortcut: taketwo_core::delivery does not define these (only taketwo-engine's api.rs lists them for /api/engines),
-/// so this is the voice's one copy; move both to taketwo-core when a step may edit it.
-pub const DEFAULTS: [(&str, f64); 4] = [("temperature", 0.7), ("top_p", 0.9), ("top_k", 40.0), ("repetition_penalty", 1.05)];
+/// The `qwen3` family's parameter defaults (engines.py `_QWEN_PARAMS`): taketwo-core's one copy.
+pub const DEFAULTS: [(&str, f64); 4] = taketwo_core::render::QWEN_SAMPLER_DEFAULTS;
 
 /// engines.py `LANG_NAMES`.
 pub const LANG_NAMES: [(&str, &str); 10] = [
@@ -243,6 +241,11 @@ mod tests {
             Value::Object(m) => m,
             _ => panic!(),
         }
+    }
+
+    #[test]
+    fn the_cancelled_word_is_the_one_the_render_pipeline_knows() {
+        assert_eq!(CANCELLED, taketwo_core::render::CANCELLED);
     }
 
     #[test]

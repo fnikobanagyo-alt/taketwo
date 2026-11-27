@@ -1,13 +1,14 @@
 //! `taketwo-engine serve [--port N] [--ui DIR] [--stub-renderer] [--idle-exit SECONDS] [--exit-with-stdin]`:
 //! isolated mode only (`--live` is refused until the shell step).
-//! `--stub-renderer` wires the stub renderer (its gate is the folder `TAKETWO_STUB_GATE`); without it every
-//! path that would start a job answers 501.
+//! `--stub-renderer` wires the stub renderer (its gate is the folder `TAKETWO_STUB_GATE`); without it the real
+//! renderer renders (models from `TAKETWO_MODELS`, loaded on the first job; `TAKETWO_MAX_TAKES` caps the takes).
 //! One engine per library (the lock file). `--idle-exit` stops after that long with no job and no request
 //! (MCP passes 900); `--exit-with-stdin` stops when standard input closes (the parent went away).
 //! On those, Ctrl-C and SIGTERM: the running job's cancel flag is set, the worker gets a few seconds,
-//! the lock is released.
+//! the lock is released (the file stays; the next engine takes it over).
 
 use crate::api::{self, AppState};
+use crate::real::{self, RealRenderer};
 use crate::render::{Renderer, StubRenderer};
 use std::ffi::OsStr;
 use std::io::Write;
@@ -115,11 +116,18 @@ pub fn run(args: &[String]) -> Result<(), String> {
     let port = listener.local_addr().map_err(|e| e.to_string())?.port();
     let ui = a.ui.filter(|d| d.is_dir());
     let started = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).map(|d| d.as_secs_f64()).unwrap_or(0.0);
-    let renderer: Option<Arc<dyn Renderer>> = a.stub_renderer.then(|| {
+    let cap = paths::parse_max_takes(std::env::var_os("TAKETWO_MAX_TAKES").as_deref())?;
+    let (renderer, real): (Arc<dyn Renderer>, Option<Arc<RealRenderer>>) = if a.stub_renderer {
         let gate = std::env::var_os("TAKETWO_STUB_GATE").filter(|g| !g.is_empty()).map(PathBuf::from);
-        Arc::new(StubRenderer { gate }) as Arc<dyn Renderer>
-    });
-    let state = Arc::new(AppState::new(lib, ui, started, Box::new(api::reveal_in_file_manager), renderer, crate::worker::random_ids()));
+        (Arc::new(StubRenderer { gate }), None)
+    } else {
+        let r = RealRenderer::new(&real::models_dir(), cap, real::idle_unload());
+        (r.clone(), Some(r))
+    };
+    let state = Arc::new(AppState::new(lib, ui, started, Box::new(api::reveal_in_file_manager), Some(renderer), crate::worker::random_ids()));
+    if let Some(r) = real {
+        let _ = r.worker.set(state.worker.clone());
+    }
     let app = api::router(state.clone());
     publish(&mode, Path::new(""), port, started);
     let stop = Arc::new(tokio::sync::Notify::new());
@@ -161,10 +169,7 @@ pub fn run(args: &[String]) -> Result<(), String> {
     }
     // The isolated address file goes before the lock, so a second engine never sees our stale address.
     let _ = std::fs::remove_file(a.data.join(paths::ADDRESS_FILE));
-    // The lock file goes too (lead decision 10, smoke check e), removed while still held.
-    // shortcut: an engine that opened the file just before this removal can lock the removed copy while a third
-    // creates a new one; acquire uses try_lock, so the window is microseconds. Compare the file id if it matters.
-    let _ = std::fs::remove_file(&lock.path);
+    // The lock file stays (lead decision 11): released here, so the next engine on this library takes it.
     drop(lock);
     served
 }
