@@ -177,14 +177,23 @@ Needs: S01. Gate: G1. No push. Binding detail (signals as files, precision, tole
 - Every tolerance is written next to its test with the reason. Decisions (which frames count as silence, where a cut lands) must match exactly; only filter and loudness numbers may differ, within the stated tolerance.
 - Done when: `cargo test -p taketwo-core audio` passes.
 
-### S11 Delivery, ending guard, check decisions
-Needs: S03, S10. Gate: G1.
-- Port `delivery.py` (`prosody` with a hand port of librosa `yin`, `expressiveness`, `resolve`, `pick_variant`, `ltas`, `mic_match` with `firwin2`), `ending_guard.py`, `studio.master_chain`, and from `pipeline.py`: `noise_limit`, `_internal_sentence_cut`, `evaluate` (every check with today's limits, `HARD_ISSUES`), `widen_sentence_pauses`, `_processed_edge_issues`, `clean_replacement`.
-- Whisper timing sensitivity (lead decision 13, map ticket #11): the check vectors that take a word time (`end_analysis`'s `last_word_end`, the ending guard, `_internal_sentence_cut`) are recorded three times, with the time as given and shifted by -0.16 s and +0.16 s (the largest Rust-against-Python word-end difference S13 measured). The recorder writes whether Python's own decision changes. No tolerance is set before those numbers exist. Also record how `evaluate` uses `avg_logprob` and whether a change of 0.05 flips any decision (S13's value lacks the end-of-text term).
-- Vectors: `rust/golden/record.py` runs `evaluate` and friends on synthetic audio with canned transcripts, similarities and settings (the model calls are replaced by fixed values) and stores inputs, issues and measurements in `rust/golden/checks.json`.
-- Port the cases in `backend/tests/test_narration_quality.py`, `test_ending_guard.py`, `test_repeat_cutoff.py`, `test_regressions.py` and `test_audit_fixes.py` that test these functions. List any case left out in PROGRESS.md with the reason.
+### S11a Take checks, ending guard, pitch measures (push)
+Needs: S03, S10. Gate: G1. Split from the old S11 by lead decision 14: this half is what S15 needs. Push at the end (Windows `check` only). Binding detail: lead decision 14 in PROGRESS.md.
+- Port from `pipeline.py`: `evaluate` (every check with today's limits), `_internal_sentence_cut`, `HARD_ISSUES`, the arithmetic of `noise_limit` (its file reads and `put_profile` are S15). From `ending_guard.py`: all of it. From `delivery.py`: `prosody` with a hand port of librosa `yin`, `expressiveness`, `DEFAULT_VOICE_SETTINGS`, `resolve`, `pick_variant`.
+- Already ported, not redone: `clean_replacement` (S07a), `wer`, `word_coverage`, `ABBREVIATIONS`, the difflib matcher (S03), all of `audio.py` (S10).
+- `Transcript`, `Segment` and `Word` move from `taketwo-voice` to `taketwo-core` (the voice crate re-exports them), so the checks and Whisper share one type.
+- The speaker similarity is a callback that receives the trimmed, padded and faded audio and is called only when the take is longer than 1.0 s, as Python does.
+- Whisper timing sensitivity (lead decision 13, map ticket #11): the check vectors that take a word time are recorded as given and with every word time shifted by -0.16 s and +0.16 s. The recorder writes whether Python's own decision changes. Rust must equal Python on all three; the numbers go to the lead. `evaluate` reads no `avg_logprob` (only `reference.py` stores it: S17).
+- Vectors: `rust/golden/record_checks.py` (synthetic audio, canned transcripts and similarities, no model) into `rust/golden/checks.json`, reusing signals in `rust/golden/audio/` where they fit.
+- Port the cases of `backend/tests/test_narration_quality.py`, `test_ending_guard.py`, `test_repeat_cutoff.py`, `test_regressions.py` and `test_audit_fixes.py` that test these functions. List any case left out in PROGRESS.md with the reason.
+- Done when: `cargo test -p taketwo-core -- checks delivery ending_guard` passes, with each test asserting the number of golden cases it read, and the Windows `check` job is green on the pushed commit.
+
+### S11b Mic match, master chain, sentence pauses, final-mix edge check
+Needs: S10. Gate: G1. No push. This half is what S16 needs; it can run any time before S16.
+- Port `delivery.ltas` and `mic_match` (`firwin2`, `fftconvolve` by hand), `studio.expander`, `de_ess`, `master_chain`, `pipeline.widen_sentence_pauses`, `_processed_edge_issues`. Anything S11a handed back (the lead says so in the decision that starts this step).
+- Vectors from a recorder on synthetic signals, with the S10 rules (signals as files, decisions exact, stated tolerances on filter numbers, knife-edge margins).
 - `profiles/<id>/mic.json` is written by Python with plain `json.dumps` and likely holds `NaN` (`delivery.ltas` returns nan above 0.92 x Nyquist): read it with a NaN-tolerant parser, never plain serde_json (found in S04).
-- Done when: `cargo test -p taketwo-core -- checks delivery ending_guard` passes, with each test asserting the number of golden cases it read.
+- Done when: `cargo test -p taketwo-core -- mastering mic_match pauses` passes, with each test asserting the number of golden cases it read.
 
 ### S12 Qwen voice (real model, Metal)
 Needs: S01. Gate: G5 (part).
@@ -208,14 +217,14 @@ Needs: S12. Gate: G5 (part).
 - Done when: `cargo test -p taketwo-voice --features metal -- --ignored encoder_parity` has run with numbers in PROGRESS.md.
 
 ### S15 Render pipeline A: takes and retakes
-Needs: S07b, S11. Gate: G1.
+Needs: S07b, S11a. Gate: G1.
 - Port `profile_assets`, `_ref_pitch`, `_guarded_take`, `render_chunk` (seeds, retake rounds and budgets, the choice between takes, hard and soft issues, what is stored on the part), using the traits so tests run on the stub.
 - Tests script the stub (take 1 cut off, take 2 clean; all takes flagged; cancel mid-part; ending guard on and off) and compare the part document with what Python produces for the same scripted inputs (`rust/golden/record.py` drives `render_chunk` with patched model calls into `rust/golden/render.json`).
 - The engine keeps `engine.lock` on exit again (lead decision 11): `tests/lifecycle.rs` and `smoke_shell.sh` check e assert the lock is released (a second engine on the same folder takes it), not that the file is gone.
 - Done when: `cargo test -p taketwo-engine render_chunk` passes.
 
 ### S16 Render pipeline B: assembly, final scan, re-speak, takes, speed (push)
-Needs: S15. Gate: G1, G2 (still green). Push at the end.
+Needs: S15, S11b. Gate: G1, G2 (still green). Push at the end.
 - Port `assemble` (pauses, mic match, master chain, loudness), `final_scan`, `run_generation`, `regenerate_chunk` with snapshot and restore, `select_take` with remix, `fix_remaining`, `apply_speed`, `retime`, `create_generation`, MP3 export, the WAV and subtitle files written beside the narration.
 - Replace S07b's stub renderer with the real one. Port the cases from `backend/tests/test_review_loop.py` and the rest of `test_regressions.py`. Add stub-engine tests for what the contract can't reach: a successful create and render, re-speak, fix-remaining, speed change, select-take of a kept take, MP3.
 - Delay-load `nvcuda.dll` so the CUDA exe answers `--version` on a machine with no NVIDIA driver, plus a Windows job check for it (Franz, lead decision 11).
@@ -277,7 +286,7 @@ Stop-and-clean check after any run: `lsof -nP -iTCP -sTCP:LISTEN | grep -E ':(87
 
 ## Order and what can run side by side
 
-Critical path: S01, S02, S03, S04, S05, S06, S07a (G2), S07b, then S10, S11, S15, S16, with S12, S13, S14 before S17, then S19, S21.
+Critical path: S01, S02, S03, S04, S05, S06, S07a (G2), S07b, then S10, S11a, S15, S11b, S16, with S12, S13, S14 before S17, then S19, S21.
 Independent after S07b: S08 (G4), S09 (G3). Independent after S07a: S20 (G7). Independent after S01: S10, S12.
 Model steps (S12, S13, S14, S18, S19) never run at the same time as each other.
 

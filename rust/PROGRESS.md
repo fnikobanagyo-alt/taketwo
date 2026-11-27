@@ -17,7 +17,8 @@ The loop appends one entry per session at the bottom: date, step id, what was bu
 | S08 MCP server | done (G4 evidence, judged again after S16 for mp3) |
 | S09 Tauri shell | done (G3 pass, pushed `e9ee6a4`, Windows `check` green) |
 | S10 Audio DSP with Python parity vectors | done (not pushed; `taketwo_core::audio`, 12 golden tests) |
-| S11 Delivery, ending guard, check decisions | todo |
+| S11a Take checks, ending guard, pitch measures | todo (next; split from S11 by lead decision 14) |
+| S11b Mic match, master chain, sentence pauses, final-mix edge check | todo (before S16) |
 | S12 Qwen voice (real model, Metal) | todo |
 | S13 Whisper with word timings | done, accepted (lead decision 13: heads = all heads of the top two decoder layers; pushed `c123c7b`, Windows `check` green, run 45968817348) |
 | S14 Speaker encoder | todo |
@@ -33,12 +34,12 @@ The loop appends one entry per session at the bottom: date, step id, what was bu
 
 | Gate | Status | Evidence |
 |---|---|---|
-| G1 | partial (text, library, captions, review, create logic, the worker, the MCP tools and Whisper word grouping in; audio, checks and the render pipeline still to port) | Lead decision 10 below (233 passed at `31b1140`); the S13 builder's acceptance run reported `cargo test --workspace` exit 0 at `f4e5664` (not rerun by the lead) |
+| G1 | partial (text, library, captions, review, create logic, the worker, the MCP tools, Whisper word grouping and audio DSP in; checks, delivery, mastering and the render pipeline still to port) | Lead decision 10 below (233 passed at `31b1140`); the S10 builder's acceptance run reported `cargo test --workspace` exit 0 at `5e7491c`; the lead reran `cargo test -p taketwo-core audio` there (12 golden + 2 unit tests ok) |
 | G2 | 33 of 33 at `31b1140` (judge again at the end; without `--stub-renderer` the paths that start a job still answer 501 until S16) | Lead decision 10 below: `contract.sh`, `Ran 33 tests`, `OK`, exit 0 |
 | G3 | pass at `cbdc9b1` | S09 entry below: `smoke_shell.sh` checks a-i ok, `G3 PASS`, exit 0 (hidden window, page load fired) |
 | G4 | pass for wav, mp3 waits for S16 | S08 entry below: `cargo test -p taketwo-mcp` from no prebuilt engine, exit 0 (27 tests) |
 | G5 | not run | |
-| G6 | waiting on `c123c7b` (run 45968817348: `check` success, `build (cuda)` and `build (cuda,flash-attn)` in progress when read); earlier all three success on `2e4d02a`; judge again on the final commit | Lead decision 13 below: `g6.sh` printed `G6 WAIT`; lead decision 10: run 45945950326, all three jobs `success` |
+| G6 | plain `cuda` success on `c123c7b` (run 45968817348: `check` success, `build (cuda)` success, `build (cuda,flash-attn)` still in progress when read); `5e7491c` is not pushed, so the newest code has no run yet; judge again on the final commit | Lead decision 14 below: `gh run view 45968817348`; lead decision 10: run 45945950326, all three jobs `success` |
 | G7 | pass at `8b6eed6` (judge again after S16/S17 if the voice-copy route changes) | S20 entry below: `plan` 10 scripts and `takes, most: 480`; `selftest` `AB SELFTEST PASS`; `render` exit 3 |
 | G8 | pass so far (re-run at the end) | Lead decision 9 below: `g8.sh` `G8 PASS`, exit 0 at `1f5b85b`. Data differences are Franz's own app use, information only |
 
@@ -1321,3 +1322,77 @@ Measured maxima (from `cargo test -p taketwo-core --test audio_golden -- --nocap
 ffmpeg test: argument lists against literal lists; a WAV -> MP3 -> 16 kHz WAV round trip with `max_seconds` 1.5 (mono, float, 24000 samples); a missing program is an error value (unit test). It fails with a message when ffmpeg is missing, no skip.
 Open: Python's `str()` and Rust's `{:?}` differ for exponent forms (1e-05 against 1e-5), irrelevant for real `max_seconds`. `lead_burst` returns None where Python would raise for inputs under 28 samples at absurd rates (code comment).
 Notes for the lead: the crate measurements (rubato, ebur128, sci-rs) came from a throwaway program in the session scratchpad, not in the repo, so they cannot be rerun from it. The hand port of `butter`/`sosfiltfilt` that sci-rs replaced is in `643ed92` (closer to scipy: 1.5e-11 against sci-rs's 3.0e-8) if the lead prefers fewer packages; sci-rs adds nine packages to `taketwo-core`, none compiled on Windows yet (`taketwo-core` is in the Windows `check` build at the next push). The test helper treats a NaN on one side as an infinite difference, so no NaN hides in a maximum. `audio.json` `dtypes` records the type of every returned number.
+
+### 2026-11-27, lead, iteration 14 decision
+State checked by command at `5e7491c` (tree clean apart from the two untracked symlinks): `main` and `origin/main` still `4448aaa`; `origin/rust/taketwo` is `c123c7b` (S10 is not pushed); Franz's app answers on 8766 (`"name":"TakeTwo"`, `"running":null`, `"queued":0`); `gh run view 45968817348` on `c123c7b`: `check` success, `build (cuda)` success, `build (cuda,flash-attn)` in progress; disk 11 GB free, `rust/target` 21 GB; swap 13.1 of 14.3 GB used; no dev port or process of ours left. Franz's standing safety policy is already in PLAN.md's safety section and in the entry of `ef3d382` above (not repeated here); the plan is well past S09. Not done, not blocked on Franz. Open gates: G1 (checks, delivery, mastering, pipeline), G5; G2, G4, G6, G8 judged again at the end.
+
+**S10 is accepted.** The lead reran `cargo test -p taketwo-core audio` at `5e7491c`: 12 golden tests and 2 unit tests ok. Judgements:
+- Hand ports of `resample_poly` and the pyloudnorm meter stay (the crates were outside the tolerance). `sci-rs` stays for `butter` and `sosfiltfilt` while it builds on Windows; if the Windows `check` job fails on a `sci-rs` package, go back to the hand port in `643ed92` instead of patching the crate.
+- `rubato` and `ebur128` are not used by `taketwo-core`. Decision #4's crate list is a preference, not a rule; the measured tolerance decides.
+- The two open notes (`{:?}` exponent form, `lead_burst` under 28 samples) need no work.
+
+**S11 is split in two** (PLAN.md updated): the old step held a yin port, two FIR designs, three mastering stages, `evaluate`, the ending guard, the timing vectors and cases from five test files, which is more than S10 was. **S11a** is what S15 needs; **S11b** is what S16 needs.
+
+Next step: **S11a Take checks, ending guard, pitch measures (push at the end)**. It is next on the critical path, needs no model (swap is nearly full, so S12 still waits), and compiles only `taketwo-core`.
+
+Facts found by the lead (read-only):
+- `taketwo-voice` depends on `taketwo-core`, not the other way round. `Transcript`, `Segment`, `Word` are in `rust/crates/taketwo-voice/src/whisper/mod.rs`.
+- Already in `taketwo_core::text::score`: `wer`, `word_coverage`, `final_word_missing`, `first_word_missing`, the difflib `SequenceMatcher` and `ratio`. `ABBREVIATIONS` is in `text/mod.rs`. `clean_replacement` is in `pipeline.rs`. `captions::round3` exists.
+- `evaluate` never reads `avg_logprob` or `no_speech_prob`. Only `reference.py` (S17) stores them and uses `no_speech_prob > 0.5`. The S13 `avg_logprob` difference is therefore S17's question, not this step's.
+- `flat` and `off_pitch` are raised in `render_chunk` from `prosody` (`liveliness = round(pitch_st / ref_pitch, 2) < 0.65`; `off = |12 log2(pitch_hz / target)| > 2.0` with `pitch_hz` rounded to 0.1). `ending_unverified` is raised in `_guarded_take`. All three are S15; this step ports the numbers they read.
+- `prosody` also ranks reference windows in `reference.py` (S17), through `expressiveness`.
+- librosa 0.11.0 and numba 0.67.0 are in `backend/.venv`. QC defaults: `max_wer` 0.12, `min_speaker_similarity` 0.85, `max_internal_silence` 0.9.
+- The Windows workflow starts on a push that changes `rust/**` other than `.md` files.
+
+Build, in this order, committing after each green part. **Hand-back point:** parts A to C green and committed come first. If part D (pitch) does not fit the session, say so and stop there: it moves to S11b. Push in either case.
+
+**A. One transcript type.** Move `Transcript`, `Segment`, `Word` to `taketwo_core::transcript` unchanged (fields, order, serde). `taketwo-voice` re-exports them (`pub use`), so no second copy exists and its tests still pass. Functions that need only words take `&[Word]`.
+
+**B. Recorder** `rust/golden/record_checks.py` (sibling of `record_audio.py`, same guards: fresh temporary data folder asserted before any app import, `HF_HUB_OFFLINE=1`, `ml.stt_model` raises, `audio.subprocess` replaced; run with `backend/.venv/bin/python -B`). It writes `rust/golden/checks.json` and new signals under `rust/golden/checks/` (raw little-endian float32, at most 6 MB; reuse `rust/golden/audio/` signals by name where they fit). Signals are files; Rust never regenerates one.
+- `evaluate` is called with `transcript=` given and with `ml.speaker_embedding` and `ml.cosine` replaced: the recorder stores the similarity it returned, whether it was called, and the length of the audio it was handed.
+- **Every issue fires.** Each issue `evaluate` can emit fires in at least one case and is asserted in the recorder: `empty`, `cut_off` (from the ending), `cut_off` (from `_internal_sentence_cut`), `lead_burst`, `junk_tail`, `odd_pause`, `end_word_missing`, `start_word_missing`, `long_silence`, `too_long`, `too_short`, `voice_drift`, `noise`, `clipping`, `mispronounced`, `wrong_words`. Plus at least two clean takes (issues `[]`), the no-words branch (`trim_edges` path), and a take of 1.0 s or less (similarity not called, `self_sim` used).
+- **Both sides of each limit**, with the distance to the limit stored: duration ratio 1.75 and 0.5, the `expected` floor 0.8, clipping 0.003, `noise_max` (default 0.09 and a larger one), `max_wer` and the 0.35 line, `rel_sim` against `min_speaker_similarity` (and `self_sim` under 1e-3), `max_internal_silence`, the 0.5 s gap in the odd-pause loop and each punctuation mark it accepts, `len(a) < sr * 0.3`. No case sits closer to a limit than float noise can move it; redesign one that does, as S10 did.
+- Stored per case: every key of the returned dict (`audio` and `raw_audio` as files; `issues` in order; `score`, `wer`, `sim`, `max_gap`, `dur`, `gaps`, `heard`, `words`, `ending` with all its keys) and the dtype of each number.
+- `_internal_sentence_cut` on its own: abbreviations ("Mr."), a gap under 0.15 s, a segment under 0.2 s, a late next word, a stop that is loud, a stop that decays.
+- `ending_guard`: `synthesis_text` for every branch (off, wrong family, wrong language, each end mark, none); `remove_context` success cases and one case for each of its six `UnsafeBoundary` messages; `_tokens` on Unicode and underscores.
+- **Timing sensitivity** (lead decision 13). Every `evaluate`, `_internal_sentence_cut` and `remove_context` case that has words is recorded three times: word times as given, all shifted by -0.16 s (floored at 0), all shifted by +0.16 s. The recorder stores for each whether Python's decision changed (issues, the cut in samples, the trim start, raised or not) and prints a table: cases, how many changed, which field. Rust must equal Python on all three. No tolerance is set in this step.
+- `noise_limit` arithmetic (`max(0.09, baseline * 1.3 + 0.05)` and `round(max(vals, default 0), 3)`), `resolve` (the Qwen parameter keys from `engines.QWEN_PARAMS`; also a spec with the other families' keys, since the function is ported whole), `pick_variant` (style under 0.2, 0.2 to 0.5, above; no variants; variants without `expressiveness`; ties), `expressiveness`.
+- `prosody` (part D): the 16 kHz input after `au.resample`, `f0`, `db`, the voiced mask and the four returned numbers, on tones (100, 220, 400 Hz), glides, vibrato, speech-like harmonics over noise, a clip under 0.8 s, one with fewer than 10 voiced frames, octave-jump material.
+- Deterministic: a second run leaves `git diff --exit-code -- rust/golden` clean.
+
+**C. Port: checks and ending guard** to `rust/crates/taketwo-core/src/checks.rs` and `ending_guard.rs` (public modules).
+- `evaluate(a, sr, text, self_sim, wps, limits, noise_max, transcript, similarity)`: `similarity` is a callback `(audio, sr) -> f64` called exactly where Python calls `ml.cosine(ml.speaker_embedding(a, sr), fp)`, on the trimmed, padded and faded audio, only when `dur > 1.0`. The transcript is always given (Whisper runs in the caller: S15). `language` is dropped, since it only fed the transcription call. The result is a struct with Python's keys; `issues` keeps Python's order, including a second `cut_off`.
+- Follow the recorded dtypes (float32 audio, Python floats for seconds and ratios). `round(x, n)` as Python rounds a float (round-half-even on the exact binary value): reuse or extend `captions::round3`, do not use `(x * 1e4).round() / 1e4` unless a test shows it equal on the vectors and on the half cases.
+- `ending_guard`: `UnsafeBoundary` as an error value with Python's exact message; `_tokens` with Python's `casefold` and `[^\W_]+` on Unicode (the `text::py` helpers).
+- **Tolerances:** issues, their order, cut and trim positions in samples, array lengths, raised or not, the message: **exact**. `score`, `wer`, `sim`, `max_gap`, `dur` (already rounded by Python): equal after the same rounding; a case where the unrounded value sits within 1e-9 of a rounding half is redesigned in the recorder. Audio samples within 1e-6. Seconds within 1e-9. `threshold_db` within 1e-3 dB.
+- Port the cases of `backend/tests/test_narration_quality.py`, `test_ending_guard.py`, `test_repeat_cutoff.py`, `test_regressions.py`, `test_audit_fixes.py` that test `evaluate`, `_internal_sentence_cut`, `ending_guard`, `resolve`, `pick_variant`, `prosody` or `noise_limit` with synthetic input. PROGRESS lists every test of those files as ported, covered by a golden case, or left out with the reason (S15, S16, S11b, needs a model).
+
+**D. Port: pitch measures** to `rust/crates/taketwo-core/src/delivery.rs`: `prosody`, `expressiveness`, `DEFAULT_VOICE_SETTINGS` (one definition: `pipeline::default_voice_settings` already exists), `resolve`, `pick_variant`.
+- `yin`: read librosa 0.11.0's source in `backend/.venv` (read-only) and port that code: framing and centre padding, the difference function, the cumulative mean normalised difference, the trough threshold, parabolic interpolation, the `fmin`/`fmax` period bounds. Record the librosa version in `checks.json`.
+- **Tolerances:** the voiced mask and the count of frames kept after the octave filter: exact. `f0` on voiced frames within 1e-3 Hz. `pitch_st`, `pitch_range`, `dyn_db`, `pitch_hz` within 1e-4. The decisions built on them must not move: for every prosody case the recorder also stores `round(pitch_hz, 1)` and `round(pitch_st / r, 2)` for r in 0.5, 1.0, 2.0, and Rust must equal them exactly; a case within 1e-3 of a rounding half is redesigned. If the port cannot meet a tolerance, report the measured maximum and where it comes from; do not widen it.
+- `resolve`, `pick_variant`, `expressiveness`: exact (floats equal after Python's rounding).
+
+**E. Docs and push.** PROGRESS entry: what each function uses, the measured maximum against every tolerance, the smallest limit margin, the timing sensitivity table, the test-by-test list, `df -g .` before and after, and the Windows `check` result. Step table: S11a done (or "A to C done, pitch handed to S11b"). Then `git push origin rust/taketwo` once and poll `rust/scripts/g6.sh check` (exit 75 means still running; it takes minutes). Do not wait for the two CUDA jobs. If `check` fails on a `sci-rs` package: replace `sci-rs` with the hand port from `643ed92` (S10's tolerances must still pass), push again.
+
+Not in this step: no model, no synthesis (0 takes), no engine, MCP or shell change, no `render_chunk`, `_guarded_take`, `_ref_pitch` or profile file reads (S15), no `ltas`, `mic_match`, `master_chain`, `widen_sentence_pauses`, `_processed_edge_issues` (S11b), no `backfill` (S17), no `.github` change, no real audio of Franz's.
+
+Acceptance commands, all must exit 0 (WT is the worktree root; quote it):
+- `cd "$WT/rust" && source scripts/env.sh >/dev/null && cargo test --workspace`
+- `cd "$WT/rust" && source scripts/env.sh >/dev/null && set -o pipefail && cargo test -p taketwo-core -- checks ending_guard 2>&1 | tee /dev/stderr | grep -c 'test result: ok. [1-9]' >/dev/null`
+- `cd "$WT/rust" && source scripts/env.sh >/dev/null && set -o pipefail && cargo test -p taketwo-core -- delivery 2>&1 | tee /dev/stderr | grep -c 'test result: ok. [1-9]' >/dev/null` (if part D was handed back, this one is reported as not run, with the reason)
+- `cd "$WT" && HF_HUB_OFFLINE=1 backend/.venv/bin/python -B rust/golden/record_checks.py && HF_HUB_OFFLINE=1 backend/.venv/bin/python -B rust/golden/record_audio.py && git diff --exit-code -- rust/golden && test -z "$(git status --porcelain -- rust/golden)"`
+- `cd "$WT" && test -s rust/golden/checks.json && test "$(du -sk rust/golden/checks | cut -f1)" -le 6144`
+- `cd "$WT" && pv() { git show "${1}:rust/Cargo.lock" | awk '/^name = /{n=$3} /^version = /{print n, $3}' | sort -u; } && test -z "$(comm -23 <(pv 5e7491c) <(pv HEAD))"`
+- `cd "$WT" && test -z "$(git diff --stat 5e7491c..HEAD -- rust/crates/taketwo-engine rust/crates/taketwo-mcp rust/crates/taketwo rust/third_party .github)"` (`taketwo-voice` may change for part A only)
+- `cd "$WT/rust" && ! cargo tree -p taketwo-mcp -e normal | grep -q -i -e taketwo-voice -e candle -e whisper -e qwen`
+- `cd "$WT" && rust/scripts/contract.sh`
+- `cd "$WT" && test -z "$(git status --porcelain | grep -v -e 'backend/.venv' -e 'frontend/node_modules')" && ! git grep -q '/Users[/]' HEAD -- rust contract .github && test -z "$(git diff --stat rust/taketwo main -- backend/app mcp desktop frontend)" && test "$(git rev-parse main)" = 4448aaa9b241f2e52cfaa6c06fa98b89653be82e`
+- `cd "$WT" && test "$(git rev-parse HEAD)" = "$(git rev-parse origin/rust/taketwo)" || test -z "$(git diff --name-only origin/rust/taketwo..HEAD | grep -v '\.md$')"` (all code is pushed; a later `.md` commit may stay local)
+- `cd "$WT" && rust/scripts/g6.sh check`
+- `cd "$WT" && rust/scripts/g8.sh`
+- `cd "$WT" && ! lsof -nP -iTCP -sTCP:LISTEN | grep -E ':(879[0-589])' && ! pgrep -fl 'rust-taketwo/rust/target/'`
+Report only: the timing sensitivity table; the tolerance table with measured maxima; the test-by-test list; `df -g .` before and after (disk rule of lead decision 13: 11 GB free now, work with `cargo test -p taketwo-core`, run the workspace test once at the end).
+
+Safety for this step (Franz's standing policy, PLAN.md): real risks are touching `data/`, App Support/VoiceForge or saved voices or narrations; anything but a GET to ports 8765-8785; pushing anything other than `rust/taketwo`; a model run; editing outside the worktree. Set `safety_ok=false` only for one of those. `backend/.venv` is read-only (run its Python with `-B`). Every signal is synthetic. Never write that audio is good or matching: report the numbers. Commit on `rust/taketwo` after each green part, message ending `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`.
+
+After S11a: S11b, then S15; S12 and S14 when swap allows; S16 (push), S17, S19, S21.
