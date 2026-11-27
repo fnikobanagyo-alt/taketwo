@@ -76,7 +76,9 @@ fn qwen_smoke() {
     let cancel = AtomicBool::new(false);
     let mut takes = Vec::new();
     let mut audios = Vec::new();
-    for seed in [1u32, 1, 2] {
+    // QWEN_SMOKE_TAKES (1-3) runs fewer takes, to stay within a step's take budget after an earlier attempt
+    let n: usize = std::env::var("QWEN_SMOKE_TAKES").ok().and_then(|v| v.parse().ok()).unwrap_or(3).clamp(1, 3);
+    for seed in [1u32, 1, 2].into_iter().take(n) {
         let t = Instant::now();
         let take = voice.synthesize("qwen3-tts-1.7b", LINE, &ref_wav, REF_TEXT, "en", &Doc::new(), seed, 2.5, &cancel).unwrap();
         let seconds = t.elapsed().as_secs_f64();
@@ -99,7 +101,7 @@ fn qwen_smoke() {
     let commit = Command::new("git").args(["rev-parse", "HEAD"]).output().map(|o| String::from_utf8_lossy(&o.stdout).trim().to_string()).unwrap_or_default();
     let doc = json!({
         "takes": takes,
-        "same_seed_equal": audios[0] == audios[1],
+        "same_seed_equal": if audios.len() >= 2 { json!(audios[0] == audios[1]) } else { Value::Null },
         "load_seconds": load_seconds,
         "peak_memory_bytes": peak_rss_bytes(),
         "decoder_raw_samples_for_10_frames": decoded_10,

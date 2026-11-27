@@ -134,11 +134,11 @@ impl CausalConvTranspose1d {
             vb.pp("conv"),
         )?;
 
-        // Calculate trimming to maintain causality
-        // Python: left_pad = right_pad = ceil(kernel_size - stride)
-        // Since kernel_size and stride are integers, ceil() just returns the value
+        // TakeTwo: trim the right side only, as mlx-audio's CausalTransposeConv1d does, so L frames give exactly
+        // L x stride samples. Trimming both sides lost 555 samples per take in the 12 Hz decoder
+        // (8 x 60 + 5 x 12 + 4 x 3 + 3) and shifted the audio by as much.
         let pad = kernel_size.saturating_sub(stride);
-        let left_pad = pad;
+        let left_pad = 0;
         let right_pad = pad;
 
         Ok(Self {
@@ -171,6 +171,23 @@ impl Module for CausalConvTranspose1d {
             output.narrow(2, self.left_pad, end - self.left_pad)
         } else {
             Ok(output)
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use candle_core::{DType, Device};
+
+    /// L frames in give exactly L x stride samples out, as in mlx-audio (zero weights: lengths only).
+    #[test]
+    fn transposed_conv_gives_exact_stride_multiples() {
+        let vb = VarBuilder::zeros(DType::F32, &Device::Cpu);
+        for (k, s) in [(16, 8), (10, 5), (8, 4), (6, 3), (2, 2)] {
+            let up = CausalConvTranspose1d::new(4, 4, k, s, vb.pp(format!("u{k}"))).unwrap();
+            let x = Tensor::zeros((1, 4, 7), DType::F32, &Device::Cpu).unwrap();
+            assert_eq!(up.forward(&x).unwrap().dim(2).unwrap(), 7 * s, "k={k} s={s}");
         }
     }
 }

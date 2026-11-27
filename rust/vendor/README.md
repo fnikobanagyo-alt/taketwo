@@ -359,3 +359,7 @@ Upstream: danielclough/qwen3-tts-rs at 4fc1a5da. Every change TakeTwo made (step
 5. `src/nn/generation.rs`: `generate_cancellable` and `generate_batch_cancellable` read a cancel flag once per
    frame in both frame loops and return the error `CANCELLED` ("cancelled"); `generate` and `generate_batch`
    keep their signatures.
+6. `src/audio/tokenizer/v2/causal_conv.rs`: `CausalConvTranspose1d` trims the right side only (`kernel - stride`),
+   as mlx-audio's `CausalTransposeConv1d`; it trimmed both sides, so the 12 Hz decoder gave frames x 1920 - 555
+   samples (found by the S12 smoke run: 131925 for 69 frames) and the audio started 555 samples late. Test:
+   `transposed_conv_gives_exact_stride_multiples`.
