@@ -1773,3 +1773,65 @@ State at start: `6124903`, tree clean apart from the two untracked symlinks; dis
 1. `files::save_json` writes the same document as Python, not the same text (non-ASCII and `1e-05` exponents). Is that enough for `rejected_context_NNN.json`, or should S16 add a Python-text JSON writer (the library's `generations` documents may need it too)?
 2. The vectors compare the temperature decay `t * 0.9^n` exactly (`powf`, the platform `pow`). If Windows' `pow` differs in the last bit, `check` on Windows fails at S16's push on `temperature_floor` or `all_flagged_one_clip`; then a tolerance of 1e-15 on `temperature` (or Python's exact `pow` result) is the lead's call.
 3. `cosine` sums in order; numpy's BLAS `sdot` may sum a 256-vector in another order. S14 can measure it on real embeddings; a last-bit difference can only move `sim` when it sits on a rounding half.
+
+### 2026-11-27, lead, iteration 16 decision
+State checked by command at `1a3b802` (tree clean apart from the two untracked symlinks): `main` and `origin/main` still `4448aaa`; `origin/rust/taketwo` is `840e41f`, so S15 is not pushed; `git diff --stat rust/taketwo main -- backend/app mcp` empty; Franz's app answers on 8766 (`"name":"TakeTwo"`, `"running":null`, `"queued":0`, `"loaded_engine":null`); the only listener on 8760-8799 is his app; no process of this work runs; `memory_pressure` 54% free; disk 11 GB free, `rust/target` 20 GB (19 GB of it `debug/build`); `gh run list`: run 45981183667 on `840e41f` still `in_progress` after 59 minutes, so CUDA is **not confirmed** on `840e41f` (last confirmed: `c123c7b`, run 45968817348). Franz's standing safety policy is already in PLAN.md's safety section and in the entry of `ef3d382` above; nothing to add. The coordinator's "continue from S09" is stale: S09 is done. Not done, not blocked on Franz. Open gates: G1 (mastering, render pipeline B, and the plain-shell failure below), G5; G2, G4, G6, G8 judged again at the end.
+
+**S15 is accepted.** Rust equals Python on all 47 render cases and 6 widen vectors. Its three rule slips (two builds without `env.sh`, one build without a fresh `df`, no wiki receipt) are guidance-level, not real risks; the receipt is outside the worktree and stays out of this plan.
+
+**Answers to the S15 builder.**
+1. `save_json`: the same parsed document is enough. No Python-text JSON writer.
+2. `powf` on Windows: S12 pushes, so the Windows `check` job answers it now. If `temperature_floor` or `all_flagged_one_clip` fails there by a last bit, the allowed fix is a 1e-15 tolerance on `temperature` only; say so.
+3. `cosine` summation order: S14 measures it.
+4. `base_temp` absent: accepted as unreachable, no vector.
+5. The two `make_preview` tests go to S17 (PLAN.md updated).
+
+**G1 blocker: `cargo test --workspace` fails in a plain shell** (cmake is only on PATH through `env.sh`). The gate command stays as written; the build is fixed in S12 item 0.
+
+**S12 go rule:** memory and 8766 pass; disk is 11 GB against 12, so the disk rule runs first (item 0). Next step: **S12 Qwen voice (real model, Metal) (push)**. It is the head of the model chain (S12, S14, S17, S19) that G5 waits on, and the memory condition holds now. It pushes because it edits `rust/vendor/qwen_tts`, which the Windows CUDA job compiles, and S15 is still unpushed.
+
+Binding instructions for the builder:
+
+0. **Before any build.**
+   - `df -g .`. Apply the disk rule until **14 GB** is free: delete hash folders under `rust/target/debug/build/<crate>/` older than the session start, biggest first (`candle-transformers` 2.5 GB, `taketwo-core` 1.7 GB, `tokenizers` 1.4 GB, `ort-sys` 1.1 GB, `taketwo-engine` 1.0 GB). No `cargo clean`. Under 8 GB at any later point: stop and report.
+   - `rust/crates/taketwo-voice/build.rs`: when the `CMAKE` variable is unset and `rust/.tools/bin/cmake` exists, use that file (the `cmake` crate reads `CMAKE`). Do not set `CMAKE` in `.cargo/config.toml` (it would point the Windows runner at a missing file).
+   - `rust/.cargo/config.toml`: `[build] incremental = false`.
+   - Always `source rust/scripts/env.sh` anyway (models, temporary data folder).
+1. **Where.** `taketwo-voice::qwen` (new module) and `rust/vendor/qwen_tts` (edits allowed; list each one in `rust/vendor/README.md`). No change to `taketwo-engine`, `taketwo-mcp`, the shell, `taketwo-core` (a bug found there is reported, not fixed silently). No `cargo update`. Reference audio is loaded with `taketwo_core::audio` and resampled to the model rate; do not turn on the crate's `audio-loading` feature.
+2. **`QwenVoice`** implements `taketwo_core::render::Voice` unchanged (`models.rs`). Loads once from `TAKETWO_MODELS/qwen3-tts-1.7b-base`, keeps the model between calls, has `unload()`. Device: Metal with bf16 under the `metal` feature, CUDA under `cuda`, else CPU f32. The idle timer is S16's (engine worker). It must compile with no feature and on Windows.
+3. **Match `engines.synthesize` for `qwen3`** (read `backend/app/engines.py` lines 311-397 and `qwen_compat.py`):
+   - Settings: the family defaults first, then the caller's non-null `params` on top (`temperature` 0.7, `top_p` 0.9, `top_k` 40, `repetition_penalty` 1.05; take the defaults from where `taketwo_core::delivery` defines them, not a second copy).
+   - `max_tokens = int(12.5 * (expected_seconds * 1.8 + 3.0)) + 8`: truncate before the `+ 8`. Unit test against values computed by Python for at least 8 inputs, including ones where the truncation matters.
+   - Language through `LANG_NAMES`; an unknown code becomes `"auto"`.
+   - Seed: the call's `seed` seeds every random draw of that take. Candle and MLX draws differ, so there is **no take-level parity with Python**, only measurements.
+   - Report (`Take.report`), keys in Python's order: `tokens`, `token_limit`, `raw_samples`, `sample_rate`, `stop_reason` (`length_limit_reached` when `tokens >= token_limit`, else `ended_before_limit`), `sampler` (the four settings used), `generation_route` (`icl_explicit_penalty`), `decoder` (`frames`, `samples`, `zero_codes`).
+   - Cancel: read the flag once per frame in **both** frame loops of `nn/generation.rs` (near lines 983 and 1329) and before the decode; a cancelled take returns an error the caller can tell from a failure.
+4. **The three listening rules. Read the crate, do not assume**, and write what you found for each:
+   - **Sub-talker.** Two routes exist: `opts.subtalker_*` in `model/generate.rs` and `sampling_config.for_subtalker()` in `nn/sampling.rs` (which sets its repetition penalty to 1.0). `QwenVoice` must set the sub-talker's temperature, top-p and top-k to the caller's values on every call, so the crate defaults (0.9 / 50 / 1.0) can never be used. A no-model test proves the caller's values reach the code predictor's sampling settings on the voice-clone path, and that the 1.05 penalty applies to codebook 0 only.
+   - **Exact cut.** `model/generate.rs` near line 588 uses the proportional cut. Replace it with `ref_len x 1920` (the decoder's upsample rate, read from the config, not a literal). Port `decode_unpadded`: reject output shorter than `frames x 1920`, cut to exactly that, report `frames`, `samples`, `zero_codes` (code 0 is data, never padding or length).
+   - **Trim and last frame.** The prototype's output was not a multiple of 1920 and its reference was 169 frames against MLX's 170. Find the trim and the dropped frame. The reference keeps its last frame; `raw_samples` is asserted to be a multiple of 1920 before any trim.
+5. **Carried tests** (S11a left them for this step, `test_qwen_compat.py`): `test_zero_codes_preserve_length_and_exact_reference_boundary`, `test_all_zero_codes_are_data_and_install_is_idempotent`, `test_short_decoder_output_is_rejected`, `test_upstream_reference_change_fails_before_install`. Port each as a no-model test where the Rust code has the same seam, or say why it does not apply (the last one guards a Python AST patch; a vendored crate has no such seam).
+6. **Smoke test** `qwen_smoke`, ignored by default, release build: `cargo test --release -p taketwo-voice --features metal -- --ignored qwen_smoke --nocapture`.
+   - First: `GET http://127.0.0.1:8766/api/status` must show `"running":null`, `"queued":0`, `"loaded_engine":null`, and `memory_pressure` at least 50% free; else the test prints "busy" and writes nothing (run it later, or report).
+   - Reference: made with macOS `say` into a temporary folder (24 kHz WAV), its text as `ref_text`. No voice of Franz's.
+   - **At most 3 takes**, one process, through the `Voice` trait: seed 1, seed 1 again, seed 2, one short line.
+   - Writes `rust/out/qwen_smoke.json`: for each take `tokens`, `token_limit`, `raw_samples`, `raw_samples % 1920`, `stop_reason`, seconds, audio seconds; whether takes 1 and 2 are sample-equal (a measurement, not an assertion); load seconds; peak memory (`ru_maxrss`, and the footprint if cheap); the commit. Asserts: `raw_samples % 1920 == 0`, audio not empty and not all zero, report keys present.
+   - No claim about sound. Do not keep the WAVs in git.
+7. **Push** `rust/taketwo` once the local commands pass. Wait for the Windows `check` job on the pushed code commit; do not wait for the CUDA jobs. Put the run id in PROGRESS.md. Record the final state of run 45981183667 if it has finished.
+8. **Not in this step:** speaker encoder, engine wiring, idle timer, any of Franz's voices, more than 3 takes, any second model process, any claim about sound.
+9. **If it does not fit:** finish item 0, the unit tests and the exact cut first, commit, then the smoke. Report exactly what is missing. `safety_ok=false` only for a real risk (PLAN.md safety section).
+
+Acceptance commands (the lead runs them; `WT` is the worktree; none starts a model):
+- `cd "$WT/rust" && (! command -v cmake >/dev/null) && cargo test --workspace` (a fresh shell, `env.sh` not sourced)
+- `cd "$WT/rust" && grep -q 'incremental *= *false' .cargo/config.toml && test ! -d target/debug/incremental`
+- `cd "$WT/rust" && cargo test -p taketwo-voice qwen`
+- `cd "$WT/rust" && cargo test -p qwen_tts --lib`
+- `cd "$WT" && python3 -c "import json;r=json.load(open('rust/out/qwen_smoke.json'));t=r['takes'];assert 1<=len(t)<=3 and all(x['raw_samples']%1920==0 and x['raw_samples']>0 for x in t) and r['peak_memory_bytes']>0, r"`
+- `cd "$WT" && git diff --quiet 1a3b802 -- rust/crates/taketwo-engine rust/crates/taketwo-mcp rust/crates/taketwo rust/crates/taketwo-core/src .github`
+- `cd "$WT" && git diff --stat rust/taketwo main -- backend/app mcp | wc -l | grep -qx ' *0'`
+- `cd "$WT" && test "$(git rev-parse main)" = 4448aaa9b241f2e52cfaa6c06fa98b89653be82e && git merge-base --is-ancestor "$(git log -1 --format=%H -- rust/crates rust/vendor)" origin/rust/taketwo` (code pushed, `main` unmoved)
+- `cd "$WT" && gh run list -R fnikobanagyo-alt/taketwo --branch rust/taketwo -L 1 --json headSha,databaseId,status` then `gh run view <id> -R fnikobanagyo-alt/taketwo --json jobs` shows job `check` `success` on the pushed code commit
+- `cd "$WT" && rust/scripts/g8.sh`
+- `lsof -nP -iTCP -sTCP:LISTEN | grep -E ':(879[0-589])' ; pgrep -fl 'rust-taketwo/rust/target/'` shows nothing of ours
+
+After S12: S14, S11b, S16 (push), S17, S19, S21.

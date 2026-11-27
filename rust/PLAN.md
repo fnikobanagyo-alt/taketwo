@@ -195,11 +195,11 @@ Needs: S10. Gate: G1. No push. This half is what S16 needs; it can run any time 
 - `profiles/<id>/mic.json` is written by Python with plain `json.dumps` and likely holds `NaN` (`delivery.ltas` returns nan above 0.92 x Nyquist): read it with a NaN-tolerant parser, never plain serde_json (found in S04).
 - Done when: `cargo test -p taketwo-core -- mastering mic_match edge` passes, with each test asserting the number of golden cases it read.
 
-### S12 Qwen voice (real model, Metal)
-Needs: S01. Gate: G5 (part).
-- `taketwo-voice::qwen`: load once, bf16 on Metal, `synthesize(text, ref wav, ref text, language, params, seed, expected seconds, cancel)` matching `engines.synthesize` for the `qwen3` family: `max_tokens = 12.5 * (expected * 1.8 + 3) + 8`, the synthesis report (tokens, limit, stop reason, sampler), cancel checked every frame, unload on idle (`IDLE_UNLOAD_SECONDS`).
+### S12 Qwen voice (real model, Metal) (push)
+Needs: S01. Gate: G5 (part), G6 (the vendored crate changes), G1 (plain-shell fix). Push at the end. Binding detail: lead decision 16 in PROGRESS.md.
+- `taketwo-voice::qwen`: load once, bf16 on Metal, `synthesize(text, ref wav, ref text, language, params, seed, expected seconds, cancel)` matching `engines.synthesize` for the `qwen3` family: `max_tokens = int(12.5 * (expected * 1.8 + 3.0)) + 8` (truncate before the `+ 8`, as Python does), the synthesis report (tokens, limit, stop reason, sampler), cancel checked every frame, unload on idle (`IDLE_UNLOAD_SECONDS`).
 - The three listening rules, each with a unit test that needs no model: the sub-talker always takes the caller's temperature, top-p and top-k (defaults 0.7 / 0.9 / 40; repetition penalty 1.05 on the first codebook only), never the crate defaults; the exact reference cut (`ref_len x 1920` samples, see `qwen_compat.py`), not the proportional one; the last reference frame is kept.
-- One model test, ignored by default (`cargo test -p taketwo-voice --features metal -- --ignored qwen_smoke`): checks 8766 is idle, renders one short line from a reference made with macOS `say` in a temp folder, asserts the sample count is a multiple of 1920 before trimming, records seconds and peak memory. At most 3 takes. No claim about sound.
+- One model test, ignored by default (`cargo test --release -p taketwo-voice --features metal -- --ignored qwen_smoke`; release, lead decision 16): checks 8766 is idle, renders one short line from a reference made with macOS `say` in a temp folder, asserts the sample count is a multiple of 1920 before trimming, records seconds and peak memory. At most 3 takes. No claim about sound.
 - Done when: the unit tests pass and the ignored smoke test has run once with its numbers in PROGRESS.md.
 
 ### S13 Whisper with word timings (push)
@@ -235,6 +235,7 @@ Needs: S15, S11b. Gate: G1, G2 (still green). Push at the end.
 ### S17 Voice creation
 Needs: S13, S14, S16. Gate: G5 (part).
 - Port `reference.py` (`analyze`, utterances, pause valleys, `snap_window`, window choice, `room_echo`, tips, `refresh_clips`) and the profile routes: create (multipart upload, ffmpeg decode, length limits), patch, delete, re-analyze, refresh, analysis, `make_preview`, `delivery.backfill`.
+- The two `make_preview` tests of `test_audit_fixes.py` that S15 left unassigned belong here (lead decision 16).
 - Without Sidon (S18) the "studio" option answers with a clear "not available yet" and the plain path is used.
 - Tests on the stub with `say`-made clips; vectors for the pure parts from `rust/golden/record.py`.
 - Done when: `cargo test -p taketwo-engine profiles` passes.
