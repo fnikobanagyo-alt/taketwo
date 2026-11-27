@@ -594,3 +594,162 @@ fn a_model_answering_cancelled_without_the_flag_is_a_stop() {
     assert_eq!((g["status"].as_str(), g["message"].as_str()), (Some("cancelled"), Some(STOPPED)));
     assert!(!fk.flag().load(std::sync::atomic::Ordering::SeqCst), "the flag stayed unset");
 }
+
+// ------------------------------------------------------------------ voice previews (S17)
+
+use taketwo_core::render::preview::{self, Preview, PREVIEW_TEXT_EN};
+
+/// The golden clean take with a transcript of the preview sentence spread over the same 0.14-2.41 s.
+fn preview_take(stop_reason: &str) -> (Take, Transcript, Vec<f32>) {
+    let (mut take, mut tr, e) = scripted("clean_first", 0);
+    take.report.insert("stop_reason".into(), stop_reason.into());
+    let words: Vec<&str> = PREVIEW_TEXT_EN.split(' ').collect();
+    let n = words.len();
+    let step = (2.41 - 0.14) / n as f64;
+    let ws: Vec<taketwo_core::transcript::Word> = words
+        .iter()
+        .enumerate()
+        .map(|(k, w)| taketwo_core::transcript::Word { word: format!(" {w}"), start: 0.14 + k as f64 * step, end: if k + 1 == n { 2.41 } else { 0.14 + k as f64 * step + step * 0.8 }, p: 0.9 })
+        .collect();
+    tr.text = PREVIEW_TEXT_EN.into();
+    tr.segments[0].text = PREVIEW_TEXT_EN.into();
+    tr.segments[0].words = ws;
+    (take, tr, e)
+}
+
+/// The world's voice made ready for a preview: two clips, the Qwen engine, a speech rate that fits the take.
+fn preview_voice(w: &World) {
+    let mut p = w.lib.get_profile("rvoice").unwrap().unwrap();
+    let pdir = w.lib.profiles_dir().join("rvoice");
+    std::fs::copy(pdir.join("ref_0.wav"), pdir.join("ref_1.wav")).unwrap();
+    p.extend(obj(&json!({"status": "ready", "language": "en", "default_engine": "qwen3-tts-1.7b", "active_variant": 0, "speech_rate_wps": 8.0,
+                          "variants": [{"index": 0, "file": "ref_0.wav", "text": "Our voice reads a calm line of text here."},
+                                       {"index": 1, "file": "ref_1.wav", "text": "other"}]})));
+    w.lib.put_profile(&mut p).unwrap();
+}
+
+fn run_preview(w: &World, voice: &mut dyn taketwo_core::render::models::Voice, fake: &Fake, downloaded: bool) -> Preview {
+    let (mut t, mut e) = (fake.clone(), fake.clone());
+    let flag = fake.flag();
+    let lib = &w.lib;
+    let mut put = |p: &mut Doc| lib.put_profile(p);
+    let mut clock = || 1_700_000_000.0;
+    let mut cache = HashMap::new();
+    let (pd, gd) = (lib.profiles_dir(), lib.generations_dir());
+    let mut r = taketwo_core::render::Render {
+        profiles_dir: &pd, generations_dir: &gd, voice, transcriber: &mut t, encoder: &mut e, put_profile: &mut put,
+        clock: &mut clock, cancel: &flag, pitch_cache: &mut cache, phase: &taketwo_core::render::no_phase,
+    };
+    preview::make_preview(&mut r, lib, "rvoice", downloaded).unwrap()
+}
+
+fn preview_fake(reports: &[&str]) -> Fake {
+    let (mut a, mut b, mut c) = (Vec::new(), Vec::new(), Vec::new());
+    for r in reports {
+        let (t, tr, e) = preview_take(r);
+        a.push(t);
+        b.push(tr);
+        c.push(e);
+    }
+    Fake::new(a, b, c, 0.0, 0.0)
+}
+
+fn synth_expected(fake: &Fake) -> Vec<(u32, f64)> {
+    fake.calls()
+        .into_iter()
+        .filter_map(|c| match c {
+            taketwo_core::render::models::fake::Call::Synthesize { seed, expected_seconds, .. } => Some((seed, expected_seconds)),
+            _ => None,
+        })
+        .collect()
+}
+
+/// test_audit_fixes.py `test_length_capped_preview_is_retried_and_never_published`.
+#[test]
+fn length_capped_preview_is_retried_and_never_published() {
+    for all_capped in [false, true] {
+        let w = World::new(if all_capped { "prevcap1" } else { "prevcap0" });
+        preview_voice(&w);
+        let pdir = w.lib.profiles_dir().join("rvoice");
+        std::fs::write(pdir.join("preview.wav"), b"previous preview").unwrap();
+        let reports: &[&str] = if all_capped { &["length_limit_reached"; 3] } else { &["length_limit_reached", "ended_before_limit"] };
+        let fake = preview_fake(reports);
+        let mut v = fake.clone();
+        let got = run_preview(&w, &mut v, &fake, true);
+        assert_eq!(got, if all_capped { Preview::Nothing } else { Preview::Saved }, "all_capped {all_capped}");
+        let calls = synth_expected(&fake);
+        assert_eq!(calls.len(), if all_capped { 3 } else { 2 });
+        assert_eq!(calls.iter().map(|c| c.0).collect::<Vec<_>>(), (0..calls.len() as u32).map(|k| 4242 + k).collect::<Vec<_>>(), "seeds 4242 + k");
+        assert!(calls[1].1 > calls[0].1, "the length budget grows after a capped take");
+        let saved = std::fs::read(pdir.join("preview.wav")).unwrap();
+        if all_capped {
+            assert_eq!(saved, b"previous preview");
+            assert!(w.lib.get_profile("rvoice").unwrap().unwrap().get("preview").is_none());
+        } else {
+            let (a, sr) = audio::load(&pdir.join("preview.wav"), None).unwrap();
+            assert_eq!(a[..(0.1 * sr as f64) as usize].iter().filter(|x| **x != 0.0).count(), 0, "0.1 s of silence before");
+            let p = w.lib.get_profile("rvoice").unwrap().unwrap();
+            assert_eq!(p["preview"]["file"], "preview.wav");
+            assert_eq!(p["preview"]["engine"], "qwen3-tts-1.7b");
+            assert_eq!(p["preview"]["duration"].as_f64().unwrap(), ((a.len() as f64 / sr as f64) * 100.0).round() / 100.0);
+            assert!(!pdir.join("preview.tmp.wav").exists());
+        }
+    }
+}
+
+/// test_audit_fixes.py `test_clean_take_beats_a_failed_take_with_a_better_score`: the failed (capped) take comes first
+/// and the clean one after it is the one saved.
+#[test]
+fn clean_take_beats_a_failed_take() {
+    let w = World::new("prevclean");
+    preview_voice(&w);
+    let fake = preview_fake(&["length_limit_reached", "eos"]);
+    let mut v = fake.clone();
+    assert_eq!(run_preview(&w, &mut v, &fake, true), Preview::Saved);
+    assert_eq!(synth_expected(&fake).len(), 2);
+    // the text of the second take had no " —" (only a cut_off best adds it; here the first take was cut off)
+    let texts: Vec<String> = fake.calls().into_iter().filter_map(|c| match c {
+        taketwo_core::render::models::fake::Call::Synthesize { text, .. } => Some(text),
+        _ => None,
+    }).collect();
+    assert_eq!(texts, vec![PREVIEW_TEXT_EN.to_string(), format!("{PREVIEW_TEXT_EN} —")]);
+}
+
+/// A voice that changes the active clip while the take is made.
+struct Meddler<'a>(Fake, &'a Library);
+
+impl taketwo_core::render::models::Voice for Meddler<'_> {
+    fn synthesize(&mut self, engine: &str, text: &str, ref_wav: &std::path::Path, ref_text: &str, language: &str, params: &Doc, seed: u32,
+                  expected_seconds: f64, cancel: &std::sync::atomic::AtomicBool) -> Result<Take, String> {
+        let mut p = self.1.get_profile("rvoice")?.unwrap();
+        p.insert("active_variant".into(), 1.into());
+        self.1.put_profile(&mut p)?;
+        self.0.synthesize(engine, text, ref_wav, ref_text, language, params, seed, expected_seconds, cancel)
+    }
+}
+
+/// test_audit_fixes.py `test_preview_made_from_an_old_voice_setting_is_not_published`, and the missing model folder.
+#[test]
+fn a_stale_or_impossible_preview_is_not_published() {
+    let w = World::new("prevstale");
+    preview_voice(&w);
+    let fake = preview_fake(&["eos"]);
+    let mut v = Meddler(fake.clone(), &w.lib);
+    assert_eq!(run_preview(&w, &mut v, &fake, true), Preview::Stale);
+    let pdir = w.lib.profiles_dir().join("rvoice");
+    assert!(w.lib.get_profile("rvoice").unwrap().unwrap().get("preview").is_none());
+    assert!(!pdir.join("preview.wav").exists() && !pdir.join("preview.tmp.wav").exists());
+    // no model folder: nothing is touched (no backfill, no take)
+    let before = w.lib.get_profile("rvoice").unwrap().unwrap();
+    let fake = preview_fake(&["eos"]);
+    let mut v = fake.clone();
+    assert_eq!(run_preview(&w, &mut v, &fake, false), Preview::Nothing);
+    assert!(fake.calls().is_empty());
+    assert_eq!(w.lib.get_profile("rvoice").unwrap().unwrap(), before);
+    // drop_preview removes the file and the field
+    std::fs::write(pdir.join("preview.wav"), b"x").unwrap();
+    let mut p = before.clone();
+    p.insert("preview".into(), json!({"file": "preview.wav"}));
+    preview::drop_preview(&w.lib.profiles_dir(), &mut p).unwrap();
+    assert!(!pdir.join("preview.wav").exists() && p.get("preview").is_none());
+}

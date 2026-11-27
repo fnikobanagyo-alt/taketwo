@@ -8,6 +8,7 @@
 pub mod files;
 pub mod models;
 pub mod narration;
+pub mod preview;
 
 use crate::audio;
 use crate::checks::{self, py_round, Evaluation, Limits, HARD_ISSUES};
