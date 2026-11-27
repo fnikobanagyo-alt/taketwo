@@ -12,7 +12,7 @@ The loop appends one entry per session at the bottom: date, step id, what was bu
 | S04 Library store, seeder, one-time copy | done |
 | S05 Captions, timings, subtitles, review rules | done |
 | S06 Engine: read side, guards, UI, contract runner | done |
-| S07a Engine: write routes that start no job | next |
+| S07a Engine: write routes that start no job | done |
 | S07b Engine: worker, stub renderer, lifecycle | todo |
 | S08 MCP server | todo |
 | S09 Tauri shell | todo |
@@ -596,3 +596,30 @@ Next step: **S07a Engine: write routes that start no job**, alone. Do not start 
    - Report only: `df -g .` at the end; if under 10 GB free, say so before any `cargo clean`.
 7. Safety for this step: dev ports only (8790-8795, 8798, 8799), bound only by `contract.sh`, `record_http.py` and `seed_python.py`, each stopping what it started by pid. Never 8765-8785; 8766 is only read by `g8.sh`. No model, no push. Only temp libraries; nothing under the main checkout's `data/` or App Support/VoiceForge is opened. Python runs only as the two recorders and the contract runs. Do not edit `contract/test_contract.py`, `fixture.json`, `contract/golden/` or `seed_python.py`. Add files to git by name, never `git add -A`. Do not weaken a test to get to green; a case that can't match goes to the lead with the evidence. In zsh, pass the `-k` filters as separate words (an unquoted variable is one word there and runs 0 tests).
 8. Engine id for the create checks: `qwen3-tts-1.7b` is the id in the fixture narrations, the default in `library/settings.rs` and the `/api/engines` stub (checked by grep), so a create with no `engine` passes the model check and reaches the empty-script 400. Any other id is 404 `Unknown model`.
+
+### 2026-11-27, builder (Opus), S07a Engine: write routes that start no job
+Built (commit `3664daf`, plus this entry):
+- `taketwo-core::pipeline`: `create_generation` (the document without the save: no `created`/`updated`, no folder; id passed in; speed clamp, `voice_settings` over the ported `DEFAULT_VOICE_SETTINGS`, title rule, `source` rule, the ten kept settings, the empty-script `ValueError`), `clean_replacement` (both texts), `clean_with_settings`, `thousands` (`{n:,}`). A `Fail::Value` is Python's `ValueError` (400), `Fail::Other` anything else (500). `Library::now()` gives handlers the library clock.
+- `rust/golden/record.py` writes `rust/golden/pipeline.json`: 22 `create_generation` cases (title given, long, blank, derived with and without the ellipsis, speed 0.5/1.7/null/0, params kept, unknown `voice_settings` keys dropped, `voice_settings` null, each source and an unknown one, two empty-after-cleaning scripts, pronunciations and no citation stripping, several chunks, another engine and language) and 11 `clean_replacement` cases (fine, empty, blank, too long, at the limit, limit from settings when the narration has none, null or 0). Python's document was written only into the recorder's temporary library and deleted there. `tests/pipeline_golden.rs` compares key order and values; it also checks that Python's `created` and `updated` are the two db.py clock readings of the save, which the port leaves to its caller (see question 1).
+- `api.rs` routes ported from main.py in Python's check order: `accept_part`/`unaccept_part` through `_idle_gen` (busy 409 on a stored `queued`/`running` status), `delete_generation`, `restore_generation`, `patch_generation` (speed change: 501, marked `// S16`, nothing changed), `reveal_narrations_folder`/`reveal_narration` through `AppState.reveal` (`serve` passes `reveal_in_file_manager`: `open -R`/`open`, `explorer [/select,]`, `xdg-open`; tests pass a recorder), `create_generation` (404 voice, 400 not ready, 404 `Unknown model` for anything but `qwen3-tts-1.7b`, 400 word limit, 400 empty script; then 501 `// S07b`, nothing written), `resume_generation`, `regenerate`, `select_take`, `fix_remaining` (every check, then 501 `// S07b`). Bodies are validated as pydantic does (missing, `string_type`, `int_parsing`, `int_from_float`, `float_parsing`, `bool_parsing`, `dict_type`, body missing or not an object), path errors first, all in one 422.
+- `record_http.py`: the engine now runs as a child of the recorder (`--serve`), with db.py and pipeline.py clocks pinned to one counter from `engine_clock_start` and `worker.submit` replaced by a function that raises; the recorder asserts no case answered 500 and the log has no job attempt. Four write phases (c to f) with setup steps (`set_status` through db.py; through a second library handle in the Rust test, which mirrors the recorder's process with its own clock, and the engine's handle runs `startup_repairs` as main.py does on import). 223 cases (152 before). `updated`, `accepted.at` and `deleted_at` all match with the pinned clocks; nothing is masked or skipped.
+- Rust-only tests in `tests/http.rs`: the nine job paths (two creates, resume, two re-speaks, a take switch with a kept take, fix-remaining, two speed changes) answer 501 and leave every file and document unchanged; an equal speed is ignored; reveal calls the opener with `final.wav`, the folder of a narration with no audio, and the narrations folder, answers 404 for a deleted narration and for a missing folder, and opens nothing on a refusal; foreign-origin DELETE, PATCH and accept are 403 and change nothing. The obsolete S06 test that expected 501 on the write routes was replaced by one for the routes outside 1.0.
+- `env.sh` keeps an existing `TAKETWO_DATA`. `contract.sh` now makes its library first and exports it before sourcing `env.sh`, so its `rm -rf` never reaches a caller's folder. The 49 empty `taketwo-data.*` folders in `$TMPDIR` were removed with `rmdir`. `contract/README.md`: 33 of 33 and "Not judged by this suite yet".
+
+Commands and results:
+- `rust/scripts/contract.sh`: `Ran 33 tests`, `OK`, exit 0.
+- `cd rust && source scripts/env.sh && cargo test -p taketwo-core && cargo test -p taketwo-engine && cargo test --workspace`: exit 0; workspace 189 passed (183 + 6), 0 failed, 1 ignored as before.
+- `record.py && record_http.py && git diff --exit-code -- rust/golden`: exit 0 after the commit; `record_http.py` run twice before: byte-identical.
+- Mutation check: `set_accepted` without `by` made 2 of 223 cases fail (the accept answer and the read after it); undone, green.
+- `backend/.venv/bin/python -B contract/seed_python.py`: `Ran 33 tests`, `OK`; `git diff --exit-code aff179c -- contract/test_contract.py contract/fixture.json contract/golden contract/seed_python.py`: exit 0.
+- `rust/scripts/g8.sh`: ends `G8 PASS`. For the lead to attribute: `data/` shows 9 added (profiles: 5 audio, 4 other), 3 changed (2 top-level files, 1 under generations); App Support/VoiceForge 8 added, 1 removed (top-level file), 26 changed (caches and storage). This work never opened either folder; the `data/` additions look like a voice made in Franz's running app since the last decision.
+- No model run, no push. Dev ports bound only by `contract.sh`, `record_http.py` and `seed_python.py`, each stopped by pid.
+
+Not done or limited:
+- The 501 paths (create success, resume, regenerate, select-take, fix-remaining past their checks) and the speed change are S07b and S16. The duplicate 409 and `updates.blocking_reason` are not in this step.
+- Pydantic lax edge cases not recorded: a bool or a float with a fraction sent as `speed`/`take`, NaN in a body (serde refuses it as invalid JSON), a non-JSON content type. Only the cases in `http.json` are compared.
+- `reveal_in_file_manager` spawns the opener and does not wait (Python waits up to 10 s and ignores the result). It is never run by a test.
+
+Questions for the lead:
+1. `pipeline::create_generation` returns the document without `created`/`updated`; S07b's save (`Library::put_generation`) stamps them with two clock readings, as db.py does. Fine to keep the stamps in the save only?
+2. The `data/` differences in G8 above need your attribution.
