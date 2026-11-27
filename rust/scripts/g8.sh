@@ -70,7 +70,10 @@ holders="$(lsof -nP -Fpfn 2>/dev/null | awk -v wt="$WT" -v w1="$W1" -v w2="$W2" 
     /^n/ { n = substr($0, 2)
            if (fd == "cwd" && under(n, wt)) ours[pid] = 1
            if (under(n, w1) || under(n, w2) || under(n, w3)) holds[pid]++ }
-    END { for (p in holds) print p, (p in ours ? "cwd" : "-"), holds[p] }' || true)"
+    END { print "seen", "-", NR; for (p in holds) print p, (p in ours ? "cwd" : "-"), holds[p] }' || true)"
+# A check that saw nothing proves nothing: lsof missing or failing must not read as a pass.
+if [[ "$holders" != seen\ -\ [1-9]* ]]; then echo "FAIL: lsof gave no output, open files could not be checked"; fail=1; fi
+holders="$(sed 1d <<<"$holders")"
 ours_holding=0 others_holding=0
 while read -r pid flag count; do
     [ -n "$pid" ] || continue
