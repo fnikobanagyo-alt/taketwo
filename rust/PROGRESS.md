@@ -18,11 +18,11 @@ The loop appends one entry per session at the bottom: date, step id, what was bu
 | S09 Tauri shell | done (G3 pass, pushed `e9ee6a4`, Windows `check` green) |
 | S10 Audio DSP with Python parity vectors | done (`taketwo_core::audio`, 12 golden tests; first pushed with S11a) |
 | S11a Take checks, ending guard, pitch measures | done, parts A to D (pushed; `taketwo_core::checks`, `ending_guard`, `delivery`; 9 golden, 23 ported, 1 unit test) |
-| S11b Mic match, master chain, sentence pauses, final-mix edge check | todo (before S16) |
+| S11b Mic match, master chain, final-mix edge check | todo (before S16; sentence pauses moved to S15) |
 | S12 Qwen voice (real model, Metal) | todo |
 | S13 Whisper with word timings | done, accepted (lead decision 13: heads = all heads of the top two decoder layers; pushed `c123c7b`, Windows `check` green, run 45968817348) |
 | S14 Speaker encoder | todo |
-| S15 Render pipeline A | todo |
+| S15 Render pipeline A | started (lead decision 15) |
 | S16 Render pipeline B | todo |
 | S17 Voice creation | todo |
 | S18 Studio restoration (Sidon) | todo |
@@ -34,12 +34,12 @@ The loop appends one entry per session at the bottom: date, step id, what was bu
 
 | Gate | Status | Evidence |
 |---|---|---|
-| G1 | partial (text, library, captions, review, create logic, the worker, the MCP tools, Whisper word grouping and audio DSP in; checks, delivery, mastering and the render pipeline still to port) | Lead decision 10 below (233 passed at `31b1140`); the S10 builder's acceptance run reported `cargo test --workspace` exit 0 at `5e7491c`; the lead reran `cargo test -p taketwo-core audio` there (12 golden + 2 unit tests ok) |
+| G1 | partial (text, library, captions, review, create logic, the worker, the MCP tools, Whisper word grouping and audio DSP in; take checks, ending guard and pitch measures in; mastering and the render pipeline still to port) | Lead decision 10 below (233 passed at `31b1140`); the S10 builder's acceptance run reported `cargo test --workspace` exit 0 at `5e7491c`; the lead reran `cargo test -p taketwo-core audio` there (12 golden + 2 unit tests ok) |
 | G2 | 33 of 33 at `31b1140` (judge again at the end; without `--stub-renderer` the paths that start a job still answer 501 until S16) | Lead decision 10 below: `contract.sh`, `Ran 33 tests`, `OK`, exit 0 |
 | G3 | pass at `cbdc9b1` | S09 entry below: `smoke_shell.sh` checks a-i ok, `G3 PASS`, exit 0 (hidden window, page load fired) |
 | G4 | pass for wav, mp3 waits for S16 | S08 entry below: `cargo test -p taketwo-mcp` from no prebuilt engine, exit 0 (27 tests) |
 | G5 | not run | |
-| G6 | plain `cuda` success on `c123c7b` (run 45968817348: `check` success, `build (cuda)` success, `build (cuda,flash-attn)` still in progress when read); `5e7491c` is not pushed, so the newest code has no run yet; judge again on the final commit | Lead decision 14 below: `gh run view 45968817348`; lead decision 10: run 45945950326, all three jobs `success` |
+| G6 | plain `cuda` success on `c123c7b` (run 45968817348, all jobs success); on `840e41f` (run 45981183667) `check` success, both CUDA jobs still running when read; judge again on the final commit | Lead decision 15 below: `gh run list`; lead decision 10: run 45945950326, all three jobs `success` |
 | G7 | pass at `8b6eed6` (judge again after S16/S17 if the voice-copy route changes) | S20 entry below: `plan` 10 scripts and `takes, most: 480`; `selftest` `AB SELFTEST PASS`; `render` exit 3 |
 | G8 | pass so far (re-run at the end) | Lead decision 9 below: `g8.sh` `G8 PASS`, exit 0 at `1f5b85b`. Data differences are Franz's own app use, information only |
 
@@ -1667,3 +1667,67 @@ Notes for the lead:
 - **`tokens` casefold:** it is a hand list, not the full CaseFolding table. Cherokee and some Armenian ligatures would differ; the golden tokens cover the cases the guard meets in English.
 - **The `empty` and `no_words` paths:** they keep `audio` as the input (empty) or as the trimmed input plus 0.12 s (no words), as Python does.
 - **This push:** it is the first to put S10's `sci-rs` on the Windows `check` job.
+
+### 2026-11-27, lead, iteration 15 decision
+State checked by command at `b1108e6` (tree clean apart from the two untracked symlinks): `main` and `origin/main` still `4448aaa`; `origin/rust/taketwo` is `840e41f` (the commit after it is `.md` only); `git diff --stat rust/taketwo main -- backend/app mcp` empty; Franz's app answers on 8766 (`"name":"TakeTwo"`, `"running":null`, `"queued":0`, `"loaded_engine":null`); the only listener on 8765-8799 is his app; `gh run list`: run 45981183667 on `840e41f` in progress (`check` success per the S11a entry), run 45968817348 on `c123c7b` success; disk 10 GB free, `rust/target` 21 GB; swap 13.0 of 14.3 GB used, `memory_pressure` 56% free. Franz's standing safety policy is already in PLAN.md's safety section and in the entry of `ef3d382` above; the plan is well past S09. Not done, not blocked on Franz. Open gates: G1 (mastering, render pipeline), G5; G2, G4, G6, G8 judged again at the end.
+
+**S11a is accepted.** Rust equals Python on every recorded vector, the Windows `check` job is green on `840e41f`, and no rule slip was reported. Notes kept, no work: the `tokens` casefold is a hand list (enough for English); a +-0.16 s word-time shift changes 6 of 106 decisions in Python too, so map ticket #11's question stays open until real Whisper timings are compared in S19.
+
+**Changes to the plan** (PLAN.md updated):
+- `widen_sentence_pauses` moves from S11b to S15: `render_chunk` calls it when `inner_sentence_pause_ms` is set.
+- The `engine.lock` item moves from S15 to S16, which rebuilds the engine and the shell anyway. S15 then compiles only `taketwo-core`, which matters at 10 GB free.
+- S15's code lives in `taketwo-core`; the engine wires it in S16.
+
+**S12 go or no-go.** "Swap is nearly full" deferred S12 three times and is the wrong signal: macOS does not hand used swap back. From now on: S12 runs when `memory_pressure` shows at least 50% free, 8766 shows `"running":null`, `"queued":0` and `"loaded_engine":null`, and at least 12 GB of disk is free after the disk rule. It was 56% today. S12 is the step after S15 if that holds; if not, S11b goes first and the lead asks Franz to close memory-heavy apps for one hour.
+
+Next step: **S15 Render pipeline A: takes and retakes (no push)**. It heads the longest remaining chain (S15, S16, S17, S19, S21) and needs no model.
+
+Binding instructions for the builder:
+
+1. **Where.** New module `taketwo_core::render` (split in files as needed). No change to `taketwo-engine`, `taketwo-mcp`, the shell, `taketwo-voice` (except item 2's re-export), `.github`, `Cargo.lock` versions. No new crate unless a format below needs one; say so if it does.
+2. **Traits** (fixed now so S12, S13 and S14 implement them, not reshape them):
+   - `Voice::synthesize(&mut self, engine, text, ref_wav: &Path, ref_text, language, params: &Doc, seed: u32, expected_seconds: f64, cancel) -> Result<Take, String>`, where `Take { audio: Vec<f32>, sr: u32, report: Doc }`. `report` is `engines.synthesis_report()` for that call (`tokens`, `token_limit`, `raw_samples`, `sample_rate`, `stop_reason`, `sampler`, `generation_route`, `decoder`). There is no global last report.
+   - `Transcriber`: move the trait from `taketwo-voice::whisper` to `taketwo-core` unchanged and re-export it there, as S11a did with `Transcript`. `render_chunk` resamples to 16 kHz before the call if `ml.transcribe` does (read `ml.py`).
+   - `SpeakerEncoder::embedding(&mut self, audio, sr) -> Result<Vec<f32>, String>`; `cosine` as in `ml.py`. `render_chunk` builds `evaluate`'s similarity callback from it and the voice's `fingerprint.npy`.
+   - A scripted fake of all three for tests: it returns the recorded outputs in call order and records every call it receives.
+3. **Injected inputs.** `render_chunk` takes the nonce (`secrets.randbits(32)`) and a clock (`time.time`) as inputs. The recorder patches both in Python (a fixed nonce per case; a clock that advances a fixed step per call). `secs` must then be exact.
+4. **Port** from `pipeline.py`: `Cancelled`, `profile_assets` (with `ref_text_override`, `active_variant`, the defaults 0.8 and 2.6), `noise_limit`'s file reads over `clean.wav` and the variants and the `put_profile` write-back of `noise_baseline` (the arithmetic exists in `checks`), `_ref_pitch` with its cache keyed on path, mtime in ns and size, `_guarded_take`, `render_chunk`, `widen_sentence_pauses`. Where Python's `evaluate` transcribes for itself (`transcript is None`), the Rust caller transcribes first with the same audio and arguments.
+5. **Check before assuming** and write what you found: a reader for `fingerprint.npy` (numpy `.npy`, float32 or float64, little-endian: a small hand reader is fine); a 32-bit float WAV writer for `raw_chunk_NNN.wav`, `context_chunk_NNN.wav` and `rejected_context_NNN.wav` (Python: `soundfile`, `subtype="FLOAT"`; `hound` can write float); `rejected_context_NNN.json` through the library's JSON writer (`save_json`).
+6. **Only `qwen3`.** Leave the omnivoice `length_scale` branch out with a one-line comment. Any other family returns a clear error.
+7. **Recorder.** `rust/golden/record_render.py`, a sibling of `record_checks.py` with the same guards (temporary data folder asserted before any app import, `HF_HUB_OFFLINE=1`, no model loaded, numba cache in the temporary folder, the `builtins.round` half-guard). It patches `engines.synthesize`, `engines.synthesis_report`, `ml.transcribe`, `ml.speaker_embedding`, `ml.cosine`, `secrets.randbits`, `time.time` and `db.put_profile`, builds a synthetic voice (`say` is not needed: seeded synthetic signals, reuse `rust/golden/audio/` and `rust/golden/checks/` arrays where they fit) and drives the real `render_chunk` and `_guarded_take`. It writes `rust/golden/render.json` plus arrays under `rust/golden/render/`. Size cap: 6 MB for both together (the repository is public and `rust/golden` is already 16 MB); store big outputs as SHA-256 where Rust is bit-equal, as S11a did. A second run must be byte-identical.
+8. **What each case stores and Rust must match.**
+   - The returned part document: every key in Python's order, int against float kept, `None` kept. Exact for every rounded number, string, list and seed. `score` on the fallback path is unrounded: tolerance 1e-9 there, exact elsewhere.
+   - `attempts`: exact, including `secs`, `temperature`, `ref`, `ending`, `synthesis`, `expected_seconds` (1e-12), `ending_guard`, `boundary_attempts`.
+   - The list of model calls in order: for `synthesize` the text, the reference file name, `ref_text`, `params`, `seed`, `expected_seconds`; for `transcribe` the audio length and language; for the similarity the audio length.
+   - Files in the narration folder afterwards: names, and which were removed. `raw_chunk` and `context_chunk` bit-equal to Python's float32; `chunk_NNN.wav` within S10's `normalize_lufs` tolerance, decisions exact.
+   - The profile after the call (`noise_baseline` written once) and whether `put_profile` was called.
+   - A raised error: its type (`Cancelled`, `ValueError`) and message.
+9. **Cases the recorder must hold** (each asserts in the recorder that its branch fired):
+   - first take clean; take 1 `cut_off` then take 2 clean; every take flagged (the best by `(has_hard, pick)` wins, first of equals); `compare_takes` 2 and 3 with the closer voice chosen among clean takes;
+   - temperature decay: ending-only failures do not decay, other failures do, floor 0.3, `base_temp` absent;
+   - the last-take switch to the next-best clip (`ref` changes, `fp`, `self_sim`, `wps` and the reference pitch reload), and no switch with one variant or with one take;
+   - `length_limit_reached`: budget x 1.3 capped at 4.0, `cut_off` added once, `score += 2.5`; a stored `duration_budget` kept and clamped to 1.0-4.0;
+   - seeds: the schedule with `regen_round`, a collision with `used_seeds` and with earlier `attempts` seeds, wrap at 2^32, `used_seeds` sorted in the result;
+   - pitch: `flat` under 0.65 liveliness, the `style` term in the score, `off_pitch` against the voice median and against both neighbour parts, no gate without a stored `pitch_hz`, no prosody at 1.5 s or shorter, `max_pitch_offset_st` from settings;
+   - `long_silence` repaired by `shorten_gaps` (issue removed, `words` None); `inner_sentence_pause_ms` on with words (widened, word times moved) and off;
+   - words shifted by `head_pad_s - trim_start` and rounded to 3 places; no words when `trim_start` is absent;
+   - ending guard on (`experimental_qwen_ending_guard` exactly `True`; the string `"false"` and `1` do not enable it): one sentence; several sentences with the per-sentence seeds, the pause gap from `edge_silence`, word offsets, `sentences` in context and report; a boundary failure that passes on a local retry; `UnsafeBoundary` on a middle take (attempt recorded, loop continues); `UnsafeBoundary` on the last take (the two `rejected_context` files written); every take unsafe with no earlier `chunk_NNN.wav` (plain fallback take: the last loop seed plus 1, the last loop `p`, `ending_unverified`, unrounded score, `ending_guard_fallback`) and with one (the `ValueError`, old file untouched); `context_chunk` written with a context and removed without one;
+   - `audio_revision` incremented, `accepted` reset to `None`, `status` `flagged` against `ok`;
+   - cancel at each check point: before a take, after synthesis, after `evaluate`, inside `_guarded_take` before a sentence, before a retry and after synthesis, and before the fallback take. Nothing is written to the part on cancel.
+   - `widen_sentence_pauses` alone: the six cases of `test_narration_quality.py` listed in 10, as vectors.
+10. **Backend tests to account for.** Port to `rust/crates/taketwo-core/tests/render_ported.rs`, or list as covered by a golden case or left out with the owning step, every test the S11a entry marks "left out: S15", "left out: S15/S16" or "left out: S11b (sentence pauses...)": from `test_narration_quality.py` the four pitch-gate tests, the six sentence-pause tests and the two request tests; from `test_ending_guard.py` `test_default_render_does_not_synthesize_or_remove_dummy_context`, `test_false_string_cannot_accidentally_enable_experimental_context`, `test_real_render_path_saves_separate_context_evidence`, `test_all_unsafe_takes_leave_old_audio_untouched`, `test_each_sentence_inside_one_part_is_guarded`, `test_new_narration_can_continue_with_flagged_plain_fallback`, `test_bad_second_boundary_does_not_regenerate_first_sentence`; from `test_repeat_cutoff.py` the six seed, clip and budget tests; from `test_audit_fixes.py` `test_pitch_is_remeasured_after_the_reference_is_replaced`. Tests that need `final_scan`, `assemble` or `run_generation` stay with S16: name them.
+11. **Not in this step:** `assemble`, `final_scan`, `run_generation`, re-speak, takes, speed, the engine's `Renderer` wiring, the `engine.lock` change, mic match and the master chain, any model, any push.
+12. **Disk rule (lead decision 13), restated.** `df -g .` before any build. Under 10 GB free: delete hash folders under `rust/target/debug/build/<crate>/` older than the session start, biggest crates first, until 12 GB is free, and say so. No `cargo clean`. Under 7 GB after that: stop and report. Build and test with `-p taketwo-core` only; `cargo test --workspace` once at the end.
+13. **If it does not fit in one session:** finish and commit the traits, the recorder and the plain (guard off) path with its cases first, then the guard path. Report exactly which cases of item 9 are missing. Do not weaken a case.
+
+Acceptance commands (the lead runs them; `WT` is the worktree, quoted because the path has spaces):
+- `cd "$WT" && HF_HUB_OFFLINE=1 backend/.venv/bin/python -B rust/golden/record_render.py && git status --porcelain rust/golden | wc -l | grep -qx ' *0'` (a re-run changes nothing)
+- `cd "$WT" && test "$(du -sk rust/golden/render rust/golden/render.json | awk '{s+=$1} END {print s}')" -le 6144`
+- `cd "$WT/rust" && cargo test -p taketwo-core --test render_golden --test render_ported`
+- `cd "$WT/rust" && cargo test -p taketwo-core`
+- `cd "$WT/rust" && cargo test --workspace`
+- `cd "$WT" && git diff --quiet b1108e6 -- rust/crates/taketwo-engine rust/crates/taketwo-mcp rust/crates/taketwo rust/Cargo.lock .github` (untouched; say so if a format crate had to be added)
+- `cd "$WT" && git diff --stat rust/taketwo main -- backend/app mcp | wc -l | grep -qx ' *0'`
+- `cd "$WT" && rust/scripts/g8.sh`
+
+After S15: S12 if the go rule above holds (else S11b), then S14, S11b, S16 (push), S17, S19, S21.
