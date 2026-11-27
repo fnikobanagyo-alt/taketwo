@@ -112,7 +112,8 @@ Needs: S01. Gate: G1, G2 (seeder).
 Needs: S03, S04. Gate: G1.
 - Port `tools.py` captions, timings, `to_srt`, `to_vtt`, `to_txt`, `attachment_header`; `pipeline.py` `summarize`, `fix_targets`, `ISSUE_LABEL`, `review`, `outcome`, `set_accepted`, take bookkeeping (`TAKE_FIELDS`, `MAX_OLD_TAKES`, `_archive_take`, `_trim_takes`, `take_audio`).
 - Tests: for each fixture narration, timings, captions, srt, vtt, txt, review and outcome equal `contract/golden/narrations.json` exactly.
-- Done when: `cargo test -p taketwo-core review captions` passes.
+- cargo takes one name filter before `--`; several go after it. Extra vectors come from `rust/golden/record.py` into `rust/golden/review.json` (see lead decision 5 in PROGRESS.md): the contract fixture has one part with heard words and no takes or accepted parts.
+- Done when: `cargo test -p taketwo-core -- review captions` passes, with each test asserting the number of golden cases it read.
 
 ### S06 Engine: read side, guards, UI, contract runner
 Needs: S05. Gate: G2 (part).
@@ -156,7 +157,8 @@ Needs: S03, S10. Gate: G1.
 - Port `delivery.py` (`prosody` with a hand port of librosa `yin`, `expressiveness`, `resolve`, `pick_variant`, `ltas`, `mic_match` with `firwin2`), `ending_guard.py`, `studio.master_chain`, and from `pipeline.py`: `noise_limit`, `_internal_sentence_cut`, `evaluate` (every check with today's limits, `HARD_ISSUES`), `widen_sentence_pauses`, `_processed_edge_issues`, `clean_replacement`.
 - Vectors: `rust/golden/record.py` runs `evaluate` and friends on synthetic audio with canned transcripts, similarities and settings (the model calls are replaced by fixed values) and stores inputs, issues and measurements in `rust/golden/checks.json`.
 - Port the cases in `backend/tests/test_narration_quality.py`, `test_ending_guard.py`, `test_repeat_cutoff.py`, `test_regressions.py` and `test_audit_fixes.py` that test these functions. List any case left out in PROGRESS.md with the reason.
-- Done when: `cargo test -p taketwo-core checks delivery ending_guard` passes.
+- `profiles/<id>/mic.json` is written by Python with plain `json.dumps` and likely holds `NaN` (`delivery.ltas` returns nan above 0.92 x Nyquist): read it with a NaN-tolerant parser, never plain serde_json (found in S04).
+- Done when: `cargo test -p taketwo-core -- checks delivery ending_guard` passes, with each test asserting the number of golden cases it read.
 
 ### S12 Qwen voice (real model, Metal)
 Needs: S01. Gate: G5 (part).

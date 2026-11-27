@@ -9,7 +9,7 @@ The loop appends one entry per session at the bottom: date, step id, what was bu
 | S01 Workspace, safety rails, tools | done |
 | S02 Windows CUDA link proof | done (G6 early evidence) |
 | S03 Text logic | done |
-| S04 Library store, seeder, one-time copy | todo |
+| S04 Library store, seeder, one-time copy | done |
 | S05 Captions, timings, subtitles, review rules | todo |
 | S06 Engine: read side, guards, UI, contract runner | todo |
 | S07 Engine: write side, worker, stub voice, lifecycle | todo |
@@ -32,8 +32,8 @@ The loop appends one entry per session at the bottom: date, step id, what was bu
 
 | Gate | Status | Evidence |
 |---|---|---|
-| G1 | pass (start) | S01 entry below: `cargo test --workspace` exit 0, 143 run, 0 failed |
-| G2 | not run | |
+| G1 | partial (text and library logic in; captions, review, audio and checks still to port) | Lead decision 5 below: `cargo test --workspace` exit 0 at `d0d7e7d`, 162 passed, 0 failed, 1 ignored |
+| G2 | not run (seeder done in S04; engine routes missing) | |
 | G3 | not run | |
 | G4 | not run | |
 | G5 | not run | |
@@ -415,3 +415,42 @@ Left out or limited:
 Questions for the lead:
 1. One unreadable document (for example a NaN value) makes `list_profiles`/`list_generations` fail for the whole table, so the startup repairs and every list fail too. Keep that (loud), or skip the row and report it?
 2. The one-time copy copies the database bytes. If VoiceForge is running and writing at that moment, the copy can catch it mid-write. When it is wired in, should it use SQLite's backup API on a read-only connection instead, or require VoiceForge to be closed?
+
+
+### 2026-11-27, lead, iteration 5 decision
+State checked by command: branch at `d0d7e7d`, tree clean apart from the two untracked symlinks; `main` and `origin/main` still `4448aaa`; `git diff --stat rust/taketwo main -- backend/app mcp` empty; `cargo test --workspace` exit 0 (116 + 15 + 5 + 1 + 10 + 2 + 1 + 12 doc-tests = 162 passed, 0 failed, 1 ignored as before); `g8.sh` exit 0, `G8 PASS`; 8766 answers and is idle (`running: null`, `queued: 0`); no dev port listening; no `rust/target` process. Disk: 32 GB free (37 GB one step ago; the limit for a `cargo clean` of the unused profile is 10 GB). S01 to S04 done. G2 to G5 and G7 have no evidence; G1 partial; G6 early evidence on `e28e7ba`. Not done, not blocked on Franz.
+
+G8 attribution (`g8.sh --names`): `data/` differences are the same 2 Finder `.DS_Store` files. App Support/VoiceForge: 8 added and 25 changed, all Chromium files of Franz's running app (Cache 17, Code Cache 2, GPU and Dawn caches 7, Local Storage 3, Session Storage 2, `DIPS-wal` 1). No voice, audio or library database file.
+
+S04 accepted. Answers:
+1. One unreadable document fails the whole list: keep it loud for now. Python fails the same way on broken JSON, but Python does read `NaN` and Rust does not, so this is a compatibility difference. On the list to show Franz; no gate depends on it.
+2. One-time copy while VoiceForge is writing: when the copy is wired into a live start it must use SQLite's backup API on a read-only connection for the database (files still byte-copied). Nothing in this plan wires it in, so no change now.
+3. The three old PROGRESS lines rewritten as `/Users[/]`: accepted.
+4. `mic.json` holding `NaN`: copied into the S11 text in PLAN.md.
+
+Plan fix: `cargo test -p <crate> a b` is refused by cargo (one name filter only; checked, it prints the usage text). The S05 and S11 done commands in PLAN.md now use `cargo test -p taketwo-core -- <filters>`.
+
+Next step: **S05 Captions, timings, subtitles, review rules**, alone (S06 is the step after; do not start it). Additions to the PLAN.md S05 text, all binding:
+1. Modules in `taketwo-core`: `captions` (`tools.py` lines 18-153: `MAX_CAPTION_CHARS`, `_caption_pieces`, `generation_captions`, `generation_timings`, `_ts`, `_wrap`, `attachment_header`, `to_srt`, `to_vtt`, `to_txt`) and `review` (`pipeline.py` lines 955-1066: `summarize`, `fix_targets`, `ISSUE_LABEL`, `review`, `outcome`, `set_accepted`, `TAKE_FIELDS`, `MAX_OLD_TAKES`, `_take_dir`, `_archive_take`, `_trim_takes`, `take_audio`). Test file names (or test names) contain `captions` and `review`. `select_take` and everything that renders stay for S16.
+2. Documents stay `serde_json::Map` with key order kept, as in S04. Reuse `text::split_sentences`, `text::fix_entities`, the `py` helpers (`split()`, `strip()`) and S03's `SequenceMatcher`; add `get_matching_blocks` to it (difflib's exact algorithm, including the merge of adjacent blocks and the final `(len(a), len(b), 0)` block), used here with autojunk off.
+3. Contract golden test: for each of the 5 narrations in `contract/fixture.json`, outcome, review (the 7 recorded keys), timings, captions, srt, vtt and txt equal `contract/golden/narrations.json`; the test asserts it read 5 narrations and how many of them have a timeline.
+4. The contract fixture is thin (one part with heard words, one speed of 1.25, no accepted part, no takes). `rust/golden/record.py` gets a new section writing `rust/golden/review.json` from the Python functions on synthetic documents (same temp-folder safety as S03 and S04; no model, no port). It must cover:
+   - timings with heard words: equal, replaced, missing and extra words; a script word unmatched at the start, in the middle and at the end (the neighbour fill); speed 0.8, 1.0 and 1.5; `speed` missing or 0; a part with no `words` beside one with them (`estimated` true); an empty part text; a sentence whose word count is 0; apostrophes and capitals in `norm`.
+   - rounding: Python `round(x, 3)` and `_ts`'s `int(round(t * 1000))` are round-half-to-even on the real binary value; `f64::round` rounds halves away from zero. Include times that land on a half millisecond (for example 0.0005, 0.0015, 2.5005, 3599.9995, and above one hour). Captions `start`/`end` are unrounded floats: do the arithmetic in Python's order and compare as f64 exactly (bit-equal), no tolerance.
+   - `_wrap`: lengths 41, 42, 43; one long token; CJK text with no spaces; the `best == 0` case (first word longer than the middle); two words.
+   - `_caption_pieces`: sentence of exactly 84 and 85 code points; the 0.55 flush at clause punctuation; a word longer than 84; several sentences; empty and whitespace-only text; non-ASCII text (lengths are code points, not bytes).
+   - `attachment_header`: plain name, non-ASCII, all non-ASCII (falls back to `download`), quotes, backslash, CR and LF, spaces, `%` and `/` (Python `quote(full, safe='')`).
+   - `fix_targets`, `review` (all 11 keys, with and without `voice_pitch_hz`), `outcome`, `summarize` (all three messages, 1 and 2 accepted parts, several flagged parts), `set_accepted` on and off for a done and a not-done narration: flagged part, `final_scan.remaining`, a web artifact in the text, an accepted flagged part, issues plus final_issues with a shared code (order and dedupe), no codes at all (`final_check`), an unknown code (label made from the code), no timeline, `take` present and absent, status not `done`. `review` indexes `gen["chunks"][i]` by position, as Python does.
+   - `ISSUE_LABEL` as recorded from Python (the clean-checkout run archives only `rust` and `contract`, so the test must not read `frontend/`).
+5. Clock: `set_accepted` and `_archive_take` take the time from an injectable clock, as the library store does; the recorder pins Python's `time.time` so `accepted.at` and `archived` compare exactly.
+6. Takes on disk (`_archive_take`, `_trim_takes`, `take_audio`): the functions take the generations folder as a parameter. Rust tests on a temp folder: archive copies `file`, `raw_file` and `context_file` that exist into `takes/<ci:03>-<k>/`, returns the take document with `TAKE_FIELDS` in order, then `take` and `archived`, and returns nothing when the file is missing; trim keeps the last 3 and removes the older folders; `take_audio` finds the current and an archived take and returns nothing for a missing one. The take document and the resulting file list are also compared with what Python records for the same input.
+7. Each test asserts the number of golden cases it read. Prove a comparison is live with one mutation check (for example ties-away rounding must fail), then undo it.
+8. Acceptance commands, all from the worktree root, all must exit 0:
+   - `cd rust && source scripts/env.sh && cargo test -p taketwo-core -- review captions` (passed count above zero in both).
+   - `cd rust && cargo test --workspace`.
+   - `backend/.venv/bin/python -B rust/golden/record.py && git diff --exit-code -- rust/golden` (recorder is deterministic; `git status` stays clean).
+   - Clean checkout: `git archive HEAD rust contract` into a scratch folder, fresh target dir, `cargo test -p taketwo-core -- review captions` passes there.
+   - `test -z "$(git status --porcelain | grep -v -e 'backend/.venv' -e 'frontend/node_modules')" && ! git grep -q '/Users[/]' HEAD -- rust contract && test -z "$(git diff --stat rust/taketwo main -- backend/app mcp)" && test "$(git rev-parse main)" = 4448aaa9b241f2e52cfaa6c06fa98b89653be82e`.
+   - `rust/scripts/g8.sh` ends with `G8 PASS`; `lsof -nP -iTCP -sTCP:LISTEN | grep -E ':(879[0-589])'` and `pgrep -fl 'rust-taketwo/rust/target/'` print nothing.
+9. Safety for this step: no port bound, no engine started, no model, no push. Only temp folders. Nothing under the main checkout's `data/` or App Support/VoiceForge is opened, not even read-only. Python runs only as `backend/.venv/bin/python -B rust/golden/record.py` with both data variables on a temp folder and `config.DATA_DIR` asserted before any other app import. Add files to git by name, never `git add -A`. Do not weaken a test or widen a tolerance to get to green; a case that can't match goes to the lead with the evidence.
+
