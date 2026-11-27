@@ -55,6 +55,12 @@ struct Ev {
     has_hard: bool,
 }
 
+/// Python's `(has_hard, score) < (best_has_hard, best_score)`: a clean take beats a failed one whatever the scores,
+/// then the lower score wins.
+fn beats(new: (bool, f64), best: (bool, f64)) -> bool {
+    new < best
+}
+
 /// `make_preview(pid, cancel)`. `downloaded` is `engines.is_downloaded(spec.repo)` (the Qwen model folder is there);
 /// without it nothing is touched. Writes go through `r.put_profile`; `lib` reads the voice and the settings.
 pub fn make_preview(r: &mut Render, lib: &Library, pid: &str, downloaded: bool) -> Result<Preview, RenderError> {
@@ -101,7 +107,7 @@ pub fn make_preview(r: &mut Render, lib: &Library, pid: &str, downloaded: bool) 
         // clean takes first, then the best score (a failed take must never beat a clean one)
         ev.has_hard = ev.issues.iter().any(|i| HARD_ISSUES.contains(i));
         let clean = !ev.has_hard;
-        if best.as_ref().is_none_or(|b| (ev.has_hard, ev.score) < (b.has_hard, b.score)) {
+        if best.as_ref().is_none_or(|b| beats((ev.has_hard, ev.score), (b.has_hard, b.score))) {
             best = Some(ev);
         }
         if clean {
@@ -139,4 +145,17 @@ pub fn make_preview(r: &mut Render, lib: &Library, pid: &str, downloaded: bool) 
                                              "duration": py_round(padded.len() as f64 / sr as f64, 2)}));
     (r.put_profile)(&mut profile)?;
     Ok(Preview::Saved)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::beats;
+
+    #[test]
+    fn a_clean_take_beats_a_failed_take_with_a_better_score() {
+        // test_audit_fixes.py: the cut-off take scored 2.5, the clean one 3.0
+        assert!(beats((false, 3.0), (true, 2.5)));
+        assert!(!beats((true, 2.5), (false, 3.0)));
+        assert!(beats((true, 1.0), (true, 2.5)) && !beats((false, 3.0), (false, 3.0)));
+    }
 }

@@ -27,7 +27,7 @@ const SAY_TEXT: &str = "The morning was quiet and the river ran slowly past the 
 fn models() {
     static DIR: OnceLock<PathBuf> = OnceLock::new();
     DIR.get_or_init(|| {
-        let d = std::env::temp_dir().join(format!("taketwo-profiles-models-{}", std::process::id()));
+        let d = PathBuf::from(env!("CARGO_TARGET_TMPDIR")).join(format!("profiles-models-{}", std::process::id()));
         std::fs::create_dir_all(d.join(taketwo_voice::qwen::MODEL_DIR)).unwrap();
         // SAFETY: set once under the OnceLock before this binary's tests start an engine or read the variable
         unsafe { std::env::set_var("TAKETWO_MODELS", &d) };
@@ -212,7 +212,8 @@ async fn a_too_short_upload_ends_in_the_error_state() {
 #[tokio::test(flavor = "multi_thread")]
 async fn missing_form_fields_are_422_and_nothing_is_written() {
     let e = engine();
-    let a = upload(&e.app, &[("language", "en"), ("denoise", "maybe")], None).await;
+    // an empty value counts as not sent, as FastAPI's form reading does
+    let a = upload(&e.app, &[("name", ""), ("language", "en"), ("denoise", "maybe"), ("studio", "")], None).await;
     assert_eq!(a.status, 422);
     assert_eq!(json_of(&a), json!({"detail": [
         {"type": "missing", "loc": ["body", "name"], "msg": "Field required", "input": null},
@@ -224,6 +225,32 @@ async fn missing_form_fields_are_422_and_nothing_is_written() {
     assert!(e.state.lib.list_profiles().unwrap().is_empty());
     let left: Vec<_> = std::fs::read_dir(e.state.lib.profiles_dir()).map(|d| d.flatten().collect()).unwrap_or_default();
     assert!(left.is_empty(), "no upload part file is left");
+}
+
+/// An upload over axum's 2 MB default body limit is taken (it is not audio, so the analysis fails cleanly).
+#[tokio::test(flavor = "multi_thread")]
+async fn a_large_upload_is_accepted() {
+    let e = engine();
+    let junk = vec![7u8; 3 << 20];
+    let a = upload(&e.app, &[("name", "Big")], Some(("big.wav", &junk))).await;
+    assert_eq!(a.status, 200, "{}", String::from_utf8_lossy(&a.body));
+    let pid = json_of(&a)["id"].as_str().unwrap().to_string();
+    assert_eq!(std::fs::metadata(e.state.lib.profiles_dir().join(&pid).join("original.wav")).unwrap().len(), 3 << 20);
+    wait_idle(&e);
+    assert_eq!(profile(&e, &pid)["status"], "error");
+}
+
+/// The start-up loop (main.py at import): a ready voice without `preview.wav` gets one.
+#[tokio::test(flavor = "multi_thread")]
+async fn startup_queues_a_preview_for_a_ready_voice_without_one() {
+    let e = engine();
+    let Some(pid) = ready_voice(&e, "startup_queues_a_preview_for_a_ready_voice_without_one", &[]).await else { return };
+    let f = e.state.lib.profiles_dir().join(&pid).join("preview.wav");
+    std::fs::remove_file(&f).unwrap();
+    assert_eq!(taketwo_engine::api::queue_startup_previews(&e.state).unwrap(), 1);
+    wait_idle(&e);
+    assert!(f.exists());
+    assert_eq!(taketwo_engine::api::queue_startup_previews(&e.state).unwrap(), 0, "nothing to do once it has one");
 }
 
 #[tokio::test(flavor = "multi_thread")]

@@ -196,6 +196,8 @@ pub(super) async fn create_profile(State(st): St, req: Request) -> Response {
             }
         }
     }
+    // FastAPI treats an empty form value as not sent (the default, or "Field required")
+    fields.retain(|_, v| !v.is_empty());
     let cleanup = |u: &Option<(String, PathBuf)>| {
         if let Some((_, p)) = u {
             let _ = std::fs::remove_file(p);
