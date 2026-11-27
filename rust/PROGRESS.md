@@ -1029,3 +1029,16 @@ Acceptance commands, run from WT:
 Disk free: 11 GB before, 13 GB after removing incremental, 12 GB at the end.
 
 Not done: no real render, no model run, no push. Rendering needs Franz's OK for 480 takes and for copying the files of 5 voices (at most 38) into temp folders.
+
+### 2026-11-27, builder, S20 addendum
+- **Fixed a real gap.** One of the 10 stored scripts has no `compare_takes`. `render` now always sends `max_attempts` and `compare_takes`, using the bound's defaults (4 and 1) when a script lacks one. A previous script's value can no longer carry over in the temp library. All 10 have `max_attempts`; every per-part bound is 8.
+- **Checked by hand.** I sent the 10 stored settings, as `render` sends them, with `PUT /api/settings` to a stub Rust engine on an empty temp library. All 10 answered 200 and read back equal, with `experimental_qwen_ending_guard` false. I only printed status codes. The Python engine's `db._checked` was read but not exercised with them.
+- **Unverified by the selftest.** The fixture voice names no files, and its three fixed-name files answer 404, so the voice-file fetch, write and copy ran over zero files. "The Rust engine read it" covers the profile and library documents, not voice audio. The real voice-file copy runs only in the first real `render`.
+- **Note for the lead.** The Python engine renders first. A 501 from the Rust engine therefore shows only after up to 240 Python takes. Swapping the order, or a probe create on the Rust engine first, is the lead's call.
+- **Results.** These checks were run at `0ce24b0`, then `selftest` was run again after the fix:
+  - clean-tree/main/no-`/Users` check: exit 0.
+  - `rust/scripts/g8.sh`: `G8 PASS`, exit 0. Its data differences are Franz's own app use.
+  - Port/process check: empty, exit 0.
+  - G7 gate command: exit 0.
+  - `selftest` after the fix: `AB SELFTEST PASS`.
+- **Slip, recorded.** While reading the three `eval/rust-prototype` pages for structure, I printed their opening HTML into my session's tool output, including one line of script text. It did not reach any file, commit or harness output.

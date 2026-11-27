@@ -391,6 +391,9 @@ ACTIVE = ("queued", "running")
 
 def render_one(base: str, s: dict, folder: Path) -> dict:
     stored = {k: s["settings"][k] for k in SETTING_KEYS if k in s["settings"]}
+    # the bound's defaults, sent explicitly so a previous script's value never carries over
+    stored.setdefault("max_attempts", DEFAULT_MAX_ATTEMPTS)
+    stored.setdefault("compare_takes", DEFAULT_COMPARE_TAKES)
     if stored:
         code, body = engine_call(base, "PUT", "/api/settings", stored)
         if code != 200:
