@@ -838,7 +838,7 @@ def main() -> None:
         data["timing_sensitivity"] = [{"function": k, "cases": n, "changed": [{"case": a, "timing": b, "fields": f} for a, b, f in ch]}
                                       for k, n, ch in rows]
         text = json.dumps(data, indent=1, ensure_ascii=False, allow_nan=False) + "\n"
-        assert str(tmp) not in text and "/Users/" not in text
+        assert str(tmp) not in text and str(Path.home()) not in text  # no temporary or home path in the vectors
         OUT.write_text(text)
         print(f"checks.json: {len(data['evaluate'])} evaluate, {len(data['internal_sentence_cut'])} internal cut, "
               f"{len(cs)} remove_context, {len(data['prosody'])} prosody cases; arrays {st.bytes} bytes")
