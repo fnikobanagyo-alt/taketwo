@@ -4,9 +4,20 @@ version.workspace = true
 edition.workspace = true
 license.workspace = true
 
+# A thin HTTP client of the engine with no model code, so a CUDA build starts without the NVIDIA driver.
+# The GPU features stay as empty pass-throughs so `--features cuda` still builds both programs (gate G6).
 [features]
-cuda = ["taketwo-voice/cuda"]
-flash-attn = ["taketwo-voice/flash-attn"]
+cuda = []
+flash-attn = []
 
 [dependencies]
-taketwo-voice = { path = "../taketwo-voice" }
+percent-encoding = "2"
+rmcp = { version = "3.12", default-features = false, features = ["server", "transport-io"] }
+serde_json = { version = "1", features = ["preserve_order", "float_roundtrip"] }
+tokio = { version = "1", features = ["rt", "macros", "io-std"] }
+ureq = { version = "2", default-features = false }
+taketwo-core = { path = "../taketwo-core" }
+
+[dev-dependencies]
+rmcp = { version = "3.12", default-features = false, features = ["client", "transport-child-process"] }
+tempfile = "3"
