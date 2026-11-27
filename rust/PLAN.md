@@ -148,8 +148,8 @@ Needs: S07b. Gate: G4. No push. Binding detail: lead decision 9 in PROGRESS.md.
 - MP3 is made in S16: until then `get_audio` is tested with `wav` and with the engine's 404 for `mp3`. G4 is judged again after S16.
 - Done when: `cd rust && cargo build -p taketwo-mcp && cargo test -p taketwo-mcp` passes from a state with no prebuilt engine program.
 
-### S09 Tauri shell
-Needs: S07b. Gate: G3.
+### S09 Tauri shell (push)
+Needs: S07b. Gate: G3. Binding detail: lead decision 10 in PROGRESS.md (live mode stays off, the engine lock stands in for single instance, the smoke's checks, the Windows `check` job excludes the shell and reports it separately).
 - `crates/taketwo`: Tauri 2, single instance, starts `taketwo-engine` as a sidecar, waits for health, opens the window at the engine's address (`WebviewUrl::External`), stops the engine when the window closes. What `desktop/main.js` does today, minus updates.
 - Build the UI in the worktree: `cd frontend && npm run build` (uses the symlinked `node_modules`; `frontend/dist` is git-ignored).
 - `rust/scripts/smoke_shell.sh`: isolated mode, temp library seeded with the fixture, a fixed dev port, start the built shell, check `/api/health` says `"name":"TakeTwo"`, check `GET /` returns the React page and one `/assets/*` file, quit the shell, check that the engine process is gone and the port is free.
