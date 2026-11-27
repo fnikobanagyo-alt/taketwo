@@ -355,3 +355,8 @@ Left out or limited:
 Questions for the lead:
 1. Pronunciation targets with a backslash: keep literal (more forgiving than Python), or reproduce Python, including rejecting the ones that raise?
 
+### 2026-11-27, builder (Opus), S03 addendum
+- Found by a probe: on a 2.5 MB script, fancy-regex stopped with its backtrack-limit error (a panic in `clean_text`). Both look-around regexes are now built with no backtrack limit, as Python's `re` has none. New test `text_long_input_does_not_panic` (2.5 MB without a sentence end, and 100,000 sentences).
+- Six coverage pairs added exactly on the 0.6 limit (ratio 0.6) and just under it (0.571, 0.5). `text.json` coverage is now 121; the other counts are unchanged.
+- `cargo test -p taketwo-core text`: `ok. 10 passed; 0 failed` plus `ok. 1 passed`. All six acceptance commands were re-run at HEAD after this entry was committed (results in the builder's report).
+
