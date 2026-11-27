@@ -53,9 +53,15 @@ fn num(v: &Value) -> f64 {
     }
 }
 
-/// |a - b|, 0 when both are the same infinity.
+/// |a - b|: 0 when equal (same infinity included) or both NaN, infinity when only one is NaN, so a
+/// NaN can never hide inside a `max`.
 fn diff(a: f64, b: f64) -> f64 {
-    if a == b { 0.0 } else { (a - b).abs() }
+    match (a.is_nan(), b.is_nan()) {
+        (true, true) => 0.0,
+        (true, false) | (false, true) => f64::INFINITY,
+        _ if a == b => 0.0,
+        _ => (a - b).abs(),
+    }
 }
 
 /// Same length exactly, then the largest sample difference.

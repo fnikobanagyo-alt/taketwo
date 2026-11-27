@@ -274,6 +274,34 @@
   "noise_bursts": "float",
   "estimate_snr": "float",
   "end_analysis_last_level": "float",
+  "speech_threshold_db": "float",
+  "floor_threshold": "float",
+  "silence_report": {
+   "lead": "float64",
+   "tail": "float64",
+   "max_internal": "float",
+   "speech_ratio": "float"
+  },
+  "silence_report_gap": "float",
+  "speech_start": "float",
+  "ending_level": "float",
+  "sound_regions_speech_level": "float",
+  "sound_regions_bounds": "int",
+  "edge_silence": [
+   "float",
+   "float"
+  ],
+  "end_analysis": {
+   "start": "float",
+   "cut": "float",
+   "natural": "bool",
+   "junk": "bool",
+   "last_level": "float"
+  },
+  "lead_burst": [
+   "float",
+   "float"
+  ],
   "lead_burst_full_level": "float32",
   "lead_burst_high_level": "float64"
  },

@@ -318,7 +318,7 @@ def record_all(audio, ss, sf, st, sig, tmp, bumps):
             "signals": {}}
     for name, (a, sr) in sig.items():
         data["signals"][name] = {**st.put(f"sig_{name}", a), "sr": sr}
-    record_dtypes(data, audio, *sig["speech_f45"])
+    record_dtypes(data, audio, *sig["speech_f45"], sig["lead_hiss_pause"][0])
     record_frame_db(data, audio, st, sig)
     record_thresholds(data, audio, st, sig)
     record_silence(data, audio, st, sig)
@@ -334,7 +334,7 @@ def record_all(audio, ss, sf, st, sig, tmp, bumps):
     return data
 
 
-def record_dtypes(data, audio, a, sr):
+def record_dtypes(data, audio, a, sr, sig_lead):
     db = audio.frame_db(a, sr)
     p10, p90 = np.percentile(db, 10), np.percentile(db, 90)
     data["dtypes"] = {
@@ -356,6 +356,23 @@ def record_dtypes(data, audio, a, sr):
         "estimate_snr": type(audio.estimate_snr(a, sr)).__name__,
         "end_analysis_last_level": type(audio.end_analysis(a, sr, 1.5)["last_level"]).__name__,
     }
+    r = audio.silence_report(a, sr)
+    ea = audio.end_analysis(a, sr, 1.5)
+    regions, _, sp = audio.sound_regions(a, sr)
+    lb = audio.lead_burst(sig_lead, 24000)
+    data["dtypes"].update({
+        "speech_threshold_db": type(audio.speech_threshold_db(db)).__name__,
+        "floor_threshold": type(audio._floor_threshold(db)).__name__,
+        "silence_report": {k: type(getattr(r, k)).__name__ for k in ("lead", "tail", "max_internal", "speech_ratio")},
+        "silence_report_gap": type(r.internal_gaps[0][0]).__name__,
+        "speech_start": type(audio.speech_start(a, sr)).__name__,
+        "ending_level": type(audio.ending_level(a, sr)).__name__,
+        "sound_regions_speech_level": type(sp).__name__,
+        "sound_regions_bounds": type(regions[0][0]).__name__,
+        "edge_silence": [type(v).__name__ for v in audio.edge_silence(a, sr)],
+        "end_analysis": {k: type(v).__name__ for k, v in ea.items()},
+        "lead_burst": [type(v).__name__ for v in lb],
+    })
     import scipy.signal as ss
     n, m = int(0.01 * sr), min(len(a), int(1.2 * sr)) // int(0.01 * sr)
     level = lambda x: 20 * np.log10(np.sqrt(np.mean(x[: m * n].reshape(m, n) ** 2, axis=1)) + 1e-9)  # noqa: E731  as lead_burst
