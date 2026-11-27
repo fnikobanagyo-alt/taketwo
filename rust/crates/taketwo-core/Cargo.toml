@@ -12,6 +12,7 @@ hound = "3.5"
 num-bigint = "0.4"
 realfft = "3.5"
 regex = "1"
+sci-rs = "0.4"
 rusqlite = { version = "0.43", features = ["bundled"] }
 serde = "1"
 serde_json = { version = "1", features = ["preserve_order", "float_roundtrip"] }
