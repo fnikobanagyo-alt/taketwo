@@ -13,7 +13,7 @@ The loop appends one entry per session at the bottom: date, step id, what was bu
 | S05 Captions, timings, subtitles, review rules | done |
 | S06 Engine: read side, guards, UI, contract runner | done |
 | S07a Engine: write routes that start no job | done |
-| S07b Engine: worker, stub renderer, lifecycle | todo |
+| S07b Engine: worker, stub renderer, lifecycle | done (pushed `2e4d02a`, Windows `check` green) |
 | S08 MCP server | todo |
 | S09 Tauri shell | todo |
 | S10 Audio DSP with Python parity vectors | todo |
@@ -685,3 +685,31 @@ Safety for this step: dev ports only (8790-8795, 8798, 8799), bound only by `con
 Left outside this loop until the end (they live outside the worktree): the wiki receipt, the HANDOFFS note, `scripts/check.py` on the main app. Hindsight was unreachable again (connection refused): no recall, no retain.
 
 Addendum to decision 8 (same day): `g8.sh` now also fails when `lsof` returns nothing, so a broken check can't read as a pass. New commits on `main` are still read by the lead before S21 (the acceptance commands pin `main` at `4448aaa` each step); only the data folder differences need no attribution. For S07b test 11, "`--stub-renderer` with live mode is refused" must be a unit test on the argument parsing with a live mode value, because `--live` alone is already refused.
+
+### 2026-11-27, builder (Opus), S07b Engine: worker, stub renderer, lifecycle (push)
+Built, in three commits on `rust/taketwo` (pushed, `2e4d02a`):
+- `7586c44` part A. `taketwo-engine::worker` is ported from worker.py. It has one `std::thread`, a queue, the jobs map with Python's key order, a cancel flag per job, the 32-event list, `phase`, `active_for`, `public` and `diagnostics` (20 jobs). `runtime.source_sha256` holds the build stamp `taketwo-engine <version> built <exe mtime>`. `render.rs` holds `trait Renderer` (run, respeak, fix_remaining, select_take; each gets the library, the narration id and a cancel check). It also holds `StubRenderer`, always compiled, behind a gate folder: it waits until `go` exists, fails when `fail` exists, and obeys cancel. Once through the gate it writes tones, final.wav, timeline, duration and parts `ok`, and is marked `shortcut: stub document, replaced by the real renderer in S16`. `serve --stub-renderer` wires it, with its gate from `TAKETWO_STUB_GATE`; without the switch every job path still answers 501, and `contract.sh` uses that default. api.rs now ports `_submit_generation` (the error marking, skipped for a re-speak), `_mark_cancelled_before_start`, the duplicate check and `_dup_notices` under one lock, `/api/status`, `/api/jobs/{id}`, `job`/`duplicate_notice`/`queue` on a narration, cancel, the busy 409s, delete cancelling the job, the busy check before a speed change's 501, and real diagnostics. As in main.py, select-take is a bare job: label `Switching take`, source `unknown`, no on_cancel, no error marking. The narration id is taken only after the empty-script check, as Python takes its uuid.
+- `record_http.py` gained phases g1 to g4 with the real Python worker. pipeline's four calls are replaced by a gated fake doing what the Rust stub does up to its gate, `engines.load` raises, and `uuid.uuid4` is a counter (ids `{n:010x}{n:022x}`, the same counter in the Rust test). A case may carry `wait_before`, which both the recorder and the replay poll. Clock values are masked by position, on both sides, and listed in `MASKED` in tests/http.rs with their reasons: job times, `events[].at`, the notice's `last`, and `runtime.pid`/`started_at`/`source_sha256`. Null stays null. Narration `created`/`updated` are not masked; they match on the pinned clocks. No document is recorded after a stub render finished. Cases went from 223 to 275, all matching. The mutation check is `parity_catches_a_job_change` (a g3 job answer without `phase` fails, and only there). It sits in tests/http.rs, not jobs.rs, because the replay lives there.
+- `tests/jobs.rs`, in-process, covers: two jobs run in order and never together, cancel while queued and while running, the fail switch, a finished stub render answering timings, srt and audio with 200, delete cancelling the running job, and the restart repair (`running` opens as `interrupted`). The S07a 501 test is kept as it was in tests/http.rs, without a renderer.
+- `7541537` part B. `serve` takes `EngineLock` before repairs and binding. A second engine exits 2 with "another TakeTwo engine is running for this library (lock ..., pid ...)". `--idle-exit <s>` exits when there has been no job and no request for that long; every request, refused ones too, resets the clock. `--exit-with-stdin` exits when stdin closes. On those, on Ctrl-C and on SIGTERM (`cfg(unix)`), the running job's cancel flag is set, the worker gets 5 s, and the lock is dropped. `serve::publish` calls `paths::publish_address`; a unit test uses `Mode::Live` on a temporary folder, `--live` is still refused, and `--live` was never run. `parse_for(args, &Mode::Live)` refuses `--stub-renderer` (unit test). The reveal child is reaped by a waiting thread (part A). `tests/lifecycle.rs` starts the built program on temporary libraries and free dev ports read from the ready line, with a kill-and-wait guard. It covers: a second engine refused, `--idle-exit 2` exiting by itself and freeing the port and the lock, no exit while a stub job waits at the gate, and an exit within 5 s of stdin closing.
+- `2e4d02a` part C. `g6.sh [job name]`, with the default `build (cuda)` and the same exit codes; `g6.sh check` judges the `check` job.
+
+Commands and their real results:
+- `rust/scripts/contract.sh`: `Ran 33 tests`, `OK`.
+- `cargo test -p taketwo-engine`: exit 0 (33 passed). `cargo test --workspace`: exit 0, 205 passed, 0 failed, 1 ignored.
+- `record.py && record_http.py && git diff --exit-code -- rust/golden`: exit 0, 275 cases. Four back-to-back runs of `record_http.py` gave byte-identical files, and the http parity test passed five runs in a row.
+- `git diff --exit-code 5afb819 -- contract/...`: exit 0. The hygiene line (clean tree, no `/Users/` path, `backend/app` and `mcp` equal to main, main `4448aaa`): exit 0.
+- `rust/scripts/g8.sh`: `G8 PASS`, exit 0 (the data differences are information only).
+- Ports and processes: nothing listens on 8790-8795, 8798 or 8799, and no `rust-taketwo/rust/target/` process is left.
+- `git push origin rust/taketwo` (`e28e7ba..2e4d02a`), then `rust/scripts/g6.sh check`: run 45945950326, `check` completed success, `G6 PASS`, exit 0, in one round. The two CUDA jobs were still running and were not waited for.
+- Read-only `GET 127.0.0.1:8766/api/status` once before the recordings: idle.
+- `df -g .`: 19 GB available.
+
+Not done, or left as is:
+- The Windows `check` job runs `cargo check --workspace` and a release build, not the tests, so lifecycle.rs has only run on this Mac.
+- Python's `progress` callback, its idle hooks and the per-job `_on_error` are not ported; nothing in 1.0 uses them yet. The renderer gets no progress callback; S15/S16 add one if the real pipeline needs it.
+- Select-take: Python passes no cancel check to `pipeline.select_take`, and the Python fake ignores cancel there. The Rust seam passes the real check, so shutdown can stop it. This difference is never recorded.
+
+Questions for the lead:
+1. An address file in isolated mode: lead decision 2 (answer 1) said S07 writes `<TAKETWO_DATA>/engine.json` for S08's discovery. PLAN.md and decision 8 say live mode only. I followed decision 8: `publish` writes nothing in isolated mode. Should S08 get the isolated file, or keep using `TAKETWO_URL` only?
+2. The lock file `engine.lock` now sits inside the isolated library folder (as `Mode::lock_file` says). The contract and the snapshot tests don't mind. Is that also fine for the one-time copy (S04 copies from VoiceForge `data/`, never into it)?
