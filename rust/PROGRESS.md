@@ -807,3 +807,10 @@ Questions for the lead:
 2. Should an engine started by the MCP write its standard error to a log file in the library (for example `<TAKETWO_DATA>/engine.log`) instead of discarding it?
 
 Hindsight was not tried (it was unreachable at lead decision 9 and is outside the worktree rules); no recall, no retain.
+
+Addendum (same session, after a review; code commit `aa9396c`):
+- `Finder` now refuses an address from `<TAKETWO_DATA>/engine.json` on 8765-8785 as it refuses a pinned one: it is never probed or used (new unit test `an_address_file_on_a_live_port_is_never_used`: a file naming 8766, a counting transport, no engine program: 0 requests, the "not running" sentence).
+- `starts_an_engine_when_none_answers`: the leak guard is made before the first tool call and reads the pid from `engine.json` when first needed, at the latest on drop.
+- The `seed` child in `tools.rs` now removes `TAKETWO_URL` and `VOICEFORGE_URL` explicitly. The nested `cargo build -p taketwo-engine` in the test helper is the one child that keeps the real `HOME` (cargo needs its home folder); it builds, it starts nothing.
+- Windows: the workflow's `check` job runs `cargo check --workspace` and release builds, not `cargo test`, so `tools.rs` (which uses `kill` and `ps`) is not compiled there; nothing in the workflow reads a second `--version` line.
+- Commands 1-7 rerun at `aa9396c`: all exit 0; `cargo test -p taketwo-mcp` 22 + 6 passed; `cargo test --workspace` 233 passed, 0 failed, 1 ignored; `contract.sh` `Ran 33 tests`, `OK`. Commands 8-10 run after this addendum's commit: results in the builder's final report to the lead (they need a clean, committed tree).
