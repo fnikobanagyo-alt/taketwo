@@ -915,7 +915,7 @@ Acceptance commands (in order, at `cbdc9b1`, then 10 and 13 again after the last
 10. Clean tree, no home path in HEAD, `backend/app mcp desktop frontend` same as `main`, `main` at `4448aaa`: exit 1 at first only because of the coordinator's uncommitted PROGRESS.md lines; exit 0 after `e9ee6a4`.
 11. `rust/scripts/g8.sh`: `G8 PASS`, exit 0.
 12. No dev port listening, no `rust/target` process: exit 0.
-13. After `git push origin rust/taketwo` (`2e4d02a..e9ee6a4`, one push round): `rust/scripts/g6.sh check` exit 0, `G6 PASS` for `check` (run 45957448669 on `e9ee6a4`, target `cbdc9b1`, check job 07:17:34-07:25:20 UTC); `origin/main` still `4448aaa`. The two CUDA jobs were `in_progress` when recorded, not waited for. **Windows `cargo check -p taketwo` step: `success`** (step conclusion from `gh run view --json jobs`; the step log was not readable while the run was still going).
+13. After `git push origin rust/taketwo` (`2e4d02a..e9ee6a4`, one push round): `rust/scripts/g6.sh check` exit 0, `G6 PASS` for `check` (run 45957448669 on `e9ee6a4`, target `cbdc9b1`, check job 07:17:34-07:25:20 UTC); `origin/main` still `4448aaa`. The two CUDA jobs were `in_progress` when recorded, not waited for. **Windows `cargo check -p taketwo` step: `success`**, and its log (job 140367102384) ends `Finished `dev` profile [unoptimized + debuginfo] target(s) in 1m 06s`, so the shell really compiles on Windows.
 
 Disk: `df -g .` 17 GB free before, 11 GB after (`rust/target` is 21 GB, of which 4.1 GB `debug/incremental`). That is near the 10 GB line: the next step should start with the lead's call on cleaning `target`. No `cargo clean` was run.
 
@@ -927,3 +927,7 @@ Questions for the lead:
 1. The engine now deletes `engine.lock` on a clean exit (above). Keep it, or should check e read "lock released" instead and the engine change be reverted?
 2. Keep the Tauri pins in `Cargo.lock` as they are, or pin them in `crates/taketwo/Cargo.toml` (`=2.10.1` etc.) so a `cargo update` cannot break the build?
 3. Disk is at 11 GB free: may the next builder delete `rust/target/debug/incremental` or run `cargo clean`?
+
+Hand checks after the entry (no code change, temp libraries, dev port 8791, everything stopped and deleted afterwards):
+- Focus: with Discord in front, a hidden shell with `TAKETWO_SHELL_CLOSE_AFTER_MS=4000` was started and `lsappinfo front` sampled every 0.5 s for 8 s, through start, page load and close: 16 of 16 samples Discord. The shell exited 0 and printed the page-loaded line. So the hidden shell does not take focus here.
+- Engine exits first: a hidden shell, health answered, then `kill` (SIGTERM) of the engine pid from `engine.json` (parent was the shell): the shell exited 1 and printed `taketwo: the engine stopped (exit status: 0): ` (the reason is empty because the engine writes nothing to stderr on SIGTERM); port free, no `rust/target` process left.
