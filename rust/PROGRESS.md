@@ -16,7 +16,7 @@ The loop appends one entry per session at the bottom: date, step id, what was bu
 | S07b Engine: worker, stub renderer, lifecycle | done (pushed `2e4d02a`, Windows `check` green) |
 | S08 MCP server | done (G4 evidence, judged again after S16 for mp3) |
 | S09 Tauri shell | done (G3 pass, pushed `e9ee6a4`, Windows `check` green) |
-| S10 Audio DSP with Python parity vectors | next (lead decision 13) |
+| S10 Audio DSP with Python parity vectors | done (not pushed; `taketwo_core::audio`, 12 golden tests) |
 | S11 Delivery, ending guard, check decisions | todo |
 | S12 Qwen voice (real model, Metal) | todo |
 | S13 Whisper with word timings | done, accepted (lead decision 13: heads = all heads of the top two decoder layers; pushed `c123c7b`, Windows `check` green, run 45968817348) |
@@ -1278,3 +1278,45 @@ Report only: `df -g .` before and after; the tolerance table with measured maxim
 Safety for this step (Franz's standing policy, PLAN.md): real risks are touching `data/`, App Support/VoiceForge or saved voices or narrations; anything but a GET to ports 8765-8785; pushing anything; a model run; editing outside the worktree. Set `safety_ok=false` only for one of those. `backend/.venv` is read-only (run its Python with `-B`). No voice, recording or narration is read: every signal is synthetic. Never write that audio is good or matching: report the numbers. Commit on `rust/taketwo` after each green part, message ending `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`. Do not push.
 
 After S10: S11 (delivery, ending guard, check decisions, with the Whisper timing sensitivity vectors), then S12 and S14 when swap allows, S15, S16 (push), S17, S19, S21.
+
+### 2026-11-27, builder (Opus), S10 Audio DSP with Python parity vectors (no push)
+Done on `rust/taketwo`, not pushed. No model, no synthesis (0 takes), no real audio; nothing outside the worktree touched; ports 8765-8785 not contacted. `df -g .`: 13 GB free at the start, 11 GB after `cargo test --workspace` (no target folders deleted).
+
+**A. Recorder** `rust/golden/record_audio.py` -> `rust/golden/audio.json` + `rust/golden/audio/` (185 files: raw little-endian float32 signals and outputs, 8 WAV files; `du -sk` 7948 KB, the recorder asserts at most 7.7 MB of bytes). Guards as `record.py` (fresh temporary data folder asserted before any app import, `HF_HUB_OFFLINE=1`, no model module imported, `audio.subprocess` replaced so ffmpeg can never run). 26 case lists, 670 decision cases carry `margin_db`. **Knife edges:** the recorder repeats until no case has a margin under 0.01 dB; a signal that produced one is redesigned with a seeded -85 dBFS dither (`redesigned` in the JSON: only `lead_hiss_pause`, once). **Smallest margin 0.0166 dB** (`speech_start` and `end_analysis`). Deterministic: two runs give byte-identical files (libsndfile writes a time stamp into float WAVs, so the two float32 load files are written by hand, one with a LIST chunk as ffmpeg's are). `rust/golden/.gitignore` re-includes `audio/*.wav` (the root ignores `*.wav` for real audio).
+Facts found while recording: libsndfile 1.2.2 converts float to PCM16 as `lrintf(x * 2^31) >> 16` (clip at +1.0 gives 32767; -1e-10 gives 0, -3e-10 gives -1), not `round(x * 32767)`; the save ramp pins this. `end_analysis` with no regions and `edge_silence`'s (0, 0) branch are unreachable with finite audio (the loudest 10 ms frame always clears `sp - 20`); not recorded.
+
+**B. Port** `rust/crates/taketwo-core/src/audio/` (public `taketwo_core::audio`): `mod.rs` (all analysis and shaping functions, `SilenceReport`, `EndAnalysis`, `PyError` for what Python raises), `np.rs` (numpy pairwise sum, linear percentile with numpy 2's weak-q `_lerp`, `linspace`, `hanning`, Python slice clamping), `signal.rs`, `loudness.rs`, `wav.rs`, `ffmpeg.rs`. New dependencies (taketwo-core only): `hound` 3.5.1 and `realfft` 3.5.0 (both already locked), `sci-rs` 0.4.1 (new: adds approx, gaussfilt, itertools 0.13, kalmanfilt, lstsq, nalgebra 0.33.3, ndarray 0.16.1, simba; no locked version changed). Tests: `tests/audio_golden.rs` (12 tests, each asserts its case count) and 2 unit tests.
+
+Which code each function uses, and why:
+| Function | Implementation | Why |
+|---|---|---|
+| `resample` (`resample_poly`) | hand port (Kaiser 5.0 `firwin` with an I0 series, polyphase sum per output, scipy's pre-pad and trim; filter cast to float32 as scipy does, sums in f64) | `rubato` 0.16.2 `FftFixedIn` measured once against the vectors: 1.3e-3 to 1.8e-1 max difference and no exact-length mode (needs 1e-4 and exact length) |
+| `highpass`, band-pass in `lead_burst` (`butter`, `sosfiltfilt`) | `sci-rs` 0.4.1 `butter_dyn` + `sosfiltfilt_dyn`, plus scipy's padlen ValueError (sci-rs panics on short input) | meets the tolerance (measured below). A hand port written first also met it (SOS 1.3e-15, filter 1.5e-11) and was replaced, per "sci-rs if it meets this" |
+| `loudness` | hand port of pyloudnorm 0.2.0 (RBJ biquads through `lfilter` and back to float32, pyloudnorm's block count with `np.round` ties-to-even, short last block over the full length, both gates) | `ebur128` 0.1.11 measured once: 0.126 LU off at 16 kHz, 0.084 at 24 kHz, 0.041 at 48 kHz (needs 0.05 on every vector); the gap growing as the rate falls suggests a different K-weighting design per rate (hypothesis, not checked) |
+| `load` | `hound` read, channels averaged as numpy (f32 sum / count in f64) | |
+| `save` | 44-byte header + libsndfile's conversion by hand | byte equality needs libsndfile's rounding |
+| `noise_bursts` | `realfft` (f64), numpy `hanning` | |
+| `decode_to_wav`, `export_mp3` | `ffmpeg` program (`TAKETWO_FFMPEG` or PATH), Python's argument lists; `max_seconds` printed with `{:?}` ("300.0" as Python's `str`) | |
+| everything else | direct ports in float32 where numpy is float32 | |
+
+Measured maxima (from `cargo test -p taketwo-core --test audio_golden -- --nocapture`):
+| Check | Tolerance | Measured max |
+|---|---|---|
+| decisions: regions, gap lists, trim slice bounds, cut in samples, natural/junk, noise_bursts run, lead_burst None or not, `_terminal_end`, lengths | exact | exact (all pass) |
+| `frame_db`, thresholds, `ending_level`, `estimate_snr`, `sound_regions` speech level, `end_analysis` last_level (dB) | 1e-3 dB | 0 (bit-equal) |
+| returned seconds (`silence_report`, `speech_start`, `edge_silence`, `end_analysis`, `lead_burst`) | 1e-9 | 0 |
+| `fade`, `shorten_gaps`, `concat_with_pauses` | 1e-6 | 0 |
+| `soft_limit` | 1e-6 | 6.0e-8 |
+| `trim_edges` | 1e-6 | exact slice bounds (stricter) |
+| `save` PCM16 bytes | equal | equal (3 cases incl. the half-LSB ramp) |
+| `load` before a rate change / with one | 1e-7 / 1e-4 | 0 / 8.9e-8 |
+| `resample` 24k->16k, 44.1k->24k, 48k->24k, 22.05k->24k, 16k->24k, identity, plus tiny inputs | same length, 1e-4 | same length; 1.2e-7 (identity 0) |
+| `butter` SOS (highpass 60/50 Hz and band at 5 rates) | 1e-9 | 1.25e-15 |
+| `highpass` / band `sosfiltfilt` output | 1e-4 | 3.0e-8 |
+| `loudness` (16/24/48 kHz; quiet, loud, gapped; -inf cases) | 0.05 LU | 0 (bit-equal, 9 finite vectors) |
+| `normalize_lufs` fed Python's loudness | 1e-3 | 6.0e-8 |
+| `normalize_lufs` end to end | reported | 6.0e-8 |
+| `clipping_ratio` | exact | exact (includes samples exactly on float32 0.985) |
+
+ffmpeg test: argument lists against literal lists; a WAV -> MP3 -> 16 kHz WAV round trip with `max_seconds` 1.5 (mono, float, 24000 samples); a missing program is an error value (unit test). It fails with a message when ffmpeg is missing, no skip.
+Open: Python's `str()` and Rust's `{:?}` differ for exponent forms (1e-05 against 1e-5), irrelevant for real `max_seconds`. `lead_burst` returns None where Python would raise for inputs under 28 samples at absurd rates (code comment).
