@@ -5977,6 +5977,7 @@ dependencies = [
  "libc",
  "ort",
  "qwen_tts",
+ "realfft",
  "serde",
  "serde_json",
  "taketwo-core",

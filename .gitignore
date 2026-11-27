@@ -3,6 +3,8 @@
 /backups/
 /eval/
 *.wav
+# S14 golden clips are synthetic (macOS say), not from the library
+!/rust/golden/encoder/*.wav
 *.mp3
 *.m4a
 *.flac

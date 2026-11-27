@@ -18,6 +18,12 @@ _tt_qwen="$HOME/Library/Application Support/TakeTwo/models/qwen3-tts-1.7b-base"
 if [ -d "$_tt_qwen" ] && [ ! -e "$TAKETWO_MODELS/qwen3-tts-1.7b-base" ]; then
     ln -s "$_tt_qwen" "$TAKETWO_MODELS/qwen3-tts-1.7b-base"
 fi
+# The speaker encoder (S14), read in place from the Hugging Face cache; `find`, not a glob (zsh errors on no match).
+_tt_ve="$(find "$HOME/.cache/huggingface/hub/models--ResembleAI--chatterbox/snapshots" -name ve.safetensors 2>/dev/null | head -1)"
+if [ -n "$_tt_ve" ] && [ ! -e "$TAKETWO_MODELS/voice-encoder/ve.safetensors" ]; then
+    mkdir -p "$TAKETWO_MODELS/voice-encoder"
+    ln -s "$_tt_ve" "$TAKETWO_MODELS/voice-encoder/ve.safetensors"
+fi
 
 # Keep the caller's TAKETWO_DATA when it names an existing folder; otherwise make a new temporary one.
 if [ -z "${TAKETWO_DATA:-}" ] || [ ! -d "$TAKETWO_DATA" ]; then
@@ -26,5 +32,5 @@ if [ -z "${TAKETWO_DATA:-}" ] || [ ! -d "$TAKETWO_DATA" ]; then
 fi
 export TAKETWO_DATA
 
-unset _tt_rust _tt_qwen _tt_tmp
+unset _tt_rust _tt_qwen _tt_tmp _tt_ve
 echo "TakeTwo dev env: isolated mode, TAKETWO_DATA=$TAKETWO_DATA, TAKETWO_MODELS=$TAKETWO_MODELS"

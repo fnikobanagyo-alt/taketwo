@@ -17,6 +17,7 @@ metal = ["qwen_tts/metal"]
 [dependencies]
 qwen_tts = { path = "../../vendor/qwen_tts" }
 candle-core = "0.9"
+realfft = "3.5"
 # download-binaries: ort-sys fetches pyke's prebuilt ONNX Runtime at build time and links it
 # statically on macOS arm64 and Windows x64, so no DLL ships beside the exe for the CPU provider.
 serde = { version = "1", features = ["derive"] }
