@@ -168,6 +168,11 @@ impl QwenVoice {
         Ok(())
     }
 
+    /// The loaded crate model, for measurements.
+    pub fn model(&self) -> Option<&Model> {
+        self.model.as_ref()
+    }
+
     /// Frees the model (the idle timer that calls this is S16's).
     pub fn unload(&mut self) {
         self.model = None;
