@@ -698,7 +698,7 @@ Commands and their real results:
 - `rust/scripts/contract.sh`: `Ran 33 tests`, `OK`.
 - `cargo test -p taketwo-engine`: exit 0 (33 passed). `cargo test --workspace`: exit 0, 205 passed, 0 failed, 1 ignored.
 - `record.py && record_http.py && git diff --exit-code -- rust/golden`: exit 0, 275 cases. Four back-to-back runs of `record_http.py` gave byte-identical files, and the http parity test passed five runs in a row.
-- `git diff --exit-code 5afb819 -- contract/...`: exit 0. The hygiene line (clean tree, no `/Users/` path, `backend/app` and `mcp` equal to main, main `4448aaa`): exit 0.
+- `git diff --exit-code 5afb819 -- contract/...`: exit 0. The hygiene line (clean tree, no absolute home path, `backend/app` and `mcp` equal to main, main `4448aaa`): exit 0.
 - `rust/scripts/g8.sh`: `G8 PASS`, exit 0 (the data differences are information only).
 - Ports and processes: nothing listens on 8790-8795, 8798 or 8799, and no `rust-taketwo/rust/target/` process is left.
 - `git push origin rust/taketwo` (`e28e7ba..2e4d02a`), then `rust/scripts/g6.sh check`: run 45945950326, `check` completed success, `G6 PASS`, exit 0, in one round. The two CUDA jobs were still running and were not waited for.
