@@ -9398,7 +9398,7 @@
   {
    "input": {
     "file": "in_save_ramp.f32",
-    "len": 681
+    "len": 846
    },
    "sr": 24000,
    "expected": "save_ramp.wav"

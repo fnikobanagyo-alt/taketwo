@@ -355,9 +355,13 @@ def record_dtypes(data, audio, a, sr):
         "noise_bursts": type(audio.noise_bursts(a, sr)).__name__,
         "estimate_snr": type(audio.estimate_snr(a, sr)).__name__,
         "end_analysis_last_level": type(audio.end_analysis(a, sr, 1.5)["last_level"]).__name__,
-        "lead_burst_full_level": "float32",
-        "lead_burst_high_level": "float64",
     }
+    import scipy.signal as ss
+    n, m = int(0.01 * sr), min(len(a), int(1.2 * sr)) // int(0.01 * sr)
+    level = lambda x: 20 * np.log10(np.sqrt(np.mean(x[: m * n].reshape(m, n) ** 2, axis=1)) + 1e-9)  # noqa: E731  as lead_burst
+    band = ss.sosfiltfilt(ss.butter(4, [4000, min(10000, sr / 2 * 0.95)], btype="band", fs=sr, output="sos"), a)
+    data["dtypes"]["lead_burst_full_level"] = str(level(a).dtype)
+    data["dtypes"]["lead_burst_high_level"] = str(level(band).dtype)
 
 
 def record_frame_db(data, audio, st, sig):
@@ -731,7 +735,8 @@ def lead_margin(audio, ss, a, sr):
 def record_wav(data, audio, sf, st, sig, tmp):
     # save: a ramp with exactly +1 and -1, values beyond them, and half-LSB values
     k = np.arange(-40, 40)
-    vals = np.concatenate([[1.0, -1.0, 1.5, -1.5, 2.0, -7.0, 0.999999, -0.999999, 0.0, -0.0],
+    vals = np.concatenate([[1.0, -1.0, 1.5, -1.5, 2.0, -7.0, 0.999999, -0.999999, 0.0, -0.0, -1e-10, -3e-10, 1e-10, 3e-10, -2.2e-10],
+                           (k + 1e-6) / 32768, (k - 1e-6) / 32768,
                            (k + 0.5) / 32768, k / 32768, (32767 - np.arange(5) + 0.5) / 32768,
                            -(32767 - np.arange(5) + 0.5) / 32768, np.linspace(-1.2, 1.2, 501)]).astype(np.float32)
     ramp = st.put("in_save_ramp", vals)

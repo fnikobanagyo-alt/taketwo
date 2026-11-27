@@ -8,7 +8,9 @@ license.workspace = true
 [dependencies]
 dirs = "6"
 fancy-regex = "0.17"
+hound = "3.5"
 num-bigint = "0.4"
+realfft = "3.5"
 regex = "1"
 rusqlite = { version = "0.43", features = ["bundled"] }
 serde = "1"

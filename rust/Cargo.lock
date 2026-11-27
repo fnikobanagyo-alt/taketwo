@@ -5818,7 +5818,9 @@ version = "0.1.0"
 dependencies = [
  "dirs",
  "fancy-regex",
+ "hound",
  "num-bigint",
+ "realfft",
  "regex",
  "rusqlite",
  "serde",
