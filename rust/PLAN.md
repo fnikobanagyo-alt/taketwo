@@ -255,9 +255,9 @@ Needs: S17. Gate: G5 (the smoke reports whether studio ran); it completes decisi
 ### S19 Real synthesis smoke
 Needs: S17 (S18 optional). Gate: G5.
 - Also in this step (lead decision 12): `rust/ab/ab.py render` renders with the Rust engine first, so a 501 or a failed voice copy shows before any Python take is spent; `selftest` still passes.
-- `rust/scripts/synth_smoke.sh`: check 8766 is idle (else exit 75, "busy, try later"); pick one voice and copy one reference clip through `GET http://127.0.0.1:8766/api/profiles` and `GET /api/profiles/<id>/audio/<file>` into a temp folder; start `taketwo-engine` (release, `metal`) in isolated mode on a dev port with `TAKETWO_MAX_TAKES=20` under `/usr/bin/time -l`; create the voice from that clip; create one narration of 2-3 fixed sentences; wait; fetch the WAV, SRT and timings into `rust/out/smoke/`; stop the engine; delete the temp library.
+- `rust/scripts/synth_smoke.sh`: check 8766 is idle (else exit 75, "busy, try later"); pick one voice and copy one reference clip through `GET http://127.0.0.1:8766/api/profiles` and `GET /api/profiles/<id>/audio/<file>` into a temp folder; start `taketwo-engine` (release, `metal`) in isolated mode on a dev port with `TAKETWO_MAX_TAKES=10` (Franz, 20:31 note; lead decision 21) under `/usr/bin/time -l`; create the voice from that clip; create one narration of 2-3 fixed sentences; wait; fetch the WAV, SRT and timings into `rust/out/smoke/`; stop the engine; delete the temp library. Temp library and clip copy live under `rust/target/smoke-tmp` (never `$TMPDIR`). Lead decision 21 in PROGRESS.md has the binding details (preview takes counted apart, at most two attempts, 20 takes in all, no voice name or id in anything committed).
 - It writes `rust/out/smoke/report.json`: takes used, seconds per phase, audio seconds, peak memory, the checks' result for each part (issues, outcome), which options ran (studio on or off). It prints "no quality claim; Franz listens".
-- Done when: the script exits 0, `report.json` shows `takes <= 20`, the WAV and SRT exist, and the numbers are in PROGRESS.md.
+- Done when: the script exits 0, `report.json` shows `takes_total <= 20` and at most 10 per attempt, the WAV and SRT exist, and the numbers are in PROGRESS.md.
 
 ### S20 Blind A/B harness (not rendered)
 Needs: S07a (for the engine's API); can run any time after it. Gate: G7.
@@ -281,11 +281,11 @@ Each is one command whose exit code is the verdict. G5 renders audio and G6 wait
 
 | Gate | Command | Passes when |
 |---|---|---|
-| G1 | `cd "$WT"/rust && cargo test --workspace` | exit 0 from a clean checkout; the golden and stub tests are in the run (not ignored) |
+| G1 | `cd "$WT"/rust && source scripts/env.sh >/dev/null && cargo test --workspace` | exit 0 (lead decision 21: `env.sh` puts the worktree's cmake on PATH, which a first build of whisper.cpp needs); the golden and stub tests are in the run (not ignored) |
 | G2 | `cd "$WT" && rust/scripts/contract.sh` | exit 0; prints `Ran 33 tests` and `OK`, no skips |
 | G3 | `cd "$WT"/rust && cargo build -p taketwo && scripts/smoke_shell.sh` | exit 0; health names TakeTwo; UI served; no process or port left |
 | G4 | `cd "$WT"/rust && cargo build -p taketwo-mcp && cargo test -p taketwo-mcp` | exit 0; all 12 tools called |
-| G5 | `cd "$WT" && rust/scripts/synth_smoke.sh && cat rust/out/smoke/report.json` | exit 0; takes <= 20; WAV and SRT exist; timings and peak memory recorded. Exit 75 means Franz's app was busy: try later |
+| G5 | `cd "$WT" && rust/scripts/synth_smoke.sh && cat rust/out/smoke/report.json` | exit 0; takes <= 10 per attempt and <= 20 in all; WAV and SRT exist; timings and peak memory recorded. Exit 75 means Franz's app was busy: try later |
 | G6 | `cd "$WT" && rust/scripts/g6.sh` | exit 0: the plain `cuda` job is `success` on the newest non-`.md` commit of `rust/taketwo`; flash-attn printed separately. Exit 75: still running |
 | G7 | `cd "$WT" && python3 rust/ab/ab.py plan && python3 rust/ab/ab.py selftest && ! python3 rust/ab/ab.py render` | exit 0: 10 scripts and a take count printed; selftest OK; render refuses |
 | G8 | `cd "$WT" && rust/scripts/g8.sh` | exit 0: this work is on no branch or tag but `rust/taketwo`; no process of this work has a file open in Franz's folders; 8766 health OK. The printed data differences are Franz's own app use: information, not a verdict |

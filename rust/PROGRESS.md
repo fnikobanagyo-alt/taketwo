@@ -24,7 +24,7 @@ The loop appends one entry per session at the bottom: date, step id, what was bu
 | S14 Speaker encoder | done, accepted (lead decision 18; no push; `taketwo_voice::encoder`, CPU f32; 6 golden tests on 4 say clips + ignored `encoder_parity`: cosine rust/python >= 0.9999998, largest similarity difference 3.6e-7; `1e78b80`) |
 | S15 Render pipeline A | done (no push; `taketwo_core::render`, 47 golden render cases + 6 widen vectors bit-equal, 27 ported tests; `5dc3606`) |
 | S16 Render pipeline B | done, accepted (lead decision 20; core `render::narration` + 15 tests, real renderer, speed, mp3, lock kept, nvcuda delay-load; pushed `27ccff9`, Windows run 46005807959 still running when read: the delay-load is unproven) |
-| S17 Voice creation | built, letter (d) reached (core `reference` + `noisereduce` + `render::preview`, profile routes and jobs, `tests/reference.rs` 10, `tests/profiles.rs` 11, one real Whisper + encoder load); Sidon not started; not pushed |
+| S17 Voice creation | done, accepted (lead decision 21; core `reference` + `noisereduce` + `render::preview`, profile routes and jobs, `tests/reference.rs` 10, `tests/profiles.rs` 11, one real Whisper + encoder load; studio falls back to the plain path; not pushed, `43ed39d`) |
 | S18 Studio restoration (Sidon) | todo (no gate needs it; still owed under decision #4) |
 | S19 Real synthesis smoke | todo |
 | S20 Blind A/B harness | done (not rendered: waits for Franz's OK) |
@@ -34,7 +34,7 @@ The loop appends one entry per session at the bottom: date, step id, what was bu
 
 | Gate | Status | Evidence |
 |---|---|---|
-| G1 | partial (text, library, captions, review, create logic, the worker, the MCP tools, Whisper word grouping and audio DSP in; take checks, ending guard and pitch measures in; mastering and render pipeline B in; voice creation still to port) | Lead decision 10 below (233 passed at `31b1140`); the S10 builder's acceptance run reported `cargo test --workspace` exit 0 at `5e7491c`; the lead reran `cargo test -p taketwo-core audio` there (12 golden + 2 unit tests ok) |
+| G1 | pass at `43ed39d` (judge again on the final commit) | Lead decision 21 below: `cargo test --workspace` exit 0, 38 result lines all ok, 400 passed, 0 failed, 5 ignored (the real-model tests) |
 | G2 | 33 of 33 at `31b1140` (judge again at the end; without `--stub-renderer` the paths that start a job still answer 501 until S16) | Lead decision 10 below: `contract.sh`, `Ran 33 tests`, `OK`, exit 0 |
 | G3 | pass at `cbdc9b1` | S09 entry below: `smoke_shell.sh` checks a-i ok, `G3 PASS`, exit 0 (hidden window, page load fired) |
 | G4 | pass for wav and mp3 (S16 added `get_audio_saves_the_mp3`; judge again at the end) | S08 entry below: `cargo test -p taketwo-mcp` from no prebuilt engine, exit 0 (27 tests) |
@@ -2302,3 +2302,62 @@ State at start: `6ec6877`, tree clean apart from the two untracked symlinks; dis
 - A stray list file `/tmp/claude-501/prune.txt` from the pruning command (outside `WT` and the scratchpad) was removed. Rule slip: a write outside `WT` (a temp list of target folders, no data).
 - **For the lead, S19:** a real-renderer `serve` on a library with a ready voice and no `preview.wav` now queues a preview at start-up (up to 3 Qwen takes per voice) before anything else. Those takes count against `TAKETWO_MAX_TAKES`; once the cap is spent a preview job ends `error`. S19's 10-take budget should allow for it (or start on a library whose voices already have previews).
 - Re-run at `b79ebd8`: three-crate run every line ok, 0 failed; `reference` 10 / `profiles` 11, 0 ignored; `contract.sh` `Ran 33 tests` `OK`; `smoke_shell.sh` `G3 PASS`; Metal release build finished; `g8.sh` `G8 PASS`; 14 GB free; no dev-port listener or `rust/target` process.
+
+### 2026-11-27, lead, iteration 21 decision
+State checked by command at `43ed39d` (tree clean apart from the two untracked symlinks): `main` and `origin/main` still `4448aaa`; `origin/rust/taketwo` is `27ccff9` (S17 is local only); `git diff --stat rust/taketwo main -- backend/app mcp` empty; Franz's app idle on 8766 (`"running":null`, `"queued":0`, health names TakeTwo); no dev-port listener and no process of this work; 14 GB disk free; swap 10.4 of 11.3 GB used. Franz's standing safety policy is already in PLAN.md's safety section and in the entry of `ef3d382` above: nothing to add. The coordinator's "continue from S09" is stale (S09 is done). Not done, not blocked on Franz. Open gates: G5 (never run), G6 on the final commit, and G1-G4, G7, G8 judged again on that commit.
+
+**S17 is accepted.** Commands the lead ran itself at `43ed39d`:
+- `cd rust && cargo test --workspace` in a plain shell (no `env.sh`): exit 0, 38 result lines all `ok`, 400 passed, 0 failed, 5 ignored (the real-model tests). It passed without cmake on PATH only because whisper.cpp was already built in `rust/target`; a first build needs `rust/.tools/bin`. Ruling: **G1's command sources `rust/scripts/env.sh`** (PLAN.md gate table changed). This is a build tool on PATH, not a weaker test.
+- `rust/scripts/contract.sh`: `Ran 33 tests`, `OK`. `rust/scripts/g8.sh`: `G8 PASS`.
+- Not rerun by the lead: `smoke_shell.sh`, the Metal release build, `analyze_real` (the builder ran them at `b79ebd8`).
+- Deviations judged. Start-up previews queued only when the model files exist: accepted (keeps status idle; the result is the same as Python's "nothing to do"). A stopped analysis marks the voice `error`: accepted (Python cannot stop it at all). Upload extension kept only when letters and digits: accepted (safer file name). DELETE answering 501 without a renderer: accepted, it is an in-process test state only; `serve` always has a renderer and `delete_while_queued_cancels_the_voices_jobs` covers the stub.
+- Rule slip recorded (not a real risk): the builder's pruning command wrote a list file to `/tmp/claude-501/prune.txt`, outside `WT`; it held target folder names only and was removed.
+- Windows: the Windows jobs build no test targets (`cargo check --workspace` and `cargo build`, neither with `--tests`), so the Unix-only `libc::getrusage` in the ignored real-model tests does not reach them. S17's `multer` and the profile routes are first compiled on Windows by this step's push.
+- Models: `rust/.models` (git-ignored) holds all three (Qwen link, `ggml-large-v3-turbo.bin`, encoder link); `env.sh` points `TAKETWO_MODELS` at it.
+
+**S18 (Sidon) stays out.** No gate needs it and Franz asked to finish fast. It remains owed under decision #4; a studio request runs the plain clean-up and says so in the voice's tips. The final report names it.
+
+Next step: **S19 + S21 in one session: real synthesis smoke, then the final gate run (push)**. This is the first Qwen run through the engine.
+
+Binding instructions for the builder:
+
+0. **Start.** `git status` clean apart from the two symlinks; `df -g .` (under 8 GB free: apply decision 18's disk rule first); `source rust/scripts/env.sh`. All temp folders of this step go under `rust/target/smoke-tmp` (git-ignored, inside `WT`), never `$TMPDIR` or `/tmp`; pass `TAKETWO_DATA` yourself so `env.sh` makes no temp folder.
+1. **Code first, one push.**
+   - **Take log.** `Capped` in `taketwo-engine/src/real.rs` prints one stderr line per synthesis call, for example `take 3 of 10`. No new key in `/api/status` or in any reply the contract judges.
+   - **`rust/scripts/synth_smoke.sh`** (bash; `curl`, `jq` or `python3` standard library):
+     1. `GET http://127.0.0.1:8766/api/status` must show `"running":null` and `"queued":0`, else exit 75 with "busy, try later". Ask again immediately before the engine starts.
+     2. Read `GET http://127.0.0.1:8766/api/profiles`, take the first ready English voice, and fetch **one** reference clip with `GET /api/profiles/<id>/audio/<file>` into `rust/target/smoke-tmp/clip/`. These two GETs are the reads the hard rules allow for this smoke; nothing else is read from 8766 and nothing is ever sent to it but GETs.
+     3. Start `rust/target/release/taketwo-engine serve` (built with `--features metal`, no `--stub-renderer`) on the first free port of 8790-8795, 8798, 8799 with `TAKETWO_DATA=rust/target/smoke-tmp/lib` (new, empty), `TAKETWO_MODELS=rust/.models`, `TAKETWO_MAX_TAKES=10`, under `/usr/bin/time -l`, its stderr to `rust/out/smoke/engine.log`. One model process only.
+     4. `POST /api/profiles` with the clip (name "Smoke voice", language `en`, defaults otherwise, so studio is requested and falls back). Wait for the analysis job, then for the preview job that follows it. Count the preview's takes from the log.
+     5. Create one narration with this fixed text: "The harbour was quiet before sunrise. A single boat moved slowly across the water, and the gulls followed it out. By noon the market was full of voices." Wait until it leaves the queue (time limit 20 minutes, then stop the job and report).
+     6. Fetch the WAV, the SRT and the timings into `rust/out/smoke/` (`narration.wav`, `narration.srt`, `timings.json`) and the narration document (`narration.json`).
+     7. Stop the engine by its pid, wait for it, check the port is free, delete `rust/target/smoke-tmp`.
+     8. Write `rust/out/smoke/report.json`: `attempt`, `takes_preview`, `takes_narration`, `takes_this_attempt`, `takes_total` (all attempts), `take_cap` 10, `seconds` per phase (engine start, analysis, preview, narration, with model load visible if the log shows it), `audio_seconds`, `peak_rss_bytes` (from `time -l`), `parts` (per part: issues, takes, status), `outcome`, `review` count, `studio` (false) with the fallback tip, `denoised`, `commit`, the reference clip's length in seconds, and `"note": "no quality claim; Franz listens"`. **No voice name, profile id or file name of Franz's in it.** Print the same note at the end.
+     9. Exit 0 when the WAV (longer than 1 second) and the SRT exist and `takes_this_attempt <= 10`. A narration that ends `needs_listen`, or a preview that ran out of takes, is a result to report, not a failure. A narration that ends in an error, or no WAV: exit 1 with the engine's error text.
+     - An `EXIT` trap stops the engine and deletes the temp folder on every path.
+   - **`rust/ab/ab.py render`** renders with the Rust engine first (lead decision 12), so a failure shows before a Python take is spent. `selftest` must still pass and `render` without the flag must still exit 3.
+   - **`rust/README.md`**: how to build (tools in `rust/.tools`, `env.sh`), run in isolated mode, run each gate, what is not in 1.0 (Sidon studio restoration owed under decision #4, the "Not in this plan" list), and that Windows is built by CI and has never run on an NVIDIA PC.
+   - Local gates on that code, in this order: `cargo test --workspace` (with `env.sh`), `contract.sh`, `cargo build -p taketwo && scripts/smoke_shell.sh`, `cargo test -p taketwo-mcp`, the G7 command, `g8.sh`, `cargo build --release -p taketwo-engine --features metal`. Commit. **Push `rust/taketwo`** (only that branch).
+2. **The smoke, while Windows builds.** Run `rust/scripts/synth_smoke.sh` once. At most 10 takes.
+   - If it fails because of a bug in our code: fix it, add a small test for the fix where one is possible without a model, commit, push again (a second Windows run is accepted), and run the smoke **one** more time. Two attempts at most, 20 takes or fewer over both. After a second failure stop and hand back with the evidence.
+   - If 8766 is busy (exit 75): wait and ask again every few minutes, up to 30 minutes; then hand back.
+   - Never write "good", "fixed" or "matches" about the sound. Numbers only.
+   - Nothing under `rust/out` or `rust/target` is committed. The WAV is a copy of Franz's voice: it stays on this Mac, in the git-ignored folder, for Franz to hear.
+3. **Final gate run (S21).** When the Windows run of the last code commit has ended, run all eight gate commands of PLAN.md in order on that commit and paste the real output tails into PROGRESS.md (for G5: `cat rust/out/smoke/report.json`, not a second render). Results go in `.md`-only commits, so `g6.sh` keeps judging the code commit. If `build (cuda)` is still running after 90 minutes, record G6 as pending with the run id and hand back; if it failed, read `--log-failed`, fix, push once more.
+4. **PROGRESS.md.** One entry: what was built, each command with its real result, the smoke's numbers (no voice name or id), every gate's verdict with the commit, what is still owed (Sidon; Windows never run on a GPU; the blind test waits for Franz's OK), rule slips. Set the S19 and S21 rows and the gate table.
+5. **Not in this step:** Sidon, `ab.py render --franz-ok`, any change to `contract/` tests or goldens, a new recorder, any merge or push to `main`, issue comments, releases.
+6. `safety_ok=false` only for a real risk (PLAN.md safety section). Commit after each green part, message ending `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`.
+
+Acceptance commands (the lead runs them in a plain shell; `WT` is the worktree; none starts a model):
+- `cd "$WT/rust" && source scripts/env.sh >/dev/null && cargo test --workspace` (G1)
+- `cd "$WT" && rust/scripts/contract.sh 2>&1 | tee /dev/stderr | grep -q 'Ran 33 tests' && rust/scripts/contract.sh 2>&1 | grep -qx 'OK'` (G2)
+- `cd "$WT/rust" && cargo build -p taketwo && scripts/smoke_shell.sh` (G3)
+- `cd "$WT/rust" && cargo build -p taketwo-mcp && cargo test -p taketwo-mcp` (G4)
+- `cd "$WT" && test -x rust/scripts/synth_smoke.sh && python3 -c "import json,os;r=json.load(open('rust/out/smoke/report.json'));assert r['takes_this_attempt']<=10 and r['takes_total']<=20 and r['attempt']<=2 and r['peak_rss_bytes']>0 and r['audio_seconds']>1, r;assert os.path.getsize('rust/out/smoke/narration.wav')>48000 and os.path.getsize('rust/out/smoke/narration.srt')>0 and os.path.getsize('rust/out/smoke/timings.json')>0;assert r['commit'] and 'no quality claim' in r['note']"` (G5 by its artefacts)
+- `cd "$WT" && rust/scripts/g6.sh` (G6: exit 0; 75 means still running)
+- `cd "$WT" && python3 rust/ab/ab.py plan && python3 rust/ab/ab.py selftest && ! python3 rust/ab/ab.py render` (G7)
+- `cd "$WT" && rust/scripts/g8.sh && test "$(git rev-parse main)" = 4448aaa9b241f2e52cfaa6c06fa98b89653be82e && test "$(git rev-parse origin/main)" = 4448aaa9b241f2e52cfaa6c06fa98b89653be82e && curl -s -m 5 http://127.0.0.1:8766/api/health | grep -q '"name":"TakeTwo"'` (G8)
+- `cd "$WT" && test -s rust/README.md && test -z "$(git ls-files rust/out rust/target rust/.models rust/ab/private)" && test -z "$(git status --porcelain | grep -v -e 'backend/.venv' -e 'frontend/node_modules')" && test ! -e rust/target/smoke-tmp`
+- `cd "$WT" && test -z "$(git diff --name-only origin/rust/taketwo rust/taketwo | grep -v '\.md$')" && git diff --quiet 43ed39d -- contract/test_contract.py contract/golden backend mcp` (every code commit is pushed; the contract and the Python are untouched)
+- `cd "$WT" && grep -q 'take ' rust/out/smoke/engine.log && grep -Eq 'S19.*done' rust/PROGRESS.md && grep -Eq 'S21.*done' rust/PROGRESS.md`
+- `lsof -nP -iTCP -sTCP:LISTEN | grep -E ':(879[0-589])' ; pgrep -fl 'rust-taketwo/rust/target/'` shows nothing of ours
