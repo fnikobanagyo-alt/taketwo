@@ -14,7 +14,7 @@ realfft = "3.5"
 regex = "1"
 sci-rs = "0.4"
 rusqlite = { version = "0.43", features = ["bundled"] }
-serde = "1"
+serde = { version = "1", features = ["derive"] }
 serde_json = { version = "1", features = ["preserve_order", "float_roundtrip"] }
 unicode-normalization = "0.1"
 

@@ -3,38 +3,13 @@
 
 pub mod words;
 
-use serde::{Deserialize, Serialize};
 use std::ffi::{CStr, CString, c_char, c_int};
 use std::path::Path;
 use std::sync::atomic::AtomicBool;
 
 use words::{SegmentTimes, Token};
 
-/// `ml.transcribe`'s return value, key for key and in the same order.
-#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
-pub struct Transcript {
-    pub text: String,
-    pub segments: Vec<Segment>,
-    pub language: String,
-}
-
-#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
-pub struct Segment {
-    pub start: f64,
-    pub end: f64,
-    pub text: String,
-    pub avg_logprob: f64,
-    pub no_speech_prob: f64,
-    pub words: Vec<Word>,
-}
-
-#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
-pub struct Word {
-    pub word: String,
-    pub start: f64,
-    pub end: f64,
-    pub p: f64,
-}
+pub use taketwo_core::transcript::{Segment, Transcript, Word};
 
 pub trait Transcriber {
     /// `audio` is 16 kHz mono f32 (resampling is the caller's job). `language` None = detect.
