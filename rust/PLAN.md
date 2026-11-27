@@ -118,9 +118,9 @@ Needs: S03, S04. Gate: G1.
 ### S06 Engine: read side, guards, UI, contract runner
 Needs: S05. Gate: G2 (part).
 - axum on 127.0.0.1. FastAPI-compatible errors (`{"detail": ...}`). Host guard (403), Origin guard on writes (403), id and path checks (`..`, encoded `/`).
-- Routes: health, pipeline-version, status, profiles list/get/audio/preview, generations list/search/get/timings/subtitles/audio (WAV, download name; MP3 through ffmpeg), part audio, take audio, jobs, settings get/put, the start-up stubs and the 501s listed under Layout, static UI from `--ui`.
+- Routes: health, pipeline-version, status, profiles list/get/analysis/audio/preview, generations list/search/get/timings/subtitles/audio (WAV, download name; `final.mp3` only if the file is there, making it is S16), part audio, take audio, jobs, settings get/put, a no-op cancel (`{"ok": true}`, there is no worker yet), the start-up stubs and the 501s listed under Layout, static UI from `--ui`. Every other write route checks its id and answers 501 until S07.
 - `rust/scripts/contract.sh`: build, make a temp library, seed, start the engine on a free dev port, run `TAKETWO_URL=http://127.0.0.1:<port> python3 -m unittest discover -s contract`, stop the engine, delete the library. It fails unless the run says `Ran 33 tests` and `OK` with no skips.
-- Done when: the Health, Profiles, Generations (read), Search, TimingsAndSubtitles, Audio and SafetyGuards classes pass through `contract.sh` (run it with `-k` filters while the write side is missing).
+- Done when: `contract.sh` with the `-k` list in lead decision 6 (PROGRESS.md) prints `Ran 20 tests` and `OK`: Health 3, Profiles 1, Generations 3 (the two create tests are S07), Search 3, TimingsAndSubtitles 3, Audio 3, SafetyGuards 4.
 
 ### S07 Engine: write side, worker, stub voice, lifecycle (push)
 Needs: S06. Gate: G2 (full). Push at the end so the Windows jobs see the engine.
