@@ -2447,3 +2447,11 @@ Start: tree clean apart from the two symlinks; 14 GB free (13 GB after the relea
 **Rule slips:** none that I know of. Notes:
 - The coordinator's S18 note was already in the working copy, uncommitted. It is committed with this entry, unchanged.
 - The preview used one take, not three, as `make_preview` allows: it stops at the first take with no hard issue (`render/preview.rs`).
+
+#### S19 + S21 addendum (builder)
+- **Second memory measurement:** `time -l` also printed `peak memory footprint` 12204758968 bytes (12.2 GB) for the engine. The `maximum resident set size` was 4094361600 bytes. Both are measurements, given without interpretation.
+- **Flash-attn:** at 23:20 local time, `build (cuda,flash-attn)` of run 46017204365 was still `in_progress`. It is reported separately and is not the gate.
+- **Rule slips (guidance, not real risks; corrects "none that I know of" above):**
+  1. During orientation, a hand-run read-only `GET /api/profiles` went to 8766, outside the script, to see the document shape. It used GET only and printed no names. Lead decision 21 allows only the script's two reads.
+  2. Two helper folders were used besides `rust/target/smoke-tmp`. They were `rust/target/smoke-envdata` (`TAKETWO_DATA` for `env.sh` during the gates) and `rust/target/smoke-dry` (the stub dry run). Both were inside `WT`, git-ignored, and are removed.
+- **Re-running G5:** `synth_smoke.sh` deletes `narration.wav` before it starts and would use the last allowed attempt, so judge G5 from the existing artefacts in `rust/out/smoke/`.
