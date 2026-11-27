@@ -1,8 +1,11 @@
-//! The HTTP API, ported from backend/app/main.py (read side, step S06): the same routes, status codes,
-//! `{"detail": ...}` texts and JSON key order. Step S07a adds the write routes that start no job; the paths
-//! that would start one answer 501 until S07b (the worker), a speed change until S16.
+//! The HTTP API, ported from backend/app/main.py: the same routes, status codes, `{"detail": ...}` texts
+//! and JSON key order. S06 is the read side, S07a the writes that start no job, S07b the worker and its
+//! routes. Without a renderer (the default `serve`) every path that would start a job answers 501;
+//! a speed change answers 501 until S16.
 
 use crate::files;
+use crate::render::Renderer;
+use crate::worker::{self, Ids, JobError, Worker};
 use axum::Router;
 use axum::body::Bytes;
 use axum::extract::{Path, Request, State};
@@ -14,7 +17,7 @@ use percent_encoding::{AsciiSet, NON_ALPHANUMERIC, percent_decode_str, utf8_perc
 use serde_json::{Value, json};
 use std::collections::HashMap;
 use std::path::PathBuf;
-use std::sync::Arc;
+use std::sync::{Arc, Mutex};
 use taketwo_core::library::{self, Doc, Library, is_plain_name};
 use taketwo_core::text::py;
 use taketwo_core::pipeline::{self, Fail, NewNarration};
@@ -36,6 +39,38 @@ pub struct AppState {
     pub started: f64,
     /// Shows a file or folder in the file manager: `reveal_in_file_manager` when serving, a recorder in tests.
     pub reveal: Box<dyn Fn(&std::path::Path) + Send + Sync>,
+    /// Renders narrations; None means every path that would start a job answers 501.
+    pub renderer: Option<Arc<dyn Renderer>>,
+    pub worker: Worker,
+    /// main.py `_create_lock` around `_dup_notices` (narration id -> {"count", "last"}, in insertion order).
+    dup_notices: Mutex<Vec<(String, Doc)>>,
+    /// When the last request arrived (the idle exit counts from it).
+    pub last_request: Mutex<std::time::Instant>,
+    /// `runtime.source_sha256` in diagnostics: which build of the Rust engine runs.
+    pub build_stamp: String,
+}
+
+impl AppState {
+    /// `ids` gives new job and narration ids (`worker::random_ids()` when serving; a counter in tests).
+    pub fn new(lib: Library, ui: Option<PathBuf>, started: f64, reveal: Box<dyn Fn(&std::path::Path) + Send + Sync>,
+               renderer: Option<Arc<dyn Renderer>>, ids: Ids) -> AppState {
+        AppState {
+            lib, ui, started, reveal, renderer, worker: Worker::start(ids), dup_notices: Mutex::new(Vec::new()),
+            last_request: Mutex::new(std::time::Instant::now()), build_stamp: build_stamp(),
+        }
+    }
+}
+
+/// The engine's version and the modification time of its program file, so two builds can be told apart.
+pub fn build_stamp() -> String {
+    let built = std::env::current_exe()
+        .and_then(std::fs::metadata)
+        .and_then(|m| m.modified())
+        .ok()
+        .and_then(|t| t.duration_since(std::time::UNIX_EPOCH).ok())
+        .map(|d| d.as_secs())
+        .unwrap_or(0);
+    format!("taketwo-engine {} built {built}", env!("CARGO_PKG_VERSION"))
 }
 
 /// main.py `_reveal`: a file selected, or a folder opened, in the system file manager.
@@ -62,9 +97,12 @@ pub fn reveal_in_file_manager(target: &std::path::Path) {
         c.arg(if file { target.parent().unwrap_or(target) } else { target });
         c
     };
-    // Python waits up to 10 s and ignores the result; the opener returns at once, so a spawn is enough.
-    if let Err(e) = cmd.spawn() {
-        eprintln!("taketwo-engine: could not open the file manager: {e}");
+    // Python waits up to 10 s and ignores the result; a thread waits here so the child is reaped.
+    match cmd.spawn() {
+        Ok(mut child) => {
+            std::thread::spawn(move || child.wait());
+        }
+        Err(e) => eprintln!("taketwo-engine: could not open the file manager: {e}"),
     }
 }
 
@@ -214,8 +252,64 @@ async fn pipeline_version() -> Response {
     ok_json(json!({ "version": PIPELINE_VERSION }))
 }
 
-async fn status() -> Response {
-    ok_json(json!({"loaded_engine": null, "running": null, "queued": 0, "queue": [], "duplicates": [], "max_script_words": MAX_SCRIPT_WORDS}))
+/// main.py `_narration_progress`: real progress of a narration (the job only knows it started).
+fn narration_progress(lib: &Library, gid: &str) -> Result<Doc, String> {
+    let g = lib.get_generation(gid)?.unwrap_or_default();
+    let chunks = g.get("chunks").filter(|v| py::truthy(v)).and_then(Value::as_array).cloned().unwrap_or_default();
+    let done = chunks.iter().filter(|c| matches!(c.get("status").and_then(Value::as_str), Some("ok" | "flagged"))).count();
+    let title = ["title", "text_preview"].iter().filter_map(|k| g.get(*k)).find(|v| py::truthy(v)).cloned().unwrap_or_else(|| {
+        let text = g.get("text").and_then(Value::as_str).unwrap_or_default();
+        Value::from(text.chars().take(60).collect::<String>())
+    });
+    let progress = if chunks.is_empty() { 0.0 } else { (done as f64 / chunks.len() as f64 * 1e4).round() / 1e4 };
+    let mut d = Doc::new();
+    d.insert("title".into(), title);
+    d.insert("done".into(), done.into());
+    d.insert("total".into(), chunks.len().into());
+    d.insert("gen_message".into(), g.get("message").filter(|v| py::truthy(v)).cloned().unwrap_or_else(|| "".into()));
+    d.insert("progress".into(), progress.into());
+    Ok(d)
+}
+
+fn is_generate_with_ref(j: &Value) -> Option<&str> {
+    if j["kind"] == "generate" { j.get("ref").filter(|r| py::truthy(r)).and_then(Value::as_str) } else { None }
+}
+
+/// main.py `_describe_job`.
+fn describe_job(lib: &Library, j: &Value) -> Result<Value, String> {
+    let mut d = j.as_object().cloned().unwrap_or_default();
+    if let Some(gid) = is_generate_with_ref(j) {
+        let info = narration_progress(lib, gid)?;
+        d.insert("gid".into(), gid.into());
+        for k in ["title", "done", "total", "progress"] {
+            d.insert(k.into(), info[k].clone());
+        }
+        let msg = if py::truthy(&info["gen_message"]) { info["gen_message"].clone() } else { d.get("message").cloned().unwrap_or(Value::Null) };
+        d.insert("message".into(), msg);
+    }
+    Ok(Value::Object(d))
+}
+
+async fn status(State(st): St) -> Response {
+    let run = || -> Result<Value, String> {
+        let queue = st.worker.active_jobs().iter().map(|j| describe_job(&st.lib, j)).collect::<Result<Vec<_>, _>>()?;
+        let running = queue.iter().find(|q| q["status"] == "running").cloned().unwrap_or(Value::Null);
+        let active: Vec<&str> = queue.iter().filter_map(|q| q.get("gid").and_then(Value::as_str)).collect();
+        let mut duplicates = Vec::new();
+        for (gid, n) in st.dup_notices.lock().unwrap_or_else(|p| p.into_inner()).iter() {
+            if active.contains(&gid.as_str()) {
+                let mut d = Doc::new();
+                d.insert("gid".into(), gid.as_str().into());
+                d.insert("title".into(), narration_progress(&st.lib, gid)?["title"].clone());
+                d.extend(n.clone());
+                duplicates.push(Value::Object(d));
+            }
+        }
+        let queued = queue.iter().filter(|q| q["status"] == "queued").count();
+        Ok(json!({"loaded_engine": null, "running": running, "queued": queued, "queue": queue, "duplicates": duplicates,
+                  "max_script_words": MAX_SCRIPT_WORDS}))
+    };
+    run().map(ok_json).unwrap_or_else(ise)
 }
 
 /// No update check in 1.0: today's shape with nothing checked.
@@ -224,8 +318,7 @@ async fn update_state() -> Response {
 }
 
 async fn diagnostics(State(st): St) -> Response {
-    ok_json(json!({"runtime": {"pid": std::process::id(), "started_at": st.started, "source_sha256": null},
-                   "jobs": [], "job_limit": 20, "event_limit": 32}))
+    ok_json(st.worker.diagnostics(&st.build_stamp))
 }
 
 /// The one engine TakeTwo 1.0 has, in engines.py `EngineSpec.public()` shape.
@@ -556,7 +649,25 @@ fn generation_answer(st: &AppState, gid: &str) -> Response {
         let pitch = st.lib.get_profile(&pid)?.and_then(|p| p.get("pitch_hz").and_then(Value::as_f64));
         let items = if oc.is_some() { review::review(g, pitch)? } else { Vec::new() };
         g.insert("review".into(), items.into());
-        g.insert("job".into(), Value::Null);
+        let job = st.worker.active_for(gid);
+        g.insert("job".into(), job.clone().unwrap_or(Value::Null));
+        let Some(job) = job else { return Ok(()) };
+        if let Some((_, n)) = st.dup_notices.lock().unwrap_or_else(|p| p.into_inner()).iter().find(|(k, _)| k == gid) {
+            g.insert("duplicate_notice".into(), Value::Object(n.clone()));
+        }
+        if job["status"] == "queued" {
+            // what this narration is waiting for, in the order the worker takes them
+            let mine = job["created"].as_f64().unwrap_or(0.0);
+            let ahead: Vec<Value> = st.worker.active_jobs().into_iter().filter(|j| j["created"].as_f64().unwrap_or(0.0) < mine).collect();
+            let mut waiting = Vec::new();
+            for j in ahead.iter().take(3) {
+                waiting.push(match is_generate_with_ref(j) {
+                    Some(r) => narration_progress(&st.lib, r)?["title"].clone(),
+                    None => j["label"].clone(),
+                });
+            }
+            g.insert("queue".into(), json!({"ahead": ahead.len(), "waiting_for": waiting}));
+        }
         Ok(())
     };
     match run(&mut g) {
@@ -565,8 +676,17 @@ fn generation_answer(st: &AppState, gid: &str) -> Response {
     }
 }
 
-/// No worker yet: Python answers the same for an idle or unknown narration.
-async fn cancel_generation() -> Response {
+/// main.py `cancel_generation`: an idle or unknown narration answers the same.
+async fn cancel_generation(State(st): St, Path(gid): Path<String>) -> Response {
+    if let Some(j) = st.worker.active_for(&gid) {
+        st.worker.cancel(j["id"].as_str().unwrap_or_default());
+        if j["status"] == "queued" {
+            // a queued narration stops now, not when its turn would come
+            if let Err(e) = mark_cancelled_before_start(&st.lib, &gid) {
+                return ise(e);
+            }
+        }
+    }
     ok_json(json!({ "ok": true }))
 }
 
@@ -711,9 +831,8 @@ async fn take_audio(State(st): St, Path((gid, ci, k)): Path<(String, String, Str
     }
 }
 
-/// No jobs before the worker (S07).
-async fn get_job() -> Response {
-    detail(404, "Not found")
+async fn get_job(State(st): St, Path(jid): Path<String>) -> Response {
+    st.worker.get(&jid).map(ok_json).unwrap_or_else(|| detail(404, "Not found"))
 }
 
 // ------------------------------------------------------------------ request bodies (pydantic, lax mode)
@@ -853,6 +972,70 @@ fn finish_422(mut errors: Vec<Value>, fields: Option<&Fields>) -> Option<Respons
 // ------------------------------------------------------------------ narration writes (S07a)
 
 const BUSY: &str = "This narration is busy. Try again when it finishes.";
+const GEN_BUSY: &str = "This generation is busy";
+
+/// main.py `_mark_cancelled_before_start`.
+fn mark_cancelled_before_start(lib: &Library, gid: &str) -> Result<(), String> {
+    let Some(mut g) = lib.get_generation(gid)? else { return Ok(()) };
+    if !matches!(g.get("status").and_then(Value::as_str), Some("queued" | "running")) {
+        return Ok(());
+    }
+    g.insert("status".into(), "cancelled".into());
+    g.insert("message".into(), "Cancelled before it started".into());
+    reset_running_parts(&mut g)?;
+    lib.put_generation_live(&mut g).map(|_| ())
+}
+
+fn reset_running_parts(g: &mut Doc) -> Result<(), String> {
+    for c in g.get_mut("chunks").and_then(Value::as_array_mut).ok_or("chunks is not a list")? {
+        if c.get("status").and_then(Value::as_str) == Some("running") {
+            c["status"] = "pending".into();
+        }
+    }
+    Ok(())
+}
+
+/// What a narration job asks the renderer for (main.py `_submit_generation`'s arguments).
+enum Task {
+    Run,
+    Respeak(i64, Option<String>),
+    Fix,
+}
+
+/// main.py `_submit_generation`: the renderer call, wrapped so an error marks the narration (a re-speak
+/// restores its own state), and cancelled before it started marked when the worker reaches it.
+fn submit_generation(st: &Arc<AppState>, r: Arc<dyn Renderer>, gid: &str, task: Task, source: &str) -> Value {
+    let (st2, gid2) = (st.clone(), gid.to_string());
+    let work: worker::Work = Box::new(move |cancel| {
+        let res = match &task {
+            Task::Run => r.run(&st2.lib, &gid2, None, cancel),
+            Task::Respeak(ci, text) => r.respeak(&st2.lib, &gid2, *ci, text.as_deref(), cancel),
+            Task::Fix => r.fix_remaining(&st2.lib, &gid2, cancel),
+        };
+        if let Err(e) = &res
+            && !matches!(task, Task::Respeak(..))
+        {
+            let mark = || -> Result<(), String> {
+                let Some(mut g) = st2.lib.get_generation(&gid2)? else { return Ok(()) };
+                g.insert("status".into(), "error".into());
+                g.insert("message".into(), e.message.as_str().into());
+                reset_running_parts(&mut g)?;
+                st2.lib.put_generation_live(&mut g).map(|_| ())
+            };
+            if let Err(m) = mark() {
+                return Err(JobError::new("RuntimeError", m));
+            }
+        }
+        res
+    });
+    let (st3, gid3) = (st.clone(), gid.to_string());
+    let on_cancel: worker::OnCancel = Box::new(move || {
+        if let Err(e) = mark_cancelled_before_start(&st3.lib, &gid3) {
+            eprintln!("taketwo-engine: {e}");
+        }
+    });
+    st.worker.submit("generate", work, Some(gid), "Generating", Some(on_cancel), source)
+}
 
 fn chunk_count(g: &Doc) -> Result<i64, Response> {
     match g.get("chunks").and_then(Value::as_array) {
@@ -865,13 +1048,13 @@ fn chunk(g: &Doc, ci: i64) -> &Value {
     &g["chunks"][ci as usize]
 }
 
-/// main.py `_idle_gen`. No worker yet, so the stored status is the only busy case.
-fn idle_gen(lib: &Library, gid: &str, ci: i64) -> Result<Doc, Response> {
-    let g = live_gen(lib, gid)?;
+/// main.py `_idle_gen`.
+fn idle_gen(st: &AppState, gid: &str, ci: i64) -> Result<Doc, Response> {
+    let g = live_gen(&st.lib, gid)?;
     if !(0 <= ci && ci < chunk_count(&g)?) {
         return Err(detail(404, "No such part"));
     }
-    if matches!(g.get("status").and_then(Value::as_str), Some("queued" | "running")) {
+    if st.worker.active_for(gid).is_some() || matches!(g.get("status").and_then(Value::as_str), Some("queued" | "running")) {
         return Err(detail(409, BUSY));
     }
     Ok(g)
@@ -890,7 +1073,7 @@ async fn accept_part(State(st): St, Path((gid, ci)): Path<(String, String)>) -> 
         Ok(v) => v[0],
         Err(r) => return r,
     };
-    let g = match idle_gen(&st.lib, &gid, ci) {
+    let g = match idle_gen(&st, &gid, ci) {
         Ok(g) => g,
         Err(r) => return r,
     };
@@ -912,7 +1095,7 @@ async fn unaccept_part(State(st): St, Path((gid, ci)): Path<(String, String)>) -
         Ok(v) => v[0],
         Err(r) => return r,
     };
-    match idle_gen(&st.lib, &gid, ci) {
+    match idle_gen(&st, &gid, ci) {
         Ok(g) => save_accepted(&st, &gid, g, ci, false),
         Err(r) => r,
     }
@@ -922,6 +1105,9 @@ async fn unaccept_part(State(st): St, Path((gid, ci)): Path<(String, String)>) -
 async fn delete_generation(State(st): St, Path(gid): Path<String>) -> Response {
     if let Err(r) = item_id_ok(&gid) {
         return r;
+    }
+    if let Some(j) = st.worker.active_for(&gid) {
+        st.worker.cancel(j["id"].as_str().unwrap_or_default()); // a running render stops; its save keeps the deleted mark
     }
     match st.lib.set_generation_deleted(&gid, true) {
         Ok(_) => ok_json(json!({"ok": true, "undo": format!("/api/generations/{gid}/restore")})),
@@ -959,6 +1145,9 @@ async fn patch_generation(State(st): St, Path(gid): Path<String>, body: Bytes) -
     }
     let stored = g.get("speed").filter(|v| py::truthy(v)).and_then(Value::as_f64).unwrap_or(1.0);
     if speed.is_some_and(|x| (x - stored).abs() > 1e-3) {
+        if st.worker.active_for(&gid).is_some() {
+            return detail(409, GEN_BUSY);
+        }
         return not_yet(); // S16: retime (Python re-times the finished audio here); nothing is changed
     }
     let doc = if fields.is_empty() { st.lib.get_generation(&gid) } else { st.lib.patch_generation_meta(&gid, &fields) };
@@ -1044,7 +1233,29 @@ async fn create_generation(State(st): St, headers: HeaderMap, body: Bytes) -> Re
                 pipeline::thousands(words), pipeline::thousands(MAX_SCRIPT_WORDS)
             )));
         }
-        // The duplicate check needs the queue: S07b.
+        let cleaned = pipeline::clean_with_settings(&text, &s);
+        // check and add in one step, so two quick clicks cannot both get in
+        let mut notices = st.dup_notices.lock().unwrap_or_else(|p| p.into_inner());
+        if let Some((gid, status, title)) = active_duplicate(&st, &p, &cleaned)? {
+            let i = match notices.iter().position(|(k, _)| *k == gid) {
+                Some(i) => i,
+                None => {
+                    let mut n = Doc::new();
+                    n.insert("count".into(), 0.into());
+                    n.insert("last".into(), 0.0.into());
+                    notices.push((gid.clone(), n));
+                    notices.len() - 1
+                }
+            };
+            let n = &mut notices[i].1;
+            let count = n["count"].as_i64().unwrap_or(0) + 1;
+            n.insert("count".into(), count.into());
+            n.insert("last".into(), worker::wall_clock().into());
+            let place = if status == "running" { "rendering now" } else { "waiting its turn" };
+            let body = json!({"detail": {"message": format!("Already in the queue: this narration is {place}. It wasn't added twice."),
+                                         "duplicate_of": gid, "status": status, "title": title}});
+            return Ok((StatusCode::CONFLICT, axum::Json(body)).into_response());
+        }
         let language = [language.clone().map(Value::from), p.get("language").cloned()]
             .into_iter()
             .flatten()
@@ -1054,19 +1265,49 @@ async fn create_generation(State(st): St, headers: HeaderMap, body: Bytes) -> Re
             profile: &p, text: &text, engine, language, params: params.clone(), speed, voice_settings: voice_settings.as_object(),
             title: title.as_deref(), source: client(&headers),
         };
-        match pipeline::create_generation("unsaved", &req, &s) {
-            Ok(_) => Ok(not_yet()), // S07b: save the document and queue the render; nothing is written yet
-            Err(Fail::Value(m)) => Ok(detail(400, &m)),
-            Err(Fail::Other(e)) => Err(e),
-        }
+        let mut g = match pipeline::create_generation("unsaved", &req, &s) {
+            Ok(g) => g,
+            Err(Fail::Value(m)) => return Ok(detail(400, &m)),
+            Err(Fail::Other(e)) => return Err(e),
+        };
+        let Some(r) = st.renderer.clone() else { return Ok(not_yet()) }; // nothing is written without a renderer
+        // Python takes the uuid after the empty-script check, so a refused create uses no id.
+        let gid: String = st.worker.new_id().chars().take(12).collect();
+        g.insert("id".into(), gid.as_str().into());
+        let dir = st.lib.generations_dir().join(&gid);
+        std::fs::create_dir_all(&dir).map_err(|e| format!("{}: {e}", dir.display()))?;
+        st.lib.put_generation(&mut g)?;
+        let source = if g.get("source").and_then(Value::as_str) == Some("mcp") { "mcp" } else { "api" };
+        let job = submit_generation(&st, r, &gid, Task::Run, source);
+        drop(notices);
+        g.insert("job".into(), job);
+        Ok(ok_json(Value::Object(g)))
     };
     run().unwrap_or_else(ise)
 }
 
+/// main.py `_active_duplicate`: the same voice and the same cleaned script queued or rendering.
+fn active_duplicate(st: &AppState, p: &Doc, cleaned: &str) -> Result<Option<(String, Value, Value)>, String> {
+    for j in st.worker.active_jobs() {
+        let Some(gid) = is_generate_with_ref(&j) else { continue };
+        let g = st.lib.get_generation(gid)?.unwrap_or_default();
+        if g.get("profile_id").is_some() && g.get("profile_id") == p.get("id") && g.get("cleaned_text").and_then(Value::as_str) == Some(cleaned) {
+            return Ok(Some((gid.to_string(), j["status"].clone(), narration_progress(&st.lib, gid)?["title"].clone())));
+        }
+    }
+    Ok(None)
+}
+
 async fn resume_generation(State(st): St, Path(gid): Path<String>) -> Response {
-    match live_gen(&st.lib, &gid) {
-        Ok(_) => not_yet(), // S07b: queue the unfinished parts
-        Err(r) => r,
+    if let Err(r) = live_gen(&st.lib, &gid) {
+        return r;
+    }
+    if st.worker.active_for(&gid).is_some() {
+        return detail(409, "Already running");
+    }
+    match st.renderer.clone() {
+        Some(r) => ok_json(submit_generation(&st, r, &gid, Task::Run, "api")),
+        None => not_yet(),
     }
 }
 
@@ -1086,6 +1327,9 @@ async fn regenerate(State(st): St, Path((gid, ci)): Path<(String, String)>, body
         Ok(_) => return detail(404, "No such chunk"),
         Err(r) => return r,
     }
+    if st.worker.active_for(&gid).is_some() {
+        return detail(409, GEN_BUSY);
+    }
     if let Some(t) = new_text.as_deref().filter(|t| !py::strip(t).is_empty()) {
         let s = match library::get_settings(&st.lib.settings_path()) {
             Ok(s) => s,
@@ -1097,7 +1341,10 @@ async fn regenerate(State(st): St, Path((gid, ci)): Path<(String, String)>, body
             Err(Fail::Other(e)) => return ise(e),
         }
     }
-    not_yet() // S07b: re-speak the part
+    match st.renderer.clone() {
+        Some(r) => ok_json(submit_generation(&st, r, &gid, Task::Respeak(ci, new_text), "api")),
+        None => not_yet(),
+    }
 }
 
 async fn select_take(State(st): St, Path((gid, ci)): Path<(String, String)>, body: Bytes) -> Response {
@@ -1107,7 +1354,7 @@ async fn select_take(State(st): St, Path((gid, ci)): Path<(String, String)>, bod
         return r;
     }
     let (Some(ci), Some(take)) = (ci, take) else { return ise("checked above".into()) };
-    let g = match idle_gen(&st.lib, &gid, ci) {
+    let g = match idle_gen(&st, &gid, ci) {
         Ok(g) => g,
         Err(r) => return r,
     };
@@ -1117,7 +1364,12 @@ async fn select_take(State(st): St, Path((gid, ci)): Path<(String, String)>, bod
     if !kept {
         return detail(404, "That take is no longer kept.");
     }
-    not_yet() // S07b: switch the take and re-mix
+    let Some(r) = st.renderer.clone() else { return not_yet() };
+    // As main.py: a job of its own, without `_submit_generation`'s error marking or cancelled-before-start
+    // repair, label "Switching take", source left at worker.submit's default.
+    let (st2, gid2) = (st.clone(), gid.clone());
+    let work: worker::Work = Box::new(move |cancel| r.select_take(&st2.lib, &gid2, ci, take, cancel));
+    ok_json(st.worker.submit("generate", work, Some(&gid), "Switching take", None, "unknown"))
 }
 
 async fn fix_remaining(State(st): St, Path(gid): Path<String>) -> Response {
@@ -1125,9 +1377,15 @@ async fn fix_remaining(State(st): St, Path(gid): Path<String>) -> Response {
         Ok(g) => g,
         Err(r) => return r,
     };
+    if st.worker.active_for(&gid).is_some() {
+        return detail(409, GEN_BUSY);
+    }
     match review::fix_targets(&g) {
         Ok(t) if t.is_empty() => detail(400, "Nothing left to fix."),
-        Ok(_) => not_yet(), // S07b: re-record the parts that need it
+        Ok(_) => match st.renderer.clone() {
+            Some(r) => ok_json(submit_generation(&st, r, &gid, Task::Fix, "api")),
+            None => not_yet(),
+        },
         Err(e) => ise(e),
     }
 }
@@ -1265,10 +1523,19 @@ pub fn router(state: Arc<AppState>) -> Router {
         .allow_origin(AllowOrigin::exact(HeaderValue::from_static(DEV_UI_ORIGIN)))
         .allow_methods(AllowMethods::mirror_request())
         .allow_headers(AllowHeaders::mirror_request());
-    let inner = api.with_state(state).layer(cors);
+    let inner = api.with_state(state.clone()).layer(cors);
     // Outermost, so it runs before routing, for routes that do not exist too.
     // The outer router has no routes, so its layer runs before the inner router routes anything.
-    Router::new().fallback_service(inner).layer(middleware::from_fn(only_this_computer))
+    Router::new()
+        .fallback_service(inner)
+        .layer(middleware::from_fn(only_this_computer))
+        .layer(middleware::from_fn_with_state(state, touch))
+}
+
+/// Every request, answered or refused, resets the idle clock.
+async fn touch(State(st): St, req: Request, next: Next) -> Response {
+    *st.last_request.lock().unwrap_or_else(|p| p.into_inner()) = std::time::Instant::now();
+    next.run(req).await
 }
 
 #[cfg(test)]

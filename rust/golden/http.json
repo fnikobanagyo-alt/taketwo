@@ -8875,6 +8875,2770 @@
      }
     }
    ]
+  },
+  {
+   "name": "g1",
+   "masked": true,
+   "setup": [],
+   "cases": [
+    {
+     "method": "POST",
+     "path": "/api/generations",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": {
+      "profile_id": "ctvoice01",
+      "text": "The first job script. It has two sentences.",
+      "title": "Job one"
+     },
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "id": "000000000100",
+       "profile_id": "ctvoice01",
+       "profile_name": "Contract Voice",
+       "engine": "qwen3-tts-1.7b",
+       "language": "en",
+       "params": {},
+       "speed": 1.0,
+       "favorite": false,
+       "voice_settings": {
+        "stability": 0.5,
+        "similarity": 0.75,
+        "style": 0.0,
+        "mic_match": true,
+        "studio_finish": true
+       },
+       "title": "Job one",
+       "source": "api",
+       "text": "The first job script. It has two sentences.",
+       "cleaned_text": "The first job script. It has two sentences.",
+       "status": "queued",
+       "progress": 0.0,
+       "message": "Queued",
+       "chunks": [
+        {
+         "i": 0,
+         "text": "The first job script. It has two sentences.",
+         "pause_after": "end",
+         "status": "pending"
+        }
+       ],
+       "settings": {
+        "max_chunk_chars": 220,
+        "max_attempts": 4,
+        "compare_takes": 1,
+        "max_wer": 0.12,
+        "min_speaker_similarity": 0.85,
+        "max_internal_silence": 0.9,
+        "sentence_pause_ms": 350,
+        "paragraph_pause_ms": 700,
+        "target_lufs": -16.0,
+        "seed": 1234
+       },
+       "created": 1900000003.5,
+       "updated": 1900000003.75,
+       "job": {
+        "id": "0000000002",
+        "kind": "generate",
+        "ref": "000000000100",
+        "label": "Generating",
+        "status": "queued",
+        "progress": 0.0,
+        "message": "Queued",
+        "error": null,
+        "created": "<masked>",
+        "cancel": false,
+        "source": "api",
+        "phase": "queued",
+        "phase_started_at": "<masked>",
+        "last_progress_at": null,
+        "cancel_requested_at": null,
+        "cancel_acknowledged_at": null
+       }
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/000000000100",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": null,
+     "wait_before": {
+      "path": "/api/generations/000000000100",
+      "key": "status",
+      "value": "running"
+     },
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "id": "000000000100",
+       "profile_id": "ctvoice01",
+       "profile_name": "Contract Voice",
+       "engine": "qwen3-tts-1.7b",
+       "language": "en",
+       "params": {},
+       "speed": 1.0,
+       "favorite": false,
+       "voice_settings": {
+        "stability": 0.5,
+        "similarity": 0.75,
+        "style": 0.0,
+        "mic_match": true,
+        "studio_finish": true
+       },
+       "title": "Job one",
+       "source": "api",
+       "text": "The first job script. It has two sentences.",
+       "cleaned_text": "The first job script. It has two sentences.",
+       "status": "running",
+       "progress": 0.0,
+       "message": "Stub render",
+       "chunks": [
+        {
+         "i": 0,
+         "text": "The first job script. It has two sentences.",
+         "pause_after": "end",
+         "status": "running"
+        }
+       ],
+       "settings": {
+        "max_chunk_chars": 220,
+        "max_attempts": 4,
+        "compare_takes": 1,
+        "max_wer": 0.12,
+        "min_speaker_similarity": 0.85,
+        "max_internal_silence": 0.9,
+        "sentence_pause_ms": 350,
+        "paragraph_pause_ms": 700,
+        "target_lufs": -16.0,
+        "seed": 1234
+       },
+       "created": 1900000003.5,
+       "updated": 1900000004.0,
+       "outcome": null,
+       "review": [],
+       "job": {
+        "id": "0000000002",
+        "kind": "generate",
+        "ref": "000000000100",
+        "label": "Generating",
+        "status": "running",
+        "progress": 0.0,
+        "message": "Queued",
+        "error": null,
+        "created": "<masked>",
+        "cancel": false,
+        "source": "api",
+        "phase": "processing",
+        "phase_started_at": "<masked>",
+        "last_progress_at": "<masked>",
+        "cancel_requested_at": null,
+        "cancel_acknowledged_at": null,
+        "started": "<masked>"
+       }
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/status",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "loaded_engine": null,
+       "running": {
+        "id": "0000000002",
+        "kind": "generate",
+        "ref": "000000000100",
+        "label": "Generating",
+        "status": "running",
+        "progress": 0.0,
+        "message": "Stub render",
+        "error": null,
+        "created": "<masked>",
+        "cancel": false,
+        "source": "api",
+        "phase": "processing",
+        "phase_started_at": "<masked>",
+        "last_progress_at": "<masked>",
+        "cancel_requested_at": null,
+        "cancel_acknowledged_at": null,
+        "started": "<masked>",
+        "gid": "000000000100",
+        "title": "Job one",
+        "done": 0,
+        "total": 1
+       },
+       "queued": 0,
+       "queue": [
+        {
+         "id": "0000000002",
+         "kind": "generate",
+         "ref": "000000000100",
+         "label": "Generating",
+         "status": "running",
+         "progress": 0.0,
+         "message": "Stub render",
+         "error": null,
+         "created": "<masked>",
+         "cancel": false,
+         "source": "api",
+         "phase": "processing",
+         "phase_started_at": "<masked>",
+         "last_progress_at": "<masked>",
+         "cancel_requested_at": null,
+         "cancel_acknowledged_at": null,
+         "started": "<masked>",
+         "gid": "000000000100",
+         "title": "Job one",
+         "done": 0,
+         "total": 1
+        }
+       ],
+       "duplicates": [],
+       "max_script_words": 10000
+      }
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/generations",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": {
+      "profile_id": "ctvoice01",
+      "text": "The first job script. It has two sentences."
+     },
+     "response": {
+      "status": 409,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": {
+        "message": "Already in the queue: this narration is rendering now. It wasn't added twice.",
+        "duplicate_of": "000000000100",
+        "status": "running",
+        "title": "Job one"
+       }
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/status",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "loaded_engine": null,
+       "running": {
+        "id": "0000000002",
+        "kind": "generate",
+        "ref": "000000000100",
+        "label": "Generating",
+        "status": "running",
+        "progress": 0.0,
+        "message": "Stub render",
+        "error": null,
+        "created": "<masked>",
+        "cancel": false,
+        "source": "api",
+        "phase": "processing",
+        "phase_started_at": "<masked>",
+        "last_progress_at": "<masked>",
+        "cancel_requested_at": null,
+        "cancel_acknowledged_at": null,
+        "started": "<masked>",
+        "gid": "000000000100",
+        "title": "Job one",
+        "done": 0,
+        "total": 1
+       },
+       "queued": 0,
+       "queue": [
+        {
+         "id": "0000000002",
+         "kind": "generate",
+         "ref": "000000000100",
+         "label": "Generating",
+         "status": "running",
+         "progress": 0.0,
+         "message": "Stub render",
+         "error": null,
+         "created": "<masked>",
+         "cancel": false,
+         "source": "api",
+         "phase": "processing",
+         "phase_started_at": "<masked>",
+         "last_progress_at": "<masked>",
+         "cancel_requested_at": null,
+         "cancel_acknowledged_at": null,
+         "started": "<masked>",
+         "gid": "000000000100",
+         "title": "Job one",
+         "done": 0,
+         "total": 1
+        }
+       ],
+       "duplicates": [
+        {
+         "gid": "000000000100",
+         "title": "Job one",
+         "count": 1,
+         "last": "<masked>"
+        }
+       ],
+       "max_script_words": 10000
+      }
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/generations",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790",
+      "X-TakeTwo-Client": "mcp"
+     },
+     "body": {
+      "profile_id": "ctvoice01",
+      "text": "A second script, queued behind the first."
+     },
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "id": "000000000300",
+       "profile_id": "ctvoice01",
+       "profile_name": "Contract Voice",
+       "engine": "qwen3-tts-1.7b",
+       "language": "en",
+       "params": {},
+       "speed": 1.0,
+       "favorite": false,
+       "voice_settings": {
+        "stability": 0.5,
+        "similarity": 0.75,
+        "style": 0.0,
+        "mic_match": true,
+        "studio_finish": true
+       },
+       "title": "A second script, queued behind the first.",
+       "source": "mcp",
+       "text": "A second script, queued behind the first.",
+       "cleaned_text": "A second script, queued behind the first.",
+       "status": "queued",
+       "progress": 0.0,
+       "message": "Queued",
+       "chunks": [
+        {
+         "i": 0,
+         "text": "A second script, queued behind the first.",
+         "pause_after": "end",
+         "status": "pending"
+        }
+       ],
+       "settings": {
+        "max_chunk_chars": 220,
+        "max_attempts": 4,
+        "compare_takes": 1,
+        "max_wer": 0.12,
+        "min_speaker_similarity": 0.85,
+        "max_internal_silence": 0.9,
+        "sentence_pause_ms": 350,
+        "paragraph_pause_ms": 700,
+        "target_lufs": -16.0,
+        "seed": 1234
+       },
+       "created": 1900000004.25,
+       "updated": 1900000004.5,
+       "job": {
+        "id": "0000000004",
+        "kind": "generate",
+        "ref": "000000000300",
+        "label": "Generating",
+        "status": "queued",
+        "progress": 0.0,
+        "message": "Queued",
+        "error": null,
+        "created": "<masked>",
+        "cancel": false,
+        "source": "mcp",
+        "phase": "queued",
+        "phase_started_at": "<masked>",
+        "last_progress_at": null,
+        "cancel_requested_at": null,
+        "cancel_acknowledged_at": null
+       }
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/000000000300",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "id": "000000000300",
+       "profile_id": "ctvoice01",
+       "profile_name": "Contract Voice",
+       "engine": "qwen3-tts-1.7b",
+       "language": "en",
+       "params": {},
+       "speed": 1.0,
+       "favorite": false,
+       "voice_settings": {
+        "stability": 0.5,
+        "similarity": 0.75,
+        "style": 0.0,
+        "mic_match": true,
+        "studio_finish": true
+       },
+       "title": "A second script, queued behind the first.",
+       "source": "mcp",
+       "text": "A second script, queued behind the first.",
+       "cleaned_text": "A second script, queued behind the first.",
+       "status": "queued",
+       "progress": 0.0,
+       "message": "Queued",
+       "chunks": [
+        {
+         "i": 0,
+         "text": "A second script, queued behind the first.",
+         "pause_after": "end",
+         "status": "pending"
+        }
+       ],
+       "settings": {
+        "max_chunk_chars": 220,
+        "max_attempts": 4,
+        "compare_takes": 1,
+        "max_wer": 0.12,
+        "min_speaker_similarity": 0.85,
+        "max_internal_silence": 0.9,
+        "sentence_pause_ms": 350,
+        "paragraph_pause_ms": 700,
+        "target_lufs": -16.0,
+        "seed": 1234
+       },
+       "created": 1900000004.25,
+       "updated": 1900000004.5,
+       "outcome": null,
+       "review": [],
+       "job": {
+        "id": "0000000004",
+        "kind": "generate",
+        "ref": "000000000300",
+        "label": "Generating",
+        "status": "queued",
+        "progress": 0.0,
+        "message": "Queued",
+        "error": null,
+        "created": "<masked>",
+        "cancel": false,
+        "source": "mcp",
+        "phase": "queued",
+        "phase_started_at": "<masked>",
+        "last_progress_at": null,
+        "cancel_requested_at": null,
+        "cancel_acknowledged_at": null
+       },
+       "queue": {
+        "ahead": 1,
+        "waiting_for": [
+         "Job one"
+        ]
+       }
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/jobs/0000000004",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "id": "0000000004",
+       "kind": "generate",
+       "ref": "000000000300",
+       "label": "Generating",
+       "status": "queued",
+       "progress": 0.0,
+       "message": "Queued",
+       "error": null,
+       "created": "<masked>",
+       "cancel": false,
+       "source": "mcp",
+       "phase": "queued",
+       "phase_started_at": "<masked>",
+       "last_progress_at": null,
+       "cancel_requested_at": null,
+       "cancel_acknowledged_at": null
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/jobs/0000000002",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "id": "0000000002",
+       "kind": "generate",
+       "ref": "000000000100",
+       "label": "Generating",
+       "status": "running",
+       "progress": 0.0,
+       "message": "Queued",
+       "error": null,
+       "created": "<masked>",
+       "cancel": false,
+       "source": "api",
+       "phase": "processing",
+       "phase_started_at": "<masked>",
+       "last_progress_at": "<masked>",
+       "cancel_requested_at": null,
+       "cancel_acknowledged_at": null,
+       "started": "<masked>"
+      }
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/generations",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": {
+      "profile_id": "ctvoice01",
+      "text": "A second script, queued behind the first."
+     },
+     "response": {
+      "status": 409,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": {
+        "message": "Already in the queue: this narration is waiting its turn. It wasn't added twice.",
+        "duplicate_of": "000000000300",
+        "status": "queued",
+        "title": "A second script, queued behind the first."
+       }
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/000000000100",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "id": "000000000100",
+       "profile_id": "ctvoice01",
+       "profile_name": "Contract Voice",
+       "engine": "qwen3-tts-1.7b",
+       "language": "en",
+       "params": {},
+       "speed": 1.0,
+       "favorite": false,
+       "voice_settings": {
+        "stability": 0.5,
+        "similarity": 0.75,
+        "style": 0.0,
+        "mic_match": true,
+        "studio_finish": true
+       },
+       "title": "Job one",
+       "source": "api",
+       "text": "The first job script. It has two sentences.",
+       "cleaned_text": "The first job script. It has two sentences.",
+       "status": "running",
+       "progress": 0.0,
+       "message": "Stub render",
+       "chunks": [
+        {
+         "i": 0,
+         "text": "The first job script. It has two sentences.",
+         "pause_after": "end",
+         "status": "running"
+        }
+       ],
+       "settings": {
+        "max_chunk_chars": 220,
+        "max_attempts": 4,
+        "compare_takes": 1,
+        "max_wer": 0.12,
+        "min_speaker_similarity": 0.85,
+        "max_internal_silence": 0.9,
+        "sentence_pause_ms": 350,
+        "paragraph_pause_ms": 700,
+        "target_lufs": -16.0,
+        "seed": 1234
+       },
+       "created": 1900000003.5,
+       "updated": 1900000004.0,
+       "outcome": null,
+       "review": [],
+       "job": {
+        "id": "0000000002",
+        "kind": "generate",
+        "ref": "000000000100",
+        "label": "Generating",
+        "status": "running",
+        "progress": 0.0,
+        "message": "Queued",
+        "error": null,
+        "created": "<masked>",
+        "cancel": false,
+        "source": "api",
+        "phase": "processing",
+        "phase_started_at": "<masked>",
+        "last_progress_at": "<masked>",
+        "cancel_requested_at": null,
+        "cancel_acknowledged_at": null,
+        "started": "<masked>"
+       },
+       "duplicate_notice": {
+        "count": 1,
+        "last": "<masked>"
+       }
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/000000000300",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "id": "000000000300",
+       "profile_id": "ctvoice01",
+       "profile_name": "Contract Voice",
+       "engine": "qwen3-tts-1.7b",
+       "language": "en",
+       "params": {},
+       "speed": 1.0,
+       "favorite": false,
+       "voice_settings": {
+        "stability": 0.5,
+        "similarity": 0.75,
+        "style": 0.0,
+        "mic_match": true,
+        "studio_finish": true
+       },
+       "title": "A second script, queued behind the first.",
+       "source": "mcp",
+       "text": "A second script, queued behind the first.",
+       "cleaned_text": "A second script, queued behind the first.",
+       "status": "queued",
+       "progress": 0.0,
+       "message": "Queued",
+       "chunks": [
+        {
+         "i": 0,
+         "text": "A second script, queued behind the first.",
+         "pause_after": "end",
+         "status": "pending"
+        }
+       ],
+       "settings": {
+        "max_chunk_chars": 220,
+        "max_attempts": 4,
+        "compare_takes": 1,
+        "max_wer": 0.12,
+        "min_speaker_similarity": 0.85,
+        "max_internal_silence": 0.9,
+        "sentence_pause_ms": 350,
+        "paragraph_pause_ms": 700,
+        "target_lufs": -16.0,
+        "seed": 1234
+       },
+       "created": 1900000004.25,
+       "updated": 1900000004.5,
+       "outcome": null,
+       "review": [],
+       "job": {
+        "id": "0000000004",
+        "kind": "generate",
+        "ref": "000000000300",
+        "label": "Generating",
+        "status": "queued",
+        "progress": 0.0,
+        "message": "Queued",
+        "error": null,
+        "created": "<masked>",
+        "cancel": false,
+        "source": "mcp",
+        "phase": "queued",
+        "phase_started_at": "<masked>",
+        "last_progress_at": null,
+        "cancel_requested_at": null,
+        "cancel_acknowledged_at": null
+       },
+       "duplicate_notice": {
+        "count": 1,
+        "last": "<masked>"
+       },
+       "queue": {
+        "ahead": 1,
+        "waiting_for": [
+         "Job one"
+        ]
+       }
+      }
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/generations/000000000100/resume",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 409,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "Already running"
+      }
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/generations/000000000100/chunks/0/regenerate",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": {},
+     "response": {
+      "status": 409,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "This generation is busy"
+      }
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/generations/000000000100/fix-remaining",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 409,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "This generation is busy"
+      }
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/generations/000000000100/chunks/0/select-take",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": {
+      "take": 1
+     },
+     "response": {
+      "status": 409,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "This narration is busy. Try again when it finishes."
+      }
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/generations/000000000100/chunks/0/accept",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 409,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "This narration is busy. Try again when it finishes."
+      }
+     }
+    },
+    {
+     "method": "DELETE",
+     "path": "/api/generations/000000000100/chunks/0/accept",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 409,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "This narration is busy. Try again when it finishes."
+      }
+     }
+    },
+    {
+     "method": "PATCH",
+     "path": "/api/generations/000000000100",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": {
+      "speed": 1.3
+     },
+     "response": {
+      "status": 409,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "This generation is busy"
+      }
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/generations/000000000300/resume",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 409,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "Already running"
+      }
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/generations/000000000300/chunks/0/regenerate",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": {
+      "text": "New words."
+     },
+     "response": {
+      "status": 409,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "This generation is busy"
+      }
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/generations/000000000300/fix-remaining",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 409,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "This generation is busy"
+      }
+     }
+    },
+    {
+     "method": "PATCH",
+     "path": "/api/generations/000000000300",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": {
+      "speed": 0.8
+     },
+     "response": {
+      "status": 409,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "This generation is busy"
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/status",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "loaded_engine": null,
+       "running": {
+        "id": "0000000002",
+        "kind": "generate",
+        "ref": "000000000100",
+        "label": "Generating",
+        "status": "running",
+        "progress": 0.0,
+        "message": "Stub render",
+        "error": null,
+        "created": "<masked>",
+        "cancel": false,
+        "source": "api",
+        "phase": "processing",
+        "phase_started_at": "<masked>",
+        "last_progress_at": "<masked>",
+        "cancel_requested_at": null,
+        "cancel_acknowledged_at": null,
+        "started": "<masked>",
+        "gid": "000000000100",
+        "title": "Job one",
+        "done": 0,
+        "total": 1
+       },
+       "queued": 1,
+       "queue": [
+        {
+         "id": "0000000002",
+         "kind": "generate",
+         "ref": "000000000100",
+         "label": "Generating",
+         "status": "running",
+         "progress": 0.0,
+         "message": "Stub render",
+         "error": null,
+         "created": "<masked>",
+         "cancel": false,
+         "source": "api",
+         "phase": "processing",
+         "phase_started_at": "<masked>",
+         "last_progress_at": "<masked>",
+         "cancel_requested_at": null,
+         "cancel_acknowledged_at": null,
+         "started": "<masked>",
+         "gid": "000000000100",
+         "title": "Job one",
+         "done": 0,
+         "total": 1
+        },
+        {
+         "id": "0000000004",
+         "kind": "generate",
+         "ref": "000000000300",
+         "label": "Generating",
+         "status": "queued",
+         "progress": 0.0,
+         "message": "Queued",
+         "error": null,
+         "created": "<masked>",
+         "cancel": false,
+         "source": "mcp",
+         "phase": "queued",
+         "phase_started_at": "<masked>",
+         "last_progress_at": null,
+         "cancel_requested_at": null,
+         "cancel_acknowledged_at": null,
+         "gid": "000000000300",
+         "title": "A second script, queued behind the first.",
+         "done": 0,
+         "total": 1
+        }
+       ],
+       "duplicates": [
+        {
+         "gid": "000000000100",
+         "title": "Job one",
+         "count": 1,
+         "last": "<masked>"
+        },
+        {
+         "gid": "000000000300",
+         "title": "A second script, queued behind the first.",
+         "count": 1,
+         "last": "<masked>"
+        }
+       ],
+       "max_script_words": 10000
+      }
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/generations/000000000300/cancel",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "ok": true
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/000000000300",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "id": "000000000300",
+       "profile_id": "ctvoice01",
+       "profile_name": "Contract Voice",
+       "engine": "qwen3-tts-1.7b",
+       "language": "en",
+       "params": {},
+       "speed": 1.0,
+       "favorite": false,
+       "voice_settings": {
+        "stability": 0.5,
+        "similarity": 0.75,
+        "style": 0.0,
+        "mic_match": true,
+        "studio_finish": true
+       },
+       "title": "A second script, queued behind the first.",
+       "source": "mcp",
+       "text": "A second script, queued behind the first.",
+       "cleaned_text": "A second script, queued behind the first.",
+       "status": "cancelled",
+       "progress": 0.0,
+       "message": "Cancelled before it started",
+       "chunks": [
+        {
+         "i": 0,
+         "text": "A second script, queued behind the first.",
+         "pause_after": "end",
+         "status": "pending"
+        }
+       ],
+       "settings": {
+        "max_chunk_chars": 220,
+        "max_attempts": 4,
+        "compare_takes": 1,
+        "max_wer": 0.12,
+        "min_speaker_similarity": 0.85,
+        "max_internal_silence": 0.9,
+        "sentence_pause_ms": 350,
+        "paragraph_pause_ms": 700,
+        "target_lufs": -16.0,
+        "seed": 1234
+       },
+       "created": 1900000004.25,
+       "updated": 1900000004.75,
+       "outcome": null,
+       "review": [],
+       "job": null
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/jobs/0000000004",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "id": "0000000004",
+       "kind": "generate",
+       "ref": "000000000300",
+       "label": "Generating",
+       "status": "cancelled",
+       "progress": 0.0,
+       "message": "Queued",
+       "error": null,
+       "created": "<masked>",
+       "cancel": true,
+       "source": "mcp",
+       "phase": "queued",
+       "phase_started_at": "<masked>",
+       "last_progress_at": null,
+       "cancel_requested_at": "<masked>",
+       "cancel_acknowledged_at": null
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/status",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "loaded_engine": null,
+       "running": {
+        "id": "0000000002",
+        "kind": "generate",
+        "ref": "000000000100",
+        "label": "Generating",
+        "status": "running",
+        "progress": 0.0,
+        "message": "Stub render",
+        "error": null,
+        "created": "<masked>",
+        "cancel": false,
+        "source": "api",
+        "phase": "processing",
+        "phase_started_at": "<masked>",
+        "last_progress_at": "<masked>",
+        "cancel_requested_at": null,
+        "cancel_acknowledged_at": null,
+        "started": "<masked>",
+        "gid": "000000000100",
+        "title": "Job one",
+        "done": 0,
+        "total": 1
+       },
+       "queued": 0,
+       "queue": [
+        {
+         "id": "0000000002",
+         "kind": "generate",
+         "ref": "000000000100",
+         "label": "Generating",
+         "status": "running",
+         "progress": 0.0,
+         "message": "Stub render",
+         "error": null,
+         "created": "<masked>",
+         "cancel": false,
+         "source": "api",
+         "phase": "processing",
+         "phase_started_at": "<masked>",
+         "last_progress_at": "<masked>",
+         "cancel_requested_at": null,
+         "cancel_acknowledged_at": null,
+         "started": "<masked>",
+         "gid": "000000000100",
+         "title": "Job one",
+         "done": 0,
+         "total": 1
+        }
+       ],
+       "duplicates": [
+        {
+         "gid": "000000000100",
+         "title": "Job one",
+         "count": 1,
+         "last": "<masked>"
+        }
+       ],
+       "max_script_words": 10000
+      }
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/generations/000000000100/cancel",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "ok": true
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/jobs/0000000004",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": null,
+     "wait_before": {
+      "path": "/api/jobs/0000000004",
+      "key": "finished",
+      "value": "<set>"
+     },
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "id": "0000000004",
+       "kind": "generate",
+       "ref": "000000000300",
+       "label": "Generating",
+       "status": "cancelled",
+       "progress": 0.0,
+       "message": "Queued",
+       "error": null,
+       "created": "<masked>",
+       "cancel": true,
+       "source": "mcp",
+       "phase": "cancelled",
+       "phase_started_at": "<masked>",
+       "last_progress_at": "<masked>",
+       "cancel_requested_at": "<masked>",
+       "cancel_acknowledged_at": "<masked>",
+       "finished": "<masked>"
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/jobs/0000000002",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "id": "0000000002",
+       "kind": "generate",
+       "ref": "000000000100",
+       "label": "Generating",
+       "status": "cancelled",
+       "progress": 1.0,
+       "message": "Queued",
+       "error": null,
+       "created": "<masked>",
+       "cancel": true,
+       "source": "api",
+       "phase": "cancelled",
+       "phase_started_at": "<masked>",
+       "last_progress_at": "<masked>",
+       "cancel_requested_at": "<masked>",
+       "cancel_acknowledged_at": "<masked>",
+       "started": "<masked>",
+       "finished": "<masked>"
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/000000000100",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "id": "000000000100",
+       "profile_id": "ctvoice01",
+       "profile_name": "Contract Voice",
+       "engine": "qwen3-tts-1.7b",
+       "language": "en",
+       "params": {},
+       "speed": 1.0,
+       "favorite": false,
+       "voice_settings": {
+        "stability": 0.5,
+        "similarity": 0.75,
+        "style": 0.0,
+        "mic_match": true,
+        "studio_finish": true
+       },
+       "title": "Job one",
+       "source": "api",
+       "text": "The first job script. It has two sentences.",
+       "cleaned_text": "The first job script. It has two sentences.",
+       "status": "cancelled",
+       "progress": 0.0,
+       "message": "Stopped. Finished parts are kept; press Resume to finish the rest.",
+       "chunks": [
+        {
+         "i": 0,
+         "text": "The first job script. It has two sentences.",
+         "pause_after": "end",
+         "status": "pending"
+        }
+       ],
+       "settings": {
+        "max_chunk_chars": 220,
+        "max_attempts": 4,
+        "compare_takes": 1,
+        "max_wer": 0.12,
+        "min_speaker_similarity": 0.85,
+        "max_internal_silence": 0.9,
+        "sentence_pause_ms": 350,
+        "paragraph_pause_ms": 700,
+        "target_lufs": -16.0,
+        "seed": 1234
+       },
+       "created": 1900000003.5,
+       "updated": 1900000005.0,
+       "outcome": null,
+       "review": [],
+       "job": null
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/status",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "loaded_engine": null,
+       "running": null,
+       "queued": 0,
+       "queue": [],
+       "duplicates": [],
+       "max_script_words": 10000
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "g2",
+   "masked": true,
+   "setup": [
+    {
+     "gate": "open"
+    }
+   ],
+   "cases": [
+    {
+     "method": "GET",
+     "path": "/api/generations/000000000100",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "id": "000000000100",
+       "profile_id": "ctvoice01",
+       "profile_name": "Contract Voice",
+       "engine": "qwen3-tts-1.7b",
+       "language": "en",
+       "params": {},
+       "speed": 1.0,
+       "favorite": false,
+       "voice_settings": {
+        "stability": 0.5,
+        "similarity": 0.75,
+        "style": 0.0,
+        "mic_match": true,
+        "studio_finish": true
+       },
+       "title": "Job one",
+       "source": "api",
+       "text": "The first job script. It has two sentences.",
+       "cleaned_text": "The first job script. It has two sentences.",
+       "status": "cancelled",
+       "progress": 0.0,
+       "message": "Stopped. Finished parts are kept; press Resume to finish the rest.",
+       "chunks": [
+        {
+         "i": 0,
+         "text": "The first job script. It has two sentences.",
+         "pause_after": "end",
+         "status": "pending"
+        }
+       ],
+       "settings": {
+        "max_chunk_chars": 220,
+        "max_attempts": 4,
+        "compare_takes": 1,
+        "max_wer": 0.12,
+        "min_speaker_similarity": 0.85,
+        "max_internal_silence": 0.9,
+        "sentence_pause_ms": 350,
+        "paragraph_pause_ms": 700,
+        "target_lufs": -16.0,
+        "seed": 1234
+       },
+       "created": 1900000003.5,
+       "updated": 1900000005.0,
+       "outcome": null,
+       "review": [],
+       "job": null
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/jobs/0000000002",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "id": "0000000002",
+       "kind": "generate",
+       "ref": "000000000100",
+       "label": "Generating",
+       "status": "cancelled",
+       "progress": 1.0,
+       "message": "Queued",
+       "error": null,
+       "created": "<masked>",
+       "cancel": true,
+       "source": "api",
+       "phase": "cancelled",
+       "phase_started_at": "<masked>",
+       "last_progress_at": "<masked>",
+       "cancel_requested_at": "<masked>",
+       "cancel_acknowledged_at": "<masked>",
+       "started": "<masked>",
+       "finished": "<masked>"
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/status",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "loaded_engine": null,
+       "running": null,
+       "queued": 0,
+       "queue": [],
+       "duplicates": [],
+       "max_script_words": 10000
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "g3",
+   "masked": true,
+   "setup": [
+    {
+     "gate": "close"
+    },
+    {
+     "fail": true
+    }
+   ],
+   "cases": [
+    {
+     "method": "POST",
+     "path": "/api/generations",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": {
+      "profile_id": "ctvoice01",
+      "text": "This one is told to fail."
+     },
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "id": "000000000500",
+       "profile_id": "ctvoice01",
+       "profile_name": "Contract Voice",
+       "engine": "qwen3-tts-1.7b",
+       "language": "en",
+       "params": {},
+       "speed": 1.0,
+       "favorite": false,
+       "voice_settings": {
+        "stability": 0.5,
+        "similarity": 0.75,
+        "style": 0.0,
+        "mic_match": true,
+        "studio_finish": true
+       },
+       "title": "This one is told to fail.",
+       "source": "api",
+       "text": "This one is told to fail.",
+       "cleaned_text": "This one is told to fail.",
+       "status": "queued",
+       "progress": 0.0,
+       "message": "Queued",
+       "chunks": [
+        {
+         "i": 0,
+         "text": "This one is told to fail.",
+         "pause_after": "end",
+         "status": "pending"
+        }
+       ],
+       "settings": {
+        "max_chunk_chars": 220,
+        "max_attempts": 4,
+        "compare_takes": 1,
+        "max_wer": 0.12,
+        "min_speaker_similarity": 0.85,
+        "max_internal_silence": 0.9,
+        "sentence_pause_ms": 350,
+        "paragraph_pause_ms": 700,
+        "target_lufs": -16.0,
+        "seed": 1234
+       },
+       "created": 1900000005.25,
+       "updated": 1900000005.5,
+       "job": {
+        "id": "0000000006",
+        "kind": "generate",
+        "ref": "000000000500",
+        "label": "Generating",
+        "status": "queued",
+        "progress": 0.0,
+        "message": "Queued",
+        "error": null,
+        "created": "<masked>",
+        "cancel": false,
+        "source": "api",
+        "phase": "queued",
+        "phase_started_at": "<masked>",
+        "last_progress_at": null,
+        "cancel_requested_at": null,
+        "cancel_acknowledged_at": null
+       }
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/jobs/0000000006",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": null,
+     "wait_before": {
+      "path": "/api/jobs/0000000006",
+      "key": "finished",
+      "value": "<set>"
+     },
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "id": "0000000006",
+       "kind": "generate",
+       "ref": "000000000500",
+       "label": "Generating",
+       "status": "error",
+       "progress": 0.0,
+       "message": "Stub render failed.",
+       "error": "Stub render failed.",
+       "created": "<masked>",
+       "cancel": false,
+       "source": "api",
+       "phase": "error",
+       "phase_started_at": "<masked>",
+       "last_progress_at": "<masked>",
+       "cancel_requested_at": null,
+       "cancel_acknowledged_at": null,
+       "started": "<masked>",
+       "error_type": "RuntimeError",
+       "finished": "<masked>"
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/000000000500",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "id": "000000000500",
+       "profile_id": "ctvoice01",
+       "profile_name": "Contract Voice",
+       "engine": "qwen3-tts-1.7b",
+       "language": "en",
+       "params": {},
+       "speed": 1.0,
+       "favorite": false,
+       "voice_settings": {
+        "stability": 0.5,
+        "similarity": 0.75,
+        "style": 0.0,
+        "mic_match": true,
+        "studio_finish": true
+       },
+       "title": "This one is told to fail.",
+       "source": "api",
+       "text": "This one is told to fail.",
+       "cleaned_text": "This one is told to fail.",
+       "status": "error",
+       "progress": 0.0,
+       "message": "Stub render failed.",
+       "chunks": [
+        {
+         "i": 0,
+         "text": "This one is told to fail.",
+         "pause_after": "end",
+         "status": "pending"
+        }
+       ],
+       "settings": {
+        "max_chunk_chars": 220,
+        "max_attempts": 4,
+        "compare_takes": 1,
+        "max_wer": 0.12,
+        "min_speaker_similarity": 0.85,
+        "max_internal_silence": 0.9,
+        "sentence_pause_ms": 350,
+        "paragraph_pause_ms": 700,
+        "target_lufs": -16.0,
+        "seed": 1234
+       },
+       "created": 1900000005.25,
+       "updated": 1900000006.0,
+       "outcome": null,
+       "review": [],
+       "job": null
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/status",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "loaded_engine": null,
+       "running": null,
+       "queued": 0,
+       "queue": [],
+       "duplicates": [],
+       "max_script_words": 10000
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "g4",
+   "masked": true,
+   "setup": [
+    {
+     "fail": false
+    },
+    {
+     "add_take": [
+      "ctclean01",
+      0,
+      1
+     ]
+    }
+   ],
+   "cases": [
+    {
+     "method": "POST",
+     "path": "/api/generations/ctpending01/resume",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "id": "0000000007",
+       "kind": "generate",
+       "ref": "ctpending01",
+       "label": "Generating",
+       "status": "queued",
+       "progress": 0.0,
+       "message": "Queued",
+       "error": null,
+       "created": "<masked>",
+       "cancel": false,
+       "source": "api",
+       "phase": "queued",
+       "phase_started_at": "<masked>",
+       "last_progress_at": null,
+       "cancel_requested_at": null,
+       "cancel_acknowledged_at": null
+      }
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/generations/ctreview01/chunks/1/regenerate",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": {},
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "id": "0000000008",
+       "kind": "generate",
+       "ref": "ctreview01",
+       "label": "Generating",
+       "status": "queued",
+       "progress": 0.0,
+       "message": "Queued",
+       "error": null,
+       "created": "<masked>",
+       "cancel": false,
+       "source": "api",
+       "phase": "queued",
+       "phase_started_at": "<masked>",
+       "last_progress_at": null,
+       "cancel_requested_at": null,
+       "cancel_acknowledged_at": null
+      }
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/generations/ctaccept01/fix-remaining",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "id": "0000000009",
+       "kind": "generate",
+       "ref": "ctaccept01",
+       "label": "Generating",
+       "status": "queued",
+       "progress": 0.0,
+       "message": "Queued",
+       "error": null,
+       "created": "<masked>",
+       "cancel": false,
+       "source": "api",
+       "phase": "queued",
+       "phase_started_at": "<masked>",
+       "last_progress_at": null,
+       "cancel_requested_at": null,
+       "cancel_acknowledged_at": null
+      }
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/generations/ctclean01/chunks/0/select-take",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": {
+      "take": 1
+     },
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "id": "000000000a",
+       "kind": "generate",
+       "ref": "ctclean01",
+       "label": "Switching take",
+       "status": "queued",
+       "progress": 0.0,
+       "message": "Queued",
+       "error": null,
+       "created": "<masked>",
+       "cancel": false,
+       "source": "unknown",
+       "phase": "queued",
+       "phase_started_at": "<masked>",
+       "last_progress_at": null,
+       "cancel_requested_at": null,
+       "cancel_acknowledged_at": null
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/status",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": null,
+     "wait_before": {
+      "path": "/api/generations/ctpending01",
+      "key": "status",
+      "value": "running"
+     },
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "loaded_engine": null,
+       "running": {
+        "id": "0000000007",
+        "kind": "generate",
+        "ref": "ctpending01",
+        "label": "Generating",
+        "status": "running",
+        "progress": 0.0,
+        "message": "Stub render",
+        "error": null,
+        "created": "<masked>",
+        "cancel": false,
+        "source": "api",
+        "phase": "processing",
+        "phase_started_at": "<masked>",
+        "last_progress_at": "<masked>",
+        "cancel_requested_at": null,
+        "cancel_acknowledged_at": null,
+        "started": "<masked>",
+        "gid": "ctpending01",
+        "title": "Not rendered yet",
+        "done": 0,
+        "total": 1
+       },
+       "queued": 3,
+       "queue": [
+        {
+         "id": "0000000007",
+         "kind": "generate",
+         "ref": "ctpending01",
+         "label": "Generating",
+         "status": "running",
+         "progress": 0.0,
+         "message": "Stub render",
+         "error": null,
+         "created": "<masked>",
+         "cancel": false,
+         "source": "api",
+         "phase": "processing",
+         "phase_started_at": "<masked>",
+         "last_progress_at": "<masked>",
+         "cancel_requested_at": null,
+         "cancel_acknowledged_at": null,
+         "started": "<masked>",
+         "gid": "ctpending01",
+         "title": "Not rendered yet",
+         "done": 0,
+         "total": 1
+        },
+        {
+         "id": "0000000008",
+         "kind": "generate",
+         "ref": "ctreview01",
+         "label": "Generating",
+         "status": "queued",
+         "progress": 1.0,
+         "message": "Done, needs review: part 2, 3.",
+         "error": null,
+         "created": "<masked>",
+         "cancel": false,
+         "source": "api",
+         "phase": "queued",
+         "phase_started_at": "<masked>",
+         "last_progress_at": null,
+         "cancel_requested_at": null,
+         "cancel_acknowledged_at": null,
+         "gid": "ctreview01",
+         "title": "Three parts to review",
+         "done": 3,
+         "total": 3
+        },
+        {
+         "id": "0000000009",
+         "kind": "generate",
+         "ref": "ctaccept01",
+         "label": "Generating",
+         "status": "queued",
+         "progress": 1.0,
+         "message": "Done, needs review: part 2.",
+         "error": null,
+         "created": "<masked>",
+         "cancel": false,
+         "source": "api",
+         "phase": "queued",
+         "phase_started_at": "<masked>",
+         "last_progress_at": null,
+         "cancel_requested_at": null,
+         "cancel_acknowledged_at": null,
+         "gid": "ctaccept01",
+         "title": "Sounds fine test",
+         "done": 2,
+         "total": 2
+        },
+        {
+         "id": "000000000a",
+         "kind": "generate",
+         "ref": "ctclean01",
+         "label": "Switching take",
+         "status": "queued",
+         "progress": 1.0,
+         "message": "Done. All parts passed the automated checks.",
+         "error": null,
+         "created": "<masked>",
+         "cancel": false,
+         "source": "unknown",
+         "phase": "queued",
+         "phase_started_at": "<masked>",
+         "last_progress_at": null,
+         "cancel_requested_at": null,
+         "cancel_acknowledged_at": null,
+         "gid": "ctclean01",
+         "title": "Rivers and towns",
+         "done": 2,
+         "total": 2
+        }
+       ],
+       "duplicates": [],
+       "max_script_words": 10000
+      }
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/generations/ctclean01/cancel",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "ok": true
+      }
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/generations/ctaccept01/cancel",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "ok": true
+      }
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/generations/ctreview01/cancel",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "ok": true
+      }
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/generations/ctpending01/cancel",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "ok": true
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/diagnostics",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": null,
+     "wait_before": {
+      "path": "/api/jobs/000000000a",
+      "key": "finished",
+      "value": "<set>"
+     },
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "runtime": {
+        "pid": "<masked>",
+        "started_at": "<masked>",
+        "source_sha256": "<masked>"
+       },
+       "jobs": [
+        {
+         "id": "000000000a",
+         "kind": "generate",
+         "ref": "ctclean01",
+         "source": "unknown",
+         "status": "cancelled",
+         "created": "<masked>",
+         "started": null,
+         "finished": "<masked>",
+         "phase": "cancelled",
+         "phase_started_at": "<masked>",
+         "last_progress_at": "<masked>",
+         "cancel_requested_at": "<masked>",
+         "cancel_acknowledged_at": "<masked>",
+         "error_type": null,
+         "phase_elapsed_seconds": null,
+         "events": [
+          {
+           "at": "<masked>",
+           "event": "submitted",
+           "phase": "queued"
+          },
+          {
+           "at": "<masked>",
+           "event": "cancel_requested",
+           "phase": "queued"
+          },
+          {
+           "at": "<masked>",
+           "event": "cancel_acknowledged",
+           "phase": "queued"
+          },
+          {
+           "at": "<masked>",
+           "event": "finished",
+           "phase": "cancelled"
+          }
+         ]
+        },
+        {
+         "id": "0000000009",
+         "kind": "generate",
+         "ref": "ctaccept01",
+         "source": "api",
+         "status": "cancelled",
+         "created": "<masked>",
+         "started": null,
+         "finished": "<masked>",
+         "phase": "cancelled",
+         "phase_started_at": "<masked>",
+         "last_progress_at": "<masked>",
+         "cancel_requested_at": "<masked>",
+         "cancel_acknowledged_at": "<masked>",
+         "error_type": null,
+         "phase_elapsed_seconds": null,
+         "events": [
+          {
+           "at": "<masked>",
+           "event": "submitted",
+           "phase": "queued"
+          },
+          {
+           "at": "<masked>",
+           "event": "cancel_requested",
+           "phase": "queued"
+          },
+          {
+           "at": "<masked>",
+           "event": "cancel_acknowledged",
+           "phase": "queued"
+          },
+          {
+           "at": "<masked>",
+           "event": "finished",
+           "phase": "cancelled"
+          }
+         ]
+        },
+        {
+         "id": "0000000008",
+         "kind": "generate",
+         "ref": "ctreview01",
+         "source": "api",
+         "status": "cancelled",
+         "created": "<masked>",
+         "started": null,
+         "finished": "<masked>",
+         "phase": "cancelled",
+         "phase_started_at": "<masked>",
+         "last_progress_at": "<masked>",
+         "cancel_requested_at": "<masked>",
+         "cancel_acknowledged_at": "<masked>",
+         "error_type": null,
+         "phase_elapsed_seconds": null,
+         "events": [
+          {
+           "at": "<masked>",
+           "event": "submitted",
+           "phase": "queued"
+          },
+          {
+           "at": "<masked>",
+           "event": "cancel_requested",
+           "phase": "queued"
+          },
+          {
+           "at": "<masked>",
+           "event": "cancel_acknowledged",
+           "phase": "queued"
+          },
+          {
+           "at": "<masked>",
+           "event": "finished",
+           "phase": "cancelled"
+          }
+         ]
+        },
+        {
+         "id": "0000000007",
+         "kind": "generate",
+         "ref": "ctpending01",
+         "source": "api",
+         "status": "cancelled",
+         "created": "<masked>",
+         "started": "<masked>",
+         "finished": "<masked>",
+         "phase": "cancelled",
+         "phase_started_at": "<masked>",
+         "last_progress_at": "<masked>",
+         "cancel_requested_at": "<masked>",
+         "cancel_acknowledged_at": "<masked>",
+         "error_type": null,
+         "phase_elapsed_seconds": null,
+         "events": [
+          {
+           "at": "<masked>",
+           "event": "submitted",
+           "phase": "queued"
+          },
+          {
+           "at": "<masked>",
+           "event": "started",
+           "phase": "processing"
+          },
+          {
+           "at": "<masked>",
+           "event": "cancel_requested",
+           "phase": "processing"
+          },
+          {
+           "at": "<masked>",
+           "event": "cancel_acknowledged",
+           "phase": "processing"
+          },
+          {
+           "at": "<masked>",
+           "event": "finished",
+           "phase": "cancelled"
+          }
+         ]
+        },
+        {
+         "id": "0000000006",
+         "kind": "generate",
+         "ref": "000000000500",
+         "source": "api",
+         "status": "error",
+         "created": "<masked>",
+         "started": "<masked>",
+         "finished": "<masked>",
+         "phase": "error",
+         "phase_started_at": "<masked>",
+         "last_progress_at": "<masked>",
+         "cancel_requested_at": null,
+         "cancel_acknowledged_at": null,
+         "error_type": "RuntimeError",
+         "phase_elapsed_seconds": null,
+         "events": [
+          {
+           "at": "<masked>",
+           "event": "submitted",
+           "phase": "queued"
+          },
+          {
+           "at": "<masked>",
+           "event": "started",
+           "phase": "processing"
+          },
+          {
+           "at": "<masked>",
+           "event": "finished",
+           "phase": "error"
+          }
+         ]
+        },
+        {
+         "id": "0000000004",
+         "kind": "generate",
+         "ref": "000000000300",
+         "source": "mcp",
+         "status": "cancelled",
+         "created": "<masked>",
+         "started": null,
+         "finished": "<masked>",
+         "phase": "cancelled",
+         "phase_started_at": "<masked>",
+         "last_progress_at": "<masked>",
+         "cancel_requested_at": "<masked>",
+         "cancel_acknowledged_at": "<masked>",
+         "error_type": null,
+         "phase_elapsed_seconds": null,
+         "events": [
+          {
+           "at": "<masked>",
+           "event": "submitted",
+           "phase": "queued"
+          },
+          {
+           "at": "<masked>",
+           "event": "cancel_requested",
+           "phase": "queued"
+          },
+          {
+           "at": "<masked>",
+           "event": "cancel_acknowledged",
+           "phase": "queued"
+          },
+          {
+           "at": "<masked>",
+           "event": "finished",
+           "phase": "cancelled"
+          }
+         ]
+        },
+        {
+         "id": "0000000002",
+         "kind": "generate",
+         "ref": "000000000100",
+         "source": "api",
+         "status": "cancelled",
+         "created": "<masked>",
+         "started": "<masked>",
+         "finished": "<masked>",
+         "phase": "cancelled",
+         "phase_started_at": "<masked>",
+         "last_progress_at": "<masked>",
+         "cancel_requested_at": "<masked>",
+         "cancel_acknowledged_at": "<masked>",
+         "error_type": null,
+         "phase_elapsed_seconds": null,
+         "events": [
+          {
+           "at": "<masked>",
+           "event": "submitted",
+           "phase": "queued"
+          },
+          {
+           "at": "<masked>",
+           "event": "started",
+           "phase": "processing"
+          },
+          {
+           "at": "<masked>",
+           "event": "cancel_requested",
+           "phase": "processing"
+          },
+          {
+           "at": "<masked>",
+           "event": "cancel_acknowledged",
+           "phase": "processing"
+          },
+          {
+           "at": "<masked>",
+           "event": "finished",
+           "phase": "cancelled"
+          }
+         ]
+        }
+       ],
+       "job_limit": 20,
+       "event_limit": 32
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/status",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "loaded_engine": null,
+       "running": null,
+       "queued": 0,
+       "queue": [],
+       "duplicates": [],
+       "max_script_words": 10000
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/jobs/0000000007",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "id": "0000000007",
+       "kind": "generate",
+       "ref": "ctpending01",
+       "label": "Generating",
+       "status": "cancelled",
+       "progress": 1.0,
+       "message": "Queued",
+       "error": null,
+       "created": "<masked>",
+       "cancel": true,
+       "source": "api",
+       "phase": "cancelled",
+       "phase_started_at": "<masked>",
+       "last_progress_at": "<masked>",
+       "cancel_requested_at": "<masked>",
+       "cancel_acknowledged_at": "<masked>",
+       "started": "<masked>",
+       "finished": "<masked>"
+      }
+     }
+    }
+   ]
   }
  ]
 }

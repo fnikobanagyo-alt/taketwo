@@ -1,7 +1,9 @@
-//! `taketwo-engine serve [--port N] [--ui DIR]`: isolated mode only (no lock file, idle exit,
-//! parent watch or address file yet; those are S07b).
+//! `taketwo-engine serve [--port N] [--ui DIR] [--stub-renderer]`: isolated mode only.
+//! `--stub-renderer` wires the stub renderer (its gate is the folder `TAKETWO_STUB_GATE`); without it every
+//! path that would start a job answers 501.
 
 use crate::api::{self, AppState};
+use crate::render::{Renderer, StubRenderer};
 use std::ffi::OsStr;
 use std::io::Write;
 use std::net::TcpListener;
@@ -15,15 +17,24 @@ pub struct ServeArgs {
     pub data: PathBuf,
     pub port: Option<u16>,
     pub ui: Option<PathBuf>,
+    pub stub_renderer: bool,
 }
 
 /// Check the arguments before anything is opened or bound. `taketwo_data` is the value of `TAKETWO_DATA`.
 pub fn parse(args: &[String], taketwo_data: Option<&OsStr>) -> Result<ServeArgs, String> {
     let mode = Mode::resolve(taketwo_data, args.iter().any(|a| a == "--live"))?;
+    parse_for(args, &mode)
+}
+
+/// The checks that depend on the mode, given the mode (a unit test passes a live value here).
+pub fn parse_for(args: &[String], mode: &Mode) -> Result<ServeArgs, String> {
+    if mode.is_live() && args.iter().any(|a| a == "--stub-renderer") {
+        return Err("--stub-renderer is only allowed in isolated mode (TAKETWO_DATA set, no --live)".into());
+    }
     let Mode::Isolated { data } = mode.clone() else {
         return Err("serve --live is not built yet; set TAKETWO_DATA to a temporary folder".into());
     };
-    let (mut port, mut ui) = (None, None);
+    let (mut port, mut ui, mut stub_renderer) = (None, None, false);
     let mut it = args.iter();
     while let Some(a) = it.next() {
         match a.as_str() {
@@ -34,10 +45,11 @@ pub fn parse(args: &[String], taketwo_data: Option<&OsStr>) -> Result<ServeArgs,
                 port = Some(p);
             }
             "--ui" => ui = Some(PathBuf::from(it.next().ok_or("--ui needs a folder")?)),
+            "--stub-renderer" => stub_renderer = true,
             other => return Err(format!("serve: unknown argument {other}")),
         }
     }
-    Ok(ServeArgs { data, port, ui })
+    Ok(ServeArgs { data, port, ui, stub_renderer })
 }
 
 fn bind(a: &ServeArgs) -> Result<TcpListener, String> {
@@ -77,7 +89,11 @@ pub fn run(args: &[String]) -> Result<(), String> {
     let port = listener.local_addr().map_err(|e| e.to_string())?.port();
     let ui = a.ui.filter(|d| d.is_dir());
     let started = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).map(|d| d.as_secs_f64()).unwrap_or(0.0);
-    let app = api::router(Arc::new(AppState { lib, ui, started, reveal: Box::new(api::reveal_in_file_manager) }));
+    let renderer: Option<Arc<dyn Renderer>> = a.stub_renderer.then(|| {
+        let gate = std::env::var_os("TAKETWO_STUB_GATE").filter(|g| !g.is_empty()).map(PathBuf::from);
+        Arc::new(StubRenderer { gate }) as Arc<dyn Renderer>
+    });
+    let app = api::router(Arc::new(AppState::new(lib, ui, started, Box::new(api::reveal_in_file_manager), renderer, crate::worker::random_ids())));
     let rt = tokio::runtime::Builder::new_multi_thread().worker_threads(4).enable_all().build().map_err(|e| e.to_string())?;
     rt.block_on(async move {
         let listener = tokio::net::TcpListener::from_std(listener).map_err(|e| e.to_string())?;
@@ -105,8 +121,16 @@ mod tests {
             assert!(parse(&args(&["--port", p]), Some(d)).unwrap_err().contains("reserved"), "{p}");
         }
         let ok = parse(&args(&["--port", "8790", "--ui", "ui"]), Some(d)).unwrap();
-        assert_eq!(ok, ServeArgs { data: "/tmp/x".into(), port: Some(8790), ui: Some("ui".into()) });
+        assert_eq!(ok, ServeArgs { data: "/tmp/x".into(), port: Some(8790), ui: Some("ui".into()), stub_renderer: false });
+        assert!(parse(&args(&["--stub-renderer"]), Some(d)).unwrap().stub_renderer);
         assert!(parse(&args(&["--port", "x"]), Some(d)).is_err());
         assert!(parse(&args(&["--bogus"]), Some(d)).is_err());
+    }
+
+    #[test]
+    fn stub_renderer_is_refused_in_live_mode() {
+        let e = parse_for(&args(&["--stub-renderer"]), &Mode::Live).unwrap_err();
+        assert!(e.contains("only allowed in isolated mode"), "{e}");
+        assert!(parse_for(&args(&[]), &Mode::Live).unwrap_err().contains("not built yet"));
     }
 }

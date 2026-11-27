@@ -1,4 +1,4 @@
-"""Record what the Python engine answers over HTTP, for the Rust engine's parity test (steps S06, S07a).
+"""Record what the Python engine answers over HTTP, for the Rust engine's parity test (steps S06, S07a, S07b).
 
     backend/.venv/bin/python -B rust/golden/record_http.py
 
@@ -19,9 +19,19 @@ and every refusal of the routes that would start a job, each change undone or fo
 shows it. Setup steps between phases (a narration "running", a voice "analyzing", and back) are made
 through db.py here and through the library in the Rust test. The engine runs as a child of this script
 (`--serve`), with db.py's and pipeline.py's clocks pinned to one stepping counter (so `updated`,
-`accepted.at` and `deleted_at` are the same on every run) and `worker.submit` replaced by a function that
-raises: no recorded request can start a job or load a model. Never recorded: reveal (it opens the file
-manager), a create, resume, re-speak, take switch or fix that passes its checks, a speed change.
+`accepted.at` and `deleted_at` are the same on every run). Never recorded: reveal (it opens the file
+manager), a speed change.
+
+Step S07b adds job phases (g1 to g4) with the real worker.py. In the engine child, pipeline.run_generation,
+regenerate_chunk, fix_remaining and select_take are replaced from the start by a gated fake that does what
+the Rust StubRenderer does up to its gate: mark the narration running (its first part to do running) in
+one save, then wait until `<gate>/go` exists, raising RuntimeError when `<gate>/fail` exists and marking
+the narration cancelled when cancel is asked. engines.load raises, so no model can load. Job and narration
+ids are pinned (uuid.uuid4 is a counter in the child). A case may carry `wait_before`: the recorder (and
+the Rust replay) polls a GET until a key has a value, so each state exists before it is asked about.
+In the job phases, clock values the worker and main.py take from time.time() (job times, event times,
+the duplicate notice's `last`, the runtime block) are recorded as "<masked>" (null stays null); see MASKED
+in the Rust test. No document is recorded after a stub render finished.
 """
 from __future__ import annotations
 
@@ -46,6 +56,11 @@ HOST = "127.0.0.1:8790"  # sent on every request; the guard compares Origin with
 CLOCK0 = 1800000000.0
 ENGINE_CLOCK0 = 1900000000.0  # the engine child's own counter (a second process, as in the Rust test's second library handle)
 HEADERS = ("content-type", "content-disposition", "cache-control", "x-preview-kind", "content-range")
+JOB_TIMES = ("created", "started", "finished", "phase_started_at", "last_progress_at", "cancel_requested_at",
+             "cancel_acknowledged_at", "phase_elapsed_seconds")
+STUB_RUNNING = "Stub render"  # the Rust StubRenderer's texts (crates/taketwo-engine/src/render.rs)
+STUB_FAILED = "Stub render failed."
+STOPPED = "Stopped. Finished parts are kept; press Resume to finish the rest."
 SHAPE_ONLY = {"/api/engines", "/api/integrations", "/api/diagnostics"}
 
 sys.path.insert(0, str(WT / "contract"))
@@ -245,15 +260,104 @@ def cases_phase_f() -> list[dict]:
     return [_case("GET", f"/api/profiles/{VOICE}"), _case("GET", "/api/profiles"), _case("GET", "/api/status")]
 
 
+def job_id(n: int) -> str:
+    """The n-th pinned uuid4 of the engine child, as a job id (hex[:10])."""
+    return f"{n:010x}"
+
+
+def gen_id(n: int) -> str:
+    """The n-th pinned uuid4 of the engine child, as a narration id (hex[:12])."""
+    return (f"{n:010x}" + f"{n:022x}")[:12]
+
+
+def until(path: str, key: str, value) -> dict:
+    return {"path": path, "key": key, "value": value}
+
+
+SCRIPT1 = "The first job script. It has two sentences."
+SCRIPT2 = "A second script, queued behind the first."
+SCRIPT3 = "This one is told to fail."
+
+
+def cases_phase_g1() -> list[dict]:
+    """A running job at the closed gate and a second one queued behind it; every busy refusal; both cancelled."""
+    w, G = _case, "/api/generations"
+    n1, j1, n2, j2 = gen_id(1), job_id(2), gen_id(3), job_id(4)
+    c = [w("POST", G, {"profile_id": VOICE, "text": SCRIPT1, "title": "Job one"})]
+    c.append({**w("GET", f"{G}/{n1}"), "wait_before": until(f"{G}/{n1}", "status", "running")})
+    c += [w("GET", "/api/status"), w("POST", G, {"profile_id": VOICE, "text": SCRIPT1}), w("GET", "/api/status"),
+          w("POST", G, {"profile_id": VOICE, "text": SCRIPT2}, {"X-TakeTwo-Client": "mcp"}),
+          w("GET", f"{G}/{n2}"), w("GET", f"/api/jobs/{j2}"), w("GET", f"/api/jobs/{j1}"),
+          w("POST", G, {"profile_id": VOICE, "text": SCRIPT2}), w("GET", f"{G}/{n1}"), w("GET", f"{G}/{n2}"),
+          # every busy refusal, on the running and on the queued narration
+          w("POST", f"{G}/{n1}/resume"), w("POST", f"{G}/{n1}/chunks/0/regenerate", {}), w("POST", f"{G}/{n1}/fix-remaining"),
+          w("POST", f"{G}/{n1}/chunks/0/select-take", {"take": 1}), w("POST", f"{G}/{n1}/chunks/0/accept"),
+          w("DELETE", f"{G}/{n1}/chunks/0/accept"), w("PATCH", f"{G}/{n1}", {"speed": 1.3}),
+          w("POST", f"{G}/{n2}/resume"), w("POST", f"{G}/{n2}/chunks/0/regenerate", {"text": "New words."}),
+          w("POST", f"{G}/{n2}/fix-remaining"), w("PATCH", f"{G}/{n2}", {"speed": 0.8}),
+          w("GET", "/api/status"),
+          # cancel the queued one: cancelled at once
+          w("POST", f"{G}/{n2}/cancel"), w("GET", f"{G}/{n2}"), w("GET", f"/api/jobs/{j2}"), w("GET", "/api/status"),
+          # cancel the running one; read once the loop has reaped both
+          w("POST", f"{G}/{n1}/cancel")]
+    c.append({**w("GET", f"/api/jobs/{j2}"), "wait_before": until(f"/api/jobs/{j2}", "finished", "<set>")})
+    c += [w("GET", f"/api/jobs/{j1}"), w("GET", f"{G}/{n1}"), w("GET", "/api/status")]
+    return c
+
+
+def cases_phase_g2() -> list[dict]:
+    """The gate opened after the cancel: nothing changes."""
+    G = "/api/generations"
+    return [_case("GET", f"{G}/{gen_id(1)}"), _case("GET", f"/api/jobs/{job_id(2)}"), _case("GET", "/api/status")]
+
+
+def cases_phase_g3() -> list[dict]:
+    """The gate closed again and the fail switch on: a job that fails."""
+    G = "/api/generations"
+    n3, j3 = gen_id(5), job_id(6)
+    return [_case("POST", G, {"profile_id": VOICE, "text": SCRIPT3}),
+            {**_case("GET", f"/api/jobs/{j3}"), "wait_before": until(f"/api/jobs/{j3}", "finished", "<set>")},
+            _case("GET", f"{G}/{n3}"), _case("GET", "/api/status")]
+
+
+def cases_phase_g4() -> list[dict]:
+    """Resume, re-speak, fix and take switch accepted (the job answers only), then all cancelled; diagnostics."""
+    w, G = _case, "/api/generations"
+    c = [w("POST", f"{G}/ctpending01/resume"), w("POST", f"{G}/ctreview01/chunks/1/regenerate", {}),
+         w("POST", f"{G}/ctaccept01/fix-remaining"), w("POST", f"{G}/ctclean01/chunks/0/select-take", {"take": 1})]
+    c.append({**w("GET", "/api/status"), "wait_before": until(f"{G}/ctpending01", "status", "running")})
+    c += [w("POST", f"{G}/{g}/cancel") for g in ("ctclean01", "ctaccept01", "ctreview01", "ctpending01")]
+    c.append({**w("GET", "/api/diagnostics"), "wait_before": until(f"/api/jobs/{job_id(10)}", "finished", "<set>")})
+    c += [w("GET", "/api/status"), w("GET", f"/api/jobs/{job_id(7)}")]
+    return c
+
+
+JOB_PHASES = {"g1": cases_phase_g1, "g2": cases_phase_g2, "g3": cases_phase_g3, "g4": cases_phase_g4}
+
+
 SETUP = {
     "a": [], "b": [{"soft_delete": "cttrash01"}],
     "c": [], "d": [{"set_status": ["generations", "ctaccept01", "running"]}],
     "e": [{"set_status": ["generations", "ctaccept01", "done"]}, {"set_status": ["profiles", VOICE, "analyzing"]}],
     "f": [{"set_status": ["profiles", VOICE, "ready"]}],
+    "g1": [], "g2": [{"gate": "open"}], "g3": [{"gate": "close"}, {"fail": True}],
+    "g4": [{"fail": False}, {"add_take": ["ctclean01", 0, 1]}],
 }
 
 
-def run_setup(db, step: dict) -> None:
+def run_setup(db, step: dict, gate: Path) -> None:
+    if "gate" in step:
+        (gate / "go").touch() if step["gate"] == "open" else (gate / "go").unlink()
+        return
+    if "fail" in step:
+        (gate / "fail").touch() if step["fail"] else (gate / "fail").unlink()
+        return
+    if "add_take" in step:  # a kept earlier take, so a take switch passes its checks (the fixture keeps none)
+        gid, ci, take = step["add_take"]
+        doc = db.get_generation(gid)
+        doc["chunks"][ci]["takes"] = [{"take": take, "text": doc["chunks"][ci]["text"]}]
+        db.put_generation(doc)
+        return
     if "soft_delete" in step:
         assert db.set_generation_deleted(step["soft_delete"], True)
         return
@@ -264,7 +368,35 @@ def run_setup(db, step: dict) -> None:
     put(doc)
 
 
-def send(port: int, case: dict) -> dict:
+def mask(v):
+    """Clock values of the worker and main.py, by position: job objects, events, notices, the runtime block."""
+    if isinstance(v, list):
+        return [mask(x) for x in v]
+    if not isinstance(v, dict):
+        return v
+    job, notice, event, runtime = ("kind" in v and "phase" in v), ("count" in v and "last" in v), ("event" in v and "at" in v), "source_sha256" in v
+    out = {}
+    for k, x in v.items():
+        hide = (job and k in JOB_TIMES) or (notice and k == "last") or (event and k == "at") or (runtime and k in ("pid", "started_at", "source_sha256"))
+        out[k] = ("<masked>" if x is not None else None) if hide else mask(x)
+    return out
+
+
+def wait_for(port: int, w: dict) -> None:
+    for _ in range(1000):  # 20 s
+        r = send(port, _case("GET", w["path"]))
+        v = r.get("json")
+        for k in w["key"].split("."):
+            v = v.get(k) if isinstance(v, dict) else None
+        if (w["value"] == "<set>" and v is not None) or v == w["value"]:
+            return
+        time.sleep(0.02)
+    raise SystemExit(f"timed out waiting for {w}")
+
+
+def send(port: int, case: dict, masked: bool = False) -> dict:
+    if case.get("wait_before"):
+        wait_for(port, case["wait_before"])
     conn = http.client.HTTPConnection("127.0.0.1", port, timeout=30)
     data = json.dumps(case["body"]).encode() if case["body"] is not None else None
     headers = {**({"Content-Type": "application/json"} if data is not None else {}), **case["headers"]}
@@ -282,11 +414,11 @@ def send(port: int, case: dict) -> dict:
     ctype = got.get("content-type", "")
     if ctype.startswith("application/json"):
         body = json.loads(raw)
-        if case["path"].split("?")[0] in SHAPE_ONLY and r.status == 200:
+        if case["path"].split("?")[0] in SHAPE_ONLY and r.status == 200 and not masked:
             out["shape"] = list((body[0] if isinstance(body, list) else body).keys())
             out["count"] = len(body) if isinstance(body, list) else None
         else:
-            out["json"] = body
+            out["json"] = mask(body) if masked else body
     elif ctype.startswith("text/"):
         out["text"] = raw.decode("utf-8")
     else:
@@ -306,18 +438,65 @@ def pin_clock(db, start: float = CLOCK0, pipeline=None) -> None:
         pipeline.time = types.SimpleNamespace(**{k: getattr(time, k) for k in ("sleep", "monotonic", "perf_counter")}, time=now)
 
 
+def install_fakes(db, pipeline, engines, gate: Path) -> None:
+    """The gated fake of the four pipeline calls (what the Rust StubRenderer does up to its gate)."""
+
+    def no_model(*args, **kwargs):
+        raise RuntimeError("record_http.py must never load a model")
+
+    engines.load = no_model
+
+    def fake(gid, first, cancel):
+        g = db.get_generation(gid)
+        g["status"], g["message"] = "running", STUB_RUNNING
+        if first is None:
+            first = next((c["i"] for c in g["chunks"] if c["status"] != "ok"), None)
+        for c in g["chunks"]:
+            if first is not None and c["i"] == first:
+                c["status"] = "running"
+        db.put_generation_live(g)
+        while True:
+            if (gate / "fail").exists():
+                raise RuntimeError(STUB_FAILED)
+            if cancel():
+                g["status"], g["message"] = "cancelled", STOPPED
+                for c in g["chunks"]:
+                    if c["status"] == "running":
+                        c["status"] = "pending"
+                db.put_generation_live(g)
+                return
+            if (gate / "go").exists():
+                return  # the Rust stub writes a finished narration here; never recorded
+            time.sleep(0.02)
+
+    pipeline.run_generation = lambda gid, cancel, only_chunks=None: fake(gid, only_chunks[0] if only_chunks else None, cancel)
+    pipeline.regenerate_chunk = lambda gid, ci, text, cancel: fake(gid, ci, cancel)
+    pipeline.fix_remaining = lambda gid, cancel: fake(gid, None, cancel)
+    pipeline.select_take = lambda gid, ci, take: fake(gid, ci, lambda: False)  # main.py passes no cancel here
+
+
+def pin_uuid() -> None:
+    """uuid.uuid4 as a counter: narration ids (hex[:12]) and job ids (hex[:10]) are the same on every run."""
+    import uuid
+
+    n = [0]
+
+    def uuid4():
+        n[0] += 1
+        return types.SimpleNamespace(hex=f"{n[0]:010x}{n[0]:022x}")
+
+    uuid.uuid4 = uuid4
+
+
 def serve_child(port: int) -> None:
-    """The Python engine with pinned clocks and no worker, in this process (started by main())."""
+    """The Python engine with pinned clocks and ids and a gated fake renderer, in this process (started by main())."""
     sys.path.insert(0, str(BACKEND))
-    from app import config, db, pipeline, worker
+    pin_uuid()
+    from app import config, db, engines, pipeline
 
     assert config.DATA_DIR.resolve() == Path(os.environ["TAKETWO_DATA"]).resolve(), config.DATA_DIR
     pin_clock(db, ENGINE_CLOCK0, pipeline)
-
-    def no_job(*args, **kwargs):
-        raise RuntimeError("record_http.py must never start a job")
-
-    worker.submit = no_job
+    install_fakes(db, pipeline, engines, Path(os.environ["TAKETWO_STUB_GATE"]))
     import uvicorn
     from app import main as engine
 
@@ -350,7 +529,9 @@ def main() -> int:
         pin_clock(db)
         seed_python.seed(data)
         port = free_port()
-        env = {**os.environ, "HF_HOME": str(tmp / "hf")}
+        gate = tmp / "gate"
+        gate.mkdir()
+        env = {**os.environ, "HF_HOME": str(tmp / "hf"), "TAKETWO_STUB_GATE": str(gate)}
         log = open(tmp / "engine.log", "w+b")
         proc = subprocess.Popen([sys.executable, "-B", str(Path(__file__).resolve()), "--serve", str(port)],
                                 cwd=BACKEND, env=env, stdout=log, stderr=subprocess.STDOUT)
@@ -359,13 +540,20 @@ def main() -> int:
         for name, cases in (("a", cases_phase_a()), ("b", cases_phase_b()), ("c", cases_phase_c()), ("d", cases_phase_d()),
                             ("e", cases_phase_e()), ("f", cases_phase_f())):
             for step in SETUP[name]:
-                run_setup(db, step)
+                run_setup(db, step, gate)
             phases.append({"name": name, "setup": SETUP[name], "cases": [{**c, "response": send(port, c)} for c in cases]})
+        status_f = phases[-1]["cases"][-1]["response"]["json"]
+        assert status_f["queue"] == [] and status_f["running"] is None, "a case before the job phases started a job"
+        for name, cases in JOB_PHASES.items():
+            for step in SETUP[name]:
+                run_setup(db, step, gate)
+            phases.append({"name": name, "masked": True, "setup": SETUP[name],
+                           "cases": [{**c, "response": send(port, c, masked=True)} for c in cases()]})
         for p in phases:
             for c in p["cases"]:
-                assert c["response"]["status"] != 500, c  # 500 here means a case reached worker.submit
+                assert c["response"]["status"] != 500, c
         log.seek(0)
-        assert b"must never start a job" not in log.read(), "a recorded request tried to start a job"
+        assert b"must never load a model" not in log.read(), "a recorded request tried to load a model"
         OUT.write_text(json.dumps({"clock_start": CLOCK0, "engine_clock_start": ENGINE_CLOCK0, "clock_step": 0.25, "phases": phases},
                                   indent=1, ensure_ascii=False) + "\n")
         print(f"wrote {OUT.relative_to(WT)}: {sum(len(p['cases']) for p in phases)} cases")
