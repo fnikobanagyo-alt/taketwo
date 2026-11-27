@@ -40,9 +40,20 @@ Seed a fresh temporary library with it (from the repository root, after `cd rust
 D=$(mktemp -d) && TAKETWO_DATA="$D" rust/target/debug/taketwo-engine seed --fixture contract/fixture.json
 ```
 
-It refuses to run without `TAKETWO_DATA`, or with `--live`, and writes nothing then. `cargo test -p taketwo-engine seed` checks its output against what `seed_python.py` writes (documents, file list, WAV headers and sample counts, recorded in `rust/golden/library.json`). The runner that starts the Rust engine and runs the suite comes in step S06 of `rust/PLAN.md`.
+It refuses to run without `TAKETWO_DATA`, or with `--live`, and writes nothing then. `cargo test -p taketwo-engine seed` checks its output against what `seed_python.py` writes (documents, file list, WAV headers and sample counts, recorded in `rust/golden/library.json`).
 
-Start the engine on a port in 8790-8799, then run:
+`rust/scripts/contract.sh` does the whole run (from any folder):
+
+```sh
+rust/scripts/contract.sh              # all 33 tests; exit 0 only with "Ran 33 tests", "OK" and no skips
+rust/scripts/contract.sh -k Health    # arguments go to unittest, and its exit code is returned
+```
+
+1. It builds `taketwo-engine`, seeds a fresh temporary library with it and starts `taketwo-engine serve` on the first free port of 8790-8795, 8798, 8799 (never 8765-8785).
+2. It reads the port from the engine's ready line (`{"ready":true,"port":N,"pid":P}`, 30 s limit) and runs the suite with `TAKETWO_URL` pointing at it.
+3. It stops that engine by its own pid and deletes the library.
+
+To run the suite by hand, start the engine on a port in 8790-8799 and run:
 
 ```sh
 TAKETWO_URL=http://127.0.0.1:8791 python3 -m unittest discover -s contract

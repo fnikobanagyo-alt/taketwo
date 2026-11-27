@@ -36,9 +36,13 @@ fn truthy(v: Option<&Value>) -> bool {
 }
 
 pub fn seed(data: &Path, fixture: &Path) -> Result<(), String> {
+    seed_into(&Library::open(data)?, fixture)
+}
+
+/// `seed` into a library that is already open (tests pin its clock first).
+pub fn seed_into(lib: &Library, fixture: &Path) -> Result<(), String> {
     let text = std::fs::read_to_string(fixture).map_err(|e| format!("{}: {e}", fixture.display()))?;
     let fx: Value = serde_json::from_str(&text).map_err(|e| format!("{}: {e}", fixture.display()))?;
-    let lib = Library::open(data)?;
     for p in fx["profiles"].as_array().into_iter().flatten() {
         let dir = lib.profiles_dir().join(name(&p["id"], "profile id")?);
         std::fs::create_dir_all(&dir).map_err(|e| e.to_string())?;

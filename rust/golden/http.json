@@ -1,0 +1,4735 @@
+{
+ "clock_start": 1800000000.0,
+ "clock_step": 0.25,
+ "phases": [
+  {
+   "name": "a",
+   "setup": [],
+   "cases": [
+    {
+     "method": "GET",
+     "path": "/api/health",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "ok": true,
+       "name": "TakeTwo",
+       "formerly": "VoiceForge",
+       "version": "2.0.0",
+       "loaded_engine": null
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/pipeline-version",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "version": 4
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/status",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "loaded_engine": null,
+       "running": null,
+       "queued": 0,
+       "queue": [],
+       "duplicates": [],
+       "max_script_words": 10000
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/update",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "current": "2.0.0",
+       "check": null,
+       "available": false,
+       "dismissed": false,
+       "installed": null,
+       "job": null
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/engines",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "shape": [
+       "id",
+       "name",
+       "repo",
+       "family",
+       "description",
+       "license",
+       "size_gb",
+       "languages",
+       "needs_ref_text",
+       "recommended",
+       "params",
+       "custom",
+       "kind",
+       "downloaded",
+       "loaded",
+       "download"
+      ],
+      "count": 8
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/integrations",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "shape": [
+       "script_found",
+       "apps"
+      ],
+      "count": null
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/diagnostics",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "shape": [
+       "runtime",
+       "jobs",
+       "job_limit",
+       "event_limit"
+      ],
+      "count": null
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/settings",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "default_engine": "qwen3-tts-1.7b",
+       "max_chunk_chars": 220,
+       "max_attempts": 4,
+       "compare_takes": 1,
+       "experimental_qwen_ending_guard": false,
+       "max_wer": 0.12,
+       "min_speaker_similarity": 0.85,
+       "max_internal_silence": 0.9,
+       "max_pitch_offset_st": 2.0,
+       "sentence_pause_ms": 300,
+       "inner_sentence_pause_ms": 0,
+       "paragraph_pause_ms": 700,
+       "target_lufs": -16.0,
+       "seed": 1234,
+       "pronunciations": [],
+       "strip_citations": true,
+       "custom_engines": [],
+       "check_updates": true,
+       "update_dismissed": ""
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/profiles",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": [
+       {
+        "id": "ctvoice01",
+        "name": "Contract Voice",
+        "language": "en",
+        "status": "ready",
+        "pitch_hz": 180.0,
+        "speech_rate_wps": 2.6,
+        "studio": true,
+        "description": "Synthetic voice for the contract suite",
+        "created": 1700000000.0,
+        "updated": 1800000000.5
+       }
+      ]
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/profiles/ctvoice01",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "id": "ctvoice01",
+       "name": "Contract Voice",
+       "language": "en",
+       "status": "ready",
+       "pitch_hz": 180.0,
+       "speech_rate_wps": 2.6,
+       "studio": true,
+       "description": "Synthetic voice for the contract suite",
+       "created": 1700000000.0,
+       "updated": 1800000000.5,
+       "job": null
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/profiles/nosuchvoice",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 404,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "Not found"
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/profiles/ctvoice01/analysis",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 404,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "Not found"
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/profiles/%2Ftmp/analysis",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 404,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "Not Found"
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/profiles/ctvoice01/preview",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "audio/wav",
+       "content-disposition": null,
+       "cache-control": "no-store",
+       "x-preview-kind": "generated",
+       "content-range": null
+      },
+      "bytes": 48044
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/profiles/nosuchvoice/preview",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 404,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "Not found"
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/profiles/ctvoice01/audio/preview.wav",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "audio/x-wav",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "bytes": 48044
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/profiles/ctvoice01/audio/nosuch.wav",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 404,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "Not found"
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/profiles/ctvoice01/audio/%2Fetc%2Fhosts",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 404,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "Not Found"
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/profiles/bad.id/audio/preview.wav",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 400,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "Invalid id"
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/profiles/upgrade-all",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 404,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "Not found"
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": [
+       {
+        "id": "ctclean01",
+        "profile_id": "ctvoice01",
+        "profile_name": "Contract Voice",
+        "engine": "qwen3-tts-1.7b",
+        "language": "en",
+        "status": "done",
+        "source": "mcp",
+        "speed": 1.25,
+        "duration": 7.4,
+        "file": "final.wav",
+        "created": 1700000500.0,
+        "title": "Rivers and towns",
+        "message": "Done. All parts passed the automated checks.",
+        "timeline": [
+         {
+          "i": 0,
+          "start": 0.0,
+          "end": 5.2
+         },
+         {
+          "i": 1,
+          "start": 5.9,
+          "end": 7.1
+         }
+        ],
+        "updated": 1800000001.0,
+        "outcome": "clean",
+        "review_count": 0,
+        "text_preview": "Welcome to the show &amp; thanks for listening [1]. Today we talk about rivers — and the towns along them.\n\nThe Nile is long."
+       },
+       {
+        "id": "ctreview01",
+        "profile_id": "ctvoice01",
+        "profile_name": "Contract Voice",
+        "engine": "qwen3-tts-1.7b",
+        "language": "en",
+        "status": "done",
+        "source": "app",
+        "speed": 1.0,
+        "duration": 6.0,
+        "file": "final.wav",
+        "created": 1700000400.0,
+        "title": "Three parts to review",
+        "message": "Done, needs review: part 2, 3.",
+        "timeline": [
+         {
+          "i": 0,
+          "start": 0.0,
+          "end": 1.5
+         },
+         {
+          "i": 1,
+          "start": 1.8,
+          "end": 3.4
+         },
+         {
+          "i": 2,
+          "start": 3.7,
+          "end": 5.6
+         }
+        ],
+        "updated": 1800000001.5,
+        "outcome": "needs_listen",
+        "review_count": 2,
+        "text_preview": "Part one is fine. Part two ends early. It&#39;s part three."
+       },
+       {
+        "id": "ctaccept01",
+        "profile_id": "ctvoice01",
+        "profile_name": "Contract Voice",
+        "engine": "qwen3-tts-1.7b",
+        "language": "en",
+        "status": "done",
+        "source": "api",
+        "speed": 1.0,
+        "duration": 4.0,
+        "file": "final.wav",
+        "created": 1700000300.0,
+        "title": "Sounds fine test",
+        "message": "Done, needs review: part 2.",
+        "timeline": [
+         {
+          "i": 0,
+          "start": 0.0,
+          "end": 1.6
+         },
+         {
+          "i": 1,
+          "start": 1.9,
+          "end": 3.8
+         }
+        ],
+        "updated": 1800000002.0,
+        "outcome": "needs_listen",
+        "review_count": 1,
+        "text_preview": "First line here. Second line ends here."
+       },
+       {
+        "id": "ctpending01",
+        "profile_id": "ctvoice01",
+        "profile_name": "Contract Voice",
+        "engine": "qwen3-tts-1.7b",
+        "language": "en",
+        "status": "cancelled",
+        "source": "api",
+        "speed": 1.0,
+        "created": 1700000200.0,
+        "title": "Not rendered yet",
+        "message": "Cancelled before it started",
+        "updated": 1800000002.5,
+        "outcome": null,
+        "review_count": 0,
+        "text_preview": "Not rendered yet. This one was stopped."
+       },
+       {
+        "id": "cttrash01",
+        "profile_id": "ctvoice01",
+        "profile_name": "Contract Voice",
+        "engine": "qwen3-tts-1.7b",
+        "language": "en",
+        "status": "done",
+        "source": "api",
+        "speed": 1.0,
+        "duration": 2.5,
+        "file": "final.wav",
+        "created": 1700000100.0,
+        "title": "Delete and restore",
+        "message": "Done. All parts passed the automated checks.",
+        "timeline": [
+         {
+          "i": 0,
+          "start": 0.0,
+          "end": 2.3
+         }
+        ],
+        "updated": 1800000003.0,
+        "outcome": "clean",
+        "review_count": 0,
+        "text_preview": "A narration to delete and bring back."
+       }
+      ]
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/nosuchid",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 404,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "Not found"
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/reveal",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 404,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "Not found"
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/ctclean01",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "id": "ctclean01",
+       "profile_id": "ctvoice01",
+       "profile_name": "Contract Voice",
+       "engine": "qwen3-tts-1.7b",
+       "language": "en",
+       "status": "done",
+       "source": "mcp",
+       "speed": 1.25,
+       "duration": 7.4,
+       "file": "final.wav",
+       "created": 1700000500.0,
+       "title": "Rivers and towns",
+       "text": "Welcome to the show &amp; thanks for listening [1]. Today we talk about rivers — and the towns along them.\n\nThe Nile is long.",
+       "cleaned_text": "Welcome to the show & thanks for listening. Today we talk about rivers, and the towns along them.\n\nThe Nile is long.",
+       "message": "Done. All parts passed the automated checks.",
+       "timeline": [
+        {
+         "i": 0,
+         "start": 0.0,
+         "end": 5.2
+        },
+        {
+         "i": 1,
+         "start": 5.9,
+         "end": 7.1
+        }
+       ],
+       "chunks": [
+        {
+         "i": 0,
+         "text": "Welcome to the show & thanks for listening. Today we talk about rivers, and the towns along them.",
+         "pause_after": "paragraph",
+         "status": "ok",
+         "issues": [],
+         "file": "chunk_000.wav",
+         "pitch_hz": 181.0,
+         "dur": 6.5,
+         "heard": "Welcome to the show and thanks for listening. Today we talk about rivers and the towns along them.",
+         "words": [
+          {
+           "word": "Welcome",
+           "start": 0.0,
+           "end": 0.4
+          },
+          {
+           "word": "to",
+           "start": 0.4,
+           "end": 0.5
+          },
+          {
+           "word": "the",
+           "start": 0.5,
+           "end": 0.6
+          },
+          {
+           "word": "show",
+           "start": 0.6,
+           "end": 1.0
+          },
+          {
+           "word": "and",
+           "start": 1.0,
+           "end": 1.2
+          },
+          {
+           "word": "thanks",
+           "start": 1.2,
+           "end": 1.6
+          },
+          {
+           "word": "for",
+           "start": 1.6,
+           "end": 1.8
+          },
+          {
+           "word": "listening.",
+           "start": 1.8,
+           "end": 2.5
+          },
+          {
+           "word": "Today",
+           "start": 2.9,
+           "end": 3.3
+          },
+          {
+           "word": "we",
+           "start": 3.3,
+           "end": 3.4
+          },
+          {
+           "word": "talk",
+           "start": 3.4,
+           "end": 3.7
+          },
+          {
+           "word": "about",
+           "start": 3.7,
+           "end": 4.0
+          },
+          {
+           "word": "rivers",
+           "start": 4.0,
+           "end": 4.5
+          },
+          {
+           "word": "and",
+           "start": 4.7,
+           "end": 4.9
+          },
+          {
+           "word": "the",
+           "start": 4.9,
+           "end": 5.0
+          },
+          {
+           "word": "towns",
+           "start": 5.0,
+           "end": 5.4
+          },
+          {
+           "word": "along",
+           "start": 5.4,
+           "end": 5.8
+          },
+          {
+           "word": "them.",
+           "start": 5.8,
+           "end": 6.4
+          }
+         ]
+        },
+        {
+         "i": 1,
+         "text": "The Nile is long.",
+         "pause_after": "end",
+         "status": "ok",
+         "issues": [],
+         "file": "chunk_001.wav",
+         "pitch_hz": 179.0,
+         "dur": 1.5,
+         "heard": "The Nile is long."
+        }
+       ],
+       "updated": 1800000001.0,
+       "outcome": "clean",
+       "review": [],
+       "job": null
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/ctclean01/timings",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "speed": 1.25,
+       "duration": 7.4,
+       "estimated": true,
+       "sentences": [
+        {
+         "text": "Welcome to the show & thanks for listening.",
+         "start": 0.0,
+         "end": 2.0
+        },
+        {
+         "text": "Today we talk about rivers, and the towns along them.",
+         "start": 2.32,
+         "end": 5.12
+        },
+        {
+         "text": "The Nile is long.",
+         "start": 5.9,
+         "end": 7.1
+        }
+       ],
+       "words": [
+        {
+         "word": "Welcome",
+         "start": 0.0,
+         "end": 0.32
+        },
+        {
+         "word": "to",
+         "start": 0.32,
+         "end": 0.4
+        },
+        {
+         "word": "the",
+         "start": 0.4,
+         "end": 0.48
+        },
+        {
+         "word": "show",
+         "start": 0.48,
+         "end": 0.8
+        },
+        {
+         "word": "&",
+         "start": 0.8,
+         "end": 0.96
+        },
+        {
+         "word": "thanks",
+         "start": 0.96,
+         "end": 1.28
+        },
+        {
+         "word": "for",
+         "start": 1.28,
+         "end": 1.44
+        },
+        {
+         "word": "listening.",
+         "start": 1.44,
+         "end": 2.0
+        },
+        {
+         "word": "Today",
+         "start": 2.32,
+         "end": 2.64
+        },
+        {
+         "word": "we",
+         "start": 2.64,
+         "end": 2.72
+        },
+        {
+         "word": "talk",
+         "start": 2.72,
+         "end": 2.96
+        },
+        {
+         "word": "about",
+         "start": 2.96,
+         "end": 3.2
+        },
+        {
+         "word": "rivers,",
+         "start": 3.2,
+         "end": 3.6
+        },
+        {
+         "word": "and",
+         "start": 3.76,
+         "end": 3.92
+        },
+        {
+         "word": "the",
+         "start": 3.92,
+         "end": 4.0
+        },
+        {
+         "word": "towns",
+         "start": 4.0,
+         "end": 4.32
+        },
+        {
+         "word": "along",
+         "start": 4.32,
+         "end": 4.64
+        },
+        {
+         "word": "them.",
+         "start": 4.64,
+         "end": 5.12
+        },
+        {
+         "word": "The",
+         "start": 5.9,
+         "end": 6.157
+        },
+        {
+         "word": "Nile",
+         "start": 6.157,
+         "end": 6.5
+        },
+        {
+         "word": "is",
+         "start": 6.5,
+         "end": 6.671
+        },
+        {
+         "word": "long.",
+         "start": 6.671,
+         "end": 7.1
+        }
+       ]
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/ctclean01/subtitles",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "text/plain; charset=utf-8",
+       "content-disposition": "attachment; filename=\"Rivers and towns.srt\"; filename*=UTF-8''Rivers%20and%20towns.srt",
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "text": "1\n00:00:00,000 --> 00:00:02,329\nWelcome to the show &\nthanks for listening.\n\n2\n00:00:02,329 --> 00:00:05,200\nToday we talk about rivers,\nand the towns along them.\n\n3\n00:00:05,900 --> 00:00:07,100\nThe Nile is long.\n"
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/ctclean01/audio",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "audio/x-wav",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "bytes": 355244
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/ctclean01/chunks/0/audio",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "audio/x-wav",
+       "content-disposition": null,
+       "cache-control": "no-store",
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "bytes": 24044
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/ctclean01/chunks/0/takes/1/audio",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "audio/x-wav",
+       "content-disposition": null,
+       "cache-control": "no-store",
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "bytes": 24044
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/ctreview01",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "id": "ctreview01",
+       "profile_id": "ctvoice01",
+       "profile_name": "Contract Voice",
+       "engine": "qwen3-tts-1.7b",
+       "language": "en",
+       "status": "done",
+       "source": "app",
+       "speed": 1.0,
+       "duration": 6.0,
+       "file": "final.wav",
+       "created": 1700000400.0,
+       "title": "Three parts to review",
+       "text": "Part one is fine. Part two ends early. It&#39;s part three.",
+       "cleaned_text": "Part one is fine. Part two ends early. It's part three.",
+       "message": "Done, needs review: part 2, 3.",
+       "timeline": [
+        {
+         "i": 0,
+         "start": 0.0,
+         "end": 1.5
+        },
+        {
+         "i": 1,
+         "start": 1.8,
+         "end": 3.4
+        },
+        {
+         "i": 2,
+         "start": 3.7,
+         "end": 5.6
+        }
+       ],
+       "chunks": [
+        {
+         "i": 0,
+         "text": "Part one is fine.",
+         "pause_after": "sentence",
+         "status": "ok",
+         "issues": [],
+         "file": "chunk_000.wav",
+         "heard": "Part one is fine.",
+         "pitch_hz": 180.0
+        },
+        {
+         "i": 1,
+         "text": "Part two ends early.",
+         "pause_after": "sentence",
+         "status": "flagged",
+         "issues": [
+          "cut_off"
+         ],
+         "file": "chunk_001.wav",
+         "heard": "Part two ends",
+         "pitch_hz": 176.0
+        },
+        {
+         "i": 2,
+         "text": "It&39;s part three.",
+         "pause_after": "end",
+         "status": "ok",
+         "issues": [],
+         "file": "chunk_002.wav",
+         "heard": "It's part three.",
+         "pitch_hz": 182.0
+        }
+       ],
+       "updated": 1800000001.5,
+       "outcome": "needs_listen",
+       "review": [
+        {
+         "part": 2,
+         "text": "Part two ends early.",
+         "issues": [
+          "cut_off"
+         ],
+         "reasons": [
+          "Cut-off ending"
+         ],
+         "start": 1.8,
+         "end": 3.4,
+         "heard": "Part two ends",
+         "pitch_hz": 176.0,
+         "voice_pitch_hz": 180.0,
+         "checked_by": [
+          "take check"
+         ],
+         "take": 1
+        },
+        {
+         "part": 3,
+         "text": "It&39;s part three.",
+         "issues": [
+          "web_artifact"
+         ],
+         "reasons": [
+          "Web code in the script (such as &#39;)"
+         ],
+         "start": 3.7,
+         "end": 5.6,
+         "heard": "It's part three.",
+         "pitch_hz": 182.0,
+         "voice_pitch_hz": 180.0,
+         "checked_by": [
+          "script check"
+         ],
+         "take": 1
+        }
+       ],
+       "job": null
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/ctreview01/timings",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "speed": 1.0,
+       "duration": 6.0,
+       "estimated": true,
+       "sentences": [
+        {
+         "text": "Part one is fine.",
+         "start": 0.0,
+         "end": 1.5
+        },
+        {
+         "text": "Part two ends early.",
+         "start": 1.8,
+         "end": 3.4
+        },
+        {
+         "text": "It&39;s part three.",
+         "start": 3.7,
+         "end": 5.6
+        }
+       ],
+       "words": [
+        {
+         "word": "Part",
+         "start": 0.0,
+         "end": 0.429
+        },
+        {
+         "word": "one",
+         "start": 0.429,
+         "end": 0.75
+        },
+        {
+         "word": "is",
+         "start": 0.75,
+         "end": 0.964
+        },
+        {
+         "word": "fine.",
+         "start": 0.964,
+         "end": 1.5
+        },
+        {
+         "word": "Part",
+         "start": 1.8,
+         "end": 2.176
+        },
+        {
+         "word": "two",
+         "start": 2.176,
+         "end": 2.459
+        },
+        {
+         "word": "ends",
+         "start": 2.459,
+         "end": 2.835
+        },
+        {
+         "word": "early.",
+         "start": 2.835,
+         "end": 3.4
+        },
+        {
+         "word": "It&39;s",
+         "start": 3.7,
+         "end": 4.482
+        },
+        {
+         "word": "part",
+         "start": 4.482,
+         "end": 4.929
+        },
+        {
+         "word": "three.",
+         "start": 4.929,
+         "end": 5.6
+        }
+       ]
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/ctreview01/subtitles",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "text/plain; charset=utf-8",
+       "content-disposition": "attachment; filename=\"Three parts to review.srt\"; filename*=UTF-8''Three%20parts%20to%20review.srt",
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "text": "1\n00:00:00,000 --> 00:00:01,500\nPart one is fine.\n\n2\n00:00:01,800 --> 00:00:03,400\nPart two ends early.\n\n3\n00:00:03,700 --> 00:00:05,600\nIt&39;s part three.\n"
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/ctreview01/audio",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "audio/x-wav",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "bytes": 288044
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/ctreview01/chunks/0/audio",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "audio/x-wav",
+       "content-disposition": null,
+       "cache-control": "no-store",
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "bytes": 24044
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/ctreview01/chunks/0/takes/1/audio",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "audio/x-wav",
+       "content-disposition": null,
+       "cache-control": "no-store",
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "bytes": 24044
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/ctaccept01",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "id": "ctaccept01",
+       "profile_id": "ctvoice01",
+       "profile_name": "Contract Voice",
+       "engine": "qwen3-tts-1.7b",
+       "language": "en",
+       "status": "done",
+       "source": "api",
+       "speed": 1.0,
+       "duration": 4.0,
+       "file": "final.wav",
+       "created": 1700000300.0,
+       "title": "Sounds fine test",
+       "text": "First line here. Second line ends here.",
+       "cleaned_text": "First line here. Second line ends here.",
+       "message": "Done, needs review: part 2.",
+       "timeline": [
+        {
+         "i": 0,
+         "start": 0.0,
+         "end": 1.6
+        },
+        {
+         "i": 1,
+         "start": 1.9,
+         "end": 3.8
+        }
+       ],
+       "chunks": [
+        {
+         "i": 0,
+         "text": "First line here.",
+         "pause_after": "sentence",
+         "status": "ok",
+         "issues": [],
+         "file": "chunk_000.wav",
+         "heard": "First line here.",
+         "pitch_hz": 180.0
+        },
+        {
+         "i": 1,
+         "text": "Second line ends here.",
+         "pause_after": "end",
+         "status": "flagged",
+         "issues": [
+          "end_word_missing"
+         ],
+         "file": "chunk_001.wav",
+         "heard": "Second line ends",
+         "pitch_hz": 181.0
+        }
+       ],
+       "updated": 1800000002.0,
+       "outcome": "needs_listen",
+       "review": [
+        {
+         "part": 2,
+         "text": "Second line ends here.",
+         "issues": [
+          "end_word_missing"
+         ],
+         "reasons": [
+          "Last word missing"
+         ],
+         "start": 1.9,
+         "end": 3.8,
+         "heard": "Second line ends",
+         "pitch_hz": 181.0,
+         "voice_pitch_hz": 180.0,
+         "checked_by": [
+          "take check"
+         ],
+         "take": 1
+        }
+       ],
+       "job": null
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/ctaccept01/timings",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "speed": 1.0,
+       "duration": 4.0,
+       "estimated": true,
+       "sentences": [
+        {
+         "text": "First line here.",
+         "start": 0.0,
+         "end": 1.6
+        },
+        {
+         "text": "Second line ends here.",
+         "start": 1.9,
+         "end": 3.8
+        }
+       ],
+       "words": [
+        {
+         "word": "First",
+         "start": 0.0,
+         "end": 0.571
+        },
+        {
+         "word": "line",
+         "start": 0.571,
+         "end": 1.029
+        },
+        {
+         "word": "here.",
+         "start": 1.029,
+         "end": 1.6
+        },
+        {
+         "word": "Second",
+         "start": 1.9,
+         "end": 2.5
+        },
+        {
+         "word": "line",
+         "start": 2.5,
+         "end": 2.9
+        },
+        {
+         "word": "ends",
+         "start": 2.9,
+         "end": 3.3
+        },
+        {
+         "word": "here.",
+         "start": 3.3,
+         "end": 3.8
+        }
+       ]
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/ctaccept01/subtitles",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "text/plain; charset=utf-8",
+       "content-disposition": "attachment; filename=\"Sounds fine test.srt\"; filename*=UTF-8''Sounds%20fine%20test.srt",
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "text": "1\n00:00:00,000 --> 00:00:01,600\nFirst line here.\n\n2\n00:00:01,900 --> 00:00:03,800\nSecond line ends here.\n"
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/ctaccept01/audio",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "audio/x-wav",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "bytes": 192044
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/ctaccept01/chunks/0/audio",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "audio/x-wav",
+       "content-disposition": null,
+       "cache-control": "no-store",
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "bytes": 24044
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/ctaccept01/chunks/0/takes/1/audio",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "audio/x-wav",
+       "content-disposition": null,
+       "cache-control": "no-store",
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "bytes": 24044
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/ctpending01",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "id": "ctpending01",
+       "profile_id": "ctvoice01",
+       "profile_name": "Contract Voice",
+       "engine": "qwen3-tts-1.7b",
+       "language": "en",
+       "status": "cancelled",
+       "source": "api",
+       "speed": 1.0,
+       "created": 1700000200.0,
+       "title": "Not rendered yet",
+       "text": "Not rendered yet. This one was stopped.",
+       "cleaned_text": "Not rendered yet. This one was stopped.",
+       "message": "Cancelled before it started",
+       "chunks": [
+        {
+         "i": 0,
+         "text": "Not rendered yet. This one was stopped.",
+         "pause_after": "end",
+         "status": "pending"
+        }
+       ],
+       "updated": 1800000002.5,
+       "outcome": null,
+       "review": [],
+       "job": null
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/ctpending01/timings",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 404,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "Timings are available once the audio is rendered"
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/ctpending01/subtitles",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 404,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "Subtitles are available once the audio is rendered"
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/ctpending01/audio",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 404,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "Not rendered yet"
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/ctpending01/chunks/0/audio",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 404,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "Not found"
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/ctpending01/chunks/0/takes/1/audio",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 404,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "That take is no longer kept"
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/cttrash01",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "id": "cttrash01",
+       "profile_id": "ctvoice01",
+       "profile_name": "Contract Voice",
+       "engine": "qwen3-tts-1.7b",
+       "language": "en",
+       "status": "done",
+       "source": "api",
+       "speed": 1.0,
+       "duration": 2.5,
+       "file": "final.wav",
+       "created": 1700000100.0,
+       "title": "Delete and restore",
+       "text": "A narration to delete and bring back.",
+       "cleaned_text": "A narration to delete and bring back.",
+       "message": "Done. All parts passed the automated checks.",
+       "timeline": [
+        {
+         "i": 0,
+         "start": 0.0,
+         "end": 2.3
+        }
+       ],
+       "chunks": [
+        {
+         "i": 0,
+         "text": "A narration to delete and bring back.",
+         "pause_after": "end",
+         "status": "ok",
+         "issues": [],
+         "file": "chunk_000.wav",
+         "heard": "A narration to delete and bring back.",
+         "pitch_hz": 180.0
+        }
+       ],
+       "updated": 1800000003.0,
+       "outcome": "clean",
+       "review": [],
+       "job": null
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/cttrash01/timings",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "speed": 1.0,
+       "duration": 2.5,
+       "estimated": true,
+       "sentences": [
+        {
+         "text": "A narration to delete and bring back.",
+         "start": 0.0,
+         "end": 2.3
+        }
+       ],
+       "words": [
+        {
+         "word": "A",
+         "start": 0.0,
+         "end": 0.074
+        },
+        {
+         "word": "narration",
+         "start": 0.074,
+         "end": 0.742
+        },
+        {
+         "word": "to",
+         "start": 0.742,
+         "end": 0.89
+        },
+        {
+         "word": "delete",
+         "start": 0.89,
+         "end": 1.335
+        },
+        {
+         "word": "and",
+         "start": 1.335,
+         "end": 1.558
+        },
+        {
+         "word": "bring",
+         "start": 1.558,
+         "end": 1.929
+        },
+        {
+         "word": "back.",
+         "start": 1.929,
+         "end": 2.3
+        }
+       ]
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/cttrash01/subtitles",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "text/plain; charset=utf-8",
+       "content-disposition": "attachment; filename=\"Delete and restore.srt\"; filename*=UTF-8''Delete%20and%20restore.srt",
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "text": "1\n00:00:00,000 --> 00:00:02,300\nA narration to delete and bring back.\n"
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/cttrash01/audio",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "audio/x-wav",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "bytes": 120044
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/cttrash01/chunks/0/audio",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "audio/x-wav",
+       "content-disposition": null,
+       "cache-control": "no-store",
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "bytes": 24044
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/cttrash01/chunks/0/takes/1/audio",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "audio/x-wav",
+       "content-disposition": null,
+       "cache-control": "no-store",
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "bytes": 24044
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/ctclean01/subtitles?fmt=srt",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "text/plain; charset=utf-8",
+       "content-disposition": "attachment; filename=\"Rivers and towns.srt\"; filename*=UTF-8''Rivers%20and%20towns.srt",
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "text": "1\n00:00:00,000 --> 00:00:02,329\nWelcome to the show &\nthanks for listening.\n\n2\n00:00:02,329 --> 00:00:05,200\nToday we talk about rivers,\nand the towns along them.\n\n3\n00:00:05,900 --> 00:00:07,100\nThe Nile is long.\n"
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/ctclean01/subtitles?fmt=vtt",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "text/plain; charset=utf-8",
+       "content-disposition": "attachment; filename=\"Rivers and towns.vtt\"; filename*=UTF-8''Rivers%20and%20towns.vtt",
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "text": "WEBVTT\n\n00:00:00.000 --> 00:00:02.329\nWelcome to the show &\nthanks for listening.\n\n00:00:02.329 --> 00:00:05.200\nToday we talk about rivers,\nand the towns along them.\n\n00:00:05.900 --> 00:00:07.100\nThe Nile is long.\n"
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/ctclean01/subtitles?fmt=txt",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "text/plain; charset=utf-8",
+       "content-disposition": "attachment; filename=\"Rivers and towns.txt\"; filename*=UTF-8''Rivers%20and%20towns.txt",
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "text": "Welcome to the show & thanks for listening. Today we talk about rivers, and the towns along them. The Nile is long."
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/ctclean01/subtitles?fmt=xyz",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "text/plain; charset=utf-8",
+       "content-disposition": "attachment; filename=\"Rivers and towns.xyz\"; filename*=UTF-8''Rivers%20and%20towns.xyz",
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "text": "1\n00:00:00,000 --> 00:00:02,329\nWelcome to the show &\nthanks for listening.\n\n2\n00:00:02,329 --> 00:00:05,200\nToday we talk about rivers,\nand the towns along them.\n\n3\n00:00:05,900 --> 00:00:07,100\nThe Nile is long.\n"
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/ctreview01/subtitles?fmt=srt",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "text/plain; charset=utf-8",
+       "content-disposition": "attachment; filename=\"Three parts to review.srt\"; filename*=UTF-8''Three%20parts%20to%20review.srt",
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "text": "1\n00:00:00,000 --> 00:00:01,500\nPart one is fine.\n\n2\n00:00:01,800 --> 00:00:03,400\nPart two ends early.\n\n3\n00:00:03,700 --> 00:00:05,600\nIt&39;s part three.\n"
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/ctreview01/subtitles?fmt=vtt",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "text/plain; charset=utf-8",
+       "content-disposition": "attachment; filename=\"Three parts to review.vtt\"; filename*=UTF-8''Three%20parts%20to%20review.vtt",
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "text": "WEBVTT\n\n00:00:00.000 --> 00:00:01.500\nPart one is fine.\n\n00:00:01.800 --> 00:00:03.400\nPart two ends early.\n\n00:00:03.700 --> 00:00:05.600\nIt&39;s part three.\n"
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/ctreview01/subtitles?fmt=txt",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "text/plain; charset=utf-8",
+       "content-disposition": "attachment; filename=\"Three parts to review.txt\"; filename*=UTF-8''Three%20parts%20to%20review.txt",
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "text": "Part one is fine. Part two ends early. It&39;s part three."
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/ctreview01/subtitles?fmt=xyz",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "text/plain; charset=utf-8",
+       "content-disposition": "attachment; filename=\"Three parts to review.xyz\"; filename*=UTF-8''Three%20parts%20to%20review.xyz",
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "text": "1\n00:00:00,000 --> 00:00:01,500\nPart one is fine.\n\n2\n00:00:01,800 --> 00:00:03,400\nPart two ends early.\n\n3\n00:00:03,700 --> 00:00:05,600\nIt&39;s part three.\n"
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/nosuchid/timings",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 404,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "Not found"
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/nosuchid/audio",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 404,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "Not found"
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/ctclean01/audio?download=true",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "audio/x-wav",
+       "content-disposition": "attachment; filename*=utf-8''Contract%20Voice%20-%20Rivers%20and%20towns.wav",
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "bytes": 355244
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/ctreview01/audio?download=1",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "audio/x-wav",
+       "content-disposition": "attachment; filename*=utf-8''Contract%20Voice%20-%20Three%20parts%20to%20review.wav",
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "bytes": 288044
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/ctclean01/audio?download=false",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "audio/x-wav",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "bytes": 355244
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/ctclean01/audio?download=maybe",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 422,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": [
+        {
+         "type": "bool_parsing",
+         "loc": [
+          "query",
+          "download"
+         ],
+         "msg": "Input should be a valid boolean, unable to interpret input",
+         "input": "maybe"
+        }
+       ]
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/ctclean01/audio?fmt=mp3",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 404,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "Not rendered yet"
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/ctclean01/audio?fmt=ogg&download=true",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "audio/ogg",
+       "content-disposition": "attachment; filename*=utf-8''Contract%20Voice%20-%20Rivers%20and%20towns.ogg",
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "bytes": 355244
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/ctclean01/audio",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Range": "bytes=0-99"
+     },
+     "body": null,
+     "response": {
+      "status": 206,
+      "headers": {
+       "content-type": "audio/x-wav",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": "bytes 0-99/355244"
+      },
+      "bytes": 100
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/ctclean01/audio",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Range": "bytes=-10"
+     },
+     "body": null,
+     "response": {
+      "status": 206,
+      "headers": {
+       "content-type": "audio/x-wav",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": "bytes 355234-355243/355244"
+      },
+      "bytes": 10
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/ctreview01/chunks/1/audio",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "audio/x-wav",
+       "content-disposition": null,
+       "cache-control": "no-store",
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "bytes": 24044
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/ctreview01/chunks/7/audio",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 404,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "Not found"
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/ctreview01/chunks/x/audio",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 422,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": [
+        {
+         "type": "int_parsing",
+         "loc": [
+          "path",
+          "ci"
+         ],
+         "msg": "Input should be a valid integer, unable to parse string as an integer",
+         "input": "x"
+        }
+       ]
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/ctreview01/chunks/-1/audio",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 404,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "Not found"
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/%2Ftmp/chunks/0/audio",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 404,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "Not Found"
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/ctreview01/chunks/1/takes/1/audio",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "audio/x-wav",
+       "content-disposition": null,
+       "cache-control": "no-store",
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "bytes": 24044
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/ctreview01/chunks/1/takes/9/audio",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 404,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "That take is no longer kept"
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/ctreview01/chunks/7/takes/1/audio",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 404,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "No such part"
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/ctreview01/chunks/1/takes/x/audio",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 422,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": [
+        {
+         "type": "int_parsing",
+         "loc": [
+          "path",
+          "k"
+         ],
+         "msg": "Input should be a valid integer, unable to parse string as an integer",
+         "input": "x"
+        }
+       ]
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/nosuchid/chunks/0/takes/1/audio",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 404,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "Not found"
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/search?",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": [
+       {
+        "id": "ctclean01",
+        "title": "Rivers and towns",
+        "voice": "Contract Voice",
+        "profile_id": "ctvoice01",
+        "status": "done",
+        "outcome": "clean",
+        "created": 1700000500.0,
+        "duration": 7.4,
+        "source": "mcp"
+       },
+       {
+        "id": "ctreview01",
+        "title": "Three parts to review",
+        "voice": "Contract Voice",
+        "profile_id": "ctvoice01",
+        "status": "needs_review",
+        "outcome": "needs_listen",
+        "created": 1700000400.0,
+        "duration": 6.0,
+        "source": "app"
+       },
+       {
+        "id": "ctaccept01",
+        "title": "Sounds fine test",
+        "voice": "Contract Voice",
+        "profile_id": "ctvoice01",
+        "status": "needs_review",
+        "outcome": "needs_listen",
+        "created": 1700000300.0,
+        "duration": 4.0,
+        "source": "api"
+       },
+       {
+        "id": "ctpending01",
+        "title": "Not rendered yet",
+        "voice": "Contract Voice",
+        "profile_id": "ctvoice01",
+        "status": "cancelled",
+        "outcome": null,
+        "created": 1700000200.0,
+        "duration": null,
+        "source": "api"
+       },
+       {
+        "id": "cttrash01",
+        "title": "Delete and restore",
+        "voice": "Contract Voice",
+        "profile_id": "ctvoice01",
+        "status": "done",
+        "outcome": "clean",
+        "created": 1700000100.0,
+        "duration": 2.5,
+        "source": "api"
+       }
+      ]
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/search?q=Nile",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": [
+       {
+        "id": "ctclean01",
+        "title": "Rivers and towns",
+        "voice": "Contract Voice",
+        "profile_id": "ctvoice01",
+        "status": "done",
+        "outcome": "clean",
+        "created": 1700000500.0,
+        "duration": 7.4,
+        "source": "mcp"
+       }
+      ]
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/search?q=review",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": [
+       {
+        "id": "ctreview01",
+        "title": "Three parts to review",
+        "voice": "Contract Voice",
+        "profile_id": "ctvoice01",
+        "status": "needs_review",
+        "outcome": "needs_listen",
+        "created": 1700000400.0,
+        "duration": 6.0,
+        "source": "app"
+       }
+      ]
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/search?q=RIVERS",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": [
+       {
+        "id": "ctclean01",
+        "title": "Rivers and towns",
+        "voice": "Contract Voice",
+        "profile_id": "ctvoice01",
+        "status": "done",
+        "outcome": "clean",
+        "created": 1700000500.0,
+        "duration": 7.4,
+        "source": "mcp"
+       }
+      ]
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/search?status=needs_review",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": [
+       {
+        "id": "ctreview01",
+        "title": "Three parts to review",
+        "voice": "Contract Voice",
+        "profile_id": "ctvoice01",
+        "status": "needs_review",
+        "outcome": "needs_listen",
+        "created": 1700000400.0,
+        "duration": 6.0,
+        "source": "app"
+       },
+       {
+        "id": "ctaccept01",
+        "title": "Sounds fine test",
+        "voice": "Contract Voice",
+        "profile_id": "ctvoice01",
+        "status": "needs_review",
+        "outcome": "needs_listen",
+        "created": 1700000300.0,
+        "duration": 4.0,
+        "source": "api"
+       }
+      ]
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/search?status=done",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": [
+       {
+        "id": "ctclean01",
+        "title": "Rivers and towns",
+        "voice": "Contract Voice",
+        "profile_id": "ctvoice01",
+        "status": "done",
+        "outcome": "clean",
+        "created": 1700000500.0,
+        "duration": 7.4,
+        "source": "mcp"
+       },
+       {
+        "id": "ctreview01",
+        "title": "Three parts to review",
+        "voice": "Contract Voice",
+        "profile_id": "ctvoice01",
+        "status": "needs_review",
+        "outcome": "needs_listen",
+        "created": 1700000400.0,
+        "duration": 6.0,
+        "source": "app"
+       },
+       {
+        "id": "ctaccept01",
+        "title": "Sounds fine test",
+        "voice": "Contract Voice",
+        "profile_id": "ctvoice01",
+        "status": "needs_review",
+        "outcome": "needs_listen",
+        "created": 1700000300.0,
+        "duration": 4.0,
+        "source": "api"
+       },
+       {
+        "id": "cttrash01",
+        "title": "Delete and restore",
+        "voice": "Contract Voice",
+        "profile_id": "ctvoice01",
+        "status": "done",
+        "outcome": "clean",
+        "created": 1700000100.0,
+        "duration": 2.5,
+        "source": "api"
+       }
+      ]
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/search?status=cancelled",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": [
+       {
+        "id": "ctpending01",
+        "title": "Not rendered yet",
+        "voice": "Contract Voice",
+        "profile_id": "ctvoice01",
+        "status": "cancelled",
+        "outcome": null,
+        "created": 1700000200.0,
+        "duration": null,
+        "source": "api"
+       }
+      ]
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/search?status=error",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": []
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/search?voice=contract+voice",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": [
+       {
+        "id": "ctclean01",
+        "title": "Rivers and towns",
+        "voice": "Contract Voice",
+        "profile_id": "ctvoice01",
+        "status": "done",
+        "outcome": "clean",
+        "created": 1700000500.0,
+        "duration": 7.4,
+        "source": "mcp"
+       },
+       {
+        "id": "ctreview01",
+        "title": "Three parts to review",
+        "voice": "Contract Voice",
+        "profile_id": "ctvoice01",
+        "status": "needs_review",
+        "outcome": "needs_listen",
+        "created": 1700000400.0,
+        "duration": 6.0,
+        "source": "app"
+       },
+       {
+        "id": "ctaccept01",
+        "title": "Sounds fine test",
+        "voice": "Contract Voice",
+        "profile_id": "ctvoice01",
+        "status": "needs_review",
+        "outcome": "needs_listen",
+        "created": 1700000300.0,
+        "duration": 4.0,
+        "source": "api"
+       },
+       {
+        "id": "ctpending01",
+        "title": "Not rendered yet",
+        "voice": "Contract Voice",
+        "profile_id": "ctvoice01",
+        "status": "cancelled",
+        "outcome": null,
+        "created": 1700000200.0,
+        "duration": null,
+        "source": "api"
+       },
+       {
+        "id": "cttrash01",
+        "title": "Delete and restore",
+        "voice": "Contract Voice",
+        "profile_id": "ctvoice01",
+        "status": "done",
+        "outcome": "clean",
+        "created": 1700000100.0,
+        "duration": 2.5,
+        "source": "api"
+       }
+      ]
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/search?voice=CTVOICE01",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": [
+       {
+        "id": "ctclean01",
+        "title": "Rivers and towns",
+        "voice": "Contract Voice",
+        "profile_id": "ctvoice01",
+        "status": "done",
+        "outcome": "clean",
+        "created": 1700000500.0,
+        "duration": 7.4,
+        "source": "mcp"
+       },
+       {
+        "id": "ctreview01",
+        "title": "Three parts to review",
+        "voice": "Contract Voice",
+        "profile_id": "ctvoice01",
+        "status": "needs_review",
+        "outcome": "needs_listen",
+        "created": 1700000400.0,
+        "duration": 6.0,
+        "source": "app"
+       },
+       {
+        "id": "ctaccept01",
+        "title": "Sounds fine test",
+        "voice": "Contract Voice",
+        "profile_id": "ctvoice01",
+        "status": "needs_review",
+        "outcome": "needs_listen",
+        "created": 1700000300.0,
+        "duration": 4.0,
+        "source": "api"
+       },
+       {
+        "id": "ctpending01",
+        "title": "Not rendered yet",
+        "voice": "Contract Voice",
+        "profile_id": "ctvoice01",
+        "status": "cancelled",
+        "outcome": null,
+        "created": 1700000200.0,
+        "duration": null,
+        "source": "api"
+       },
+       {
+        "id": "cttrash01",
+        "title": "Delete and restore",
+        "voice": "Contract Voice",
+        "profile_id": "ctvoice01",
+        "status": "done",
+        "outcome": "clean",
+        "created": 1700000100.0,
+        "duration": 2.5,
+        "source": "api"
+       }
+      ]
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/search?voice=nobody",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": []
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/search?same_script=Welcome+to+the+show",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": []
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/search?same_script=+++",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": [
+       {
+        "id": "ctclean01",
+        "title": "Rivers and towns",
+        "voice": "Contract Voice",
+        "profile_id": "ctvoice01",
+        "status": "done",
+        "outcome": "clean",
+        "created": 1700000500.0,
+        "duration": 7.4,
+        "source": "mcp"
+       },
+       {
+        "id": "ctreview01",
+        "title": "Three parts to review",
+        "voice": "Contract Voice",
+        "profile_id": "ctvoice01",
+        "status": "needs_review",
+        "outcome": "needs_listen",
+        "created": 1700000400.0,
+        "duration": 6.0,
+        "source": "app"
+       },
+       {
+        "id": "ctaccept01",
+        "title": "Sounds fine test",
+        "voice": "Contract Voice",
+        "profile_id": "ctvoice01",
+        "status": "needs_review",
+        "outcome": "needs_listen",
+        "created": 1700000300.0,
+        "duration": 4.0,
+        "source": "api"
+       },
+       {
+        "id": "ctpending01",
+        "title": "Not rendered yet",
+        "voice": "Contract Voice",
+        "profile_id": "ctvoice01",
+        "status": "cancelled",
+        "outcome": null,
+        "created": 1700000200.0,
+        "duration": null,
+        "source": "api"
+       },
+       {
+        "id": "cttrash01",
+        "title": "Delete and restore",
+        "voice": "Contract Voice",
+        "profile_id": "ctvoice01",
+        "status": "done",
+        "outcome": "clean",
+        "created": 1700000100.0,
+        "duration": 2.5,
+        "source": "api"
+       }
+      ]
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/search?limit=2",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": [
+       {
+        "id": "ctclean01",
+        "title": "Rivers and towns",
+        "voice": "Contract Voice",
+        "profile_id": "ctvoice01",
+        "status": "done",
+        "outcome": "clean",
+        "created": 1700000500.0,
+        "duration": 7.4,
+        "source": "mcp"
+       },
+       {
+        "id": "ctreview01",
+        "title": "Three parts to review",
+        "voice": "Contract Voice",
+        "profile_id": "ctvoice01",
+        "status": "needs_review",
+        "outcome": "needs_listen",
+        "created": 1700000400.0,
+        "duration": 6.0,
+        "source": "app"
+       }
+      ]
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/search?limit=0",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": [
+       {
+        "id": "ctclean01",
+        "title": "Rivers and towns",
+        "voice": "Contract Voice",
+        "profile_id": "ctvoice01",
+        "status": "done",
+        "outcome": "clean",
+        "created": 1700000500.0,
+        "duration": 7.4,
+        "source": "mcp"
+       }
+      ]
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/search?limit=500",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": [
+       {
+        "id": "ctclean01",
+        "title": "Rivers and towns",
+        "voice": "Contract Voice",
+        "profile_id": "ctvoice01",
+        "status": "done",
+        "outcome": "clean",
+        "created": 1700000500.0,
+        "duration": 7.4,
+        "source": "mcp"
+       },
+       {
+        "id": "ctreview01",
+        "title": "Three parts to review",
+        "voice": "Contract Voice",
+        "profile_id": "ctvoice01",
+        "status": "needs_review",
+        "outcome": "needs_listen",
+        "created": 1700000400.0,
+        "duration": 6.0,
+        "source": "app"
+       },
+       {
+        "id": "ctaccept01",
+        "title": "Sounds fine test",
+        "voice": "Contract Voice",
+        "profile_id": "ctvoice01",
+        "status": "needs_review",
+        "outcome": "needs_listen",
+        "created": 1700000300.0,
+        "duration": 4.0,
+        "source": "api"
+       },
+       {
+        "id": "ctpending01",
+        "title": "Not rendered yet",
+        "voice": "Contract Voice",
+        "profile_id": "ctvoice01",
+        "status": "cancelled",
+        "outcome": null,
+        "created": 1700000200.0,
+        "duration": null,
+        "source": "api"
+       },
+       {
+        "id": "cttrash01",
+        "title": "Delete and restore",
+        "voice": "Contract Voice",
+        "profile_id": "ctvoice01",
+        "status": "done",
+        "outcome": "clean",
+        "created": 1700000100.0,
+        "duration": 2.5,
+        "source": "api"
+       }
+      ]
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/search?limit=abc",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 422,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": [
+        {
+         "type": "int_parsing",
+         "loc": [
+          "query",
+          "limit"
+         ],
+         "msg": "Input should be a valid integer, unable to parse string as an integer",
+         "input": "abc"
+        }
+       ]
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/search?q=the&status=done&limit=1",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": [
+       {
+        "id": "ctclean01",
+        "title": "Rivers and towns",
+        "voice": "Contract Voice",
+        "profile_id": "ctvoice01",
+        "status": "done",
+        "outcome": "clean",
+        "created": 1700000500.0,
+        "duration": 7.4,
+        "source": "mcp"
+       }
+      ]
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/search?same_script=Welcome+to+the+show+%26amp%3B+thanks+for+listening+%5B1%5D.+Today+we+talk+about+rivers+%E2%80%94+and+the+towns+along+them.%0A%0AThe+Nile+is+long.",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": [
+       {
+        "id": "ctclean01",
+        "title": "Rivers and towns",
+        "voice": "Contract Voice",
+        "profile_id": "ctvoice01",
+        "status": "done",
+        "outcome": "clean",
+        "created": 1700000500.0,
+        "duration": 7.4,
+        "source": "mcp"
+       }
+      ]
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/search?same_script=Part+one+is+fine.+Part+two+ends+early.+It%26%2339%3Bs+part+three.",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": [
+       {
+        "id": "ctreview01",
+        "title": "Three parts to review",
+        "voice": "Contract Voice",
+        "profile_id": "ctvoice01",
+        "status": "needs_review",
+        "outcome": "needs_listen",
+        "created": 1700000400.0,
+        "duration": 6.0,
+        "source": "app"
+       }
+      ]
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/search?same_script=First+line+here.+Second+line+ends+here.",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": [
+       {
+        "id": "ctaccept01",
+        "title": "Sounds fine test",
+        "voice": "Contract Voice",
+        "profile_id": "ctvoice01",
+        "status": "needs_review",
+        "outcome": "needs_listen",
+        "created": 1700000300.0,
+        "duration": 4.0,
+        "source": "api"
+       }
+      ]
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/search?same_script=Not+rendered+yet.+This+one+was+stopped.",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": [
+       {
+        "id": "ctpending01",
+        "title": "Not rendered yet",
+        "voice": "Contract Voice",
+        "profile_id": "ctvoice01",
+        "status": "cancelled",
+        "outcome": null,
+        "created": 1700000200.0,
+        "duration": null,
+        "source": "api"
+       }
+      ]
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/search?same_script=A+narration+to+delete+and+bring+back.",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": [
+       {
+        "id": "cttrash01",
+        "title": "Delete and restore",
+        "voice": "Contract Voice",
+        "profile_id": "ctvoice01",
+        "status": "done",
+        "outcome": "clean",
+        "created": 1700000100.0,
+        "duration": 2.5,
+        "source": "api"
+       }
+      ]
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/jobs/nosuchjob",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 404,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "Not found"
+      }
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/generations/nosuchid/cancel",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "ok": true
+      }
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/generations/ctclean01/cancel",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "ok": true
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/nosuch",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 404,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "Not Found"
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/nosuch",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 404,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "Not Found"
+      }
+     }
+    },
+    {
+     "method": "DELETE",
+     "path": "/api/health",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 405,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "Method Not Allowed"
+      }
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/generations/search",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 405,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "Method Not Allowed"
+      }
+     }
+    },
+    {
+     "method": "DELETE",
+     "path": "/api/profiles/bad.id",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 400,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "Invalid id"
+      }
+     }
+    },
+    {
+     "method": "DELETE",
+     "path": "/api/generations/bad.id",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 400,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "Invalid id"
+      }
+     }
+    },
+    {
+     "method": "DELETE",
+     "path": "/api/transcripts/bad.id",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 400,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "Invalid id"
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/designs/bad.id/audio/x.wav",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 400,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "Invalid id"
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/health",
+     "headers": {
+      "Host": "evil.example"
+     },
+     "body": null,
+     "response": {
+      "status": 403,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "TakeTwo only answers this computer."
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/health",
+     "headers": {
+      "Host": "127.0.0.1.evil.example:8766"
+     },
+     "body": null,
+     "response": {
+      "status": 403,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "TakeTwo only answers this computer."
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/health",
+     "headers": {
+      "Host": "localhost:abc"
+     },
+     "body": null,
+     "response": {
+      "status": 403,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "TakeTwo only answers this computer."
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/health",
+     "headers": {
+      "Host": "localhost:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "ok": true,
+       "name": "TakeTwo",
+       "formerly": "VoiceForge",
+       "version": "2.0.0",
+       "loaded_engine": null
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/health",
+     "headers": {
+      "Host": "[::1]:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "ok": true,
+       "name": "TakeTwo",
+       "formerly": "VoiceForge",
+       "version": "2.0.0",
+       "loaded_engine": null
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/health",
+     "headers": {
+      "Host": "localhost"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "ok": true,
+       "name": "TakeTwo",
+       "formerly": "VoiceForge",
+       "version": "2.0.0",
+       "loaded_engine": null
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/nosuch",
+     "headers": {
+      "Host": "evil.example"
+     },
+     "body": null,
+     "response": {
+      "status": 403,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "TakeTwo only answers this computer."
+      }
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/generations/nosuchid/cancel",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "https://evil.example"
+     },
+     "body": null,
+     "response": {
+      "status": 403,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "Requests from other websites are not allowed."
+      }
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/generations/nosuchid/cancel",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "null"
+     },
+     "body": null,
+     "response": {
+      "status": 403,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "Requests from other websites are not allowed."
+      }
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/generations/nosuchid/cancel",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:3000"
+     },
+     "body": null,
+     "response": {
+      "status": 403,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "Requests from other websites are not allowed."
+      }
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/generations/nosuchid/cancel",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://localhost.evil.example:8766"
+     },
+     "body": null,
+     "response": {
+      "status": 403,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "Requests from other websites are not allowed."
+      }
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/generations/nosuchid/cancel",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://localhost:5173"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "ok": true
+      }
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/generations/nosuchid/cancel",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "ok": true
+      }
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/generations/nosuchid/cancel",
+     "headers": {
+      "Host": "localhost:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 403,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "Requests from other websites are not allowed."
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/health",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "https://evil.example"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "ok": true,
+       "name": "TakeTwo",
+       "formerly": "VoiceForge",
+       "version": "2.0.0",
+       "loaded_engine": null
+      }
+     }
+    },
+    {
+     "method": "DELETE",
+     "path": "/api/generations/%2e%2e",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 400,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "Invalid path."
+      }
+     }
+    },
+    {
+     "method": "DELETE",
+     "path": "/api/profiles/%2e%2e",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 400,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "Invalid path."
+      }
+     }
+    },
+    {
+     "method": "DELETE",
+     "path": "/api/transcripts/%2e%2e",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 400,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "Invalid path."
+      }
+     }
+    },
+    {
+     "method": "DELETE",
+     "path": "/api/generations/a%2f..%2f..",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 400,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "Invalid path."
+      }
+     }
+    },
+    {
+     "method": "DELETE",
+     "path": "/api/generations/a%5c..",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 400,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "Invalid path."
+      }
+     }
+    },
+    {
+     "method": "DELETE",
+     "path": "/api/generations/../x",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 400,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "Invalid path."
+      }
+     }
+    },
+    {
+     "method": "DELETE",
+     "path": "/api/nosuch/%2e",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 400,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "Invalid path."
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/profiles/%2e%2e/audio/voiceforge.db",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 400,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "Invalid path."
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/..%2f..%2fx/audio",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 400,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "Invalid path."
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/x/%2e%2e",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 404,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "Not Found"
+      }
+     }
+    },
+    {
+     "method": "PUT",
+     "path": "/api/settings",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "https://evil.example"
+     },
+     "body": {
+      "sentence_pause_ms": 350
+     },
+     "response": {
+      "status": 403,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "Requests from other websites are not allowed."
+      }
+     }
+    },
+    {
+     "method": "PUT",
+     "path": "/api/settings",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": {
+      "max_wer": 5
+     },
+     "response": {
+      "status": 400,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "max_wer must be between 0.01 and 0.5"
+      }
+     }
+    },
+    {
+     "method": "PUT",
+     "path": "/api/settings",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": {
+      "sentence_pause_ms": "350",
+      "not_a_setting": 1
+     },
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "default_engine": "qwen3-tts-1.7b",
+       "max_chunk_chars": 220,
+       "max_attempts": 4,
+       "compare_takes": 1,
+       "experimental_qwen_ending_guard": false,
+       "max_wer": 0.12,
+       "min_speaker_similarity": 0.85,
+       "max_internal_silence": 0.9,
+       "max_pitch_offset_st": 2.0,
+       "sentence_pause_ms": 350,
+       "inner_sentence_pause_ms": 0,
+       "paragraph_pause_ms": 700,
+       "target_lufs": -16.0,
+       "seed": 1234,
+       "pronunciations": [],
+       "strip_citations": true,
+       "custom_engines": [],
+       "check_updates": true,
+       "update_dismissed": ""
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/settings",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "default_engine": "qwen3-tts-1.7b",
+       "max_chunk_chars": 220,
+       "max_attempts": 4,
+       "compare_takes": 1,
+       "experimental_qwen_ending_guard": false,
+       "max_wer": 0.12,
+       "min_speaker_similarity": 0.85,
+       "max_internal_silence": 0.9,
+       "max_pitch_offset_st": 2.0,
+       "sentence_pause_ms": 350,
+       "inner_sentence_pause_ms": 0,
+       "paragraph_pause_ms": 700,
+       "target_lufs": -16.0,
+       "seed": 1234,
+       "pronunciations": [],
+       "strip_citations": true,
+       "custom_engines": [],
+       "check_updates": true,
+       "update_dismissed": ""
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "b",
+   "setup": [
+    {
+     "soft_delete": "cttrash01"
+    }
+   ],
+   "cases": [
+    {
+     "method": "GET",
+     "path": "/api/generations/cttrash01",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 404,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "Not found"
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/cttrash01/timings",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 404,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "Not found"
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/cttrash01/subtitles",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 404,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "Not found"
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/cttrash01/audio",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 404,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "Not found"
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/cttrash01/chunks/0/audio",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "audio/x-wav",
+       "content-disposition": null,
+       "cache-control": "no-store",
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "bytes": 24044
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/cttrash01/chunks/0/takes/1/audio",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 404,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "Not found"
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": [
+       {
+        "id": "ctclean01",
+        "profile_id": "ctvoice01",
+        "profile_name": "Contract Voice",
+        "engine": "qwen3-tts-1.7b",
+        "language": "en",
+        "status": "done",
+        "source": "mcp",
+        "speed": 1.25,
+        "duration": 7.4,
+        "file": "final.wav",
+        "created": 1700000500.0,
+        "title": "Rivers and towns",
+        "message": "Done. All parts passed the automated checks.",
+        "timeline": [
+         {
+          "i": 0,
+          "start": 0.0,
+          "end": 5.2
+         },
+         {
+          "i": 1,
+          "start": 5.9,
+          "end": 7.1
+         }
+        ],
+        "updated": 1800000001.0,
+        "outcome": "clean",
+        "review_count": 0,
+        "text_preview": "Welcome to the show &amp; thanks for listening [1]. Today we talk about rivers — and the towns along them.\n\nThe Nile is long."
+       },
+       {
+        "id": "ctreview01",
+        "profile_id": "ctvoice01",
+        "profile_name": "Contract Voice",
+        "engine": "qwen3-tts-1.7b",
+        "language": "en",
+        "status": "done",
+        "source": "app",
+        "speed": 1.0,
+        "duration": 6.0,
+        "file": "final.wav",
+        "created": 1700000400.0,
+        "title": "Three parts to review",
+        "message": "Done, needs review: part 2, 3.",
+        "timeline": [
+         {
+          "i": 0,
+          "start": 0.0,
+          "end": 1.5
+         },
+         {
+          "i": 1,
+          "start": 1.8,
+          "end": 3.4
+         },
+         {
+          "i": 2,
+          "start": 3.7,
+          "end": 5.6
+         }
+        ],
+        "updated": 1800000001.5,
+        "outcome": "needs_listen",
+        "review_count": 2,
+        "text_preview": "Part one is fine. Part two ends early. It&#39;s part three."
+       },
+       {
+        "id": "ctaccept01",
+        "profile_id": "ctvoice01",
+        "profile_name": "Contract Voice",
+        "engine": "qwen3-tts-1.7b",
+        "language": "en",
+        "status": "done",
+        "source": "api",
+        "speed": 1.0,
+        "duration": 4.0,
+        "file": "final.wav",
+        "created": 1700000300.0,
+        "title": "Sounds fine test",
+        "message": "Done, needs review: part 2.",
+        "timeline": [
+         {
+          "i": 0,
+          "start": 0.0,
+          "end": 1.6
+         },
+         {
+          "i": 1,
+          "start": 1.9,
+          "end": 3.8
+         }
+        ],
+        "updated": 1800000002.0,
+        "outcome": "needs_listen",
+        "review_count": 1,
+        "text_preview": "First line here. Second line ends here."
+       },
+       {
+        "id": "ctpending01",
+        "profile_id": "ctvoice01",
+        "profile_name": "Contract Voice",
+        "engine": "qwen3-tts-1.7b",
+        "language": "en",
+        "status": "cancelled",
+        "source": "api",
+        "speed": 1.0,
+        "created": 1700000200.0,
+        "title": "Not rendered yet",
+        "message": "Cancelled before it started",
+        "updated": 1800000002.5,
+        "outcome": null,
+        "review_count": 0,
+        "text_preview": "Not rendered yet. This one was stopped."
+       }
+      ]
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/search?q=delete",
+     "headers": {
+      "Host": "127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": []
+     }
+    }
+   ]
+  }
+ ]
+}
