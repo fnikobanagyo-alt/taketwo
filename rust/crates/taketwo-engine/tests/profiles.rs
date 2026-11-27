@@ -300,7 +300,9 @@ async fn reanalyze_clamps_the_window() {
     // a 1 s target is raised to 6 s: clips from 5 to 9 s of speech (plus the pause-snapping margin)
     let r = send(&e.app, "POST", &format!("/api/profiles/{pid}/reanalyze"), Some(json!({"target_window": 1}))).await;
     assert_eq!((r.status, json_of(&r)["kind"].as_str()), (200, Some("analyze")));
-    assert_eq!(profile(&e, &pid)["status"], "queued");
+    // the worker may already have picked the job up (seen once under load in S22)
+    let st = profile(&e, &pid)["status"].clone();
+    assert!(st == "queued" || st == "analyzing", "{st}");
     wait_idle(&e);
     let p = profile(&e, &pid);
     assert_eq!(p["status"], "ready");

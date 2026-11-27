@@ -52,7 +52,7 @@ The verdict of each gate is its command's exit code (`WT` is the worktree root).
 | G2 API contract | `cd "$WT" && rust/scripts/contract.sh` (prints `Ran 33 tests` and `OK`) |
 | G3 shell | `cd "$WT"/rust && cargo build -p taketwo && scripts/smoke_shell.sh` |
 | G4 MCP | `cd "$WT"/rust && cargo build -p taketwo-mcp && cargo test -p taketwo-mcp` |
-| G5 real synthesis smoke | `cd "$WT" && rust/scripts/synth_smoke.sh && cat rust/out/smoke/report.json` |
+| G5 real synthesis smoke | `cd "$WT" && SMOKE_STUDIO=0 rust/scripts/synth_smoke.sh && cat rust/out/smoke/report.json` |
 | G6 Windows build | `cd "$WT" && rust/scripts/g6.sh` (exit 75: still running) |
 | G7 blind A/B harness | `cd "$WT" && python3 rust/ab/ab.py plan && python3 rust/ab/ab.py selftest && ! python3 rust/ab/ab.py render` |
 | G8 isolation | `cd "$WT" && rust/scripts/g8.sh` |
@@ -63,6 +63,11 @@ How G5 works:
 - It exits 75 when the running app on 8766 is busy, and sends that app only GET requests.
 - Its WAV stays in the git-ignored `rust/out/smoke/` for a listen.
 - It makes no claim about the sound.
+- Two modes:
+  - Run A, `SMOKE_STUDIO=0 rust/scripts/synth_smoke.sh`: one reference clip of the running app's first ready English voice, studio off (the plain clean-up), into `rust/out/smoke/`.
+  - Run B, `SMOKE_OUT=rust/out/smoke-studio SMOKE_CLIP=<wav> rust/scripts/synth_smoke.sh`: a given clip (a synthetic `say` voice of about 44 s), studio on (the default), into its own folder and ledger; it reads 8766 only for `/api/status`.
+- `report.json` says `studio_requested` and whether studio ran (`studio`, `room_echo_after_db`).
+- A short single-window upload with studio on (the default) ends in "Could not find a clean stretch of speech" in both the Python app and TakeTwo, which is why run A switches studio off.
 
 ## Not in TakeTwo 1.0
 

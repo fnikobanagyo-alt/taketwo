@@ -247,7 +247,7 @@ Needs: S13, S14, S16. Gate: G5 (part).
 
 ### S18 Studio restoration (Sidon)
 Needs: S17. Gate: G5 (the smoke reports whether studio ran); it completes decision #4.
-Status: S18 code done, G5 not met (studio smoke attempt 1 ended in the analysis, see PROGRESS.md; lead decision 22): `taketwo-core::studio` (`restore`), the `Restorer` seam, `taketwo-voice::sidon` (ort, CPU provider, hand-ported feature extractor), the `analyze` studio branch; a studio request without the Sidon files (`<models>/sidon/sidon-predictor.onnx`, `sidon-vocoder.onnx`) runs the plain path with a first tip naming them. Parity: the ignored test `sidon_parity`.
+Status: S18 code done and accepted (lead decision 23). Its proof through the engine is S22's run B (a `say` clip of about 44 s, studio on), not Franz's clip: a short single-window reference clip with studio on ends in "Could not find a clean stretch of speech" in both apps. Earlier: studio smoke attempt 1 ended in the analysis (lead decision 22): `taketwo-core::studio` (`restore`), the `Restorer` seam, `taketwo-voice::sidon` (ort, CPU provider, hand-ported feature extractor), the `analyze` studio branch; a studio request without the Sidon files (`<models>/sidon/sidon-predictor.onnx`, `sidon-vocoder.onnx`) runs the plain path with a first tip naming them. Parity: the ignored test `sidon_parity`.
 - Port `studio.restore`: the w2v-BERT feature extractor by hand, Sidon predictor and vocoder through `ort` (fp16, local files), 20 s chunks with 1 s overlap (`noisereduce` moved to S17). No gate needs this step; if the gates pass first it stays owed under decision #4 and the final report says so.
 - Check (ignored test): Rust and Python outputs on one `say` clip with added noise; record length, loudness and spectral distance. No claim about sound.
 - If it does not fit in one session, record what is left; G5 does not depend on it.
@@ -276,6 +276,13 @@ Needs: all. Gates: all.
 - Run every gate command below in order and paste the real output tails into PROGRESS.md. That log commit changes only a `.md` file, so it starts no build and `g6.sh` still judges the last code commit. Write `rust/README.md` (how to build, run in isolated mode, run the gates).
 - Done when: G1 to G8 pass on the same code commit.
 
+### S22 Smoke input ruling (lead decision 23)
+Needs: S18, S21. Gates: G5 (run A), S18 through the engine (run B), then G1-G8 again.
+Status: open.
+- `synth_smoke.sh`: `SMOKE_STUDIO=0` sends `studio=false` with the create call; the report gains `studio_requested`. `SMOKE_CLIP` with the release engine is a real attempt in its own `SMOKE_OUT` ledger.
+- Run A: `SMOKE_STUDIO=0 rust/scripts/synth_smoke.sh` (Franz's clip, plain path, attempt 2 of 2 in `rust/out/smoke`). Run B: `SMOKE_OUT=rust/out/smoke-studio SMOKE_CLIP=<44 s say clip> rust/scripts/synth_smoke.sh` (studio on). One launch each, at most 10 takes each, 20 in all.
+- Done when: both reports exist on the pushed code commit and the final gate run is in PROGRESS.md.
+
 ## Gate commands
 
 Each is one command whose exit code is the verdict. G5 renders audio and G6 waits on GitHub: run them only after their steps are done, not on every loop turn.
@@ -286,7 +293,7 @@ Each is one command whose exit code is the verdict. G5 renders audio and G6 wait
 | G2 | `cd "$WT" && rust/scripts/contract.sh` | exit 0; prints `Ran 33 tests` and `OK`, no skips |
 | G3 | `cd "$WT"/rust && cargo build -p taketwo && scripts/smoke_shell.sh` | exit 0; health names TakeTwo; UI served; no process or port left |
 | G4 | `cd "$WT"/rust && cargo build -p taketwo-mcp && cargo test -p taketwo-mcp` | exit 0; all 12 tools called |
-| G5 | `cd "$WT" && rust/scripts/synth_smoke.sh && cat rust/out/smoke/report.json` | exit 0; takes <= 10 per attempt and <= 20 in all; WAV and SRT exist; timings and peak memory recorded. Exit 75 means Franz's app was busy: try later |
+| G5 | `cd "$WT" && SMOKE_STUDIO=0 rust/scripts/synth_smoke.sh && cat rust/out/smoke/report.json` (run A, Franz's clip, studio off), plus run B's report: `cat rust/out/smoke-studio/report.json` shows `studio_requested` true, `studio` true and `room_echo_after_db` set (lead decision 23) | exit 0; takes <= 10 per attempt and <= 20 in all; WAV and SRT exist; timings and peak memory recorded. Exit 75 means Franz's app was busy: try later |
 | G6 | `cd "$WT" && rust/scripts/g6.sh` | exit 0: the plain `cuda` job is `success` on the newest non-`.md` commit of `rust/taketwo`; flash-attn printed separately. Exit 75: still running |
 | G7 | `cd "$WT" && python3 rust/ab/ab.py plan && python3 rust/ab/ab.py selftest && ! python3 rust/ab/ab.py render` | exit 0: 10 scripts and a take count printed; selftest OK; render refuses |
 | G8 | `cd "$WT" && rust/scripts/g8.sh` | exit 0: this work is on no branch or tag but `rust/taketwo`; no process of this work has a file open in Franz's folders; 8766 health OK. The printed data differences are Franz's own app use: information, not a verdict |

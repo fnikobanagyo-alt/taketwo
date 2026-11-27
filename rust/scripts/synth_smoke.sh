@@ -5,15 +5,19 @@
 #    /api/profiles and ONE reference clip of the first ready English voice, through source_get below.
 # 2. The release engine (built with --features metal) starts on a dev port with TAKETWO_DATA under
 #    rust/target/smoke-tmp (new, empty), TAKETWO_MAX_TAKES=10, under /usr/bin/time -l; stderr to engine.log.
-# 3. It makes a voice from the clip (studio requested: Sidon runs when its files are there), waits for its analysis and preview, renders
+# 3. It makes a voice from the clip (studio requested by default: Sidon runs when its files are there; SMOKE_STUDIO=0
+#    sends studio=false, the plain path), waits for its analysis and preview, renders
 #    one fixed narration, saves WAV, SRT, timings and the narration document in rust/out/smoke/, stops the engine
 #    and deletes rust/target/smoke-tmp (an EXIT trap does both on every path) and writes report.json.
 # At most two attempts and 20 takes over all attempts (attempts.json keeps the count; delete rust/out/smoke to
 # start a new experiment). Exit 0: WAV over 1 s and SRT exist and this attempt used <= 10 takes.
 # Exit 1: an error (the engine's error text is printed). Exit 75: Franz's app was busy.
-# Dry run without a model (not an attempt of the experiment): SMOKE_OUT=<dir> SMOKE_CLIP=<wav>
-#   SMOKE_ENGINE=rust/target/debug/taketwo-engine SMOKE_ENGINE_ARGS=--stub-renderer (SMOKE_CLIP skips the two
-#   profile reads of 8766; the status read stays).
+# SMOKE_CLIP=<wav> uses that clip instead of Franz's (it skips the two profile reads of 8766; the status reads stay).
+# With the real release engine it is a real attempt in its own SMOKE_OUT ledger (run B of lead decision 23:
+#   SMOKE_OUT=rust/out/smoke-studio SMOKE_CLIP=<say clip>).
+# Dry run without a model: SMOKE_OUT=<dir under rust/target> SMOKE_CLIP=<wav>
+#   SMOKE_ENGINE=rust/target/debug/taketwo-engine SMOKE_ENGINE_ARGS=--stub-renderer.
+# An exit 75 at either status read is not an attempt: STARTED is set only after the engine is launched.
 # No voice name, profile id or file name of Franz's is printed or written anywhere.
 set -euo pipefail
 
@@ -24,6 +28,8 @@ OUT="${SMOKE_OUT:-$RUST/out/smoke}"
 TMP="$RUST/target/smoke-tmp"
 ENGINE="${SMOKE_ENGINE:-$RUST/target/release/taketwo-engine}"
 ENGINE_ARGS="${SMOKE_ENGINE_ARGS:-}"
+STUDIO_REQUESTED=true STUDIO_FORM=()
+[ "${SMOKE_STUDIO:-1}" = 0 ] && STUDIO_REQUESTED=false STUDIO_FORM=(--form-string studio=false)
 TAKE_CAP=10 TOTAL_CAP=20 MAX_ATTEMPTS=2
 NARRATION_LIMIT=1200   # seconds
 TEXT="The harbour was quiet before sunrise. A single boat moved slowly across the water, and the gulls followed it out. By noon the market was full of voices."
@@ -158,8 +164,9 @@ wait_idle() { # our engine: nothing running or queued
     return 1
 }
 
-# The voice: name "Smoke voice", English, defaults otherwise (studio is requested; without the Sidon files it falls back).
-P="$(dev POST /api/profiles -F "file=@$CLIP;filename=reference.wav;type=audio/wav" --form-string "name=Smoke voice" --form-string "language=en")"
+# The voice: name "Smoke voice", English, defaults otherwise (studio is requested unless SMOKE_STUDIO=0; without the
+# Sidon files it falls back).
+P="$(dev POST /api/profiles -F "file=@$CLIP;filename=reference.wav;type=audio/wav" --form-string "name=Smoke voice" --form-string "language=en" ${STUDIO_FORM[@]+"${STUDIO_FORM[@]}"})"
 PID_="$(printf '%s' "$P" | jget id)"
 AJOB="$(printf '%s' "$P" | jget job id)"
 [ -n "$PID_" ] && [ -n "$AJOB" ] || die "creating the voice failed: $P"
@@ -207,7 +214,7 @@ rm -rf "$TMP"
 COMMIT="$(git -C "$WT" rev-parse HEAD)"
 RC=0
 python3 - "$OUT" "$LEDGER" "$ATTEMPT" "$PREV_TAKES" "$TAKES_PREVIEW" "$TAKES_ALL" "$TAKE_CAP" "$CAP" "$COMMIT" "$CLIP_SECONDS" \
-    "$NOTE" "$T0" "$T1" "$T2" "$T3" "$T4" "$(printf '%s' "$PROFILE")" <<'PY' || RC=$?
+    "$NOTE" "$T0" "$T1" "$T2" "$T3" "$T4" "$(printf '%s' "$PROFILE")" "$STUDIO_REQUESTED" <<'PY' || RC=$?
 import json, re, sys, wave
 from pathlib import Path
 out, ledger = Path(sys.argv[1]), Path(sys.argv[2])
@@ -241,6 +248,7 @@ r = {
     "outcome": g.get("outcome"),
     "review": len(g.get("review") or []),
     "narration_status": g.get("status"),
+    "studio_requested": sys.argv[18] == "true",
     "studio": profile.get("studio"),
     "studio_tip": next((t for t in tips if "Studio restoration" in str(t)), None),
     "room_echo_db": profile.get("room_echo_db"),
