@@ -145,6 +145,11 @@
    "file": "sig_audit_short_061.f32",
    "len": 14640,
    "sr": 24000
+  },
+  "nr_tone": {
+   "file": "sig_nr_tone.f32",
+   "len": 9600,
+   "sr": 24000
   }
  },
  "ltas": [
@@ -2089,6 +2094,26 @@
    "issues": [],
    "margin_db": 4.103767395019531,
    "max_edge_run": 0
+  }
+ ],
+ "noisereduce": [
+  {
+   "name": "default",
+   "signal": "nr_tone",
+   "out": {
+    "file": "nr_default.f32",
+    "len": 9600
+   }
+  },
+  {
+   "name": "chunked",
+   "signal": "nr_tone",
+   "chunk_size": 4000,
+   "padding": 1000,
+   "out": {
+    "file": "nr_chunked.f32",
+    "len": 9600
+   }
   }
  ]
 }

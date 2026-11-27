@@ -7,6 +7,7 @@
 
 pub mod ffmpeg;
 pub mod loudness;
+pub mod noisereduce;
 pub mod np;
 pub mod signal;
 pub mod wav;

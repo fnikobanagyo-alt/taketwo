@@ -30,7 +30,7 @@ OUT = HERE / "mastering.json"
 ARR = HERE / "mastering"
 MIN_MARGIN_DB = 0.01
 MIN_TIE_DB = 1e-6
-MAX_BYTES = 5_600_000  # du -sk counts blocks; the gate is 6144 KB
+MAX_BYTES = 5_720_000  # du -sk counts blocks; the gate is 6144 KB (raised for the S17 noisereduce vector)
 
 np = None  # numpy, imported after the guards
 
@@ -371,6 +371,24 @@ def record_de_ess(studio, st, sig):
     return out
 
 
+def record_noisereduce(st):
+    """noisereduce.reduce_noise as reference.analyze calls it (step S17): a seeded noisy tone at 24 kHz, once with
+    the default chunks (one chunk, zero padded) and once with small chunks (the chunked path a long upload takes,
+    noise statistics from the first chunk only)."""
+    import noisereduce as nr
+
+    sr, n = 24000, 9600
+    rng = np.random.default_rng(1717)
+    t = np.arange(n) / sr
+    y = (0.3 * np.sin(2 * np.pi * 220 * t) * ((t > 0.12) & (t < 0.3)) + 0.02 * rng.standard_normal(n)).astype(np.float32)
+    src = st.signal("nr_tone", y, sr)
+    out = []
+    for name, kw in (("default", {}), ("chunked", {"chunk_size": 4000, "padding": 1000})):
+        a = nr.reduce_noise(y=src, sr=sr, stationary=True, prop_decrease=0.75, **kw).astype(np.float32)
+        out.append({"name": name, "signal": "nr_tone", **kw, "out": st.put(f"nr_{name}", a)})
+    return out
+
+
 def record_master(studio, au, st, sig):
     out = []
     plan = [("speech24", None), ("harsh24", None), ("clean24", None), ("harsh48", None), ("harsh16", None)]
@@ -520,6 +538,7 @@ def main() -> None:
         data["de_ess"] = record_de_ess(studio, st, sig)
         data["master_chain"] = record_master(studio, au, st, sig)
         data["edge"] = record_edge(pipeline, au, st, sig)
+        data["noisereduce"] = record_noisereduce(st)
         # pipeline imports app.ml (lazy: it loads no model at import, as in record_checks.py); no model library loaded
         assert not {"mlx", "mlx.core", "onnxruntime", "torch"} & set(sys.modules), "no model import"
         data = {"bands": [float(x) for x in delivery.BANDS], "signals": st.signals, **data}

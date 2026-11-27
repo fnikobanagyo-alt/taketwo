@@ -38,6 +38,22 @@ pub fn read_npy(path: &Path) -> Result<Vec<f32>, String> {
     Ok(out)
 }
 
+/// `np.save(path, a.astype(np.float32))` for a 1-D array: format 1.0, the header numpy 2 writes, padded to 64 bytes.
+pub fn write_npy_f32(path: &Path, a: &[f32]) -> Result<(), String> {
+    let mut h = format!("{{'descr': '<f4', 'fortran_order': False, 'shape': ({},), }}", a.len());
+    while (10 + h.len() + 1) % 64 != 0 {
+        h.push(' ');
+    }
+    h.push('\n');
+    let mut b = b"\x93NUMPY\x01\x00".to_vec();
+    b.extend((h.len() as u16).to_le_bytes());
+    b.extend(h.as_bytes());
+    for x in a {
+        b.extend(x.to_le_bytes());
+    }
+    std::fs::write(path, b).map_err(|e| format!("{}: {e}", path.display()))
+}
+
 /// `soundfile.write(path, audio, sr, subtype="FLOAT")`: mono IEEE float WAV. The samples are the same bits;
 /// the file bytes differ (libsndfile adds `fact` and `PEAK` chunks, hound skips them when reading).
 pub fn write_float_wav(path: &Path, audio: &[f32], sr: u32) -> Result<(), String> {
@@ -85,6 +101,18 @@ mod tests {
         write_float_wav(&p, &[0.25, -1.5], 16000).unwrap();
         assert_eq!(crate::audio::load(&p, None).unwrap(), (vec![0.25, -1.5], 16000));
         std::fs::remove_dir_all(dir).unwrap();
+    }
+
+    #[test]
+    fn npy_written_as_numpy_writes_it() {
+        let p = std::env::temp_dir().join(format!("taketwo-npy-write-{}.npy", std::process::id())); // not the shared dir another test removes
+        write_npy_f32(&p, &[1.5, -2.0, 0.25]).unwrap();
+        // np.save(io.BytesIO(), np.array([1.5, -2.0, 0.25], np.float32)) with the backend's numpy
+        let want = "934e554d5059010076007b276465736372273a20273c6634272c2027666f727472616e5f6f72646572273a2046616c73652c20277368617065273a2028332c292c207d2020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020200a0000c03f000000c00000803e";
+        let got: String = std::fs::read(&p).unwrap().iter().map(|b| format!("{b:02x}")).collect();
+        assert_eq!(got, want);
+        assert_eq!(read_npy(&p).unwrap(), vec![1.5, -2.0, 0.25]);
+        std::fs::remove_file(p).unwrap();
     }
 
     fn tempfile_dir() -> std::path::PathBuf {

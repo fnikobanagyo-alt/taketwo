@@ -103,7 +103,7 @@ fn settings_for(lib: &Library, doc: &Doc) -> Result<Doc, RenderError> {
 
 /// `json.dumps({"sr": sr, "bands": bands})`: Python writes NaN for the bands above 0.92 x Nyquist, which
 /// `delivery::read_mic_bands` reads back.
-fn mic_json(sr: u32, bands: &[f64]) -> String {
+pub(crate) fn mic_json(sr: u32, bands: &[f64]) -> String {
     let b: Vec<String> = bands
         .iter()
         .map(|x| match *x {
