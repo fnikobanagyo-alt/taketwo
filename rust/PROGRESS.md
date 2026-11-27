@@ -298,3 +298,11 @@ Questions for the lead:
 1. Should a CUDA build start and answer `--version` or `/api/health` on a PC without an NVIDIA driver (for example with a clear "needs an NVIDIA GPU" message)? That needs delay-loading `nvcuda.dll` or `cuda.lib`, or loading ggml-cuda dynamically.
 2. Is NuGet acceptable as the source of the Windows ONNX Runtime DLL from now on, or should a later step build ONNX Runtime `/MT` from source?
 3. Every later push step should keep the code commit as the tip, or rely on `g6.sh`'s ".md-only descendant" rule as built here.
+
+### 2026-11-27, builder (Opus), S02 addendum (.md only, starts no build)
+- A clean checkout now needs the whisper.cpp submodule (`git clone --recurse-submodules` or `git submodule update --init`). Without it, `taketwo-voice`'s `build.rs` stops with that hint, so G1 "from a clean checkout" assumes the submodule.
+- `g6.sh`'s ".md-only descendant" rule is untested against a real run: every run so far matched its commit exactly. Exits 0, 1 and 75 were each seen for real. The `!rust/**/*.md` path filter is also unproven, because no .md-only push was made.
+- Which DLL the CUDA exe missed on the runner (`STATUS_DLL_NOT_FOUND`) was not identified. The NVIDIA driver is likely, not confirmed. Whisper's CUDA side is shown only by the successful static `ggml-cuda` link; no CUDA exe printed a system-info line.
+- flash-attn when last read: run 45917033507 `failure` (00:29 to 01:38; log not read, the commit had the known ORT `/MD` clash); run 45921171833 still `in_progress`.
+- Hindsight was unreachable, so no `retain` was made. `env.sh` has left 8 empty `$TMPDIR/taketwo-data.*` folders in all.
+- Suggestions for the lead, not done so that G6 keeps its commit: `cargo build --locked` in CI, and a `dumpbin /dependents` line in the CUDA job to name the missing DLL.
