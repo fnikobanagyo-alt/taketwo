@@ -220,7 +220,7 @@ fn each_sentence_inside_one_part_is_guarded() {
     let p = part(&o);
     let ctx = p["attempts"][1]["ending_guard"]["sentences"].as_array().unwrap();
     assert_eq!(ctx.len(), 2);
-    assert!(ctx[1]["offset"].as_f64().unwrap() >= ctx[0]["cut_seconds"].as_f64().unwrap(), "the second sentence comes after the first");
+    assert!(ctx[1]["offset"].as_f64().unwrap() > ctx[0]["cut_seconds"].as_f64().unwrap(), "the second sentence comes after the first");
     let w = p["words"].as_array().unwrap();
     assert_eq!(w.iter().map(|w| w["word"].as_str().unwrap().trim()).collect::<Vec<_>>(), ["Pull", "half.", "One", "nudge", "more."]);
     assert!(w[2]["start"].as_f64().unwrap() > w[1]["end"].as_f64().unwrap(), "word times moved by the offset");
@@ -331,12 +331,15 @@ fn render_saves_raw_float_and_keeps_cutoff_flagged() {
 #[test]
 fn clean_take_outranks_lower_scoring_failed_take() {
     let g = golden();
-    // take 1 is mispronounced with score 0.64; take 2 is clean
-    let o = run(&g, "seed_schedule");
+    // take 1 drifts from the voice with the lower score; take 2 is clean with a higher one (its pitch term)
+    let o = run(&g, "clean_beats_lower_failed");
     let p = part(&o);
+    let at = p["attempts"].as_array().unwrap();
+    assert!(at[1]["score"].as_f64().unwrap() > at[0]["score"].as_f64().unwrap());
     assert_eq!(p["status"], "ok");
     assert_eq!(p["issues"], serde_json::json!([]));
-    assert_eq!(p["chosen_seed"], p["attempts"][2]["seed"]);
+    assert_eq!(at.len(), 2);
+    assert_eq!(p["chosen_seed"], at[1]["seed"]);
 }
 
 #[test]

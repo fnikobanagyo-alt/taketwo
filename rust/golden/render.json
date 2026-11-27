@@ -79,7 +79,7 @@
     "regen_round": 0,
     "clock": [
      1000000.0,
-     0.75
+     1.3
     ],
     "cancel_after": null,
     "pre_files": {
@@ -208,7 +208,7 @@
        "dur": 2.66,
        "issues": [],
        "score": 0.0,
-       "secs": 0.8,
+       "secs": 1.3,
        "liveliness": 1.05,
        "pitch_hz": null,
        "ref": 0,
@@ -454,7 +454,7 @@
     "regen_round": 0,
     "clock": [
      1000000.0,
-     0.75
+     1.3
     ],
     "cancel_after": null,
     "pre_files": {}
@@ -665,7 +665,7 @@
         "cut_off"
        ],
        "score": 2.5,
-       "secs": 0.8,
+       "secs": 1.3,
        "liveliness": 1.02,
        "pitch_hz": null,
        "ref": 0,
@@ -707,7 +707,7 @@
        "dur": 2.66,
        "issues": [],
        "score": 0.0,
-       "secs": 0.8,
+       "secs": 1.3,
        "liveliness": 1.05,
        "pitch_hz": null,
        "ref": 0,
@@ -965,7 +965,7 @@
     "regen_round": 0,
     "clock": [
      1000000.0,
-     0.75
+     1.3
     ],
     "cancel_after": null,
     "pre_files": {}
@@ -1340,7 +1340,7 @@
         "voice_drift"
        ],
        "score": 0.3,
-       "secs": 0.8,
+       "secs": 1.3,
        "liveliness": 1.05,
        "pitch_hz": null,
        "ref": 0,
@@ -1384,7 +1384,7 @@
         "mispronounced"
        ],
        "score": 0.64,
-       "secs": 0.8,
+       "secs": 1.3,
        "liveliness": 1.05,
        "pitch_hz": null,
        "ref": 0,
@@ -1428,7 +1428,7 @@
         "voice_drift"
        ],
        "score": 0.3,
-       "secs": 0.8,
+       "secs": 1.3,
        "liveliness": 1.05,
        "pitch_hz": null,
        "ref": 0,
@@ -1472,7 +1472,7 @@
         "cut_off"
        ],
        "score": 2.5,
-       "secs": 0.8,
+       "secs": 1.3,
        "liveliness": 1.02,
        "pitch_hz": null,
        "ref": 0,
@@ -1810,7 +1810,7 @@
     "regen_round": 0,
     "clock": [
      1000000.0,
-     0.75
+     1.3
     ],
     "cancel_after": null,
     "pre_files": {}
@@ -2019,7 +2019,7 @@
        "dur": 2.66,
        "issues": [],
        "score": 0.0,
-       "secs": 0.8,
+       "secs": 1.3,
        "liveliness": 1.05,
        "pitch_hz": null,
        "ref": 0,
@@ -2061,7 +2061,7 @@
        "dur": 2.66,
        "issues": [],
        "score": 0.0,
-       "secs": 0.8,
+       "secs": 1.3,
        "liveliness": 1.07,
        "pitch_hz": null,
        "ref": 0,
@@ -2335,7 +2335,7 @@
     "regen_round": 0,
     "clock": [
      1000000.0,
-     0.75
+     1.3
     ],
     "cancel_after": null,
     "pre_files": {}
@@ -2708,7 +2708,7 @@
        "dur": 2.66,
        "issues": [],
        "score": 0.0,
-       "secs": 0.8,
+       "secs": 1.3,
        "liveliness": 1.05,
        "pitch_hz": null,
        "ref": 0,
@@ -2752,7 +2752,7 @@
         "cut_off"
        ],
        "score": 2.5,
-       "secs": 0.8,
+       "secs": 1.3,
        "liveliness": 1.02,
        "pitch_hz": null,
        "ref": 0,
@@ -2794,7 +2794,7 @@
        "dur": 2.66,
        "issues": [],
        "score": 0.0,
-       "secs": 0.8,
+       "secs": 1.3,
        "liveliness": 1.07,
        "pitch_hz": null,
        "ref": 0,
@@ -2836,7 +2836,7 @@
        "dur": 2.66,
        "issues": [],
        "score": 0.0,
-       "secs": 0.8,
+       "secs": 1.3,
        "liveliness": 1.05,
        "pitch_hz": null,
        "ref": 0,
@@ -3175,7 +3175,7 @@
     "regen_round": 0,
     "clock": [
      1000000.0,
-     0.75
+     1.3
     ],
     "cancel_after": null,
     "pre_files": {}
@@ -3550,7 +3550,7 @@
         "mispronounced"
        ],
        "score": 0.64,
-       "secs": 0.8,
+       "secs": 1.3,
        "liveliness": 1.05,
        "pitch_hz": null,
        "ref": 0,
@@ -3594,7 +3594,7 @@
         "mispronounced"
        ],
        "score": 0.64,
-       "secs": 0.8,
+       "secs": 1.3,
        "liveliness": 1.05,
        "pitch_hz": null,
        "ref": 0,
@@ -3638,7 +3638,7 @@
         "mispronounced"
        ],
        "score": 0.64,
-       "secs": 0.8,
+       "secs": 1.3,
        "liveliness": 1.05,
        "pitch_hz": null,
        "ref": 0,
@@ -3682,7 +3682,7 @@
         "mispronounced"
        ],
        "score": 0.64,
-       "secs": 0.8,
+       "secs": 1.3,
        "liveliness": 1.05,
        "pitch_hz": null,
        "ref": 0,
@@ -4039,7 +4039,7 @@
     "regen_round": 0,
     "clock": [
      1000000.0,
-     0.75
+     1.3
     ],
     "cancel_after": null,
     "pre_files": {}
@@ -4340,7 +4340,7 @@
         "mispronounced"
        ],
        "score": 0.64,
-       "secs": 0.8,
+       "secs": 1.3,
        "liveliness": 1.05,
        "pitch_hz": null,
        "ref": 0,
@@ -4384,7 +4384,7 @@
         "mispronounced"
        ],
        "score": 0.64,
-       "secs": 0.8,
+       "secs": 1.3,
        "liveliness": 1.07,
        "pitch_hz": null,
        "ref": 0,
@@ -4426,7 +4426,7 @@
        "dur": 2.66,
        "issues": [],
        "score": 0.0,
-       "secs": 0.8,
+       "secs": 1.3,
        "liveliness": 1.18,
        "pitch_hz": null,
        "ref": 2,
@@ -4773,7 +4773,7 @@
     "regen_round": 0,
     "clock": [
      1000000.0,
-     0.75
+     1.3
     ],
     "cancel_after": null,
     "pre_files": {}
@@ -4910,7 +4910,7 @@
         "mispronounced"
        ],
        "score": 0.64,
-       "secs": 0.8,
+       "secs": 1.3,
        "liveliness": 1.05,
        "pitch_hz": null,
        "ref": 0,
@@ -5179,7 +5179,7 @@
     "regen_round": 0,
     "clock": [
      1000000.0,
-     0.75
+     1.3
     ],
     "cancel_after": null,
     "pre_files": {}
@@ -5472,7 +5472,7 @@
         "cut_off"
        ],
        "score": 2.5,
-       "secs": 0.8,
+       "secs": 1.3,
        "liveliness": 1.02,
        "pitch_hz": null,
        "ref": 0,
@@ -5516,7 +5516,7 @@
         "cut_off"
        ],
        "score": 2.5,
-       "secs": 0.8,
+       "secs": 1.3,
        "liveliness": 1.05,
        "pitch_hz": null,
        "ref": 0,
@@ -5558,7 +5558,7 @@
        "dur": 2.66,
        "issues": [],
        "score": 0.0,
-       "secs": 0.8,
+       "secs": 1.3,
        "liveliness": 1.07,
        "pitch_hz": null,
        "ref": 0,
@@ -5864,7 +5864,7 @@
     "regen_round": 0,
     "clock": [
      1000000.0,
-     0.75
+     1.3
     ],
     "cancel_after": null,
     "pre_files": {}
@@ -6076,7 +6076,7 @@
         "cut_off"
        ],
        "score": 2.5,
-       "secs": 0.8,
+       "secs": 1.3,
        "liveliness": 1.05,
        "pitch_hz": null,
        "ref": 0,
@@ -6118,7 +6118,7 @@
        "dur": 2.66,
        "issues": [],
        "score": 0.0,
-       "secs": 0.8,
+       "secs": 1.3,
        "liveliness": 1.07,
        "pitch_hz": null,
        "ref": 0,
@@ -6392,7 +6392,7 @@
     "regen_round": 0,
     "clock": [
      1000000.0,
-     0.75
+     1.3
     ],
     "cancel_after": null,
     "pre_files": {}
@@ -6520,7 +6520,7 @@
        "dur": 2.66,
        "issues": [],
        "score": 0.0,
-       "secs": 0.8,
+       "secs": 1.3,
        "liveliness": 1.05,
        "pitch_hz": null,
        "ref": 0,
@@ -6763,7 +6763,7 @@
     "regen_round": 0,
     "clock": [
      1000000.0,
-     0.75
+     1.3
     ],
     "cancel_after": null,
     "pre_files": {}
@@ -6891,7 +6891,7 @@
        "dur": 2.66,
        "issues": [],
        "score": 0.0,
-       "secs": 0.8,
+       "secs": 1.3,
        "liveliness": 1.05,
        "pitch_hz": null,
        "ref": 0,
@@ -7148,7 +7148,7 @@
     "regen_round": 2,
     "clock": [
      1000000.0,
-     0.75
+     1.3
     ],
     "cancel_after": null,
     "pre_files": {}
@@ -7447,7 +7447,7 @@
         "mispronounced"
        ],
        "score": 0.64,
-       "secs": 0.8,
+       "secs": 1.3,
        "liveliness": 1.05,
        "pitch_hz": null,
        "ref": 0,
@@ -7491,7 +7491,7 @@
         "mispronounced"
        ],
        "score": 0.64,
-       "secs": 0.8,
+       "secs": 1.3,
        "liveliness": 1.07,
        "pitch_hz": null,
        "ref": 0,
@@ -7533,7 +7533,7 @@
        "dur": 2.66,
        "issues": [],
        "score": 0.0,
-       "secs": 0.8,
+       "secs": 1.3,
        "liveliness": 1.05,
        "pitch_hz": null,
        "ref": 0,
@@ -7838,7 +7838,7 @@
     "regen_round": 0,
     "clock": [
      1000000.0,
-     0.75
+     1.3
     ],
     "cancel_after": null,
     "pre_files": {}
@@ -7969,7 +7969,7 @@
        "dur": 2.66,
        "issues": [],
        "score": 0.0,
-       "secs": 0.8,
+       "secs": 1.3,
        "liveliness": 1.05,
        "pitch_hz": null,
        "ref": 0,
@@ -8152,6 +8152,906 @@
    "fired": "seed wraps at 2^32"
   },
   {
+   "name": "clean_24k",
+   "inputs": {
+    "gen": {
+     "id": "g_clean_24k",
+     "profile_id": "rvoice",
+     "engine": "qwen3-tts-1.7b",
+     "language": "en",
+     "params": {},
+     "chunks": [
+      {
+       "i": 0,
+       "text": "The river ran past the old mill.",
+       "pause_after": "end",
+       "status": "pending"
+      }
+     ]
+    },
+    "ci": 0,
+    "profile": {
+     "id": "rvoice",
+     "name": "Render voice",
+     "variants": [
+      {
+       "index": 0,
+       "file": "ref_0.wav",
+       "text": "Our voice reads a calm line of text here.",
+       "score": 0.9
+      }
+     ],
+     "self_similarity": 0.8,
+     "speech_rate_wps": 2.6
+    },
+    "settings": {
+     "default_engine": "qwen3-tts-1.7b",
+     "max_chunk_chars": 220,
+     "max_attempts": 4,
+     "compare_takes": 1,
+     "experimental_qwen_ending_guard": false,
+     "max_wer": 0.12,
+     "min_speaker_similarity": 0.85,
+     "max_internal_silence": 0.9,
+     "max_pitch_offset_st": 2.0,
+     "sentence_pause_ms": 300,
+     "inner_sentence_pause_ms": 0,
+     "paragraph_pause_ms": 700,
+     "target_lufs": -16.0,
+     "seed": 1234,
+     "pronunciations": [],
+     "strip_citations": true,
+     "custom_engines": [],
+     "check_updates": true,
+     "update_dismissed": ""
+    },
+    "nonce": 12345,
+    "regen_round": 0,
+    "clock": [
+     1000000.0,
+     1.3
+    ],
+    "cancel_after": null,
+    "pre_files": {}
+   },
+   "script": {
+    "takes": [
+     {
+      "audio": {
+       "file": "f32_571c4a13f0291b78.f32",
+       "len": 65520
+      },
+      "sr": 24000,
+      "report": {
+       "tokens": 51,
+       "token_limit": 120,
+       "raw_samples": 65520,
+       "sample_rate": 24000,
+       "stop_reason": "eos",
+       "sampler": {
+        "temperature": 0.7,
+        "top_p": 0.9,
+        "top_k": 40
+       },
+       "generation_route": "scripted",
+       "decoder": "scripted"
+      }
+     }
+    ],
+    "transcripts": [
+     {
+      "text": "The river ran past the old mill.",
+      "segments": [
+       {
+        "start": 0.14,
+        "end": 2.41,
+        "text": "The river ran past the old mill.",
+        "avg_logprob": -0.2,
+        "no_speech_prob": 0.01,
+        "words": [
+         {
+          "word": " The",
+          "start": 0.14,
+          "end": 0.37,
+          "p": 0.9
+         },
+         {
+          "word": " river",
+          "start": 0.46,
+          "end": 0.6,
+          "p": 0.9
+         },
+         {
+          "word": " ran",
+          "start": 0.69,
+          "end": 0.92,
+          "p": 0.9
+         },
+         {
+          "word": " past",
+          "start": 1.01,
+          "end": 1.27,
+          "p": 0.9
+         },
+         {
+          "word": " the",
+          "start": 1.36,
+          "end": 1.59,
+          "p": 0.9
+         },
+         {
+          "word": " old",
+          "start": 1.68,
+          "end": 1.91,
+          "p": 0.9
+         },
+         {
+          "word": " mill.",
+          "start": 2.0,
+          "end": 2.41,
+          "p": 0.9
+         }
+        ]
+       }
+      ],
+      "language": "en"
+     }
+    ],
+    "embeddings": [
+     [
+      4.0,
+      3.0
+     ]
+    ]
+   },
+   "voice": {
+    "clean.wav": {
+     "file": "wav_f9854012b0732304.wav",
+     "len": 47360
+    },
+    "ref_0.wav": {
+     "file": "wav_28c39f7c43cede2c.wav",
+     "len": 52000
+    },
+    "fingerprint.npy": {
+     "file": "npy_1e788703ebe24963.npy",
+     "len": 2
+    }
+   },
+   "result": {
+    "part": {
+     "i": 0,
+     "text": "The river ran past the old mill.",
+     "pause_after": "end",
+     "status": "ok",
+     "file": "chunk_000.wav",
+     "sr": 24000,
+     "attempts": [
+      {
+       "seed": 13579,
+       "temperature": 0.775,
+       "wer": 0.0,
+       "sim": 1.0,
+       "max_gap": 0.0,
+       "dur": 2.66,
+       "issues": [],
+       "score": 0.0,
+       "secs": 1.3,
+       "liveliness": 0.92,
+       "pitch_hz": null,
+       "ref": 0,
+       "heard": "The river ran past the old mill.",
+       "ending": {
+        "start": 0.12,
+        "cut": 2.54,
+        "natural": true,
+        "junk": false,
+        "last_level": -35.263771057128906,
+        "trim_start": 0.01999999999999999,
+        "head_pad_s": 0.02,
+        "raw_duration": 2.73,
+        "last_word_end": 2.41
+       },
+       "synthesis": {
+        "tokens": 51,
+        "token_limit": 120,
+        "raw_samples": 65520,
+        "sample_rate": 24000,
+        "stop_reason": "eos",
+        "sampler": {
+         "temperature": 0.7,
+         "top_p": 0.9,
+         "top_k": 40
+        },
+        "generation_route": "scripted",
+        "decoder": "scripted"
+       },
+       "expected_seconds": 2.692307692307692,
+       "ending_guard": null
+      }
+     ],
+     "wer": 0.0,
+     "sim": 1.0,
+     "dur": 2.66,
+     "issues": [],
+     "heard": "The river ran past the old mill.",
+     "raw_file": "raw_chunk_000.wav",
+     "ending": {
+      "start": 0.12,
+      "cut": 2.54,
+      "natural": true,
+      "junk": false,
+      "last_level": -35.263771057128906,
+      "trim_start": 0.01999999999999999,
+      "head_pad_s": 0.02,
+      "raw_duration": 2.73,
+      "last_word_end": 2.41
+     },
+     "audio_revision": 1,
+     "used_seeds": [
+      13579
+     ],
+     "duration_budget": 1.0,
+     "pitch_hz": null,
+     "words": [
+      {
+       "word": " The",
+       "start": 0.14,
+       "end": 0.37
+      },
+      {
+       "word": " river",
+       "start": 0.46,
+       "end": 0.6
+      },
+      {
+       "word": " ran",
+       "start": 0.69,
+       "end": 0.92
+      },
+      {
+       "word": " past",
+       "start": 1.01,
+       "end": 1.27
+      },
+      {
+       "word": " the",
+       "start": 1.36,
+       "end": 1.59
+      },
+      {
+       "word": " old",
+       "start": 1.68,
+       "end": 1.91
+      },
+      {
+       "word": " mill.",
+       "start": 2.0,
+       "end": 2.41
+      }
+     ],
+     "ending_guard": null,
+     "context_file": null,
+     "chosen_seed": 13579,
+     "accepted": null
+    },
+    "calls": [
+     {
+      "synthesize": {
+       "engine": "qwen3-tts-1.7b",
+       "text": "The river ran past the old mill.",
+       "ref_file": "ref_0.wav",
+       "ref_text": "Our voice reads a calm line of text here.",
+       "language": "en",
+       "params": {
+        "temperature": 0.775
+       },
+       "seed": 13579,
+       "expected_seconds": 2.692307692307692
+      }
+     },
+     {
+      "transcribe": {
+       "len": 65520,
+       "sr": 24000,
+       "len_16k": 43680,
+       "language": "en",
+       "words": true
+      }
+     },
+     {
+      "embedding": {
+       "len": 63841,
+       "sr": 24000
+      }
+     }
+    ],
+    "cosines": [
+     0.800000011920929
+    ],
+    "files": {
+     "chunk_000.wav": {
+      "pcm16": {
+       "file": "i16_5d55c422800b3774.i16",
+       "len": 63841
+      },
+      "sr": 24000
+     },
+     "raw_chunk_000.wav": {
+      "float": {
+       "sha256": "571c4a13f0291b783b3115501bf59c400b962f1e36770cc1c2e4e2bcaff9d8a3",
+       "len": 65520
+      },
+      "sr": 24000
+     }
+    },
+    "profile_after": {
+     "id": "rvoice",
+     "name": "Render voice",
+     "variants": [
+      {
+       "index": 0,
+       "file": "ref_0.wav",
+       "text": "Our voice reads a calm line of text here.",
+       "score": 0.9
+      }
+     ],
+     "self_similarity": 0.8,
+     "speech_rate_wps": 2.6,
+     "noise_baseline": 0.0
+    },
+    "put_profile": [
+     {
+      "id": "rvoice",
+      "name": "Render voice",
+      "variants": [
+       {
+        "index": 0,
+        "file": "ref_0.wav",
+        "text": "Our voice reads a calm line of text here.",
+        "score": 0.9
+       }
+      ],
+      "self_similarity": 0.8,
+      "speech_rate_wps": 2.6,
+      "noise_baseline": 0.0
+     }
+    ],
+    "clock_reads": 2
+   },
+   "fired": "a 24 kHz take is resampled to 16 kHz before transcription"
+  },
+  {
+   "name": "clean_beats_lower_failed",
+   "inputs": {
+    "gen": {
+     "id": "g_clean_beats_lower_failed",
+     "profile_id": "rvoice",
+     "engine": "qwen3-tts-1.7b",
+     "language": "en",
+     "params": {},
+     "chunks": [
+      {
+       "i": 0,
+       "text": "The river ran past the old mill.",
+       "pause_after": "end",
+       "status": "pending"
+      }
+     ]
+    },
+    "ci": 0,
+    "profile": {
+     "id": "rvoice",
+     "name": "Render voice",
+     "variants": [
+      {
+       "index": 0,
+       "file": "ref_0.wav",
+       "text": "Our voice reads a calm line of text here.",
+       "score": 0.9
+      }
+     ],
+     "self_similarity": 0.8,
+     "speech_rate_wps": 2.6,
+     "pitch_hz": 150.0
+    },
+    "settings": {
+     "default_engine": "qwen3-tts-1.7b",
+     "max_chunk_chars": 220,
+     "max_attempts": 4,
+     "compare_takes": 1,
+     "experimental_qwen_ending_guard": false,
+     "max_wer": 0.12,
+     "min_speaker_similarity": 0.85,
+     "max_internal_silence": 0.9,
+     "max_pitch_offset_st": 6.0,
+     "sentence_pause_ms": 300,
+     "inner_sentence_pause_ms": 0,
+     "paragraph_pause_ms": 700,
+     "target_lufs": -16.0,
+     "seed": 1234,
+     "pronunciations": [],
+     "strip_citations": true,
+     "custom_engines": [],
+     "check_updates": true,
+     "update_dismissed": ""
+    },
+    "nonce": 12345,
+    "regen_round": 0,
+    "clock": [
+     1000000.0,
+     1.3
+    ],
+    "cancel_after": null,
+    "pre_files": {}
+   },
+   "script": {
+    "takes": [
+     {
+      "audio": {
+       "file": "f32_ee9550f69a3c72bc.f32",
+       "len": 43680
+      },
+      "sr": 16000,
+      "report": {
+       "tokens": 34,
+       "token_limit": 120,
+       "raw_samples": 43680,
+       "sample_rate": 16000,
+       "stop_reason": "eos",
+       "sampler": {
+        "temperature": 0.7,
+        "top_p": 0.9,
+        "top_k": 40
+       },
+       "generation_route": "scripted",
+       "decoder": "scripted"
+      }
+     },
+     {
+      "audio": {
+       "file": "f32_1396e37dce610b6b.f32",
+       "len": 43680
+      },
+      "sr": 16000,
+      "report": {
+       "tokens": 34,
+       "token_limit": 120,
+       "raw_samples": 43680,
+       "sample_rate": 16000,
+       "stop_reason": "eos",
+       "sampler": {
+        "temperature": 0.7,
+        "top_p": 0.9,
+        "top_k": 40
+       },
+       "generation_route": "scripted",
+       "decoder": "scripted"
+      }
+     }
+    ],
+    "transcripts": [
+     {
+      "text": "The river ran past the old mill.",
+      "segments": [
+       {
+        "start": 0.14,
+        "end": 2.41,
+        "text": "The river ran past the old mill.",
+        "avg_logprob": -0.2,
+        "no_speech_prob": 0.01,
+        "words": [
+         {
+          "word": " The",
+          "start": 0.14,
+          "end": 0.37,
+          "p": 0.9
+         },
+         {
+          "word": " river",
+          "start": 0.46,
+          "end": 0.6,
+          "p": 0.9
+         },
+         {
+          "word": " ran",
+          "start": 0.69,
+          "end": 0.92,
+          "p": 0.9
+         },
+         {
+          "word": " past",
+          "start": 1.01,
+          "end": 1.27,
+          "p": 0.9
+         },
+         {
+          "word": " the",
+          "start": 1.36,
+          "end": 1.59,
+          "p": 0.9
+         },
+         {
+          "word": " old",
+          "start": 1.68,
+          "end": 1.91,
+          "p": 0.9
+         },
+         {
+          "word": " mill.",
+          "start": 2.0,
+          "end": 2.41,
+          "p": 0.9
+         }
+        ]
+       }
+      ],
+      "language": "en"
+     },
+     {
+      "text": "The river ran past the old mill.",
+      "segments": [
+       {
+        "start": 0.14,
+        "end": 2.41,
+        "text": "The river ran past the old mill.",
+        "avg_logprob": -0.2,
+        "no_speech_prob": 0.01,
+        "words": [
+         {
+          "word": " The",
+          "start": 0.14,
+          "end": 0.37,
+          "p": 0.9
+         },
+         {
+          "word": " river",
+          "start": 0.46,
+          "end": 0.6,
+          "p": 0.9
+         },
+         {
+          "word": " ran",
+          "start": 0.69,
+          "end": 0.92,
+          "p": 0.9
+         },
+         {
+          "word": " past",
+          "start": 1.01,
+          "end": 1.27,
+          "p": 0.9
+         },
+         {
+          "word": " the",
+          "start": 1.36,
+          "end": 1.59,
+          "p": 0.9
+         },
+         {
+          "word": " old",
+          "start": 1.68,
+          "end": 1.91,
+          "p": 0.9
+         },
+         {
+          "word": " mill.",
+          "start": 2.0,
+          "end": 2.41,
+          "p": 0.9
+         }
+        ]
+       }
+      ],
+      "language": "en"
+     }
+    ],
+    "embeddings": [
+     [
+      3.0,
+      4.0
+     ],
+     [
+      4.0,
+      3.0
+     ]
+    ]
+   },
+   "voice": {
+    "clean.wav": {
+     "file": "wav_f9854012b0732304.wav",
+     "len": 47360
+    },
+    "ref_0.wav": {
+     "file": "wav_28c39f7c43cede2c.wav",
+     "len": 52000
+    },
+    "fingerprint.npy": {
+     "file": "npy_1e788703ebe24963.npy",
+     "len": 2
+    }
+   },
+   "result": {
+    "part": {
+     "i": 0,
+     "text": "The river ran past the old mill.",
+     "pause_after": "end",
+     "status": "ok",
+     "file": "chunk_000.wav",
+     "sr": 16000,
+     "attempts": [
+      {
+       "seed": 13579,
+       "temperature": 0.775,
+       "wer": 0.0,
+       "sim": 0.75,
+       "max_gap": 0.0,
+       "dur": 2.66,
+       "issues": [
+        "voice_drift"
+       ],
+       "score": 0.5278,
+       "secs": 1.3,
+       "liveliness": 1.05,
+       "pitch_hz": 154.0,
+       "ref": 0,
+       "heard": "The river ran past the old mill.",
+       "ending": {
+        "start": 0.12,
+        "cut": 2.54,
+        "natural": true,
+        "junk": false,
+        "last_level": -33.3804931640625,
+        "trim_start": 0.01999999999999999,
+        "head_pad_s": 0.02,
+        "raw_duration": 2.73,
+        "last_word_end": 2.41
+       },
+       "synthesis": {
+        "tokens": 34,
+        "token_limit": 120,
+        "raw_samples": 43680,
+        "sample_rate": 16000,
+        "stop_reason": "eos",
+        "sampler": {
+         "temperature": 0.7,
+         "top_p": 0.9,
+         "top_k": 40
+        },
+        "generation_route": "scripted",
+        "decoder": "scripted"
+       },
+       "expected_seconds": 2.692307692307692,
+       "ending_guard": null
+      },
+      {
+       "seed": 13580,
+       "temperature": 0.6975,
+       "wer": 0.0,
+       "sim": 1.0,
+       "max_gap": 0.0,
+       "dur": 2.66,
+       "issues": [],
+       "score": 2.2221,
+       "secs": 1.3,
+       "liveliness": 1.02,
+       "pitch_hz": 193.9,
+       "ref": 0,
+       "heard": "The river ran past the old mill.",
+       "ending": {
+        "start": 0.12,
+        "cut": 2.54,
+        "natural": true,
+        "junk": false,
+        "last_level": -32.901344299316406,
+        "trim_start": 0.01999999999999999,
+        "head_pad_s": 0.02,
+        "raw_duration": 2.73,
+        "last_word_end": 2.41
+       },
+       "synthesis": {
+        "tokens": 34,
+        "token_limit": 120,
+        "raw_samples": 43680,
+        "sample_rate": 16000,
+        "stop_reason": "eos",
+        "sampler": {
+         "temperature": 0.7,
+         "top_p": 0.9,
+         "top_k": 40
+        },
+        "generation_route": "scripted",
+        "decoder": "scripted"
+       },
+       "expected_seconds": 2.692307692307692,
+       "ending_guard": null
+      }
+     ],
+     "wer": 0.0,
+     "sim": 1.0,
+     "dur": 2.66,
+     "issues": [],
+     "heard": "The river ran past the old mill.",
+     "raw_file": "raw_chunk_000.wav",
+     "ending": {
+      "start": 0.12,
+      "cut": 2.54,
+      "natural": true,
+      "junk": false,
+      "last_level": -32.901344299316406,
+      "trim_start": 0.01999999999999999,
+      "head_pad_s": 0.02,
+      "raw_duration": 2.73,
+      "last_word_end": 2.41
+     },
+     "audio_revision": 1,
+     "used_seeds": [
+      13579,
+      13580
+     ],
+     "duration_budget": 1.0,
+     "pitch_hz": 193.9,
+     "words": [
+      {
+       "word": " The",
+       "start": 0.14,
+       "end": 0.37
+      },
+      {
+       "word": " river",
+       "start": 0.46,
+       "end": 0.6
+      },
+      {
+       "word": " ran",
+       "start": 0.69,
+       "end": 0.92
+      },
+      {
+       "word": " past",
+       "start": 1.01,
+       "end": 1.27
+      },
+      {
+       "word": " the",
+       "start": 1.36,
+       "end": 1.59
+      },
+      {
+       "word": " old",
+       "start": 1.68,
+       "end": 1.91
+      },
+      {
+       "word": " mill.",
+       "start": 2.0,
+       "end": 2.41
+      }
+     ],
+     "ending_guard": null,
+     "context_file": null,
+     "chosen_seed": 13580,
+     "accepted": null
+    },
+    "calls": [
+     {
+      "synthesize": {
+       "engine": "qwen3-tts-1.7b",
+       "text": "The river ran past the old mill.",
+       "ref_file": "ref_0.wav",
+       "ref_text": "Our voice reads a calm line of text here.",
+       "language": "en",
+       "params": {
+        "temperature": 0.775
+       },
+       "seed": 13579,
+       "expected_seconds": 2.692307692307692
+      }
+     },
+     {
+      "transcribe": {
+       "len": 43680,
+       "sr": 16000,
+       "len_16k": 43680,
+       "language": "en",
+       "words": true
+      }
+     },
+     {
+      "embedding": {
+       "len": 42561,
+       "sr": 16000
+      }
+     },
+     {
+      "synthesize": {
+       "engine": "qwen3-tts-1.7b",
+       "text": "The river ran past the old mill.",
+       "ref_file": "ref_0.wav",
+       "ref_text": "Our voice reads a calm line of text here.",
+       "language": "en",
+       "params": {
+        "temperature": 0.6975
+       },
+       "seed": 13580,
+       "expected_seconds": 2.692307692307692
+      }
+     },
+     {
+      "transcribe": {
+       "len": 43680,
+       "sr": 16000,
+       "len_16k": 43680,
+       "language": "en",
+       "words": true
+      }
+     },
+     {
+      "embedding": {
+       "len": 42561,
+       "sr": 16000
+      }
+     }
+    ],
+    "cosines": [
+     0.6000000238418579,
+     0.800000011920929
+    ],
+    "files": {
+     "chunk_000.wav": {
+      "pcm16": {
+       "file": "i16_ec0da41426907199.i16",
+       "len": 42561
+      },
+      "sr": 16000
+     },
+     "raw_chunk_000.wav": {
+      "float": {
+       "sha256": "1396e37dce610b6be180051c9a216c618b0523506875e1050bab1b8080afc19b",
+       "len": 43680
+      },
+      "sr": 16000
+     }
+    },
+    "profile_after": {
+     "id": "rvoice",
+     "name": "Render voice",
+     "variants": [
+      {
+       "index": 0,
+       "file": "ref_0.wav",
+       "text": "Our voice reads a calm line of text here.",
+       "score": 0.9
+      }
+     ],
+     "self_similarity": 0.8,
+     "speech_rate_wps": 2.6,
+     "pitch_hz": 150.0,
+     "noise_baseline": 0.0
+    },
+    "put_profile": [
+     {
+      "id": "rvoice",
+      "name": "Render voice",
+      "variants": [
+       {
+        "index": 0,
+        "file": "ref_0.wav",
+        "text": "Our voice reads a calm line of text here.",
+        "score": 0.9
+       }
+      ],
+      "self_similarity": 0.8,
+      "speech_rate_wps": 2.6,
+      "pitch_hz": 150.0,
+      "noise_baseline": 0.0
+     }
+    ],
+    "clock_reads": 4
+   },
+   "fired": "a clean take outranks a failed take with a lower score"
+  },
+  {
    "name": "flat_then_lively",
    "inputs": {
     "gen": {
@@ -8212,7 +9112,7 @@
     "regen_round": 0,
     "clock": [
      1000000.0,
-     0.75
+     1.3
     ],
     "cancel_after": null,
     "pre_files": {}
@@ -8423,7 +9323,7 @@
         "flat"
        ],
        "score": 1.38,
-       "secs": 0.8,
+       "secs": 1.3,
        "liveliness": 0.02,
        "pitch_hz": null,
        "ref": 0,
@@ -8465,7 +9365,7 @@
        "dur": 2.66,
        "issues": [],
        "score": 0.0,
-       "secs": 0.8,
+       "secs": 1.3,
        "liveliness": 1.05,
        "pitch_hz": null,
        "ref": 0,
@@ -8740,7 +9640,7 @@
     "regen_round": 0,
     "clock": [
      1000000.0,
-     0.75
+     1.3
     ],
     "cancel_after": null,
     "pre_files": {}
@@ -8951,7 +9851,7 @@
         "off_pitch"
        ],
        "score": 2.2221,
-       "secs": 0.8,
+       "secs": 1.3,
        "liveliness": 1.02,
        "pitch_hz": 193.9,
        "ref": 0,
@@ -8993,7 +9893,7 @@
        "dur": 2.66,
        "issues": [],
        "score": 0.2278,
-       "secs": 0.8,
+       "secs": 1.3,
        "liveliness": 1.05,
        "pitch_hz": 154.0,
        "ref": 0,
@@ -9284,7 +10184,7 @@
     "regen_round": 0,
     "clock": [
      1000000.0,
-     0.75
+     1.3
     ],
     "cancel_after": null,
     "pre_files": {}
@@ -9495,7 +10395,7 @@
         "off_pitch"
        ],
        "score": 2.3049,
-       "secs": 0.8,
+       "secs": 1.3,
        "liveliness": 1.05,
        "pitch_hz": 154.0,
        "ref": 0,
@@ -9539,7 +10439,7 @@
         "off_pitch"
        ],
        "score": 2.025,
-       "secs": 0.8,
+       "secs": 1.3,
        "liveliness": 1.07,
        "pitch_hz": 149.1,
        "ref": 0,
@@ -9818,7 +10718,7 @@
     "regen_round": 0,
     "clock": [
      1000000.0,
-     0.75
+     1.3
     ],
     "cancel_after": null,
     "pre_files": {}
@@ -10111,7 +11011,7 @@
         "off_pitch"
        ],
        "score": 4.9069,
-       "secs": 0.8,
+       "secs": 1.3,
        "liveliness": 1.02,
        "pitch_hz": 193.9,
        "ref": 0,
@@ -10155,7 +11055,7 @@
         "off_pitch"
        ],
        "score": 2.9126,
-       "secs": 0.8,
+       "secs": 1.3,
        "liveliness": 1.05,
        "pitch_hz": 154.0,
        "ref": 0,
@@ -10199,7 +11099,7 @@
         "off_pitch"
        ],
        "score": 4.9069,
-       "secs": 0.8,
+       "secs": 1.3,
        "liveliness": 1.02,
        "pitch_hz": 193.9,
        "ref": 0,
@@ -10509,7 +11409,7 @@
     "regen_round": 0,
     "clock": [
      1000000.0,
-     0.75
+     1.3
     ],
     "cancel_after": null,
     "pre_files": {}
@@ -10636,7 +11536,7 @@
        "dur": 2.66,
        "issues": [],
        "score": 2.2221,
-       "secs": 0.8,
+       "secs": 1.3,
        "liveliness": 1.02,
        "pitch_hz": 193.9,
        "ref": 0,
@@ -10881,7 +11781,7 @@
     "regen_round": 0,
     "clock": [
      1000000.0,
-     0.75
+     1.3
     ],
     "cancel_after": null,
     "pre_files": {}
@@ -11008,7 +11908,7 @@
        "dur": 2.66,
        "issues": [],
        "score": 0.0,
-       "secs": 0.8,
+       "secs": 1.3,
        "liveliness": 1.02,
        "pitch_hz": null,
        "ref": 0,
@@ -11252,7 +12152,7 @@
     "regen_round": 0,
     "clock": [
      1000000.0,
-     0.75
+     1.3
     ],
     "cancel_after": null,
     "pre_files": {}
@@ -11355,7 +12255,7 @@
        "dur": 1.5,
        "issues": [],
        "score": 0.0,
-       "secs": 0.8,
+       "secs": 1.3,
        "liveliness": null,
        "pitch_hz": null,
        "ref": 0,
@@ -11580,7 +12480,7 @@
     "regen_round": 0,
     "clock": [
      1000000.0,
-     0.75
+     1.3
     ],
     "cancel_after": null,
     "pre_files": {}
@@ -11779,7 +12679,7 @@
         "long_silence"
        ],
        "score": 1.5,
-       "secs": 0.8,
+       "secs": 1.3,
        "liveliness": 1.01,
        "pitch_hz": null,
        "ref": 0,
@@ -11823,7 +12723,7 @@
         "long_silence"
        ],
        "score": 1.5,
-       "secs": 0.8,
+       "secs": 1.3,
        "liveliness": 1.01,
        "pitch_hz": null,
        "ref": 0,
@@ -12061,7 +12961,7 @@
     "regen_round": 0,
     "clock": [
      1000000.0,
-     0.75
+     1.3
     ],
     "cancel_after": null,
     "pre_files": {}
@@ -12176,7 +13076,7 @@
        "dur": 2.7,
        "issues": [],
        "score": 0.0,
-       "secs": 0.8,
+       "secs": 1.3,
        "liveliness": 1.33,
        "pitch_hz": null,
        "ref": 0,
@@ -12409,7 +13309,7 @@
     "regen_round": 0,
     "clock": [
      1000000.0,
-     0.75
+     1.3
     ],
     "cancel_after": null,
     "pre_files": {}
@@ -12524,7 +13424,7 @@
        "dur": 2.7,
        "issues": [],
        "score": 0.0,
-       "secs": 0.8,
+       "secs": 1.3,
        "liveliness": 1.33,
        "pitch_hz": null,
        "ref": 0,
@@ -12757,7 +13657,7 @@
     "regen_round": 0,
     "clock": [
      1000000.0,
-     0.75
+     1.3
     ],
     "cancel_after": null,
     "pre_files": {}
@@ -12832,7 +13732,7 @@
        "dur": 2.7,
        "issues": [],
        "score": 0.0,
-       "secs": 0.8,
+       "secs": 1.3,
        "liveliness": 1.05,
        "pitch_hz": null,
        "ref": 0,
@@ -13035,7 +13935,7 @@
     "regen_round": 0,
     "clock": [
      1000000.0,
-     0.75
+     1.3
     ],
     "cancel_after": null,
     "pre_files": {}
@@ -13101,7 +14001,7 @@
         "empty"
        ],
        "score": 99.0,
-       "secs": 0.8,
+       "secs": 1.3,
        "liveliness": null,
        "pitch_hz": null,
        "ref": 0,
@@ -13273,7 +14173,7 @@
     "regen_round": 0,
     "clock": [
      1000000.0,
-     0.75
+     1.3
     ],
     "cancel_after": [
      "clock",
@@ -13402,7 +14302,7 @@
     "regen_round": 0,
     "clock": [
      1000000.0,
-     0.75
+     1.3
     ],
     "cancel_after": [
      "synthesize",
@@ -13568,7 +14468,7 @@
     "regen_round": 0,
     "clock": [
      1000000.0,
-     0.75
+     1.3
     ],
     "cancel_after": [
      "embedding",
@@ -13814,7 +14714,7 @@
     "regen_round": 0,
     "clock": [
      1000000.0,
-     0.75
+     1.3
     ],
     "cancel_after": [
      "clock",
@@ -14060,7 +14960,7 @@
     "regen_round": 0,
     "clock": [
      1000000.0,
-     0.75
+     1.3
     ],
     "cancel_after": null,
     "pre_files": {}
@@ -14187,7 +15087,7 @@
        "dur": 2.66,
        "issues": [],
        "score": 0.0,
-       "secs": 0.8,
+       "secs": 1.3,
        "liveliness": 1.05,
        "pitch_hz": null,
        "ref": 0,
@@ -14430,7 +15330,7 @@
     "regen_round": 0,
     "clock": [
      1000000.0,
-     0.75
+     1.3
     ],
     "cancel_after": null,
     "pre_files": {}
@@ -14557,7 +15457,7 @@
        "dur": 2.66,
        "issues": [],
        "score": 0.0,
-       "secs": 0.8,
+       "secs": 1.3,
        "liveliness": 1.05,
        "pitch_hz": null,
        "ref": 0,
@@ -14800,7 +15700,7 @@
     "regen_round": 0,
     "clock": [
      1000000.0,
-     0.75
+     1.3
     ],
     "cancel_after": null,
     "pre_files": {
@@ -14953,7 +15853,7 @@
        "dur": 2.66,
        "issues": [],
        "score": 0.0,
-       "secs": 0.8,
+       "secs": 1.3,
        "liveliness": 1.22,
        "pitch_hz": null,
        "ref": 0,
@@ -15254,7 +16154,7 @@
      "min_speaker_similarity": 0.85,
      "max_internal_silence": 0.9,
      "max_pitch_offset_st": 2.0,
-     "sentence_pause_ms": 300,
+     "sentence_pause_ms": 700,
      "inner_sentence_pause_ms": 0,
      "paragraph_pause_ms": 700,
      "target_lufs": -16.0,
@@ -15269,7 +16169,7 @@
     "regen_round": 0,
     "clock": [
      1000000.0,
-     0.75
+     1.3
     ],
     "cancel_after": null,
     "pre_files": {}
@@ -15341,7 +16241,7 @@
      },
      {
       "audio": {
-       "file": "f32_dababfc57ca8359d.f32",
+       "file": "f32_58b44ae8a1fb9bce.f32",
        "len": 48480
       },
       "sr": 16000,
@@ -15618,27 +16518,27 @@
        "temperature": 0.775,
        "wer": 0.0,
        "sim": 1.0,
-       "max_gap": 0.3,
-       "dur": 2.44,
+       "max_gap": 0.7,
+       "dur": 2.84,
        "issues": [
         "cut_off"
        ],
        "score": 2.5,
-       "secs": 0.8,
+       "secs": 1.3,
        "liveliness": 1.28,
        "pitch_hz": null,
        "ref": 0,
        "heard": "Pull half. One nudge more.",
        "ending": {
-        "start": 0.12,
-        "cut": 2.32,
+        "start": 0.0,
+        "cut": 2.72,
         "natural": true,
         "junk": false,
-        "last_level": -32.46446228027344,
+        "last_level": -32.25029754638672,
         "trim_start": 0.01999999999999999,
         "head_pad_s": 0.02,
-        "raw_duration": 2.38,
-        "last_word_end": 2.1900000000000004
+        "raw_duration": 2.78,
+        "last_word_end": 2.5900000000000003
        },
        "synthesis": {
         "tokens": 37,
@@ -15696,7 +16596,7 @@
         "last_word_end": 1.1,
         "threshold_db": -64.62657928466797,
         "sentence": 1,
-        "offset": 1.09,
+        "offset": 1.4900000000000002,
         "seed": 2654449340,
         "expected_seconds": 3.092307692307692,
         "boundary_attempts": [
@@ -15764,7 +16664,7 @@
           "last_word_end": 1.1,
           "threshold_db": -64.62657928466797,
           "sentence": 1,
-          "offset": 1.09,
+          "offset": 1.4900000000000002,
           "seed": 2654449340,
           "expected_seconds": 3.092307692307692,
           "boundary_attempts": [
@@ -15795,25 +16695,25 @@
        "temperature": 0.775,
        "wer": 0.0,
        "sim": 1.0,
-       "max_gap": 0.3,
-       "dur": 2.44,
+       "max_gap": 0.7,
+       "dur": 2.84,
        "issues": [],
        "score": 0.0,
-       "secs": 0.8,
+       "secs": 1.3,
        "liveliness": 1.26,
        "pitch_hz": null,
        "ref": 0,
        "heard": "Pull half. One nudge more.",
        "ending": {
-        "start": 0.12,
-        "cut": 2.32,
+        "start": 0.0,
+        "cut": 2.72,
         "natural": true,
         "junk": false,
-        "last_level": -34.31336975097656,
+        "last_level": -34.772438049316406,
         "trim_start": 0.01999999999999999,
         "head_pad_s": 0.02,
-        "raw_duration": 2.38,
-        "last_word_end": 2.1900000000000004
+        "raw_duration": 2.78,
+        "last_word_end": 2.5900000000000003
        },
        "synthesis": {
         "tokens": 37,
@@ -15869,9 +16769,9 @@
         "pause_end": 1.47,
         "context_start": 1.49,
         "last_word_end": 1.1,
-        "threshold_db": -64.37316131591797,
+        "threshold_db": -64.53751373291016,
         "sentence": 1,
-        "offset": 1.09,
+        "offset": 1.4900000000000002,
         "seed": 2654449341,
         "expected_seconds": 4.02,
         "boundary_attempts": [
@@ -15937,9 +16837,9 @@
           "pause_end": 1.47,
           "context_start": 1.49,
           "last_word_end": 1.1,
-          "threshold_db": -64.37316131591797,
+          "threshold_db": -64.53751373291016,
           "sentence": 1,
-          "offset": 1.09,
+          "offset": 1.4900000000000002,
           "seed": 2654449341,
           "expected_seconds": 4.02,
           "boundary_attempts": [
@@ -15968,20 +16868,20 @@
      ],
      "wer": 0.0,
      "sim": 1.0,
-     "dur": 2.44,
+     "dur": 2.84,
      "issues": [],
      "heard": "Pull half. One nudge more.",
      "raw_file": "raw_chunk_000.wav",
      "ending": {
-      "start": 0.12,
-      "cut": 2.32,
+      "start": 0.0,
+      "cut": 2.72,
       "natural": true,
       "junk": false,
-      "last_level": -34.31336975097656,
+      "last_level": -34.772438049316406,
       "trim_start": 0.01999999999999999,
       "head_pad_s": 0.02,
-      "raw_duration": 2.38,
-      "last_word_end": 2.1900000000000004
+      "raw_duration": 2.78,
+      "last_word_end": 2.5900000000000003
      },
      "audio_revision": 1,
      "used_seeds": [
@@ -16003,18 +16903,18 @@
       },
       {
        "word": " One",
-       "start": 1.23,
-       "end": 1.46
+       "start": 1.63,
+       "end": 1.86
       },
       {
        "word": " nudge",
-       "start": 1.55,
-       "end": 1.69
+       "start": 1.95,
+       "end": 2.09
       },
       {
        "word": " more.",
-       "start": 1.78,
-       "end": 2.19
+       "start": 2.18,
+       "end": 2.59
       }
      ],
      "ending_guard": {
@@ -16026,9 +16926,9 @@
       "pause_end": 1.47,
       "context_start": 1.49,
       "last_word_end": 1.1,
-      "threshold_db": -64.37316131591797,
+      "threshold_db": -64.53751373291016,
       "sentence": 1,
-      "offset": 1.09,
+      "offset": 1.4900000000000002,
       "seed": 2654449341,
       "expected_seconds": 4.02,
       "boundary_attempts": [
@@ -16094,9 +16994,9 @@
         "pause_end": 1.47,
         "context_start": 1.49,
         "last_word_end": 1.1,
-        "threshold_db": -64.37316131591797,
+        "threshold_db": -64.53751373291016,
         "sentence": 1,
-        "offset": 1.09,
+        "offset": 1.4900000000000002,
         "seed": 2654449341,
         "expected_seconds": 4.02,
         "boundary_attempts": [
@@ -16174,7 +17074,7 @@
      },
      {
       "embedding": {
-       "len": 39041,
+       "len": 45441,
        "sr": 16000
       }
      },
@@ -16226,7 +17126,7 @@
      },
      {
       "embedding": {
-       "len": 39041,
+       "len": 45441,
        "sr": 16000
       }
      }
@@ -16238,22 +17138,22 @@
     "files": {
      "chunk_000.wav": {
       "pcm16": {
-       "file": "i16_d006905881273dc6.i16",
-       "len": 39041
+       "file": "i16_f2a9601e4f56c71b.i16",
+       "len": 45441
       },
       "sr": 16000
      },
      "context_chunk_000.wav": {
       "float": {
-       "sha256": "c5558ee7b98b49a8ced6db53c17f7bafdbe5a2e606cb4203673180f22c7b9e11",
+       "sha256": "428e4b1ac3c998f1a1acc3f28d0ad8a7e0d6b0e600206c0003806dc1e6157ac3",
        "len": 93760
       },
       "sr": 16000
      },
      "raw_chunk_000.wav": {
       "float": {
-       "sha256": "ac4664a7a3368e46248c7302f50c5e6cf56b372305ff2e52a05520231f2478a2",
-       "len": 38080
+       "sha256": "f8e95e5f528b57783292e8c257adc428dce63828a6ddc756735be1c40737bf7b",
+       "len": 44480
       },
       "sr": 16000
      }
@@ -16292,7 +17192,7 @@
     ],
     "clock_reads": 4
    },
-   "fired": "guarded two sentences, per-sentence seeds, length limit in one"
+   "fired": "guarded two sentences, a pause gap, per-sentence seeds, length limit in one"
   },
   {
    "name": "guard_local_retry",
@@ -16352,7 +17252,7 @@
     "regen_round": 0,
     "clock": [
      1000000.0,
-     0.75
+     1.3
     ],
     "cancel_after": null,
     "pre_files": {}
@@ -16403,7 +17303,7 @@
      },
      {
       "audio": {
-       "file": "f32_dababfc57ca8359d.f32",
+       "file": "f32_58b44ae8a1fb9bce.f32",
        "len": 48480
       },
       "sr": 16000,
@@ -16623,7 +17523,7 @@
        "dur": 2.44,
        "issues": [],
        "score": 0.0,
-       "secs": 0.8,
+       "secs": 1.3,
        "liveliness": 1.26,
        "pitch_hz": null,
        "ref": 0,
@@ -16633,7 +17533,7 @@
         "cut": 2.32,
         "natural": true,
         "junk": false,
-        "last_level": -34.31336975097656,
+        "last_level": -35.15355682373047,
         "trim_start": 0.01999999999999999,
         "head_pad_s": 0.02,
         "raw_duration": 2.38,
@@ -16693,7 +17593,7 @@
         "pause_end": 1.47,
         "context_start": 1.49,
         "last_word_end": 1.1,
-        "threshold_db": -64.37316131591797,
+        "threshold_db": -64.53751373291016,
         "sentence": 1,
         "offset": 1.09,
         "seed": 606304563,
@@ -16779,7 +17679,7 @@
           "pause_end": 1.47,
           "context_start": 1.49,
           "last_word_end": 1.1,
-          "threshold_db": -64.37316131591797,
+          "threshold_db": -64.53751373291016,
           "sentence": 1,
           "offset": 1.09,
           "seed": 606304563,
@@ -16837,7 +17737,7 @@
       "cut": 2.32,
       "natural": true,
       "junk": false,
-      "last_level": -34.31336975097656,
+      "last_level": -35.15355682373047,
       "trim_start": 0.01999999999999999,
       "head_pad_s": 0.02,
       "raw_duration": 2.38,
@@ -16885,7 +17785,7 @@
       "pause_end": 1.47,
       "context_start": 1.49,
       "last_word_end": 1.1,
-      "threshold_db": -64.37316131591797,
+      "threshold_db": -64.53751373291016,
       "sentence": 1,
       "offset": 1.09,
       "seed": 606304563,
@@ -16971,7 +17871,7 @@
         "pause_end": 1.47,
         "context_start": 1.49,
         "last_word_end": 1.1,
-        "threshold_db": -64.37316131591797,
+        "threshold_db": -64.53751373291016,
         "sentence": 1,
         "offset": 1.09,
         "seed": 606304563,
@@ -17103,21 +18003,21 @@
     "files": {
      "chunk_000.wav": {
       "pcm16": {
-       "file": "i16_d006905881273dc6.i16",
+       "file": "i16_6c61bd0175f28825.i16",
        "len": 39041
       },
       "sr": 16000
      },
      "context_chunk_000.wav": {
       "float": {
-       "sha256": "c5558ee7b98b49a8ced6db53c17f7bafdbe5a2e606cb4203673180f22c7b9e11",
+       "sha256": "428e4b1ac3c998f1a1acc3f28d0ad8a7e0d6b0e600206c0003806dc1e6157ac3",
        "len": 93760
       },
       "sr": 16000
      },
      "raw_chunk_000.wav": {
       "float": {
-       "sha256": "ac4664a7a3368e46248c7302f50c5e6cf56b372305ff2e52a05520231f2478a2",
+       "sha256": "9164f83512f63992fa53e9feb6806d56e6a34a85b7180362d757d2d34e36fa32",
        "len": 38080
       },
       "sr": 16000
@@ -17217,7 +18117,7 @@
     "regen_round": 0,
     "clock": [
      1000000.0,
-     0.75
+     1.3
     ],
     "cancel_after": null,
     "pre_files": {}
@@ -17477,7 +18377,7 @@
         "decoder": "scripted"
        },
        "expected_seconds": 4.630769230769231,
-       "secs": 0.8
+       "secs": 1.3
       },
       {
        "seed": 13580,
@@ -17488,7 +18388,7 @@
        "dur": 2.66,
        "issues": [],
        "score": 0.0,
-       "secs": 0.8,
+       "secs": 1.3,
        "liveliness": 1.13,
        "pitch_hz": null,
        "ref": 0,
@@ -17828,7 +18728,7 @@
     "regen_round": 0,
     "clock": [
      1000000.0,
-     0.75
+     1.3
     ],
     "cancel_after": null,
     "pre_files": {}
@@ -18077,7 +18977,7 @@
         "voice_drift"
        ],
        "score": 0.3,
-       "secs": 0.8,
+       "secs": 1.3,
        "liveliness": 1.22,
        "pitch_hz": null,
        "ref": 0,
@@ -18165,7 +19065,7 @@
         "decoder": "scripted"
        },
        "expected_seconds": 4.630769230769231,
-       "secs": 0.8
+       "secs": 1.3
       }
      ],
      "wer": 0.0,
@@ -18362,7 +19262,7 @@
           "voice_drift"
          ],
          "score": 0.3,
-         "secs": 0.8,
+         "secs": 1.3,
          "liveliness": 1.22,
          "pitch_hz": null,
          "ref": 0,
@@ -18450,7 +19350,7 @@
           "decoder": "scripted"
          },
          "expected_seconds": 4.630769230769231,
-         "secs": 0.8
+         "secs": 1.3
         }
        ],
        "transcript": {
@@ -18632,7 +19532,7 @@
     "regen_round": 0,
     "clock": [
      1000000.0,
-     0.75
+     1.3
     ],
     "cancel_after": null,
     "pre_files": {}
@@ -18964,7 +19864,7 @@
         "decoder": "scripted"
        },
        "expected_seconds": 4.630769230769231,
-       "secs": 0.8
+       "secs": 1.3
       },
       {
        "seed": 13580,
@@ -18988,7 +19888,7 @@
         "decoder": "scripted"
        },
        "expected_seconds": 4.630769230769231,
-       "secs": 0.8
+       "secs": 1.3
       },
       {
        "seed": 13581,
@@ -19019,7 +19919,7 @@
        "expected_seconds": 2.692307692307692,
        "ending_guard_fallback": true,
        "temperature": 0.775,
-       "secs": 0.8
+       "secs": 1.3
       }
      ],
      "wer": 0.0,
@@ -19212,7 +20112,7 @@
           "decoder": "scripted"
          },
          "expected_seconds": 4.630769230769231,
-         "secs": 0.8
+         "secs": 1.3
         },
         {
          "seed": 13580,
@@ -19236,7 +20136,7 @@
           "decoder": "scripted"
          },
          "expected_seconds": 4.630769230769231,
-         "secs": 0.8
+         "secs": 1.3
         }
        ],
        "transcript": {
@@ -19418,7 +20318,7 @@
     "regen_round": 0,
     "clock": [
      1000000.0,
-     0.75
+     1.3
     ],
     "cancel_after": null,
     "pre_files": {
@@ -19721,7 +20621,7 @@
           "decoder": "scripted"
          },
          "expected_seconds": 4.630769230769231,
-         "secs": 0.8
+         "secs": 1.3
         },
         {
          "seed": 13580,
@@ -19745,7 +20645,7 @@
           "decoder": "scripted"
          },
          "expected_seconds": 4.630769230769231,
-         "secs": 0.8
+         "secs": 1.3
         }
        ],
        "transcript": {
@@ -19927,7 +20827,7 @@
     "regen_round": 0,
     "clock": [
      1000000.0,
-     0.75
+     1.3
     ],
     "cancel_after": [
      "clock",
@@ -20056,7 +20956,7 @@
     "regen_round": 0,
     "clock": [
      1000000.0,
-     0.75
+     1.3
     ],
     "cancel_after": [
      "transcribe",
@@ -20283,7 +21183,7 @@
     "regen_round": 0,
     "clock": [
      1000000.0,
-     0.75
+     1.3
     ],
     "cancel_after": [
      "transcribe",
@@ -20605,7 +21505,7 @@
     "regen_round": 0,
     "clock": [
      1000000.0,
-     0.75
+     1.3
     ],
     "cancel_after": [
      "synthesize",
@@ -20771,7 +21671,7 @@
     "regen_round": 0,
     "clock": [
      1000000.0,
-     0.75
+     1.3
     ],
     "cancel_after": [
      "clock",
@@ -20953,7 +21853,7 @@
           "decoder": "scripted"
          },
          "expected_seconds": 4.630769230769231,
-         "secs": 0.8
+         "secs": 1.3
         }
        ],
        "transcript": {
@@ -21135,7 +22035,7 @@
     "regen_round": 0,
     "clock": [
      1000000.0,
-     0.75
+     1.3
     ],
     "cancel_after": [
      "synthesize",
@@ -21352,7 +22252,7 @@
           "decoder": "scripted"
          },
          "expected_seconds": 4.630769230769231,
-         "secs": 0.8
+         "secs": 1.3
         }
        ],
        "transcript": {

@@ -42,7 +42,7 @@ MAX_BYTES = 6_000_000
 SR = 16000
 HALF = 1e-9
 HALF_PITCH = 2e-4  # Rust's prosody is within 3.8e-5 of librosa's (S11a); its rounded results must not move
-T0, STEP = 1_000_000.0, 0.75  # the clock: secs = round(n * 0.75, 1), never a half
+T0, STEP = 1_000_000.0, 1.3  # the clock: secs = round(n * 1.3, 1), never near a half
 PID = "rvoice"
 FP = [1.0, 0.0]
 GOOD, CLOSE, DRIFT = [4.0, 3.0], [12.0, 5.0], [3.0, 4.0]  # cosine 0.8, 12/13, 0.6 against FP
@@ -477,6 +477,16 @@ def cases(h):
               nonce=2**32 - 1 - 1234, chunk={"used_seeds": [2**32 - 1]}, fired="seed wraps at 2^32")
     assert r["part"]["attempts"][0]["seed"] == 0
 
+    a24, w24 = take(spoken(A), 22, sr=24000)
+    r = h.run("clean_24k", text=A, takes=[(a24, 24000, {**rep(a24), "sample_rate": 24000})], transcripts=[T(w24)], embeddings=[GOOD],
+              voice=V1, fired="a 24 kHz take is resampled to 16 kHz before transcription")
+    t = r["calls"][1]["transcribe"]
+    assert t["sr"] == 24000 and t["len"] != t["len_16k"] and r["part"]["sr"] == 24000 and attempts_issues(r) == [[]]
+    r = h.run("clean_beats_lower_failed", text=A, takes=[Rok(a_ok), Rok(a_hi)], transcripts=[T(w_ok), T(w_hi)], embeddings=[DRIFT, GOOD],
+              voice=V1, profile={"pitch_hz": 150.0}, s={"max_pitch_offset_st": 6.0}, fired="a clean take outranks a failed take with a lower score")
+    at = r["part"]["attempts"]
+    assert at[0]["issues"] and not at[1]["issues"] and at[1]["score"] > at[0]["score"] and r["part"]["chosen_seed"] == at[1]["seed"]
+
     # --- pitch
     r = h.run("flat_then_lively", text=A, takes=[Rok(a_flat), Rok(a_ok)], transcripts=[T(w_flat), T(w_ok)], embeddings=[GOOD] * 2,
               voice=V1, gen_extra={"voice_settings": {"style": 0.6}}, fired="flat take retaken; style term in the score")
@@ -545,12 +555,12 @@ def cases(h):
     assert r["calls"][0]["synthesize"]["text"] == A + "\n\n" + pl.ending_guard.CONTINUATION
     s1, sw1 = take(with_context("Pull half."), 13)
     s2, sw2 = take(with_context("One nudge more."), 14)
-    s2b, sw2b = take(with_context("One nudge more."), 15)
+    s2b, sw2b = take(with_context("One nudge more."), 16)
     r = h.run("guard_two_sentences", text=C, takes=[Rok(s1), Rlim(s2), Rok(s1), Rok(s2b)], transcripts=[T(sw1), T(sw2), T(sw1), T(sw2b)],
               embeddings=[GOOD, GOOD], voice=V1,
-              s=G, fired="guarded two sentences, per-sentence seeds, length limit in one")
+              s={**G, "sentence_pause_ms": 700}, fired="guarded two sentences, a pause gap, per-sentence seeds, length limit in one")
     g = r["part"]["ending_guard"]
-    assert len(g["sentences"]) == 2 and g["sentences"][1]["offset"] > 0 and r["part"]["attempts"][0]["synthesis"]["stop_reason"] == "length_limit_reached"
+    assert len(g["sentences"]) == 2 and g["sentences"][1]["offset"] > g["sentences"][0]["cut_seconds"] + 0.1, g["sentences"] and r["part"]["attempts"][0]["synthesis"]["stop_reason"] == "length_limit_reached"
     assert "sentences" in r["part"]["attempts"][0]["synthesis"]
     seeds = [c["synthesize"]["seed"] for c in r["calls"] if "synthesize" in c]
     assert seeds[1] == (seeds[0] + 2654435761) % 2**32
@@ -654,7 +664,7 @@ def main() -> None:
         import soundfile as sf
         from transformers import WhisperTokenizer
 
-        from app import audio, db, ending_guard, ml, pipeline
+        from app import audio, db, delivery, ending_guard, ml, pipeline
 
         def no_model(*a, **k):
             raise RuntimeError("record_render.py must never load a model")
@@ -667,7 +677,7 @@ def main() -> None:
         audio.subprocess = type("NoSubprocess", (), {"run": staticmethod(no_ffmpeg)})
         tok = WhisperTokenizer.from_pretrained("openai/whisper-large-v3-turbo", local_files_only=True)
         ml._normalizer = tok.normalize
-        pipeline.round = guarded_round
+        pipeline.round = delivery.round = ending_guard.round = guarded_round
         REAL["_ref_pitch"] = pipeline._ref_pitch
         if ARR.exists():
             shutil.rmtree(ARR)

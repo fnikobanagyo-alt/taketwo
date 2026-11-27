@@ -35,7 +35,7 @@ fn float_wav(p: &std::path::Path) -> (Vec<f32>, u32) {
 fn render_golden_cases() {
     let g = golden();
     let cases = g["render"].as_array().unwrap();
-    assert_eq!(cases.len(), 45, "number of golden render cases");
+    assert_eq!(cases.len(), 47, "number of golden render cases");
     let (mut num_max, mut pcm_max) = (0.0f64, 0i32);
     let mut cache = HashMap::new();
     for case in cases {
