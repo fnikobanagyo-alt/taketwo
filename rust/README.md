@@ -24,6 +24,7 @@ cargo test --workspace                 # stub and golden tests; no model, no GPU
 - Tools live in `rust/.tools` (git-ignored). whisper.cpp needs cmake on its first build; `env.sh` provides it.
 - ffmpeg and ffprobe must be on PATH (or set `TAKETWO_FFMPEG`). They decode uploads and write MP3.
 - Models are read from `TAKETWO_MODELS` (dev: `rust/.models`, git-ignored). It holds the Qwen3-TTS 1.7B Base folder, `ggml-large-v3-turbo.bin` and `voice-encoder/ve.safetensors`. Nothing is downloaded.
+- Studio restoration (Sidon, decision #4) is in. It needs `sidon/sidon-predictor.onnx` and `sidon/sidon-vocoder.onnx` (soniqo/Sidon-ONNX, fp16) in the models folder; `env.sh` links them from the Hugging Face cache. It runs on the CPU (ONNX Runtime) when a voice is made or re-analysed with studio on. Without the two files a studio request runs the plain clean-up (high-pass, noise reduction when needed, loudness), and the voice's first tip names the missing files. A narration does not need them.
 - Features: `metal` (Mac), `cuda` (Windows), `flash-attn` (Windows, reported separately). `stub` is for tests only.
 
 ## Run in isolated mode
@@ -65,7 +66,6 @@ How G5 works:
 
 ## Not in TakeTwo 1.0
 
-- **Studio restoration (Sidon)** is still owed under decision #4. A studio request runs the plain clean-up (high-pass, noise reduction when needed, loudness), and the voice's first tip says so.
 - **Not in the plan:**
   - code signing, installers and app bundles
   - the update flow

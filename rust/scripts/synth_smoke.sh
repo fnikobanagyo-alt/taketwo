@@ -5,7 +5,7 @@
 #    /api/profiles and ONE reference clip of the first ready English voice, through source_get below.
 # 2. The release engine (built with --features metal) starts on a dev port with TAKETWO_DATA under
 #    rust/target/smoke-tmp (new, empty), TAKETWO_MAX_TAKES=10, under /usr/bin/time -l; stderr to engine.log.
-# 3. It makes a voice from the clip (studio requested, falls back), waits for its analysis and preview, renders
+# 3. It makes a voice from the clip (studio requested: Sidon runs when its files are there), waits for its analysis and preview, renders
 #    one fixed narration, saves WAV, SRT, timings and the narration document in rust/out/smoke/, stops the engine
 #    and deletes rust/target/smoke-tmp (an EXIT trap does both on every path) and writes report.json.
 # At most two attempts and 20 takes over all attempts (attempts.json keeps the count; delete rust/out/smoke to
@@ -158,7 +158,7 @@ wait_idle() { # our engine: nothing running or queued
     return 1
 }
 
-# The voice: name "Smoke voice", English, defaults otherwise (studio is requested and falls back).
+# The voice: name "Smoke voice", English, defaults otherwise (studio is requested; without the Sidon files it falls back).
 P="$(dev POST /api/profiles -F "file=@$CLIP;filename=reference.wav;type=audio/wav" --form-string "name=Smoke voice" --form-string "language=en")"
 PID_="$(printf '%s' "$P" | jget id)"
 AJOB="$(printf '%s' "$P" | jget job id)"
@@ -243,6 +243,8 @@ r = {
     "narration_status": g.get("status"),
     "studio": profile.get("studio"),
     "studio_tip": next((t for t in tips if "Studio restoration" in str(t)), None),
+    "room_echo_db": profile.get("room_echo_db"),
+    "room_echo_after_db": profile.get("room_echo_after_db"),
     "denoised": profile.get("denoised"),
     "voice_preview": bool(profile.get("preview")),
     "reference_clip_seconds": clip_s,
