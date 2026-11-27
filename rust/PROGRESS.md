@@ -18,10 +18,10 @@ The loop appends one entry per session at the bottom: date, step id, what was bu
 | S09 Tauri shell | done (G3 pass, pushed `e9ee6a4`, Windows `check` green) |
 | S10 Audio DSP with Python parity vectors | done (`taketwo_core::audio`, 12 golden tests; first pushed with S11a) |
 | S11a Take checks, ending guard, pitch measures | done, parts A to D (pushed; `taketwo_core::checks`, `ending_guard`, `delivery`; 9 golden, 23 ported, 1 unit test) |
-| S11b Mic match, master chain, final-mix edge check | todo (before S16; sentence pauses moved to S15) |
+| S11b Mic match, master chain, final-mix edge check | next (scoped in lead decision 18; no push) |
 | S12 Qwen voice (real model, Metal) | done, accepted (lead decision 17; pushed `ae905d1`, Windows `check` green, run 45993201520; CUDA jobs on it still running when read) |
 | S13 Whisper with word timings | done, accepted (lead decision 13: heads = all heads of the top two decoder layers; pushed `c123c7b`, Windows `check` green, run 45968817348) |
-| S14 Speaker encoder | done (no push; `taketwo_voice::encoder`, CPU f32; 6 golden tests on 4 say clips + ignored `encoder_parity`: cosine rust/python >= 0.9999998, largest similarity difference 3.6e-7; `1e78b80`) |
+| S14 Speaker encoder | done, accepted (lead decision 18; no push; `taketwo_voice::encoder`, CPU f32; 6 golden tests on 4 say clips + ignored `encoder_parity`: cosine rust/python >= 0.9999998, largest similarity difference 3.6e-7; `1e78b80`) |
 | S15 Render pipeline A | done (no push; `taketwo_core::render`, 47 golden render cases + 6 widen vectors bit-equal, 27 ported tests; `5dc3606`) |
 | S16 Render pipeline B | todo |
 | S17 Voice creation | todo |
@@ -2006,3 +2006,61 @@ Code commit `1e78b80`. Nothing pushed (`origin/rust/taketwo` still `ae905d1`).
   - The other commands all pass, and `g8.sh` reports G8 PASS.
   - No listener on 8790-8799 and no process of ours left.
 - **Rule slips:** none known. No model synthesis, no take, no push, and no claim about sound.
+
+### 2026-11-27, lead, iteration 18 decision
+State checked by command at `7208900` (tree clean apart from the two untracked symlinks): `main` and `origin/main` still `4448aaa`; `origin/rust/taketwo` is `ae905d1`, so S14 is not pushed; `git diff --stat rust/taketwo main -- backend/app mcp` empty; Franz's app answers on 8766 (`"name":"TakeTwo"`, `"running":null`, `"queued":0`, `"loaded_engine":null`); the only listener on 8760-8799 is his app; no process of this work runs; `memory_pressure` 66% free; disk 12 GB free, `rust/target` 17 GB. Franz's standing safety policy is already in PLAN.md's safety section and in the entry of `ef3d382` above; nothing to add. The coordinator's "continue from S09" is stale: S09 is done. Not done, not blocked on Franz. Open gates: G1 (mastering, render pipeline B), G5; G2, G4, G6, G8 judged again at the end.
+
+**S14 is accepted.** Commands the lead ran itself at `7208900`:
+- Plain shell (`command -v cmake` empty, `env.sh` not sourced): `cargo test --workspace` exit 0, 337 passed, 0 failed, 4 ignored.
+- `cargo test -p taketwo-voice encoder`: 7 passed, 1 ignored.
+- The `encoder_parity.json` check: pass (4 clips, largest similarity difference 3.6e-7).
+- No diff since `320986c` in engine, mcp, shell, `taketwo-core/src`, `rust/vendor`, `.github`: pass. `target/debug/incremental` empty.
+- `rust/scripts/g8.sh`: `G8 PASS`, exit 0.
+- Not rerun by the lead: the ignored `encoder_parity` test itself (its output file was checked).
+
+**G6: CUDA still not confirmed on `ae905d1`.** Run 45993201520 was created 11:46 UTC; at 12:22 UTC `check` is success and both CUDA jobs are still `in_progress` (36 minutes; run 45981183667 took over an hour). Last confirmed: `840e41f`. The next lead turn reads it again. If it ends failed or cancelled, a fix is scoped before S16's push.
+
+**S16 will be split** by the next lead turn: a core half (assemble, final scan, speed, re-speak logic, with Python vectors, no push) and an engine half (real renderer, routes, lock, nvcuda delay-load, push). The S11b builder builds plain functions and does not design toward one S16.
+
+Next step: **S11b Mic match, master chain, final-mix edge check (no push)**. No model, no engine. It is the last pure piece `assemble` and `final_scan` need. After it: S16 core, S16 engine (push), S17, S19, S21.
+
+Binding instructions for the builder:
+
+0. **Before any build.** `df -g .`. Apply the disk rule until **14 GB** is free: delete hash folders under `rust/target/debug/build/<crate>/` older than the session start, biggest first, keeping the two newest per crate. No `cargo clean`. Under 8 GB at any later point: stop and report. `source rust/scripts/env.sh`.
+1. **Where.** `taketwo-core` only: `delivery.rs` gains `ltas` and `mic_match`; a new module `mastering.rs` holds `expander`, `de_ess`, `master_chain`; `processed_edge_issues` goes beside the other pipeline rules (`pipeline.rs`, or `mastering.rs` if that file's shape does not fit; say which). Helpers `firwin2` and `fftconvolve(mode="same")` go in `audio/signal.rs`. A recorder `rust/golden/record_mastering.py` and one test file `rust/crates/taketwo-core/tests/mastering_golden.rs`. No change to `taketwo-engine`, `taketwo-mcp`, the shell, `taketwo-voice`, `rust/vendor`, `.github`. No `cargo update`; no new crate (`realfft` and `sci-rs` are already there).
+2. **Port from** `backend/app/delivery.py` lines 99-150 (`BANDS`, `ltas`, `mic_match`), `backend/app/studio.py` lines 113-185 (`expander`, `de_ess`, `master_chain`), `backend/app/pipeline.py` `_processed_edge_issues` (read the whole function, to its last `return`). Reuse `taketwo_core::audio` (`highpass`, `butter`, `sosfiltfilt`, `frame_db`, `np::percentile_*`, `np::mean_*`, `np::hanning`). Follow numpy's types: float32 where numpy is float32, float64 where it promotes (`np.hanning`, `np.ones(n)/n`, `np.interp`, `g = np.empty(n)`), and the final `.astype(np.float32)`.
+3. **Details that are easy to get wrong** (read the scipy and numpy source in `backend/.venv`, do not guess):
+   - `firwin2(1025, fpts, gains)`: scipy defaults (Hamming window, default `nfreqs`, the interpolation and the phase shift). `np.unique(fpts, return_index=True)` sorts and drops repeats, keeping the first index.
+   - `np.convolve(x, k, mode="same")` returns the **longer** operand's length. On a clip shorter than a kernel (`n`, `3n`, the 30 ms window) the next multiply may raise in Python. Record what Python really does for each of `de_ess` and `master_chain` on such clips and return the same result or the same `PyError`. Do not invent a result.
+   - `int(0.004*sr)`, `int(0.03*sr)`, `int(0.005*sr)`, `int(guard_ms/5)` truncate a float product.
+   - `expander`: fewer than 20 frames returns the input unchanged; the protected mask (pad + `valid` convolve `> 0`) is a decision.
+   - `de_ess`: `sr < 20000` returns the input unchanged.
+   - `mic_match`: three early exits return the input and an empty curve (clip under 8192 samples so `ltas` is empty; band count mismatch; fewer than 6 finite differences). The median and the 3-band smoothing skip NaN; the returned curve is rounded to one decimal with Python's `round` (ties to even on the float).
+   - `ltas`: NaN for a band at or above `0.92 x Nyquist` or with no bin. At 24 kHz the top bands are NaN.
+   - `mic.json` holds bare `NaN` (S04). Add the NaN-tolerant reader for it here (a small function that returns the `bands` as `Vec<f64>` with NaN), with a test on a file containing `NaN`; never plain `serde_json` on that file.
+   - Confirm in `assemble` which sample rate these run at and where the curve is stored (`gen["mic_eq"] = curve or None`); write both down for the S16 builder.
+4. **Recorder** `rust/golden/record_mastering.py`, with the guards of `record_audio.py` (fresh temporary data folder asserted before any app import, `HF_HUB_OFFLINE=1`, no model module imported, synthetic signals only, deterministic: two runs give identical files). Output `rust/golden/mastering.json` and arrays under `rust/golden/mastering/`, at most 6 MB. NaN is never written as bare `NaN` into JSON the Rust tests read: use `null` or an array file. Cases:
+   - Rates: 24000 (the output rate; confirm), 44100, 48000, and 16000 for the `de_ess` bypass.
+   - `firwin2`: the 1025 taps as their own vector for at least 3 curves at 2 rates, so a miss is traced to the filter or to the convolution.
+   - `ltas`: speech-like signals (shaped noise bursts with gaps), a clip under 8192 samples, a clip with a silent half.
+   - `mic_match`: reference bands with NaN in the top bands as real files have; a boomy, a thin and a bright reference; a curve that hits the +/-6 dB cap; the three early exits. Record the curve and its **margin to a rounding tie**; redesign any case with a margin under 1e-6 dB.
+   - `expander`: speech with gaps, a quiet tail, steady noise, clips of 19, 20 and 21 frames, a clip shorter than the guard kernel. Record the protected mask.
+   - `de_ess`: a harsh sibilant in loud speech, a soft fricative ending, no sibilance, short clips (under `n`, under `3n`).
+   - `master_chain`: three end-to-end signals at 24000 and one at 48000, plus short clips and whatever Python does on them (`highpass` already raises on short input).
+   - `_processed_edge_issues`, one case or more per branch: empty reference, silent reference, empty output, silent output, identical, compressed copy, shorter output (padded), longer output (cut), loss at the start, loss at the end, a boundary loss of 30 ms (no flag) and of 40 ms (flag), a mid-clip loss (no flag), output shifted by 40 ms (no flag). Record the issue set and, where it is cheap, the margin of the run length to 4 frames.
+5. **Tolerances.** Decisions are exact: early exits, error or not, the curve, the protected mask, issue sets, output lengths. Numbers: `firwin2` taps 1e-9; `ltas` 1e-3 dB; filtered samples (`mic_match`, `de_ess`, `master_chain`) 1e-4; `expander` 1e-6. Print the measured maximum of each. Do not loosen a tolerance: if one misses, find the stage with the recorded intermediates, and if it still misses, report the stage and the number.
+6. **Tests** in `tests/mastering_golden.rs`, not ignored, each asserting the number of golden cases it read. Port `test_expander_keeps_quiet_word_tails` and `test_de_esser_keeps_soft_fricative_endings` (`test_audit_fixes.py`) and `test_short_expander_keeps_shape_without_crashing` (`test_repeat_cutoff.py`) into the same file.
+7. **Not in this step:** `assemble`, `final_scan`, `apply_speed`, any engine or route change, any model, any take, any push, Sidon (`studio.restore`), `delivery.backfill`, any claim about sound.
+8. `safety_ok=false` only for a real risk (PLAN.md safety section). Append the entry to PROGRESS.md (measured maxima, smallest margins, what Python does on short clips, the rate and the `mic_eq` finding) and set S11b's row in the step table.
+
+Acceptance commands (the lead runs them; `WT` is the worktree; none starts a model):
+- `cd "$WT/rust" && (! command -v cmake >/dev/null) && cargo test --workspace` (a fresh shell, `env.sh` not sourced)
+- `cd "$WT/rust" && cargo test -p taketwo-core --test mastering_golden 2>&1 | tee /dev/stderr | grep -Eq 'test result: ok\. (1[0-9]|[2-9][0-9]) passed; 0 failed; 0 ignored'` (at least 10 tests, none ignored)
+- `cd "$WT" && grep -q 'fn ltas' rust/crates/taketwo-core/src/delivery.rs && grep -q 'fn mic_match' rust/crates/taketwo-core/src/delivery.rs && grep -q 'fn master_chain' rust/crates/taketwo-core/src/mastering.rs && grep -rq 'fn processed_edge_issues' rust/crates/taketwo-core/src && grep -q 'fn firwin2' rust/crates/taketwo-core/src/audio/signal.rs`
+- `cd "$WT" && test -f rust/golden/mastering.json && ! grep -q 'NaN' rust/golden/mastering.json && test "$(du -sk rust/golden/mastering | cut -f1)" -lt 6144`
+- `cd "$WT" && git diff --quiet 7208900 -- rust/crates/taketwo-engine rust/crates/taketwo-mcp rust/crates/taketwo rust/crates/taketwo-voice rust/vendor rust/Cargo.lock .github`
+- `cd "$WT" && git diff --stat rust/taketwo main -- backend/app mcp | wc -l | grep -qx ' *0'`
+- `cd "$WT" && test "$(git rev-parse main)" = 4448aaa9b241f2e52cfaa6c06fa98b89653be82e && test "$(git rev-parse origin/rust/taketwo)" = ae905d118a5d3b4f17feabe1d25b9a419d932ede` (nothing pushed)
+- `cd "$WT/rust" && test -z "$(ls -A target/debug/incremental 2>/dev/null)" && test "$(df -g . | tail -1 | awk '{print $4}')" -ge 8`
+- `cd "$WT" && rust/scripts/g8.sh`
+- `lsof -nP -iTCP -sTCP:LISTEN | grep -E ':(879[0-589])' ; pgrep -fl 'rust-taketwo/rust/target/'` shows nothing of ours

@@ -193,7 +193,8 @@ Needs: S10. Gate: G1. No push. This half is what S16 needs; it can run any time 
 - Port `delivery.ltas` and `mic_match` (`firwin2`, `fftconvolve` by hand), `studio.expander`, `de_ess`, `master_chain`, `_processed_edge_issues` (`widen_sentence_pauses` moved to S15, lead decision 15). Anything S11a handed back (the lead says so in the decision that starts this step).
 - Vectors from a recorder on synthetic signals, with the S10 rules (signals as files, decisions exact, stated tolerances on filter numbers, knife-edge margins).
 - `profiles/<id>/mic.json` is written by Python with plain `json.dumps` and likely holds `NaN` (`delivery.ltas` returns nan above 0.92 x Nyquist): read it with a NaN-tolerant parser, never plain serde_json (found in S04).
-- Done when: `cargo test -p taketwo-core -- mastering mic_match edge` passes, with each test asserting the number of golden cases it read.
+- Binding detail (cases, tolerances, short-clip behaviour, test list): lead decision 18 in PROGRESS.md.
+- Done when: `cargo test -p taketwo-core --test mastering_golden` passes (a named test target: a name filter passes with zero matching tests), with each test asserting the number of golden cases it read.
 
 ### S12 Qwen voice (real model, Metal) (push)
 Needs: S01. Gate: G5 (part), G6 (the vendored crate changes), G1 (plain-shell fix). Push at the end. Binding detail: lead decision 16 in PROGRESS.md.
