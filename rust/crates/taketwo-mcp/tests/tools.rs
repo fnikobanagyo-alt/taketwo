@@ -67,6 +67,8 @@ impl Lib {
             .arg(wt().join("contract/fixture.json"))
             .env("TAKETWO_DATA", &data)
             .env("HOME", tmp.path())
+            .env_remove("TAKETWO_URL")
+            .env_remove("VOICEFORGE_URL")
             .output()
             .unwrap();
         assert!(out.status.success(), "seed: {}", String::from_utf8_lossy(&out.stderr));
@@ -431,19 +433,32 @@ async fn all_twelve_tools() {
     drop(engine);
 }
 
-/// Kills the engine named in `<library>/engine.json` and waits until it is gone, also when an assert fails.
-struct EngineByPid(u32);
+/// Kills the engine named in `<library>/engine.json` and waits until it is gone, also when a tool call or an
+/// assert fails. Made before the first call; the pid is read from the file when first needed (at the latest on drop).
+struct EngineOf {
+    data: PathBuf,
+    pid: std::cell::Cell<Option<u32>>,
+}
 
 fn alive(pid: u32) -> bool {
     Command::new("kill").args(["-0", &pid.to_string()]).stderr(Stdio::null()).status().is_ok_and(|s| s.success())
 }
 
-impl EngineByPid {
+impl EngineOf {
+    fn pid(&self) -> Option<u32> {
+        if self.pid.get().is_none() {
+            let v: Option<Value> = std::fs::read_to_string(self.data.join("engine.json")).ok().and_then(|t| serde_json::from_str(&t).ok());
+            self.pid.set(v.and_then(|v| v["pid"].as_u64()).map(|p| p as u32));
+        }
+        self.pid.get()
+    }
+
     fn stop(&self, signal: &str) -> bool {
-        let _ = Command::new("kill").args([signal, &self.0.to_string()]).status();
+        let Some(pid) = self.pid() else { return true };
+        let _ = Command::new("kill").args([signal, &pid.to_string()]).status();
         let until = Instant::now() + Duration::from_secs(15);
         while Instant::now() < until {
-            if !alive(self.0) {
+            if !alive(pid) {
                 return true;
             }
             std::thread::sleep(Duration::from_millis(50));
@@ -452,9 +467,9 @@ impl EngineByPid {
     }
 }
 
-impl Drop for EngineByPid {
+impl Drop for EngineOf {
     fn drop(&mut self) {
-        if alive(self.0) && !self.stop("-TERM") {
+        if self.pid().is_some_and(alive) && !self.stop("-TERM") {
             self.stop("-KILL");
         }
     }
@@ -468,23 +483,25 @@ fn address(lib: &Lib) -> Value {
 async fn starts_an_engine_when_none_answers() {
     let lib = Lib::seeded();
     assert!(!lib.data.join("engine.json").exists());
+    // The guard comes first, so a failed call or assertion below still stops the engine.
+    let guard = EngineOf { data: lib.data.clone(), pid: std::cell::Cell::new(None) };
     let c = connect(&lib, None, &[]).await;
     let r = call(&c, "list_voices", json!({})).await;
-    // The guard comes first, so a failed assertion below still stops the engine.
     let addr = address(&lib);
-    let guard = EngineByPid(addr["pid"].as_u64().unwrap() as u32);
+    let pid = guard.pid().expect("engine pid");
+    assert_eq!(Some(u64::from(pid)), addr["pid"].as_u64());
     assert_ne!(r.is_error, Some(true), "{:?}", texts(&r));
     assert_eq!(r.structured_content.as_ref().unwrap()["result"][0]["id"], "ctvoice01");
     let port: u16 = addr["url"].as_str().unwrap().rsplit(':').next().unwrap().parse().unwrap();
     assert!((8790..=8799).contains(&port) && ![8796, 8797].contains(&port), "dev port only: {port}");
-    let cmd = Command::new("ps").args(["-o", "command=", "-p", &guard.0.to_string()]).output().unwrap();
+    let cmd = Command::new("ps").args(["-o", "command=", "-p", &pid.to_string()]).output().unwrap();
     let cmd = String::from_utf8_lossy(&cmd.stdout);
     assert!(cmd.contains("taketwo-engine serve --idle-exit 900"), "{cmd}");
     assert!(!cmd.contains("--exit-with-stdin"), "{cmd}");
     c.cancel().await.unwrap();
     // The engine outlives the MCP that started it (it stops after 15 idle minutes, decision #12).
     tokio::time::sleep(Duration::from_millis(300)).await;
-    assert!(alive(guard.0), "the engine stopped with the MCP");
+    assert!(alive(pid), "the engine stopped with the MCP");
 
     // A second MCP on the same library finds it through the address file and starts none.
     let c = connect(&lib, None, &["--name", "voiceforge"]).await;

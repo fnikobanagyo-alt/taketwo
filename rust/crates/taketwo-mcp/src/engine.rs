@@ -130,7 +130,8 @@ impl Finder {
             return Ok(b.clone());
         }
         let file = self.data.join(ADDRESS_FILE);
-        let answering = || read_address(&file).filter(|u| is_taketwo(&*self.http, u));
+        // Only an address off Franz's ports (8765-8785) is ever probed or used, whatever the file says.
+        let answering = || read_address(&file).filter(|u| check_pinned(u).is_ok() && is_taketwo(&*self.http, u));
         if let Some(u) = answering() {
             *remembered = Some(u.clone());
             return Ok(u);
@@ -242,5 +243,32 @@ mod tests {
             &mut || {}, &mut || { waited += 1; if waited == 3 { *up.borrow_mut() = true } });
         assert_eq!(found.unwrap(), "http://127.0.0.1:8768");
         assert_eq!(waited, 3);
+    }
+}
+
+#[cfg(test)]
+mod finder_tests {
+    use super::*;
+    use crate::http::Reply;
+    use std::sync::atomic::{AtomicUsize, Ordering};
+
+    struct Counting(AtomicUsize);
+    impl Transport for Counting {
+        fn send(&self, _: &str, _: &str, _: Option<Vec<u8>>, _: Duration) -> std::io::Result<Reply> {
+            self.0.fetch_add(1, Ordering::SeqCst);
+            Err(std::io::Error::other("no network in this test"))
+        }
+    }
+
+    /// An address file naming Franz's port is never probed, and with no engine program the answer is Python's
+    /// "not running" sentence.
+    #[test]
+    fn an_address_file_on_a_live_port_is_never_used() {
+        let tmp = tempfile::tempdir().unwrap();
+        std::fs::write(tmp.path().join(ADDRESS_FILE), r#"{"url": "http://127.0.0.1:8766", "pid": 1, "started": 1.0}"#).unwrap();
+        let http = Arc::new(Counting(AtomicUsize::new(0)));
+        let f = Finder::new(http.clone(), tmp.path().to_path_buf(), None, tmp.path().join("no-such-engine"));
+        assert_eq!(f.base().unwrap_err(), NOT_RUNNING);
+        assert_eq!(http.0.load(Ordering::SeqCst), 0, "nothing was sent anywhere");
     }
 }
