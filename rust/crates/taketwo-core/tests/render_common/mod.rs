@@ -45,7 +45,8 @@ pub struct Outcome {
     pub gdir: PathBuf,
     pub profile: Doc,
     pub puts: Vec<Doc>,
-    _tmp: TempDir,
+    pub narration: Doc,
+    pub tmp: TempDir,
 }
 
 /// A folder removed when dropped.
@@ -78,8 +79,20 @@ pub fn kind(k: &str) -> Kind {
 
 /// Replay `case` (its inputs and script). `edit` may change the library folder before the call.
 pub fn replay(case: &Value, pitch_cache: &mut HashMap<String, f64>, edit: impl FnOnce(&Path)) -> Outcome {
+    replay_with(case, pitch_cache, None, None, edit)
+}
+
+/// `replay` with the narration (its folder kept in `dir`) and the nonce replaced: renders the part again.
+pub fn replay_with(case: &Value, pitch_cache: &mut HashMap<String, f64>, again: Option<(&Doc, &Path)>, nonce: Option<u32>, edit: impl FnOnce(&Path)) -> Outcome {
     let tmp = tempdir(case["name"].as_str().unwrap());
-    let inp = &case["inputs"];
+    let mut inp = case["inputs"].clone();
+    if let Some((gen_doc, _)) = again {
+        inp["gen"] = Value::Object(gen_doc.clone());
+    }
+    if let Some(n) = nonce {
+        inp["nonce"] = n.into();
+    }
+    let inp = &inp;
     let profiles = tmp.0.join("profiles");
     let generations = tmp.0.join("generations");
     let pdir = profiles.join(inp["profile"]["id"].as_str().unwrap());
@@ -89,6 +102,12 @@ pub fn replay(case: &Value, pitch_cache: &mut HashMap<String, f64>, edit: impl F
     }
     let gdir = generations.join(inp["gen"]["id"].as_str().unwrap());
     std::fs::create_dir_all(&gdir).unwrap();
+    if let Some((_, old)) = again {
+        for e in std::fs::read_dir(old).unwrap() {
+            let e = e.unwrap();
+            std::fs::copy(e.path(), gdir.join(e.file_name())).unwrap();
+        }
+    }
     for (name, hex) in inp["pre_files"].as_object().unwrap() {
         std::fs::write(gdir.join(name), unhex(hex.as_str().unwrap())).unwrap();
     }
@@ -131,7 +150,7 @@ pub fn replay(case: &Value, pitch_cache: &mut HashMap<String, f64>, edit: impl F
     } else {
         assert_eq!(narration, obj(&inp["gen"]), "nothing is written to the narration on an error");
     }
-    Outcome { result, fake, gdir, profile, puts, _tmp: tmp }
+    Outcome { result, fake, gdir, profile, puts, narration, tmp }
 }
 
 fn unhex(h: &str) -> Vec<u8> {
