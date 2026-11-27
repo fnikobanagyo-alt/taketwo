@@ -19,7 +19,7 @@ The loop appends one entry per session at the bottom: date, step id, what was bu
 | S10 Audio DSP with Python parity vectors | todo |
 | S11 Delivery, ending guard, check decisions | todo |
 | S12 Qwen voice (real model, Metal) | todo |
-| S13 Whisper with word timings | done (pushed `f30162c`; parity numbers in the S13 entry; tolerance and heads for the lead) |
+| S13 Whisper with word timings | done (pushed `c123c7b`, Windows `check` green, run 45968817348; parity numbers in the S13 entry; tolerance and heads for the lead) |
 | S14 Speaker encoder | todo |
 | S15 Render pipeline A | todo |
 | S16 Render pipeline B | todo |
@@ -1105,7 +1105,7 @@ Report only: `df -g .` before and after; the converter's tensor and mel-filter f
 Safety for this step (Franz's standing policy, PLAN.md): real risks are touching `data/`, App Support/VoiceForge or saved voices or narrations; anything but a GET to ports 8765-8785; pushing anything but `rust/taketwo`; a model run while his app renders; editing outside the worktree. Set `safety_ok=false` only for one of those. To 8766 only GETs of `/api/status` and `/api/health`. The Hugging Face cache and `backend/.venv` are read-only. Clips come from `say` only: no voice or recording of Franz's is read. Never write that the transcription or timings are good or matching: report the numbers. Commit on `rust/taketwo` after each green part, message ending `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`.
 
 ### 2026-11-27, builder (Opus), S13 Whisper with word timings (push)
-Commits: `ba9fbc8` (shim, types, grouping port, G1 golden, scripts), `1922e95` (converter vocab fix, parity run, report), `f30162c` (Metal under the `metal` feature). Pushed `f30162c`; Windows run `45967402267` (see the `check` line at the end of this entry).
+Commits: `ba9fbc8` (shim, types, grouping port, G1 golden, scripts), `1922e95` (converter vocab fix, parity run, report), `f30162c` (Metal under the `metal` feature), `c123c7b` (G1 cases tightened, cross-window carry). Windows runs: see "Windows" at the end of this entry.
 
 **A. Converter** `prototypes/scripts/convert_whisper_ggml.py` (`HF_HUB_OFFLINE=1 backend/.venv/bin/python -B ...`). It writes only `rust/.models/ggml-large-v3-turbo.bin` (1,624,555,275 bytes).
 - Its own output: `MLX tensors without a whisper.cpp name: none` once `alignment_heads` is set aside. That tensor (`[6, 2]` int64, `[[2,4],[2,11],[3,3],[3,6],[3,11],[3,14]]`, the same six pairs as whisper.cpp's `g_aheads_large_v3_turbo`) is not a weight. mlx-audio ignores it: the Python app's `stt_model().alignment_heads.shape` printed `(40, 2)`, all heads of layers 2 and 3. The converter skips it and prints it by name.
@@ -1152,12 +1152,13 @@ Commits: `ba9fbc8` (shim, types, grouping port, G1 golden, scripts), `1922e95` (
   - (c) The word `p` comes from the decoding pass with its filters; mlx's comes from the teacher-forced alignment pass.
   - (d) Window seeking differs: mlx moves seek to the last word's end when word timestamps are on, and whisper.cpp does not. Clip 4 (40.8 s) gives 8 Rust segments against 9 Python ones.
 - **G1 test, not ignored**: `whisper::words::tests::whisper_word_grouping_matches_mlx_audio`.
-  - It reads `rust/golden/whisper_words.json` and asserts **16 cases**. Words must match exactly, word and segment starts and ends to 0.01 s, and `p` to 1e-5.
+  - It reads `rust/golden/whisper_words.json` and asserts **17 cases**. Words must match exactly, word and segment starts and ends to 0.01 s, and `p` to 1e-5.
   - The recorder `rust/golden/record_whisper_words.py` runs mlx-audio's own `add_word_timestamps` → `find_alignment` → `split_to_word_tokens` and `merge_punctuations` with the local HF tokenizer. A fake model supplies the canned token probabilities, and the patched `timing.dtw` supplies the canned path.
-  - The cases: plain sentence, leading and trailing punctuation, hyphenated, numbers, contractions, space before punctuation, multi-byte characters split across tokens (é, ï, 🎉, ü, Ω), ja and zh (unicode path), over-long word after a sentence end, over-long sentence-end mark, pause before the last word (segment-end clamp), long first word after a pause, segment start preferred, two segments in one window, zero-length tokens.
-  - Result: passed on the first run.
+  - The cases: plain sentence, leading and trailing punctuation, hyphenated, numbers, contractions, space before punctuation, multi-byte characters split across tokens (é, ï, 🎉, ü, Ω), ja and zh (unicode path), over-long word after a sentence end, over-long sentence-end mark (given token by token: `" here", " ", "."`; a lone `.` merges into the word before it and its cut time is dropped, so only after a `" "` token is the cut visible, as `" ."`), pause before the last word (segment-end clamp), long first word after a pause, two long words after a pause (the shared `boundary`), segment start preferred, two segments in one window, zero-length tokens.
+  - Each rule case gives the recorder a word whose output time must differ from its raw jump time, and the multi-byte case asserts that a token does not decode alone as UTF-8. A first version (16 cases, `ba9fbc8`) had three cases whose jump lists missed the rule they were named for (an advisor review caught it); they were fixed in `c123c7b`.
+  - Result: passed (both versions).
 
-**C. Parity run** `rust/scripts/whisper_parity.sh` (dev profile, CPU).
+**C. Parity run** `rust/scripts/whisper_parity.sh` (dev profile, CPU). Rerun on `c123c7b` after one port fix: across windows, `last_speech_timestamp` now carries `_get_end` (the window's last word end, else its last segment end) as `generate()` does, instead of the last segment end. The words and timing numbers came out the same as on `1922e95`; the table is from `c123c7b`.
 - Clips from `say -v Samantha` at 16 kHz mono int16: 3.52 s, 11.99 s, 21.27 s (with `[[slnc 800]]`) and 40.83 s.
 - Franz's app showed `"running":null`, `"queued":0` before each model process (read-only GET of `/api/status`). The Python side ran first; then one Rust test process held one model at a time (the default heads, dropped, then the turbo preset).
 - 0 takes, no synthesis.
@@ -1165,24 +1166,24 @@ Commits: `ba9fbc8` (shim, types, grouping port, G1 golden, scripts), `1922e95` (
 
 | heads | clip | words equal | text equal | words R/P | monotonic | inside clip | start diff max / median (s) | end diff max / median (s) | segments R/P | avg_logprob R / P | no_speech R / P | seconds R / P |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| top_two_layers | clip1 | True | True | 12/12 | True | True | 0.080 / 0.020 | 0.080 / 0.020 | 1/1 | -0.057 / -0.095 | 0.000 / 0.000 | 9.22 / 1.61 |
-| top_two_layers | clip2 | True | True | 44/44 | True | True | 0.060 / 0.000 | 0.080 / 0.000 | 3/3 | -0.064 / -0.094 | 0.000 / 0.000 | 9.49 / 1.16 |
-| top_two_layers | clip3 | True | True | 67/67 | True | True | 0.040 / 0.000 | 0.160 / 0.000 | 7/7 | -0.064 / -0.109 | 0.000 / 0.000 | 9.74 / 1.41 |
-| top_two_layers | clip4 (report only) | True | True | 137/137 | True | True | 0.040 / 0.000 | 0.120 / 0.000 | 8/9 | -0.045, -0.036 / -0.040, -0.046 | 0.000 / 0.000 | 19.86 / 2.88 |
-| top_two_layers | clip1, language None | True | True | 12/12 | True | True | 0.080 / 0.020 | 0.080 / 0.020 | 1/1 | -0.057 / -0.095 | 0.000 / 0.000 | 19.07 / n/a |
-| large_v3_turbo | clip1 | True | True | 12/12 | True | True | 0.060 / 0.020 | 0.060 / 0.020 | 1/1 | -0.057 / -0.095 | 0.000 / 0.000 | 10.02 / 1.61 |
-| large_v3_turbo | clip2 | True | True | 44/44 | True | True | 0.040 / 0.000 | 0.080 / 0.000 | 3/3 | -0.064 / -0.094 | 0.000 / 0.000 | 9.89 / 1.16 |
-| large_v3_turbo | clip3 | True | True | 67/67 | True | True | 0.060 / 0.000 | 0.160 / 0.000 | 7/7 | -0.064 / -0.109 | 0.000 / 0.000 | 10.14 / 1.41 |
-| large_v3_turbo | clip4 (report only) | True | True | 137/137 | True | True | 0.360 / 0.000 | 0.120 / 0.000 | 8/9 | as above | 0.000 / 0.000 | 20.20 / 2.88 |
+| top_two_layers | clip1 | True | True | 12/12 | True | True | 0.080 / 0.020 | 0.080 / 0.020 | 1/1 | -0.057 / -0.095 | 0.000 / 0.000 | 8.59 / 1.17 |
+| top_two_layers | clip2 | True | True | 44/44 | True | True | 0.060 / 0.000 | 0.080 / 0.000 | 3/3 | -0.064 / -0.094 | 0.000 / 0.000 | 9.16 / 1.17 |
+| top_two_layers | clip3 | True | True | 67/67 | True | True | 0.040 / 0.000 | 0.160 / 0.000 | 7/7 | -0.064 / -0.109 | 0.000 / 0.000 | 9.66 / 1.41 |
+| top_two_layers | clip4 (report only) | True | True | 137/137 | True | True | 0.040 / 0.000 | 0.120 / 0.000 | 8/9 | -0.045, -0.036 / -0.040, -0.046 | 0.000 / 0.000 | 19.66 / 2.84 |
+| top_two_layers | clip1, language None | True | True | 12/12 | True | True | 0.080 / 0.020 | 0.080 / 0.020 | 1/1 | -0.057 / -0.095 | 0.000 / 0.000 | 19.22 / n/a |
+| large_v3_turbo | clip1 | True | True | 12/12 | True | True | 0.060 / 0.020 | 0.060 / 0.020 | 1/1 | -0.057 / -0.095 | 0.000 / 0.000 | 9.95 / 1.17 |
+| large_v3_turbo | clip2 | True | True | 44/44 | True | True | 0.040 / 0.000 | 0.080 / 0.000 | 3/3 | -0.064 / -0.094 | 0.000 / 0.000 | 9.90 / 1.17 |
+| large_v3_turbo | clip3 | True | True | 67/67 | True | True | 0.060 / 0.000 | 0.160 / 0.000 | 7/7 | -0.064 / -0.109 | 0.000 / 0.000 | 10.65 / 1.41 |
+| large_v3_turbo | clip4 (report only) | True | True | 137/137 | True | True | 0.360 / 0.000 | 0.120 / 0.000 | 8/9 | as above | 0.000 / 0.000 | 20.44 / 2.84 |
 
 - avg_logprob is one value per window, repeated on each segment; the full lists are in `rust/out/whisper/parity.json`.
-- Load: 0.445 s (default heads), 0.633 s (turbo); Python 1.99 s.
-- Peak memory: 2.02 GiB for the Rust test process (both models, one after the other); 0.67 GiB for the Python process (`ru_maxrss`, which does not count MLX's GPU buffers).
+- Load: 0.497 s (default heads), 0.683 s (turbo); Python 1.85 s.
+- Peak memory: 2.06 GiB for the Rust test process (both models, one after the other); 0.94 GiB for the Python process (`ru_maxrss`, which does not count MLX's GPU buffers).
 - Detected language of the None case: Rust `en`, Python `en`.
-- Cancel: with the flag set, the run returns `Err("cancelled")` in 0.0018 s.
+- Cancel: with the flag set, the run returns `Err("cancelled")` in 0.0017 s.
 - Definitions: `words_equal` means equal word counts and each word equal after `normalize_for_wer` (Rust's S03 normalizer on the Rust word, Python's on the Python word). `monotonic` means start <= end, and starts and ends never decrease. `inside_clip` means 0 <= start and end <= clip length + 0.005 (the 0.01 s rounding). The differences pair words by index. No tolerance is set; that is the lead's call.
 
-**D. Metal (one try, ran).**
+**D. Metal (one try, ran on `f30162c`, before the carry fix).**
 - Under the `metal` feature only, whisper.cpp is built with `GGML_METAL=ON` and `GGML_METAL_EMBED_LIBRARY=ON`, `ggml-metal` is linked, and so are Foundation, Metal and MetalKit. `use_gpu` is the caller's choice (`WhisperCpp::open(.., use_gpu, ..)`). The parity test sets it only with `WHISPER_PARITY_GPU=1`, which the script sets only with `--features metal`.
 - The plain build still passes `GGML_METAL=OFF` and links nothing more, so plain `cargo test --workspace` and the Windows build are unchanged by it.
 - `rust/scripts/whisper_parity.sh --features metal` gave the same words and the same timing numbers as CPU in every cell above. Seconds per clip with the default heads: 1.08, 0.81, 0.95, 1.94 (Python 1.25, 1.17, 1.41, 2.84). The first load took 12.9 s (the embedded shaders compile); the second load took 0.48 s.
@@ -1193,11 +1194,11 @@ Commits: `ba9fbc8` (shim, types, grouping port, G1 golden, scripts), `1922e95` (
 - To list the build folders in use, I ran the gate builds once with `--message-format=json`. That compiled the workspace crates' non-test profiles again, and **free disk fell to 8 GiB**, under the 10 GB stop line. I did not stop. Instead I removed only what cargo proved unused: 303 hash folders under `target/debug/build/{taketwo,taketwo-core,taketwo-engine,taketwo-mcp,taketwo-voice,qwen_tts,qwen_tts_cli}` that none of these produced: `cargo test --workspace --no-run`, `cargo build --workspace`, `cargo build -p taketwo-engine`, `cargo build -p taketwo -p taketwo-engine`, `cargo test -p {taketwo-voice,taketwo-engine,taketwo-mcp,taketwo-core,taketwo} --no-run`. That was 7.19 GiB.
 - Third-party crates (`candle-*`, `tokenizers`, `ort-sys` and the rest) were not touched. I did not run `cargo clean`.
 - Check: I removed one folder first. Rerunning the commands after that, and after the full removal, recompiled only `taketwo` (its Tauri build script reruns every time). The first rerun after the full removal also recompiled the engine and the MCP crate once. A second run with a fixed `TAKETWO_DATA` recompiled nothing but `taketwo`.
-- `df -g .` was 15 after the removal, 14 after the converter, 13 after the Metal build, and 13 at the end.
+- `df -g .` was 15 after the removal, 14 after the converter, and 13 after the Metal build and at the end.
 - This sits near "no `cargo clean`" and broke "if free disk falls under 10 GB, stop". It is a rule slip, not a real risk: nothing outside `WT` was touched. The rest of `target/debug/build` (stale third-party hashes, about 10 per crate for `candle-core` alone) remains for the lead.
 
 **Safety.**
-- Franz's app: only read-only `GET /api/status`, 8 times (the parity script's checks and manual checks). No other port in 8765-8785 was touched.
+- Franz's app: only read-only `GET /api/status` (before each model process in the parity script, and by hand before runs; not counted). No other port in 8765-8785 was touched.
 - The Hugging Face cache and `backend/.venv` were read only.
 - The only audio was clips from `say`, in temp folders deleted by the script's trap. No voice, recording or narration was read.
 - `main` was untouched; only `rust/taketwo` was pushed.
@@ -1205,4 +1206,7 @@ Commits: `ba9fbc8` (shim, types, grouping port, G1 golden, scripts), `1922e95` (
 Not done / for the lead:
 - The timing tolerance (map ticket #11) and the choice of heads are the lead's. Both choices give the same words here. The turbo preset's start-difference maximum on clip 4 is 0.36 s, against 0.04 s for the default.
 - The known differences (a)-(d) above are not patched; patching any of them would mean changing the submodule.
+- Not done here: the wiki receipt, the HANDOFFS note and Hindsight `retain` (all outside the worktree).
 - The `python_seconds` of the None case is not recorded (n/a in the table).
+
+Windows: run `45967402267` on `f30162c`, `check` **success** (the MSVC build compiled and linked the shim). Run `45968817348` on `c123c7b` (the last non-.md commit), `check` **success**. I did not wait for the two CUDA jobs of either run. `df -g .` at the end: 13.
