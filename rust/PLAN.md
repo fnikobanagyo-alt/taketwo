@@ -118,28 +118,35 @@ Needs: S03, S04. Gate: G1.
 ### S06 Engine: read side, guards, UI, contract runner
 Needs: S05. Gate: G2 (part).
 - axum on 127.0.0.1. FastAPI-compatible errors (`{"detail": ...}`). Host guard (403), Origin guard on writes (403), id and path checks (`..`, encoded `/`).
-- Routes: health, pipeline-version, status, profiles list/get/analysis/audio/preview, generations list/search/get/timings/subtitles/audio (WAV, download name; `final.mp3` only if the file is there, making it is S16), part audio, take audio, jobs, settings get/put, a no-op cancel (`{"ok": true}`, there is no worker yet), the start-up stubs and the 501s listed under Layout, static UI from `--ui`. Every other write route checks its id and answers 501 until S07.
+- Routes: health, pipeline-version, status, profiles list/get/analysis/audio/preview, generations list/search/get/timings/subtitles/audio (WAV, download name; `final.mp3` only if the file is there, making it is S16), part audio, take audio, jobs, settings get/put, a no-op cancel (`{"ok": true}`, there is no worker yet), the start-up stubs and the 501s listed under Layout, static UI from `--ui`. Every other write route checks its id and answers 501 until S07a/S07b.
 - `rust/scripts/contract.sh`: build, make a temp library, seed, start the engine on a free dev port, run `TAKETWO_URL=http://127.0.0.1:<port> python3 -m unittest discover -s contract`, stop the engine, delete the library. It fails unless the run says `Ran 33 tests` and `OK` with no skips.
-- Done when: `contract.sh` with the `-k` list in lead decision 6 (PROGRESS.md) prints `Ran 20 tests` and `OK`: Health 3, Profiles 1, Generations 3 (the two create tests are S07), Search 3, TimingsAndSubtitles 3, Audio 3, SafetyGuards 4.
+- Done when: `contract.sh` with the `-k` list in lead decision 6 (PROGRESS.md) prints `Ran 20 tests` and `OK`: Health 3, Profiles 1, Generations 3 (the two create tests are S07a), Search 3, TimingsAndSubtitles 3, Audio 3, SafetyGuards 4.
 
-### S07 Engine: write side, worker, stub voice, lifecycle (push)
-Needs: S06. Gate: G2 (full). Push at the end so the Windows jobs see the engine.
-- Routes: create narration (404 unknown voice, 400 empty after cleaning, 409 `duplicate_of`), cancel, resume, regenerate part, accept and its undo, select-take, fix-remaining, delete, restore, patch title/favourite, reveal (opens the file manager; not run in tests).
-- One worker thread with a queue and a cancel flag (`worker.py`), job documents, `/api/status` in today's shape, busy 409s.
-- Traits `Voice`, `Transcriber`, `SpeakerEncoder` in `taketwo-voice`; under feature `stub` a deterministic stub (tones, scripted transcripts and similarities) so queue, cancel, resume, re-speak and the 409s are tested with no model. The real pipeline arrives in S15/S16; here a narration runs through a thin placeholder that S15 replaces.
-- Lifecycle: lock file (one engine at a time), `--idle-exit <seconds>` (900 when started by MCP), exit when the parent that started it goes away (the window), address file in live mode only.
-- Update `contract/README.md`: how the Rust seeder and `contract.sh` work. Add the tests the Python contract can't reach (duplicate 409, busy 409) as Rust integration tests with the stub.
+### S07a Engine: write routes that start no job
+Needs: S06. Gate: G2 (full). No push. Split from the old S07 by lead decision 7: none of the 13 contract tests S06 left red needs a job.
+- Routes answered in full: accept and its undo, delete, restore, patch title/favourite, reveal (the opener is injected; tests never open the file manager), and every refusal (400/404/409/422) of create, resume, regenerate, select-take and fix-remaining.
+- Paths that would start a job (create success, resume, regenerate, select-take and fix-remaining after their checks) answer 501 until S07b. `PATCH` with a changed `speed` answers 501 until S16.
+- Pure ports with golden cases: `pipeline.create_generation` (the document, not the save) and `pipeline.clean_replacement`.
+- `record_http.py` and `http.json` grow the write cases.
 - Done when: `rust/scripts/contract.sh` prints `Ran 33 tests` and `OK`.
 
+### S07b Engine: worker, stub renderer, lifecycle (push)
+Needs: S07a. Gates: G2 (kept), base for G3 and G4. Push at the end so the Windows `check` job sees the engine.
+- One worker thread with a queue and a cancel flag (`worker.py`), job documents, `/api/status` and `/api/jobs/{id}` in today's shape, diagnostics, busy 409s, duplicate 409 with `duplicate_of`, cancel while queued and while running, the "interrupted" repair on restart.
+- One seam in `taketwo-engine`: a `Renderer` trait (run narration, re-speak a part, fix remaining, select take). Under cargo feature `stub`, and only in isolated mode, a deterministic stub (tones, a gate the test controls). A build without `stub` answers an honest error on create, never tones. S15/S16 supply the real renderer. The model traits `Voice`, `Transcriber`, `SpeakerEncoder` move to S12, S13, S14, where their real shapes are known.
+- Lifecycle: lock file (a second engine is refused), `--idle-exit <seconds>` (tested with a few seconds; MCP passes 900), exit when the parent that started it goes away, address file in live mode only (tested on a temp folder; `--live` is never run).
+- The 33-test contract can't see any of this, so it has its own Rust integration tests; the lead writes the acceptance commands in the decision that starts it.
+- Done when: those tests pass, `contract.sh` still prints `Ran 33 tests` and `OK`, and the Windows `check` job is green on the pushed commit.
+
 ### S08 MCP server
-Needs: S07. Gate: G4.
+Needs: S07b. Gate: G4.
 - Port `mcp/taketwo_mcp.py` with `rmcp` over stdio: `list_voices`, `generate_narration`, `get_status`, `get_timings`, `get_audio`, `get_subtitles`, `find_narration`, `respeak_part`, `fix_remaining`, `stop_narration`, `resume_narration`, `mark_sounds_fine`, with the same replies and error texts. It answers to both names (`--name taketwo|voiceforge`).
 - Finding the engine: `TAKETWO_URL`/`VOICEFORGE_URL`, then the address file under both names, then a port scan, then start `taketwo-engine` next to it with `--idle-exit 900`. In isolated mode it scans dev ports only.
 - Tests (`crates/taketwo-mcp/tests`): an rmcp client starts the binary, pinned to a seeded stub engine, and calls all 12 tools; the cases from `backend/tests/test_mcp_tools.py` are ported; one test covers "no engine answers, so start one" in isolated mode and checks it is stopped afterwards.
 - Done when: `cd rust && cargo build -p taketwo-mcp && cargo test -p taketwo-mcp` passes.
 
 ### S09 Tauri shell
-Needs: S07. Gate: G3.
+Needs: S07b. Gate: G3.
 - `crates/taketwo`: Tauri 2, single instance, starts `taketwo-engine` as a sidecar, waits for health, opens the window at the engine's address (`WebviewUrl::External`), stops the engine when the window closes. What `desktop/main.js` does today, minus updates.
 - Build the UI in the worktree: `cd frontend && npm run build` (uses the symlinked `node_modules`; `frontend/dist` is git-ignored).
 - `rust/scripts/smoke_shell.sh`: isolated mode, temp library seeded with the fixture, a fixed dev port, start the built shell, check `/api/health` says `"name":"TakeTwo"`, check `GET /` returns the React page and one `/assets/*` file, quit the shell, check that the engine process is gone and the port is free.
@@ -182,7 +189,7 @@ Needs: S12. Gate: G5 (part).
 - Done when: `cargo test -p taketwo-voice --features metal -- --ignored encoder_parity` has run with numbers in PROGRESS.md.
 
 ### S15 Render pipeline A: takes and retakes
-Needs: S07, S11. Gate: G1.
+Needs: S07b, S11. Gate: G1.
 - Port `profile_assets`, `_ref_pitch`, `_guarded_take`, `render_chunk` (seeds, retake rounds and budgets, the choice between takes, hard and soft issues, what is stored on the part), using the traits so tests run on the stub.
 - Tests script the stub (take 1 cut off, take 2 clean; all takes flagged; cancel mid-part; ending guard on and off) and compare the part document with what Python produces for the same scripted inputs (`rust/golden/record.py` drives `render_chunk` with patched model calls into `rust/golden/render.json`).
 - Done when: `cargo test -p taketwo-engine render_chunk` passes.
@@ -190,7 +197,7 @@ Needs: S07, S11. Gate: G1.
 ### S16 Render pipeline B: assembly, final scan, re-speak, takes, speed (push)
 Needs: S15. Gate: G1, G2 (still green). Push at the end.
 - Port `assemble` (pauses, mic match, master chain, loudness), `final_scan`, `run_generation`, `regenerate_chunk` with snapshot and restore, `select_take` with remix, `fix_remaining`, `apply_speed`, `retime`, `create_generation`, MP3 export, the WAV and subtitle files written beside the narration.
-- Replace S07's placeholder. Port the cases from `backend/tests/test_review_loop.py` and the rest of `test_regressions.py`. Add stub-engine tests for what the contract can't reach: a successful create and render, re-speak, fix-remaining, speed change, select-take of a kept take, MP3.
+- Replace S07b's stub renderer with the real one. Port the cases from `backend/tests/test_review_loop.py` and the rest of `test_regressions.py`. Add stub-engine tests for what the contract can't reach: a successful create and render, re-speak, fix-remaining, speed change, select-take of a kept take, MP3.
 - Done when: `cargo test --workspace` and `rust/scripts/contract.sh` both pass.
 
 ### S17 Voice creation
@@ -214,7 +221,7 @@ Needs: S17 (S18 optional). Gate: G5.
 - Done when: the script exits 0, `report.json` shows `takes <= 20`, the WAV and SRT exist, and the numbers are in PROGRESS.md.
 
 ### S20 Blind A/B harness (not rendered)
-Needs: S07 (for the engine's API); can run any time after it. Gate: G7.
+Needs: S07a (for the engine's API); can run any time after it. Gate: G7.
 - `rust/ab/ab.py` (standard library):
   - `plan`: reads `GET http://127.0.0.1:8766/api/generations` (read-only), picks 10 finished narrations by a written rule (different voices where possible, short, medium and long, no duplicates of the same script), stores ids, titles and scripts in git-ignored `rust/ab/private/scripts.json`, and prints the count of parts and the takes needed (parts x 2 engines, plus the worst case with retakes).
   - `render --franz-ok`: refuses without the flag. With it: starts a Python engine and a Rust engine, each on its own temp library and dev port, one at a time; copies each needed voice through the API (profile document and its audio files) into both; renders the 10 scripts with each; never writes to Franz's library.
@@ -248,8 +255,8 @@ Stop-and-clean check after any run: `lsof -nP -iTCP -sTCP:LISTEN | grep -E ':(87
 
 ## Order and what can run side by side
 
-Critical path: S01, S02, S03, S04, S05, S06, S07 (G2), then S10, S11, S15, S16, with S12, S13, S14 before S17, then S19, S21.
-Independent after S07: S08 (G4), S09 (G3), S20 (G7). Independent after S01: S10, S12.
+Critical path: S01, S02, S03, S04, S05, S06, S07a (G2), S07b, then S10, S11, S15, S16, with S12, S13, S14 before S17, then S19, S21.
+Independent after S07b: S08 (G4), S09 (G3). Independent after S07a: S20 (G7). Independent after S01: S10, S12.
 Model steps (S12, S13, S14, S18, S19) never run at the same time as each other.
 
 ## Known risks and the fallback for each
