@@ -8,7 +8,7 @@ The loop appends one entry per session at the bottom: date, step id, what was bu
 |---|---|
 | S01 Workspace, safety rails, tools | done |
 | S02 Windows CUDA link proof | done (G6 early evidence) |
-| S03 Text logic | todo |
+| S03 Text logic | done |
 | S04 Library store, seeder, one-time copy | todo |
 | S05 Captions, timings, subtitles, review rules | todo |
 | S06 Engine: read side, guards, UI, contract runner | todo |
@@ -328,3 +328,30 @@ Found while preparing S03 (changes its size):
 - The Python data folder variable is `TAKETWO_DATA` (then `VOICEFORGE_DATA`); importing `app.config` creates folders and importing `app.db` opens the database. `record.py` must set both variables to a temp folder and assert `config.DATA_DIR` is inside it before any other app import, as `contract/seed_python.py` does.
 
 Next step: **S03 Text logic**, alone. With the full normalizer it is a session of its own; S04 follows it. PLAN.md S03 now says so.
+
+### 2026-11-27, builder (Opus), S03 Text logic
+Built (commit `8082470`), all in `taketwo-core::text`:
+- `mod.rs`: `textproc.py` in full (`ABBREVIATIONS`, `fix_entities`, `clean_text` with pronunciations and `strip_citations`, `unwrap_lines`, `split_sentences`, `hard_split`, `split_long`, `chunk_text` with `Chunk { text, pause_after }`, `word_count`). Lengths are code points. fancy-regex only for the sentence split and the pronunciation look-arounds.
+- `html.rs`: Python 3.11 `html.unescape` (no-semicolon forms, longest-prefix rule, cp1252 table, invalid code points, huge numbers to U+FFFD), with the HTML5 entity table as `data/html5_entities.json`.
+- `normalize.rs`: the transformers Whisper `EnglishTextNormalizer` (regex replacers in order, `EnglishNumberNormalizer` with `num-bigint` values and the tables built by the Python rules, spelling map, `remove_symbols_and_diacritics` with NFKD). The spelling map is `data/whisper_normalizer.json`, an unchanged copy of the tokenizer's `normalizer.json`; `data/README.md` has the attribution.
+- `score.rs`: `wer` (brackets, empty rules, min of jiwer WER and 2 x CER without spaces; own edit distance), an exact `difflib.SequenceMatcher` (popular-element autojunk rule, extension loops, ratio), `word_coverage`, `final_word_missing`, `first_word_missing`.
+- `py.rs`: Python `\s` / `\w` / `\b`, `split()`, `strip()` semantics and Unicode digit values.
+- New dependencies: `regex`, `fancy-regex`, `num-bigint` (already in the lock), `serde_json`, `unicode-normalization`.
+
+Vectors: `rust/golden/record.py` (temp folder for both data variables, `config.DATA_DIR` checked first, HF offline, normalizer from tokenizer files only, `ml.stt_model` replaced by a function that raises, spelling map drift asserted). `rust/golden/text.json`: normalize 515 (215 hand cases plus 300 seeded number strings), wer 96, ratio 202 (23 of them change if autojunk is off), coverage 115 (incl. the backend test cases; 14 final-missing and 14 first-missing are true), clean_text 29, chunk_text 17, word_count 19. Synthetic text only.
+
+Commands, from `$WT` (real tails):
+- `cd rust && source scripts/env.sh && cargo test -p taketwo-core text`: `test result: ok. 9 passed; 0 failed` (tests/text_golden.rs) and `ok. 1 passed` (`text_py_helpers`); grep check exit 0. The contract tests assert exactly 18 and 8 cases first. Every case matched on the first full run; nothing skipped, ignored or loosened.
+- `cargo test --workspace`: exit 0; 154 passed, 0 failed, 1 ignored (the existing ignored test, not new).
+- Clean checkout: `git archive HEAD rust contract` into a scratch folder, fresh target dir, `cargo test -p taketwo-core text`: same 9 + 1 passed.
+- `backend/.venv/bin/python -B rust/golden/record.py && git diff --exit-code -- rust/golden/text.json`: exit 0 (deterministic).
+- Acceptance 5 (clean tree, no home path in HEAD, `backend/app` and `mcp` unchanged against main, main at `4448aaa`): exit 0. Acceptance 6: `g8.sh` last line `G8 PASS`; no dev port listening; no `rust/target` process. No port bound, no engine, no model, no push.
+
+Left out or limited:
+- A pronunciation `to` value is inserted literally. Python reads it as a `re.sub` template: `a\nb` becomes a newline, and `C:\path` or `x\1` raise `re.error` (so the Python app fails that clean). Marked `shortcut:` in the code; no golden case.
+- Unicode tables come from the Rust crates (newer than Python 3.11's Unicode 14.0); only characters added after 14.0 can differ.
+- The normalizer.json MIT licence is taken from the published model card; the local snapshot has no licence file.
+
+Questions for the lead:
+1. Pronunciation targets with a backslash: keep literal (more forgiving than Python), or reproduce Python, including rejecting the ones that raise?
+
