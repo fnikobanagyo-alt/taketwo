@@ -146,6 +146,11 @@ pub mod fake {
             (s.takes.len(), s.transcripts.len(), s.embeddings.len())
         }
 
+        /// How many calls of `kind` ran (clock readings included).
+        pub fn count(&self, kind: Kind) -> usize {
+            self.0.borrow().counts[kind as usize]
+        }
+
         /// One clock reading.
         pub fn now(&self) -> f64 {
             let mut s = self.0.borrow_mut();
