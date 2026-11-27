@@ -15,7 +15,20 @@ The goal is met only when every gate command below passes when run, not when the
 5. Append to `rust/PROGRESS.md`: date, step id, what was built, the commands run and their real results, what is not done, anything the lead must decide.
 6. A step that fails twice goes back to the lead with the evidence. Do not weaken a test, a limit or a gate to get to green.
 
-## Safety rules (breaking one is a failure)
+## Safety rules
+
+### Franz's standing policy (2026-11-27): real risks and rule slips
+
+Only a **real risk** stops the loop, and a builder reports `safety_ok=false` only for one of these:
+1. Touching `MAIN/data`, `~/Library/Application Support/VoiceForge`, or any saved voice or narration.
+2. Starting, stopping, binding, or writing (anything but a `GET`) to ports 8765-8785.
+3. Pushing `main`, publishing a release, or changing GitHub settings or issues.
+4. A model run while Franz's app renders, or more than 20 takes in one experiment.
+5. Editing outside `WT`.
+
+Everything narrower (which language may read a fixture, which reads of 8766 a step names, how the UI is built, a step's "not in this step" list) is **guidance**. Breaking it is a **rule slip**: the builder says so plainly in its PROGRESS.md entry and report, keeps `safety_ok=true`, and the lead judges and records it. Read-only `GET`s of `/api/status` and `/api/health` on 8766 are always allowed. Franz's own use of his app changes `data/`; `g8.sh` prints that as information, not a verdict.
+
+### The rules
 
 - Change files only inside `WT`. Never touch `MAIN/data`, `~/Library/Application Support/VoiceForge`, or any saved voice, recording or narration.
 - Never bind, start, stop or restart anything on ports 8765-8785 (Franz's running app). Dev engines use 8790-8795, 8798, 8799 (8796 and 8797 are busy). Stop every process you start.
