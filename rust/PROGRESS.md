@@ -16,10 +16,10 @@ The loop appends one entry per session at the bottom: date, step id, what was bu
 | S07b Engine: worker, stub renderer, lifecycle | done (pushed `2e4d02a`, Windows `check` green) |
 | S08 MCP server | done (G4 evidence, judged again after S16 for mp3) |
 | S09 Tauri shell | done (G3 pass, pushed `e9ee6a4`, Windows `check` green) |
-| S10 Audio DSP with Python parity vectors | todo |
+| S10 Audio DSP with Python parity vectors | next (lead decision 13) |
 | S11 Delivery, ending guard, check decisions | todo |
 | S12 Qwen voice (real model, Metal) | todo |
-| S13 Whisper with word timings | done (pushed `c123c7b`, Windows `check` green, run 45968817348; parity numbers in the S13 entry; tolerance and heads for the lead) |
+| S13 Whisper with word timings | done, accepted (lead decision 13: heads = all heads of the top two decoder layers; pushed `c123c7b`, Windows `check` green, run 45968817348) |
 | S14 Speaker encoder | todo |
 | S15 Render pipeline A | todo |
 | S16 Render pipeline B | todo |
@@ -33,12 +33,12 @@ The loop appends one entry per session at the bottom: date, step id, what was bu
 
 | Gate | Status | Evidence |
 |---|---|---|
-| G1 | partial (text, library, captions, review, create logic, the worker and the MCP tools in; audio, checks and the render pipeline still to port) | Lead decision 10 below: `cargo test --workspace` exit 0 at `31b1140`, 233 passed, 0 failed, 1 ignored |
+| G1 | partial (text, library, captions, review, create logic, the worker, the MCP tools and Whisper word grouping in; audio, checks and the render pipeline still to port) | Lead decision 10 below (233 passed at `31b1140`); S13 entry: `cargo test --workspace` exit 0 at `f4e5664` |
 | G2 | 33 of 33 at `31b1140` (judge again at the end; without `--stub-renderer` the paths that start a job still answer 501 until S16) | Lead decision 10 below: `contract.sh`, `Ran 33 tests`, `OK`, exit 0 |
 | G3 | pass at `cbdc9b1` | S09 entry below: `smoke_shell.sh` checks a-i ok, `G3 PASS`, exit 0 (hidden window, page load fired) |
 | G4 | pass for wav, mp3 waits for S16 | S08 entry below: `cargo test -p taketwo-mcp` from no prebuilt engine, exit 0 (27 tests) |
 | G5 | not run | |
-| G6 | `check` success on `e9ee6a4` (run 45957448669, S09 entry); the two CUDA jobs of that run were still in progress when recorded; earlier all three success on `2e4d02a`; judge again on the final commit | Lead decision 10 below: run 45945950326, all three jobs `success` |
+| G6 | waiting on `c123c7b` (run 45968817348: `check` success, `build (cuda)` and `build (cuda,flash-attn)` in progress when read); earlier all three success on `2e4d02a`; judge again on the final commit | Lead decision 13 below: `g6.sh` printed `G6 WAIT`; lead decision 10: run 45945950326, all three jobs `success` |
 | G7 | pass at `8b6eed6` (judge again after S16/S17 if the voice-copy route changes) | S20 entry below: `plan` 10 scripts and `takes, most: 480`; `selftest` `AB SELFTEST PASS`; `render` exit 3 |
 | G8 | pass so far (re-run at the end) | Lead decision 9 below: `g8.sh` `G8 PASS`, exit 0 at `1f5b85b`. Data differences are Franz's own app use, information only |
 
@@ -1210,3 +1210,71 @@ Not done / for the lead:
 - The `python_seconds` of the None case is not recorded (n/a in the table).
 
 Windows: run `45967402267` on `f30162c`, `check` **success** (the MSVC build compiled and linked the shim). Run `45968817348` on `c123c7b` (the last non-.md commit), `check` **success**. I did not wait for the two CUDA jobs of either run. `df -g .` at the end: 13.
+
+### 2026-11-27, lead, iteration 13 decision
+State checked by command at `f4e5664` (tree clean apart from the two untracked symlinks): `main` and `origin/main` still `4448aaa`; `origin/rust/taketwo` is `c123c7b` (the two commits after it are `.md` only); Franz's app answers on 8766 (`"name":"TakeTwo"`, `"running":null`, `"queued":0`); `rust/scripts/g6.sh` printed `G6 WAIT` for run 45968817348 on `c123c7b` (`check` success, both CUDA jobs in progress); disk 13 GB free, `rust/target/debug/build` 19 GB; swap 13.3 of 14.3 GB used. Franz's standing safety policy is already in PLAN.md's safety section and in the entry of `ef3d382` above; the plan is past S09 (S09, S20 and S13 are done). Not done, not blocked on Franz. Open gates: G1 (audio, checks, pipeline), G5; G2, G4, G6, G8 judged again at the end.
+
+**S13 is accepted.** Judgements:
+- **Heads: all heads of the top two decoder layers** (`N_TOP_MOST`, `dtw_n_top = 2`). It is what the Python app runs (40 heads), and the turbo preset showed a 0.36 s start difference on the 40 s clip against 0.04 s. The turbo preset stays in the code as an option, unused.
+- **Timing tolerance: not set yet.** The measured maximum (word ends 0.16 s on clip 3, medians 0.00 to 0.02 s) is not turned into a tolerance. S11 records whether Python's own check decisions change when a word time moves by 0.16 s (added to PLAN.md S11), and the tolerance is set from that. Same for `avg_logprob` (Rust -0.06 against Python -0.10; the end-of-text term is missing).
+- **Known differences (a) to (d)** stay unpatched; the submodule is not changed. They are judged by Franz's ear in the blind A/B, not here.
+- **Disk slip** (8 GiB free, did not stop, removed 303 unused hash folders of workspace crates): a rule slip, not a real risk. Nothing outside the worktree was touched and cargo rebuilt what it needed. New disk rule below replaces "stop under 10 GB".
+- Whisper on Metal works under the `metal` feature and is about 10 times faster than CPU in the dev profile; S15/S19 use it.
+
+**Disk rule from now on.** Check `df -g .` before any build. Under 10 GB free: the builder may delete hash folders under `rust/target/debug/build/<crate>/` whose modification time is older than the start of its session (any crate; cargo rebuilds what it still needs, the cost is time only), biggest crates first, until 12 GB is free, and says so in PROGRESS.md. No `cargo clean`. Under 7 GB free after that: stop and report. Work with `cargo test -p taketwo-core` while building; run `cargo test --workspace` once at the end.
+
+Next step: **S10 Audio DSP with Python parity vectors (no push)**. It heads the longest remaining chain (S10, S11, S15, S16, S17, S19), needs no model (swap is nearly full, so the Qwen step S12 waits), and compiles only `taketwo-core`. Binding additions to PLAN.md S10.
+
+Facts found by the lead (read-only):
+- `backend/.venv`: numpy 2.4.6, scipy 1.17.1, pyloudnorm 0.2.0, soundfile 0.14.0. On float32 audio, `frame_db` returns **float32**, and `np.percentile` of it and `speech - 48.0` stay float32 (numpy 2 scalar rules). `np.mean` over the frame axis uses pairwise summation.
+- `resample` is called for 24000 to 16000 (`ml.py`, `delivery.py`), any file rate to 24000 (`engines.py`, `reference.py`), to `studio.SR_IN`, and the work rate to the output rate (`pipeline.py`).
+- `Cargo.lock` already has `hound` 3.5.1, `rubato` 0.16.2, `realfft` 3.5.0, `rustfft` 6.4.1. `ebur128` and `sci-rs` are not in it yet. `ffmpeg` is on this Mac's PATH.
+- Only the Windows workflow runs cargo in CI, and it runs no tests.
+
+Build, in this order, committing after each green part:
+
+**A. Recorder** `rust/golden/record_audio.py` (a sibling of `record.py`; run with `backend/.venv/bin/python -B`; same guards as `record.py`: fresh temporary data folder asserted before any app import, `HF_HUB_OFFLINE=1`, no model import).
+- **Signals are files, not formulas.** It writes every input signal as raw little-endian float32 under `rust/golden/audio/` (one file per signal, the sample rate in `audio.json`). Rust reads those files; it never regenerates a signal with its own maths (a sine can differ by one ulp and flip a threshold). Arrays that are outputs (resample, filters, limiter, fades, gap shortening, joins) are stored the same way. Total size of `rust/golden/audio/` at most 8 MB: keep signals short (0.3 to 3 s) and reuse them across functions.
+- Signals, all synthetic and seeded (`np.random.default_rng(<fixed>)`): tones, tone bursts with gaps of 0.1, 0.24, 0.26 and 0.8 s, white and pink-like noise at several levels, speech-like shapes (amplitude-modulated harmonics with soft onsets and decays over a noise floor at -70, -45 and -25 dB), a hard cut-off ending, a natural decaying ending, an ending with a stop closure and release, a stray loud sound after the last word, a hiss burst before a pause (for `lead_burst`) and a hiss that runs into the word, a clipped signal, digital silence, DC offset. Rates 16000, 22050, 24000, 44100, 48000 where the function takes a rate.
+- For every function in PLAN.md S10's list, `audio.json` holds the inputs (signal name, arguments) and what Python returned. Arrays as file names plus length; numbers as JSON; `-inf` and NaN as strings the Rust reader understands. It also records the dtype of each returned number and of `db`, the percentiles and the thresholds, so Rust can follow the same precision.
+- **Edge cases recorded as outcomes** (the value, or the exception's type name): empty array, shorter than one frame, shorter than the `sosfiltfilt` pad, all zeros, under 0.5 s for `loudness`, `fade` with n = 0 and n = 1, `shorten_gaps` with no gap over the limit, `concat_with_pauses` with no chunks and with chunks that start or end in sound, `silence_report` with nothing voiced, `end_analysis` with no regions and with `last_word_end` past the end, `lead_burst` under 0.2 s.
+- **Knife edges.** For every case whose result is a decision (a frame index, a cut sample, a bool, a count, a gap list), the recorder also stores the smallest distance in dB between any frame level and the threshold used. A case with a margin under 0.01 dB is redesigned, so no case depends on the last bit of a float.
+- **WAV save:** a ramp that includes exactly +1.0, -1.0, values beyond them, and half-LSB values (`(k + 0.5) / 32768`) written by `audio.save`; the PCM16 file is stored as the expected bytes. `load` cases: mono and stereo PCM16, float32 WAV, and a rate change.
+- Deterministic: a second run leaves `git diff --exit-code -- rust/golden` clean. It runs no `ffmpeg`.
+
+**B. Port** to `rust/crates/taketwo-core/src/audio/` (public module `taketwo_core::audio`), every function in PLAN.md S10's list with Python's names, arguments and defaults; `SilenceReport` as a struct; `end_analysis` as a struct with the dict's five fields.
+- **Precision:** follow the recorded dtypes step by step (float32 where numpy is float32, including the percentile interpolation; f64 where Python uses Python floats, such as `fs`, the `int(...)` truncations of seconds x rate, and the returned seconds). Port numpy's linear-interpolation percentile and, where a sum decides a threshold, its pairwise summation.
+- **Tolerances (the lead's; write each next to its test with the reason; report the measured maximum; never widen one, come back instead):**
+  - Decisions (frame indexes, cut positions in samples, array lengths, bools, counts, gap lists, `None` or not): **exact**.
+  - Returned dB values and thresholds: 1e-3 dB. Returned seconds: exact to 1e-9.
+  - `fade`, `soft_limit`, `shorten_gaps`, `concat_with_pauses`, `trim_edges`: same length exactly, samples within 1e-6.
+  - `save`: PCM16 bytes equal. `load`: samples within 1e-7 before any rate change.
+  - `resample`: **same length exactly**, every sample (edges included) within 1e-4 of scipy's `resample_poly`, for 24000 to 16000, 44100 to 24000, 48000 to 24000, 22050 to 24000, 16000 to 24000 and the same-rate identity. Try `rubato` first; if it cannot meet length and edges, hand-port `resample_poly` (Kaiser 5.0 `firwin`, zero-phase polyphase `upfirdn`, scipy's padding and trimming) and say so.
+  - `highpass` (60 and 50 Hz) and the 4 to 10 kHz band-pass inside `lead_burst`: `butter` SOS coefficients within 1e-9, `sosfiltfilt` output within 1e-4 (scipy's odd padding and initial conditions). `sci-rs` if it meets this, else a hand port.
+  - `loudness`: within 0.05 LU of pyloudnorm on every vector (rates 16000, 24000, 48000; quiet, loud, gapped). Measure `ebur128` first; if it is outside that on any vector, hand-port pyloudnorm's meter (two biquads, 400 ms blocks with 75% overlap, the two gates). `-inf` under 0.5 s, as Python. `normalize_lufs` then within 1e-3 of Python's samples when the loudness is fed from Python's value, and the end-to-end difference is reported.
+  - `noise_bursts`: the returned run length exact (the knife-edge rule covers flatness 0.1 and the -25 dB line). `estimate_snr`: 1e-3 dB.
+- **ffmpeg** (`audio::ffmpeg`): `decode_to_wav` and `export_mp3` with Python's exact argument lists, run as a separate program found as `TAKETWO_FFMPEG` or else `ffmpeg` on PATH; a failed or missing program is an error value, never a panic. One test writes a WAV, exports MP3, decodes it back at another rate with `max_seconds`, and checks rate, channel count and length; it fails with a clear message when ffmpeg is missing (no silent skip). The speed change (atempo) is S16.
+- Every test asserts the number of golden cases it read. Test names contain `audio`.
+- New dependencies go to `taketwo-core` only. `Cargo.lock` may gain packages; no existing version may change (no `cargo update`).
+
+**C. Docs.** PROGRESS entry: which crate or hand port each function uses and why, the measured maximum against every tolerance above, the smallest knife-edge margin, the size of `rust/golden/audio/`, `df -g .` before and after. Step table: S10 done.
+
+Not in this step: no model, no synthesis (0 takes), no engine, MCP or shell change, no `delivery.py` or `pipeline.py` port (S11), no push, no `.github` change, no real audio of Franz's (signals are synthetic only).
+
+Acceptance commands, all must exit 0 (WT is the worktree root; quote it):
+- `cd "$WT/rust" && source scripts/env.sh >/dev/null && cargo test --workspace`
+- `cd "$WT/rust" && source scripts/env.sh >/dev/null && set -o pipefail && cargo test -p taketwo-core audio 2>&1 | tee /dev/stderr | grep -q 'test result: ok. [1-9]'`
+- `cd "$WT" && HF_HUB_OFFLINE=1 backend/.venv/bin/python -B rust/golden/record_audio.py && git diff --exit-code -- rust/golden && test -z "$(git status --porcelain -- rust/golden)"`
+- `cd "$WT" && test -s rust/golden/audio.json && test "$(du -sk rust/golden/audio | cut -f1)" -le 8192`
+- `cd "$WT" && test -z "$(git diff f4e5664..HEAD -- rust/Cargo.lock | grep '^-[^-]')"`
+- `cd "$WT" && test -z "$(git diff --stat f4e5664..HEAD -- rust/crates/taketwo-engine rust/crates/taketwo-mcp rust/crates/taketwo rust/crates/taketwo-voice rust/third_party .github)"`
+- `cd "$WT/rust" && ! cargo tree -p taketwo-mcp -e normal | grep -q -i -e taketwo-voice -e candle -e whisper -e qwen`
+- `cd "$WT" && rust/scripts/contract.sh`
+- `cd "$WT" && test -z "$(git status --porcelain | grep -v -e 'backend/.venv' -e 'frontend/node_modules')" && ! git grep -q '/Users[/]' HEAD -- rust contract .github && test -z "$(git diff --stat rust/taketwo main -- backend/app mcp desktop frontend)" && test "$(git rev-parse main)" = 4448aaa9b241f2e52cfaa6c06fa98b89653be82e`
+- `cd "$WT" && rust/scripts/g8.sh`
+- `cd "$WT" && ! lsof -nP -iTCP -sTCP:LISTEN | grep -E ':(879[0-589])' && ! pgrep -fl 'rust-taketwo/rust/target/'`
+Report only: `df -g .` before and after; the tolerance table with measured maxima; which functions are hand ports.
+
+Safety for this step (Franz's standing policy, PLAN.md): real risks are touching `data/`, App Support/VoiceForge or saved voices or narrations; anything but a GET to ports 8765-8785; pushing anything; a model run; editing outside the worktree. Set `safety_ok=false` only for one of those. `backend/.venv` is read-only (run its Python with `-B`). No voice, recording or narration is read: every signal is synthetic. Never write that audio is good or matching: report the numbers. Commit on `rust/taketwo` after each green part, message ending `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`. Do not push.
+
+After S10: S11 (delivery, ending guard, check decisions, with the Whisper timing sensitivity vectors), then S12 and S14 when swap allows, S15, S16 (push), S17, S19, S21.

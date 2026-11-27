@@ -170,15 +170,17 @@ Needs: S07b. Gate: G3. Binding detail: lead decision 10 in PROGRESS.md (live mod
 - Done when: `cargo build -p taketwo && rust/scripts/smoke_shell.sh` passes.
 
 ### S10 Audio DSP with Python parity vectors
-Needs: S01. Gate: G1.
+Needs: S01. Gate: G1. No push. Binding detail (signals as files, precision, tolerances, edge cases, disk rule): lead decision 13 in PROGRESS.md.
 - `rust/golden/record.py` records vectors from `backend/app/audio.py` on synthetic signals (tones, noise, bursts, gaps, clipped and faded shapes) into `rust/golden/audio.json`. No model, no real audio.
 - Port `audio.py`: WAV load/save (`hound`), resample (`rubato`; tolerance against `resample_poly` stated in the test), high-pass (`sci-rs` Butterworth, forward-backward), loudness (`ebur128` against pyloudnorm), `normalize_lufs`, `soft_limit`, `frame_db`, `speech_threshold_db`, `silence_report`, `trim_edges`, `speech_start`, `ending_level`, `shorten_gaps`, `fade`, `clipping_ratio`, `noise_bursts`, `estimate_snr`, `concat_with_pauses`, `sound_regions`, `end_analysis`, `_terminal_end`, `lead_burst`, `edge_silence`; ffmpeg as a separate program for decode, MP3 and speed.
+- Crates are used where they meet the lead's tolerance against Python; where one does not (resample length and edges, loudness), that function is a hand port of the scipy or pyloudnorm code instead. The tolerance is never widened to fit a crate. Only `decode_to_wav` and `export_mp3` use ffmpeg here; the speed change (atempo) is S16.
 - Every tolerance is written next to its test with the reason. Decisions (which frames count as silence, where a cut lands) must match exactly; only filter and loudness numbers may differ, within the stated tolerance.
 - Done when: `cargo test -p taketwo-core audio` passes.
 
 ### S11 Delivery, ending guard, check decisions
 Needs: S03, S10. Gate: G1.
 - Port `delivery.py` (`prosody` with a hand port of librosa `yin`, `expressiveness`, `resolve`, `pick_variant`, `ltas`, `mic_match` with `firwin2`), `ending_guard.py`, `studio.master_chain`, and from `pipeline.py`: `noise_limit`, `_internal_sentence_cut`, `evaluate` (every check with today's limits, `HARD_ISSUES`), `widen_sentence_pauses`, `_processed_edge_issues`, `clean_replacement`.
+- Whisper timing sensitivity (lead decision 13, map ticket #11): the check vectors that take a word time (`end_analysis`'s `last_word_end`, the ending guard, `_internal_sentence_cut`) are recorded three times, with the time as given and shifted by -0.16 s and +0.16 s (the largest Rust-against-Python word-end difference S13 measured). The recorder writes whether Python's own decision changes. No tolerance is set before those numbers exist. Also record how `evaluate` uses `avg_logprob` and whether a change of 0.05 flips any decision (S13's value lacks the end-of-text term).
 - Vectors: `rust/golden/record.py` runs `evaluate` and friends on synthetic audio with canned transcripts, similarities and settings (the model calls are replaced by fixed values) and stores inputs, issues and measurements in `rust/golden/checks.json`.
 - Port the cases in `backend/tests/test_narration_quality.py`, `test_ending_guard.py`, `test_repeat_cutoff.py`, `test_regressions.py` and `test_audit_fixes.py` that test these functions. List any case left out in PROGRESS.md with the reason.
 - `profiles/<id>/mic.json` is written by Python with plain `json.dumps` and likely holds `NaN` (`delivery.ltas` returns nan above 0.92 x Nyquist): read it with a NaN-tolerant parser, never plain serde_json (found in S04).
