@@ -226,7 +226,7 @@ Needs: S07b, S11a. Gate: G1. No push. Binding detail (traits, recorder, cases, t
 - Done when: `cargo test -p taketwo-core --test render_golden --test render_ported` passes, with each test asserting the number of golden cases it read, and `cargo test --workspace` passes once at the end.
 
 ### S16 Render pipeline B: assembly, final scan, re-speak, takes, speed (push)
-Needs: S15, S11b, and S12, S13, S14 (the real renderer is built from the three models). Gate: G1, G2 (still green). Push at the end.
+Needs: S15, S11b, and S12, S13, S14 (the real renderer is built from the three models). Gate: G1, G2 (still green). Push at the end. Binding detail: lead decision 19 in PROGRESS.md (one session, not split; logic in `taketwo-core::render`; the stub renderer and `--stub-renderer` stay for tests; models load on the first job; `delivery.backfill` is ported here, not in S17; no new recorder).
 - Port `assemble` (pauses, mic match, master chain, loudness), `final_scan`, `run_generation`, `regenerate_chunk` with snapshot and restore, `select_take` with remix, `fix_remaining`, `apply_speed`, `retime`, `create_generation`, MP3 export, the WAV and subtitle files written beside the narration.
 - Replace S07b's stub renderer with the real one. Port the cases from `backend/tests/test_review_loop.py` and the rest of `test_regressions.py`. Add stub-engine tests for what the contract can't reach: a successful create and render, re-speak, fix-remaining, speed change, select-take of a kept take, MP3.
 - The engine keeps `engine.lock` on exit again (lead decision 11, moved here from S15 by lead decision 15): `tests/lifecycle.rs` and `smoke_shell.sh` check e assert the lock is released (a second engine on the same folder takes it), not that the file is gone.

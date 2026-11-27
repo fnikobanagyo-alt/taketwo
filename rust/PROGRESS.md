@@ -23,7 +23,7 @@ The loop appends one entry per session at the bottom: date, step id, what was bu
 | S13 Whisper with word timings | done, accepted (lead decision 13: heads = all heads of the top two decoder layers; pushed `c123c7b`, Windows `check` green, run 45968817348) |
 | S14 Speaker encoder | done, accepted (lead decision 18; no push; `taketwo_voice::encoder`, CPU f32; 6 golden tests on 4 say clips + ignored `encoder_parity`: cosine rust/python >= 0.9999998, largest similarity difference 3.6e-7; `1e78b80`) |
 | S15 Render pipeline A | done (no push; `taketwo_core::render`, 47 golden render cases + 6 widen vectors bit-equal, 27 ported tests; `5dc3606`) |
-| S16 Render pipeline B | todo |
+| S16 Render pipeline B | next (whole, not split: Franz 20:31; lead decision 19; push at the end) |
 | S17 Voice creation | todo |
 | S18 Studio restoration (Sidon) | todo |
 | S19 Real synthesis smoke | todo |
@@ -34,12 +34,12 @@ The loop appends one entry per session at the bottom: date, step id, what was bu
 
 | Gate | Status | Evidence |
 |---|---|---|
-| G1 | partial (text, library, captions, review, create logic, the worker, the MCP tools, Whisper word grouping and audio DSP in; take checks, ending guard and pitch measures in; mastering and the render pipeline still to port) | Lead decision 10 below (233 passed at `31b1140`); the S10 builder's acceptance run reported `cargo test --workspace` exit 0 at `5e7491c`; the lead reran `cargo test -p taketwo-core audio` there (12 golden + 2 unit tests ok) |
+| G1 | partial (text, library, captions, review, create logic, the worker, the MCP tools, Whisper word grouping and audio DSP in; take checks, ending guard and pitch measures in; mastering in; render pipeline B still to port) | Lead decision 10 below (233 passed at `31b1140`); the S10 builder's acceptance run reported `cargo test --workspace` exit 0 at `5e7491c`; the lead reran `cargo test -p taketwo-core audio` there (12 golden + 2 unit tests ok) |
 | G2 | 33 of 33 at `31b1140` (judge again at the end; without `--stub-renderer` the paths that start a job still answer 501 until S16) | Lead decision 10 below: `contract.sh`, `Ran 33 tests`, `OK`, exit 0 |
 | G3 | pass at `cbdc9b1` | S09 entry below: `smoke_shell.sh` checks a-i ok, `G3 PASS`, exit 0 (hidden window, page load fired) |
 | G4 | pass for wav, mp3 waits for S16 | S08 entry below: `cargo test -p taketwo-mcp` from no prebuilt engine, exit 0 (27 tests) |
 | G5 | not run | |
-| G6 | plain `cuda` success on `840e41f` (run 45981183667, all three jobs success); on `ae905d1` (run 45993201520) `check` success, both CUDA jobs still running when read, so the vendored conv edits are **not confirmed** on CUDA yet; judge again on the final commit | Lead decision 17 below: `gh run list`, `gh run view` |
+| G6 | plain `cuda` success on `ae905d1` (run 45993201520: `check` success, `build (cuda)` success; `cuda,flash-attn` still running when read, reported separately), so the vendored conv edits of S12 are confirmed on CUDA; judge again on the final commit | Lead decision 19 below: `gh run view 45993201520` |
 | G7 | pass at `8b6eed6` (judge again after S16/S17 if the voice-copy route changes) | S20 entry below: `plan` 10 scripts and `takes, most: 480`; `selftest` `AB SELFTEST PASS`; `render` exit 3 |
 | G8 | pass so far (re-run at the end) | Lead decision 9 below: `g8.sh` `G8 PASS`, exit 0 at `1f5b85b`. Data differences are Franz's own app use, information only |
 
@@ -2109,3 +2109,57 @@ Done on `rust/taketwo` (`b1365de` code and vectors, then this entry), not pushed
 **Tests** (`tests/mastering_golden.rs`, 12, none ignored, each counts its golden cases): bands, ltas, firwin2, mic_match, mic.json reader, expander, de_ess, master_chain, edge issues, and the ported `test_expander_keeps_quiet_word_tails`, `test_de_esser_keeps_soft_fricative_endings` (`test_audit_fixes.py`), `test_short_expander_keeps_shape_without_crashing` (`test_repeat_cutoff.py`), which read their fixtures from the golden signals. One unit check of `convolve_same`/`interp` in `np.rs`.
 
 **Note.** The coordinator's entry "Franz: finish as soon as possible" (above) appeared in this file during the session, after this step was scoped; this step was built as lead decision 18 scoped it (with its recorder). S16 was not started.
+
+### 2026-11-27, lead, iteration 19 decision
+State checked by command at `2679b3d` (tree clean apart from the two untracked symlinks): `main` and `origin/main` still `4448aaa`; `origin/rust/taketwo` is `ae905d1` (S14 and S11b are local only); `git diff --stat rust/taketwo main -- backend/app mcp` empty; Franz's app answers on 8766 (`"name":"TakeTwo"`, `"running":null`, `"queued":0`); the only listener on 8760-8799 is his app; no process of this work runs; 17 GB disk free, `rust/target` 15 GB; memory 63% free. Franz's standing safety policy is already in PLAN.md's safety section and in the entry of `ef3d382` above: nothing to add. The coordinator's "continue from S09" is stale (S09 is done). Not done, not blocked on Franz. Open gates: G1 (render pipeline B), G5; G2, G3, G4, G6, G8 judged again at the end.
+
+**S11b is accepted.** Commands the lead ran itself at `2679b3d`:
+- `cargo test -p taketwo-core --test mastering_golden`: 12 passed, 0 failed, 0 ignored.
+- No diff since `7208900` in engine, mcp, shell, voice, `rust/vendor`, `Cargo.lock`, `.github`: pass. No `NaN` in `mastering.json`; `du -sk rust/golden/mastering` 5652.
+- `rust/scripts/g8.sh`: `G8 PASS`.
+- Not rerun by the lead: the full workspace run (the builder reported 349 passed, 0 failed, 4 ignored in a plain shell).
+- Judged: (1) the `de_ess` loud mask held to 1e-6 dB instead of the 0.01 dB frame rule is right (a per-sample mask on a continuous envelope always has a sample near its line); accepted. (2) Edge check: Python flags a missing run of 4 frames, not "40 ms zeroed" as decision 18 wrote. Python wins; the lead's wording was wrong, the port is right. (3) The step kept its recorder although Franz's 20:31 note arrived mid-session: no slip, it was scoped before the note.
+
+**G6.** Run 45993201520 on `ae905d1`: `check` success, `build (cuda)` success, `build (cuda,flash-attn)` still running. The S12 vendored conv edits are confirmed on CUDA.
+
+**Franz's 20:31 note overrides decision 18's split.** S16 is one builder session. After it: S17 (+S18 only if it fits), then S19+S21.
+
+Next step: **S16 Render pipeline B, whole (push at the end)**. No model run, no take.
+
+Binding instructions for the builder:
+
+0. **Before any build.** `df -g .`; under 12 GB free, apply the disk rule of decision 18 item 0 (old hash folders under `rust/target/*/build/<crate>/`, no `cargo clean`). Under 8 GB later: stop and report. `source rust/scripts/env.sh`.
+1. **Where the logic lives (the costly one to get wrong).** All pipeline logic goes in `taketwo-core::render` (new file `render/narration.rs` or similar), written over `Render` plus the `Library`, as `render_chunk` is: `backfill`, `assemble`, `apply_speed`, `retime`, `final_scan`, `run_generation`, `_snapshot/_restore/_discard`, `regenerate_chunk`, `select_take`, `fix_remaining`. Tests drive them with the existing scripted `Fake` (it is `Rc`, not `Send`: that is why this is in core) and never link a model. The engine's real `Renderer` is a thin wrapper: the three real models behind one mutex, the real clock and a random nonce, calling the core functions. Port from `backend/app/pipeline.py` lines 576-675 and 700-780 (`assemble`, `apply_speed`, `retime`, `_save`, `run_generation`), 810-868 (`final_scan`), 883-954, 1069-1118, and `delivery.backfill` (`delivery.py` 153-186; moved here from S17 because `run_generation` calls it first). Reuse what exists: `render_chunk`, `processed_edge_issues`, `mic_match`, `read_mic_bands`, `master_chain`, `audio::*`, `summarize`, `fix_targets`, `_archive_take`, `_trim_takes`, `clean_replacement`, `fix_entities`, `ffmpeg::export_mp3`/`decode_to_wav`.
+2. **Details that are easy to get wrong.**
+   - `assemble`: `int()` truncation of the pause, `round(t, 3)` and `round(.., 2)` are Python rounds (use the existing `py` helpers); `mic_eq` is `null` first, then `curve or None`; mic match and master chain at `sr_out`; `master.tmp.wav` then `apply_speed` then replace to `master.wav`, with the temp file removed on error; `audio_rev` from the clock.
+   - `apply_speed`: `abs(speed - 1.0) < 1e-3` copies; else ffmpeg `atempo={speed:.3f}`, `pcm_s16le`; WAV and MP3 both made as temp files, then both published; temp files removed in every case.
+   - `run_generation`: the messages word for word (`Loading <spec name>`: read the name in `engines.py`; `Part N of M`; `Assembling`; the two `Final check` messages; the `Stopped.` message already in `render.rs`); `_save` turns a deleted narration into a cancel; `only_chunks` filters `bad`; the status recompute, `final_fix`, `final_scan` summary, `retries`, `render_seconds`; the last `put_generation_live` never recreates a deleted row. A take that ends with `qwen::CANCELLED` or with the flag set is `RenderError::Cancelled`, not a failure (decision 17). The download branch is not ported: a missing model is a clear job error.
+   - `regenerate_chunk`: snapshot before anything is marked running; restore plus the `before` document with the two messages on failure and on stop; the orphan take folder removed when stopped; `_trim_takes` on success.
+   - `select_take`: refusals with Python's texts; `accepted` to null; `audio_revision` + 1; `summarize` only when `done`.
+   - Job phases as Python's decorators name them: `synthesis`, `transcription`, `quality_check`, `assembly`, `speed_export`, `final_check` (`worker.phase` exists). If passing the phase hook into core costs more than an hour, do `assembly`, `speed_export`, `final_check` in the engine wrapper and say so.
+3. **Engine wiring.**
+   - Keep `StubRenderer` and `--stub-renderer` exactly as they are (the MCP tests and `smoke_shell.sh` use them). Without the switch the engine now uses the real renderer instead of answering 501.
+   - Models load on the first job, never at start: Qwen from `$TAKETWO_MODELS/qwen3-tts-1.7b-base` (bf16 on Metal, the caller's sampler settings, as `taketwo-voice::qwen` does), Whisper from `$TAKETWO_MODELS/ggml-large-v3-turbo.bin` opened as the `whisper_parity` test opens it (decision 13 heads, flash attention off), the encoder via `VoiceEncoder::from_env`. A missing file is a job error naming the file. Released after `IDLE_UNLOAD_SECONDS` of idle, as `main.py` `_release_models`.
+   - `TAKETWO_MAX_TAKES` (parsed in `paths.rs`) is enforced in the wrapper around `Voice::synthesize`: over the cap the job fails with a clear message. One unit test with a counting fake.
+   - `rust/scripts/contract.sh` must never load a model: start `serve` there with `TAKETWO_MODELS` pointing at an empty temp folder. Check whether any contract test posts a create that now succeeds and say what the engine then does (a queued job that fails for the missing model is fine if the 33 tests stay `OK`; if a test's expectation changes, stop and report, do not edit the test).
+   - `PATCH` with a changed `speed`: `retime` as `main.py` near line 982 (clamp 0.7-1.3, the 400 text when `master.wav` is missing, busy rules). `final.mp3` is now written, so `get_audio` mp3 works: add an MCP test for it (G4).
+   - One copy of the Qwen sampler defaults in `taketwo-core`, used by `taketwo-voice::qwen` and `/api/engines` (decision 17).
+   - Lock: the engine keeps `engine.lock` on exit again; `tests/lifecycle.rs` and `smoke_shell.sh` check e assert a second engine on the same folder can take the lock, not that the file is gone (decision 11).
+4. **Tests (no new recorder, no new golden file).** A named core test target `tests/narration.rs` using the `Fake` with takes from the existing `rust/golden/render/` arrays or tones: assemble (timeline, pause arithmetic against hand-computed numbers, duration, `mic_eq` null, files written, a failed export leaves the old pair), speed (ffmpeg present on this Mac; skip with a printed reason, not silently, where it is missing), final_scan branches, a full `run_generation`, cancel, deleted-while-running, re-speak success/failure/stop with restore, select_take, fix_remaining. Port these Python tests where not already ported (list any left out with the reason): `test_regressions.py` `test_final_scan_checks_raw_cutoff_despite_fade_and_padding`, `test_final_scan_preserves_legacy_known_failures`, `test_assembly_preserves_part_duration_and_wav_export`, `test_single_part_replacement_and_final_mix_are_rechecked`, `test_failed_replacement_remains_flagged_and_is_not_reported_fixed`; `test_review_loop.py` `test_respeak_keeps_take_1_playable_next_to_take_2`, `test_keeping_take_1_swaps_audio_and_measurements_and_remixes`, `test_a_failed_respeak_leaves_no_orphan_take`, `test_unknown_take_is_refused`, `test_a_render_saving_after_delete_keeps_it_deleted`, `test_a_delete_during_a_take_switch_stays_deleted`, `test_a_take_switch_on_a_missing_or_deleted_narration_is_refused`, `test_switching_takes_clears_sounds_fine`. Engine tests (stub or an in-process renderer built on the core functions with the `Fake` kind of models behind `Send` test doubles): speed change over HTTP, mp3 download.
+5. **Windows (changes the CUDA build, so this step pushes).** Delay-load `nvcuda.dll` for `taketwo-engine` under `cuda` on MSVC (`/DELAYLOAD:nvcuda.dll` plus `delayimp.lib` from the build script; other CUDA DLLs only if the import table shows them loaded at start: say what you found). Add a step to both CUDA jobs that runs `taketwo-engine.exe --version` and `taketwo-mcp.exe --version` and prints the exit codes, with `continue-on-error: true` for this push (the runner has the toolkit, not the driver; the lead reads the result and decides in S21 whether it becomes a hard check). Push `rust/taketwo` once at the end; do not wait for the run.
+6. **Hand-back order if the session runs short** (commit after each): (a) core logic and `tests/narration.rs`; (b) engine wiring, speed, mp3, lock, contract and smokes green; (c) nvcuda and the push. Report which letter was reached.
+7. **Not in this step:** voice creation and profile routes (S17), `make_preview`, Sidon, any model run or take, any new recorder, any change to `contract/` tests, the blind test.
+8. `safety_ok=false` only for a real risk (PLAN.md safety section). Append the entry to PROGRESS.md and set S16's row.
+
+Acceptance commands (the lead runs them; `WT` is the worktree; none starts a model):
+- `cd "$WT/rust" && cargo test -p taketwo-core --test narration 2>&1 | tee /dev/stderr | grep -Eq 'test result: ok\. (1[0-9]|[2-9][0-9]) passed; 0 failed; 0 ignored'` (at least 10 tests)
+- `cd "$WT/rust" && cargo test -p taketwo-core -p taketwo-engine -p taketwo-mcp` (plain shell, `env.sh` not sourced)
+- `cd "$WT" && rust/scripts/contract.sh 2>&1 | tee /dev/stderr | grep -q 'Ran 33 tests' && rust/scripts/contract.sh 2>&1 | grep -qx 'OK'`
+- `cd "$WT/rust" && cargo build -p taketwo && scripts/smoke_shell.sh`
+- `cd "$WT/rust" && source scripts/env.sh >/dev/null && cargo build --release -p taketwo-engine --features metal` (the real renderer links)
+- `cd "$WT" && grep -rq 'fn assemble' rust/crates/taketwo-core/src/render && grep -rq 'fn final_scan' rust/crates/taketwo-core/src/render && grep -rq 'fn retime' rust/crates/taketwo-core/src/render && grep -rq 'fn backfill' rust/crates/taketwo-core/src && grep -q 'DELAYLOAD' -r rust/crates/taketwo-engine rust/crates/taketwo-voice --include=build.rs && grep -q -- '--version' .github/workflows/windows-cuda.yml`
+- `cd "$WT" && grep -q 'stub-renderer' rust/crates/taketwo-engine/src/serve.rs && git diff --quiet 2679b3d -- contract/test_*.py contract/golden backend mcp`
+- `cd "$WT" && test "$(git rev-parse main)" = 4448aaa9b241f2e52cfaa6c06fa98b89653be82e && test "$(git rev-parse origin/main)" = 4448aaa9b241f2e52cfaa6c06fa98b89653be82e && git diff --quiet origin/rust/taketwo HEAD -- rust/crates rust/vendor .github` (pushed; only `.md` may differ)
+- `cd "$WT" && rust/scripts/g6.sh check` (exit 0, or 75 while the run is young)
+- `cd "$WT/rust" && test "$(df -g . | tail -1 | awk '{print $4}')" -ge 8 && cd "$WT" && rust/scripts/g8.sh`
+- `lsof -nP -iTCP -sTCP:LISTEN | grep -E ':(879[0-589])' ; pgrep -fl 'rust-taketwo/rust/target/'` shows nothing of ours
