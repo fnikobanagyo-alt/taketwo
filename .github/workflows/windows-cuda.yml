@@ -62,19 +62,23 @@ jobs:
           ninja --version
           cargo build --release -p taketwo-engine -p taketwo-mcp --features "${{ matrix.features }}" 2>&1 | Tee-Object -FilePath build.log
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-      - name: Run --version, or list the programs if they cannot start here
+      - name: Import table and --version of both programs (nvcuda.dll is delay-loaded; reported, not yet a gate)
+        continue-on-error: true   # the runner has the CUDA toolkit, not the NVIDIA driver; the lead decides in S21
         working-directory: rust
         shell: pwsh
         run: |
-          $code = 1
-          try { & target/release/taketwo-engine.exe --version; $code = $LASTEXITCODE } catch { $_ }
-          if ($code -eq 0) {
-            & target/release/taketwo-mcp.exe --version
-          } else {
-            "taketwo-engine.exe did not start here (exit $code); a CUDA build likely needs the NVIDIA driver DLL, which the runner lacks. Listing the programs instead:"
+          foreach ($p in "taketwo-engine", "taketwo-mcp") {
+            "== $p.exe: DLLs loaded at start (dumpbin /DEPENDENTS), then the delay-loaded ones"
+            dumpbin /NOLOGO /DEPENDENTS "target/release/$p.exe"
           }
-          Get-Item target/release/taketwo-engine.exe, target/release/taketwo-mcp.exe | Select-Object Name, Length | Format-Table | Out-String
-          exit 0
+          $codes = @{}
+          foreach ($p in "taketwo-engine", "taketwo-mcp") {
+            $code = 1
+            try { & "target/release/$p.exe" --version; $code = $LASTEXITCODE } catch { $_ }
+            $codes[$p] = $code
+            "$p.exe --version exit code: $code"
+          }
+          if ($codes["taketwo-engine"] -ne 0 -or $codes["taketwo-mcp"] -ne 0) { exit 1 }
       - name: Keep the build log
         if: always()
         uses: actions/upload-artifact@v4
