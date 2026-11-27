@@ -32,7 +32,7 @@ The goal is met only when every gate command below passes when run, not when the
 |---|---|
 | `TAKETWO_DATA=<dir>` puts the engine, the MCP server and the shell in **isolated mode**: library, lock file and address file all live under that folder; default ports are 8790-8799; the one-time library copy is off. | A forgotten variable can't reach Franz's files. |
 | Without `TAKETWO_DATA` the programs refuse to start unless given `--live`. The shell passes `--live` only when built with the cargo feature `live` (off by default). The loop never uses `--live`. | Running a dev build by hand can't go live. |
-| The address file (`engine.json` under the TakeTwo and VoiceForge app-data names) is written only in live mode and only for a port in 8766-8785, as Python's `_publish_address` does. Its code takes the base folder as a parameter and is tested on a temp folder. | Franz's MCP server reads that file to find his app. |
+| The address file under the TakeTwo and VoiceForge app-data names is written only in live mode and only for a port in 8766-8785, as Python's `_publish_address` does. Its code takes the base folder as a parameter and is tested on a temp folder. In isolated mode the engine writes `<TAKETWO_DATA>/engine.json` instead (dev ports only) and removes it on a clean exit (lead decision 9). | Franz's MCP server reads the app-data files to find his app; an isolated MCP server finds the engine of its own library and no other. |
 | The engine refuses ports 8765-8785 outside live mode. | Same. |
 | The one-time library copy takes its source and destination as parameters, opens the source read-only, and is tested only on a synthetic source in a temp folder. | `MAIN/data` is never read or written by this work. |
 | Every `taketwo-mcp` test pins `TAKETWO_URL`. The "start an engine" path is tested only in isolated mode with a dev port. | Unpinned discovery would find Franz's engine on 8766 and write to his library. |
@@ -140,11 +140,13 @@ Needs: S07a. Gates: G2 (kept), base for G3 and G4. Push at the end so the Window
 - Done when: those tests pass, `contract.sh` still prints `Ran 33 tests` and `OK`, and the Windows `check` job is green on the pushed commit (`rust/scripts/g6.sh check`). Hand-back point if the session runs short: worker, stub and job shapes green and committed first; lifecycle and the push second.
 
 ### S08 MCP server
-Needs: S07b. Gate: G4.
-- Port `mcp/taketwo_mcp.py` with `rmcp` over stdio: `list_voices`, `generate_narration`, `get_status`, `get_timings`, `get_audio`, `get_subtitles`, `find_narration`, `respeak_part`, `fix_remaining`, `stop_narration`, `resume_narration`, `mark_sounds_fine`, with the same replies and error texts. It answers to both names (`--name taketwo|voiceforge`).
-- Finding the engine: `TAKETWO_URL`/`VOICEFORGE_URL`, then the address file under both names, then a port scan, then start `taketwo-engine` next to it with `--idle-exit 900`. In isolated mode it scans dev ports only.
-- Tests (`crates/taketwo-mcp/tests`): an rmcp client starts the binary, pinned to a seeded stub engine, and calls all 12 tools; the cases from `backend/tests/test_mcp_tools.py` are ported; one test covers "no engine answers, so start one" in isolated mode and checks it is stopped afterwards.
-- Done when: `cd rust && cargo build -p taketwo-mcp && cargo test -p taketwo-mcp` passes.
+Needs: S07b. Gate: G4. No push. Binding detail: lead decision 9 in PROGRESS.md.
+- Port `mcp/taketwo_mcp.py` with `rmcp` over stdio: `list_voices`, `generate_narration`, `get_status`, `get_timings`, `get_audio`, `get_subtitles`, `find_narration`, `respeak_part`, `fix_remaining`, `stop_narration`, `resume_narration`, `mark_sounds_fine`, with the same parameters, defaults, descriptions, replies and error texts. It answers to both names (`--name taketwo|voiceforge`).
+- `taketwo-mcp` is a thin HTTP client: it no longer depends on `taketwo-voice` (a CUDA build of it would not start without the NVIDIA driver). Its `cuda` and `flash-attn` features stay as empty features so the G6 build command is unchanged.
+- Finding the engine, isolated mode (the only mode that runs in this loop): `TAKETWO_URL`/`VOICEFORGE_URL` (refused when its port is 8765-8785), then `<TAKETWO_DATA>/engine.json`, then start `taketwo-engine` from the folder of its own program with `serve --idle-exit 900` and wait for that file. No port scan and no app-data file is ever read in isolated mode. Live mode (app-data address files under both names, then a scan of 8765-8785, then start) is written as functions that take the base folder and the port list and is unit-tested on stand-ins; `--live` on the command line stays refused, as in the engine.
+- Tests (`crates/taketwo-mcp/tests`): an rmcp client starts the built program against a seeded `serve --stub-renderer` engine on a temp library and calls all 12 tools; the tool list is compared with the Python signatures; the cases from `backend/tests/test_mcp_tools.py` and the contract's `McpTools` class are ported; one test covers "no engine answers, so start one" in isolated mode and stops it afterwards. Every child gets a temp `HOME`, and `TAKETWO_URL`/`VOICEFORGE_URL` set or removed explicitly.
+- MP3 is made in S16: until then `get_audio` is tested with `wav` and with the engine's 404 for `mp3`. G4 is judged again after S16.
+- Done when: `cd rust && cargo build -p taketwo-mcp && cargo test -p taketwo-mcp` passes from a state with no prebuilt engine program.
 
 ### S09 Tauri shell
 Needs: S07b. Gate: G3.
