@@ -19,9 +19,9 @@ The loop appends one entry per session at the bottom: date, step id, what was bu
 | S10 Audio DSP with Python parity vectors | done (`taketwo_core::audio`, 12 golden tests; first pushed with S11a) |
 | S11a Take checks, ending guard, pitch measures | done, parts A to D (pushed; `taketwo_core::checks`, `ending_guard`, `delivery`; 9 golden, 23 ported, 1 unit test) |
 | S11b Mic match, master chain, final-mix edge check | todo (before S16; sentence pauses moved to S15) |
-| S12 Qwen voice (real model, Metal) | done, needs lead review (pushed `ae905d1`, Windows `check` green, run 45993201520; acceptance 2 fails on the empty `incremental` folder cargo always makes; smoke 2 takes after 1 refused) |
+| S12 Qwen voice (real model, Metal) | done, accepted (lead decision 17; pushed `ae905d1`, Windows `check` green, run 45993201520; CUDA jobs on it still running when read) |
 | S13 Whisper with word timings | done, accepted (lead decision 13: heads = all heads of the top two decoder layers; pushed `c123c7b`, Windows `check` green, run 45968817348) |
-| S14 Speaker encoder | todo |
+| S14 Speaker encoder | next (lead decision 17) |
 | S15 Render pipeline A | done (no push; `taketwo_core::render`, 47 golden render cases + 6 widen vectors bit-equal, 27 ported tests; `5dc3606`) |
 | S16 Render pipeline B | todo |
 | S17 Voice creation | todo |
@@ -39,7 +39,7 @@ The loop appends one entry per session at the bottom: date, step id, what was bu
 | G3 | pass at `cbdc9b1` | S09 entry below: `smoke_shell.sh` checks a-i ok, `G3 PASS`, exit 0 (hidden window, page load fired) |
 | G4 | pass for wav, mp3 waits for S16 | S08 entry below: `cargo test -p taketwo-mcp` from no prebuilt engine, exit 0 (27 tests) |
 | G5 | not run | |
-| G6 | plain `cuda` success on `c123c7b` (run 45968817348, all jobs success); on `840e41f` (run 45981183667) `check` success, both CUDA jobs still running when read; judge again on the final commit | Lead decision 15 below: `gh run list`; lead decision 10: run 45945950326, all three jobs `success` |
+| G6 | plain `cuda` success on `840e41f` (run 45981183667, all three jobs success); on `ae905d1` (run 45993201520) `check` success, both CUDA jobs still running when read, so the vendored conv edits are **not confirmed** on CUDA yet; judge again on the final commit | Lead decision 17 below: `gh run list`, `gh run view` |
 | G7 | pass at `8b6eed6` (judge again after S16/S17 if the voice-copy route changes) | S20 entry below: `plan` 10 scripts and `takes, most: 480`; `selftest` `AB SELFTEST PASS`; `render` exit 3 |
 | G8 | pass so far (re-run at the end) | Lead decision 9 below: `g8.sh` `G8 PASS`, exit 0 at `1f5b85b`. Data differences are Franz's own app use, information only |
 
@@ -1897,3 +1897,68 @@ Commits: `731b658` (item 0), `0f36cb5` (QwenVoice and vendor edits), `856d5e9` (
 3. `render/mod.rs` lines 356, 598, 671 map a synthesize error straight to `RenderError::Other` before `check()`, so a cancel during a Qwen take ends as a failure, not `Cancelled`. S16 should map `Err(qwen::CANCELLED)` (or a set flag) to `Cancelled`.
 4. CUDA dtype: bf16 chosen (needs compute capability 8.0 or later for speed); say if f32 is wanted.
 5. The first-frame-EOS case returns empty audio with `decoder: {}`; Python would report the previous call's `decoder` (a stale attribute). Kept the honest `{}`.
+
+### 2026-11-27, lead, iteration 17 decision
+State checked by command at `320986c` (tree clean apart from the two untracked symlinks): `main` and `origin/main` still `4448aaa`; `origin/rust/taketwo` is `ae905d1`, the newest code commit (`320986c` changes only `.md`); `git diff --stat rust/taketwo main -- backend/app mcp` empty; Franz's app answers on 8766 (`"name":"TakeTwo"`, `"running":null`, `"queued":0`, `"loaded_engine":null`); the only listener on 8760-8799 is his app; no process of this work runs; `memory_pressure` 69% free; disk 12 GB free, `rust/target` 16 GB (15 GB of it `debug/build`). Franz's standing safety policy is already in PLAN.md's safety section and in the entry of `ef3d382` above; nothing to add. The coordinator's "continue from S09" is stale: S09 is done. Not done, not blocked on Franz. Open gates: G1 (mastering, render pipeline B), G5; G2, G4, G6, G8 judged again at the end.
+
+**S12 is accepted.** Commands the lead ran itself at `320986c`:
+- Plain shell (`command -v cmake` empty, `env.sh` not sourced): `cargo test --workspace` exit 0, 330 passed, 0 failed, 3 ignored. The G1 plain-shell blocker of decision 16 is closed.
+- `cargo test -p taketwo-voice qwen`: 7 passed.
+- The `qwen_smoke.json` check: pass (2 takes, both multiples of 1920, peak 4.76 GB RSS).
+- No diff since `1a3b802` in engine, mcp, shell, `taketwo-core/src`, `.github`: pass.
+- `rust/scripts/g8.sh`: `G8 PASS`, exit 0.
+- `gh run view 45993201520`: `check` success; `build (cuda)` and `build (cuda,flash-attn)` still `in_progress`. **CUDA is not confirmed on `ae905d1`**, the commit with the vendored conv edits. Last confirmed: `840e41f` (run 45981183667, all three jobs success). The next lead turn reads the run again.
+- Not rerun by the lead: `cargo test -p qwen_tts --lib` (it is inside the workspace run above), the model smoke.
+
+Acceptance command 2 was wrong, not the build: cargo always recreates an empty `target/debug/incremental`. The check is from now on `test -z "$(ls -A target/debug/incremental 2>/dev/null)"`; it passes now (0 entries). The rule slips the builder listed are guidance-level, not real risks.
+
+**Answers to the S12 builder.**
+1. Empty folder: accepted (above).
+2. Qwen defaults: one copy in `taketwo-core`, done in S16 (the first step allowed to edit both core and the engine). PLAN.md S16 updated. Until then the second copy in `qwen::DEFAULTS` stays.
+3. Cancel during a take must end as `Cancelled`: S16. PLAN.md S16 updated.
+4. CUDA bf16: provisional. Franz decided bf16 for Metal only, and no NVIDIA machine is here to measure it. It is listed for Franz in S21's report, not reopened now.
+5. First-frame EOS reports `decoder: {}`: accepted. Python's stale value is a bug, not a contract.
+
+PLAN.md: S16 now needs S12, S13 and S14 as well, because it builds the real renderer from the three models.
+
+Next step: **S14 Speaker encoder (no push)**. The memory condition holds now, and S16 cannot build the real renderer without it. After S14: S11b, S16 (push), S17, S19, S21.
+
+Binding instructions for the builder:
+
+0. **Before any build.** `df -g .`. Apply the disk rule until **14 GB** is free: delete hash folders under `rust/target/debug/build/<crate>/` older than the session start, biggest first, keeping the two newest per crate. No `cargo clean`. Under 8 GB at any later point: stop and report. `source rust/scripts/env.sh`.
+1. **Where.** A new module `taketwo-voice::encoder` and a recorder `rust/golden/record_encoder.py`. No change to `taketwo-core/src`, `taketwo-engine`, `taketwo-mcp`, the shell, `rust/vendor`, `.github`. No `cargo update`; a new crate only if it is already in `Cargo.lock`. It must compile with no feature and on Windows.
+2. **What to port: all of `ml.speaker_embedding`, not only the LSTM.** Read `backend/app/ml.py` lines 112-139 and, in `backend/.venv/lib/python3.11/site-packages/mlx_audio/`, `tts/models/chatterbox/voice_encoder/{voice_encoder,melspec,config}.py`, `utils.resample_audio` and `resample.resample_audio_array`. In order:
+   - the resample to 16 kHz (mlx-audio's Kaiser-windowed sinc polyphase, not `taketwo_core::audio`'s resampler unless you show they agree);
+   - the energy trim (`trim_top_db=20`, `embeds_from_wavs` lines 410-450);
+   - the mel front end with the config's numbers;
+   - the partial windows at `rate=1.3` (including a clip shorter than one window), the LSTM stack and projection, each partial's normalisation, the `as_spk` average;
+   - `ml.py`'s own second normalisation (`e / (norm + 1e-9)`, float32).
+   `VoiceEncoder` implements `taketwo_core::render::SpeakerEncoder` unchanged, loads once, has `unload()`. Device: CPU f32 is enough for a 5.7 MB model unless you measure that Metal is needed; say which you chose and the seconds per clip.
+3. **Weights.** Read `ve.safetensors` in place from the Hugging Face cache (`~/.cache/huggingface/hub/models--ResembleAI--chatterbox/snapshots/*/ve.safetensors`), through a path variable `TAKETWO_VOICE_ENCODER` with `$TAKETWO_MODELS/voice-encoder/ve.safetensors` as the default. `env.sh` may add a symlink inside `rust/.models`, as it does for Qwen. No copy into `~/Library/Application Support/TakeTwo`, no download. Read how `sanitize` renames and reshapes the weights (PyTorch LSTM gate order and the two biases).
+4. **Recorder** (`rust/golden/record_encoder.py`, run with `backend/.venv/bin/python -B`, its own short process, after the 8766 idle check, never while a Rust model test runs). It must load the weights with `local_files_only=True` and fail instead of downloading (`ml._voice_encoder` falls back to a download: do not call it bare; set `HF_HUB_OFFLINE=1` as well). Clips are made with macOS `say` (no voice of Franz's), small, committed under `rust/golden/encoder/`:
+   - A: about 4 s at 24 kHz (the resample runs);
+   - B: about 1.1 s at 24 kHz (`pipeline.py:227` embeds anything over 1.0 s; shorter than one partial window);
+   - C: about 3 s at 16 kHz with 0.5 s of silence before and after (the trim runs);
+   - D: a second `say` voice, about 4 s at 24 kHz.
+   For each clip record: the embedding (float32, 256 values), and the intermediates that let a no-model test run: the resampled length and a checksum or the samples, the trim start and end, the mel array, the partial start frames. Also record `ml.cosine` for every pair of clips (6 values).
+5. **Tests.**
+   - Not ignored, no weights, runs in `cargo test --workspace` and on the Windows `check` job: resample, trim bounds (exact), mel (stated tolerance, with the measured maximum), partial slicing (exact), for all four clips. Each test asserts the number of golden cases it read.
+   - Ignored, needs the weights: `cargo test -p taketwo-voice -- --ignored encoder_parity --nocapture`. For each clip, the cosine between the Rust and Python embeddings must be **at least 0.999**; print it and the largest element difference. For each of the 6 pairs, print Rust `cosine` of Rust embeddings, Python's recorded value, and the difference; also Rust embedding against the **Python** embedding of the other clip (copied voices carry Python-made fingerprints, so this is the number the drift check will really see). Assert each difference is under 0.005 and report the largest. Print `taketwo_core::render::cosine` on the Python embeddings against Python's recorded `ml.cosine` (the summation-order measurement S15 left open): report the largest difference, assert under 1e-6.
+   - Write the numbers to `rust/out/encoder_parity.json` (git-ignored) and into PROGRESS.md.
+6. **If a number misses.** Do not loosen 0.999 or 0.005. Find the stage that differs with the recorded intermediates, fix it, and if it still misses, report the stage and the measured value to the lead.
+7. **Not in this step:** engine wiring, the fingerprint files of a voice (S17), Qwen, Whisper, any take, any push, any claim about sound.
+8. `safety_ok=false` only for a real risk (PLAN.md safety section). Append the entry to PROGRESS.md and set S14's row in the step table.
+
+Acceptance commands (the lead runs them; `WT` is the worktree):
+- `cd "$WT/rust" && (! command -v cmake >/dev/null) && cargo test --workspace` (a fresh shell, `env.sh` not sourced)
+- `cd "$WT/rust" && cargo test -p taketwo-voice encoder`
+- `cd "$WT/rust" && source scripts/env.sh >/dev/null && cargo test -p taketwo-voice -- --ignored encoder_parity --nocapture`
+- `cd "$WT" && python3 -c "import json;r=json.load(open('rust/out/encoder_parity.json'));assert len(r['clips'])==4 and all(c['cosine_rust_python']>=0.999 for c in r['clips']) and r['max_sim_difference']<0.005, r"`
+- `cd "$WT" && test "$(ls rust/golden/encoder/*.wav | wc -l)" -eq 4 && test "$(du -sk rust/golden/encoder | cut -f1)" -lt 4096`
+- `cd "$WT" && grep -q 'local_files_only=True' rust/golden/record_encoder.py && grep -q 'HF_HUB_OFFLINE' rust/golden/record_encoder.py`
+- `cd "$WT" && git diff --quiet 320986c -- rust/crates/taketwo-engine rust/crates/taketwo-mcp rust/crates/taketwo rust/crates/taketwo-core/src rust/vendor .github`
+- `cd "$WT" && git diff --stat rust/taketwo main -- backend/app mcp | wc -l | grep -qx ' *0'`
+- `cd "$WT" && test "$(git rev-parse main)" = 4448aaa9b241f2e52cfaa6c06fa98b89653be82e && test "$(git rev-parse origin/rust/taketwo)" = ae905d118a5d3b4f17feabe1d25b9a419d932ede` (nothing pushed)
+- `cd "$WT/rust" && test -z "$(ls -A target/debug/incremental 2>/dev/null)" && test "$(df -g . | tail -1 | awk '{print $4}')" -ge 8`
+- `cd "$WT" && rust/scripts/g8.sh`
+- `lsof -nP -iTCP -sTCP:LISTEN | grep -E ':(879[0-589])' ; pgrep -fl 'rust-taketwo/rust/target/'` shows nothing of ours

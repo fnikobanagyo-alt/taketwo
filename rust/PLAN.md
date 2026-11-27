@@ -211,7 +211,7 @@ Needs: S02 (binding chosen and linking). Gate: G5 (part), G1 (word grouping). Pu
 - Done when: `cargo test -p taketwo-voice --features metal -- --ignored whisper_parity` has run and its numbers are in PROGRESS.md.
 
 ### S14 Speaker encoder
-Needs: S12. Gate: G5 (part).
+Needs: S12. Gate: G5 (part). No push. Binding detail: lead decision 17 in PROGRESS.md.
 - Port the Chatterbox voice encoder (LSTM, from the local `ve.safetensors`) to Candle with its mel front end; `speaker_embedding`, `cosine` as in `ml.py`.
 - Check (ignored test): on three `say` clips, cosine between the Rust and Python embeddings of the same clip is at least 0.999; record the values.
 - Done when: `cargo test -p taketwo-voice --features metal -- --ignored encoder_parity` has run with numbers in PROGRESS.md.
@@ -225,10 +225,12 @@ Needs: S07b, S11a. Gate: G1. No push. Binding detail (traits, recorder, cases, t
 - Done when: `cargo test -p taketwo-core --test render_golden --test render_ported` passes, with each test asserting the number of golden cases it read, and `cargo test --workspace` passes once at the end.
 
 ### S16 Render pipeline B: assembly, final scan, re-speak, takes, speed (push)
-Needs: S15, S11b. Gate: G1, G2 (still green). Push at the end.
+Needs: S15, S11b, and S12, S13, S14 (the real renderer is built from the three models). Gate: G1, G2 (still green). Push at the end.
 - Port `assemble` (pauses, mic match, master chain, loudness), `final_scan`, `run_generation`, `regenerate_chunk` with snapshot and restore, `select_take` with remix, `fix_remaining`, `apply_speed`, `retime`, `create_generation`, MP3 export, the WAV and subtitle files written beside the narration.
 - Replace S07b's stub renderer with the real one. Port the cases from `backend/tests/test_review_loop.py` and the rest of `test_regressions.py`. Add stub-engine tests for what the contract can't reach: a successful create and render, re-speak, fix-remaining, speed change, select-take of a kept take, MP3.
 - The engine keeps `engine.lock` on exit again (lead decision 11, moved here from S15 by lead decision 15): `tests/lifecycle.rs` and `smoke_shell.sh` check e assert the lock is released (a second engine on the same folder takes it), not that the file is gone.
+- One copy of the Qwen sampler defaults (0.7 / 0.9 / 40 / 1.05) in `taketwo-core`, used by `taketwo-voice::qwen` and the engine's `/api/engines` (lead decision 17).
+- A take that ends with `qwen::CANCELLED`, or with the cancel flag set, becomes `RenderError::Cancelled`, not a failure (`render/mod.rs` near lines 356, 598, 671; lead decision 17).
 - Delay-load `nvcuda.dll` so the CUDA exe answers `--version` on a machine with no NVIDIA driver, plus a Windows job check for it (Franz, lead decision 11).
 - Done when: `cargo test --workspace` and `rust/scripts/contract.sh` both pass.
 
