@@ -11,8 +11,8 @@ The loop appends one entry per session at the bottom: date, step id, what was bu
 | S03 Text logic | done |
 | S04 Library store, seeder, one-time copy | done |
 | S05 Captions, timings, subtitles, review rules | done |
-| S06 Engine: read side, guards, UI, contract runner | next |
-| S07 Engine: write side, worker, stub voice, lifecycle | todo |
+| S06 Engine: read side, guards, UI, contract runner | done |
+| S07 Engine: write side, worker, stub voice, lifecycle | next |
 | S08 MCP server | todo |
 | S09 Tauri shell | todo |
 | S10 Audio DSP with Python parity vectors | todo |
@@ -530,3 +530,33 @@ Next step: **S06 Engine: read side, guards, UI, contract runner**, alone (the wo
    - `rust/scripts/g8.sh` ends with `G8 PASS`; `lsof -nP -iTCP -sTCP:LISTEN | grep -E ':(879[0-589])'` and `pgrep -fl 'rust-taketwo/rust/target/'` print nothing.
    - Report only, not required: the full `rust/scripts/contract.sh` result (which of the 13 remaining tests fail, expected: the 2 create tests, ReviewActions 6, and `test_mark_sounds_fine_round_trip`), and `df -g .` at the end.
 7. Safety for this step: dev ports only (8790-8795, 8798, 8799), bound only by `contract.sh` and `record_http.py`, each stopping what it started by pid. Never 8765-8785; 8766 is only read by `g8.sh`. No model, no push. Only temp libraries; nothing under the main checkout's `data/` or App Support/VoiceForge is opened. Python runs only as the two recorders and the contract suite. `contract/test_contract.py`, `fixture.json` and `contract/golden/` are the judge: do not edit them. Add files to git by name, never `git add -A`. Do not weaken a test to get to green; a case that can't match goes to the lead with the evidence. Update the "Run against the Rust engine" part of `contract/README.md` to name `rust/scripts/contract.sh`.
+
+### 2026-11-27, builder, S06 Engine: read side, guards, UI, contract runner
+Built (commit `bcaba4b`, plus this entry):
+- `taketwo-engine serve [--port N] [--ui DIR]` (`src/serve.rs`): isolated mode only (`--live` answers "not built yet"), `serve::parse` refuses without `TAKETWO_DATA` and refuses 8765-8785 through `Mode::check_port` before anything is opened or bound; no `--port` takes the first free of `default_ports()` (8790-8795, 8798, 8799). Opens the library, runs `startup_repairs`, binds 127.0.0.1, prints `{"ready":true,"port":N,"pid":P}`, stops on Ctrl-C or SIGTERM (`cfg(unix)` only for SIGTERM). No lock file, idle exit, parent watch or address file (S07). The crate now has a `lib.rs` so tests drive the router in-process.
+- `src/api.rs`: `only_this_computer` as an outer layer that runs before routing (Host, Origin on writes, decoded `.`/`..` pieces on `/api/`), then the request is routed on the decoded path re-encoded, so an encoded `/` splits the path as in Starlette (Python answers `Not Found` for `/api/profiles/%2Ftmp/analysis`; so does Rust). CORS for `http://localhost:5173`. `_item_dir` ported as its own check (`[A-Za-z0-9_-]{1,64}`), `_live_gen` exactly. Read routes ported with Python's texts and key order; FastAPI-shaped 404/405/422 (422 bodies match pydantic's for path ints, `limit` and `download`); a plain-text 500 `Internal Server Error` where core returns `Err`. Static routes Python shadows by `{id}` (`GET /api/generations/reveal`, `GET /api/profiles/upgrade-all`, search) are matched inside the `{id}` route, so they answer as Python does. Start-up stubs: engines (the one Qwen3 engine; `downloaded` = `$TAKETWO_MODELS/qwen3-tts-1.7b-base/config.json` exists), update (nothing checked), integrations (read-only registration check, `taketwo-mcp` beside the engine in place of the script), diagnostics (no jobs), catalog/library (`installed: "not used by TakeTwo 1.0"`). Every other Python route: id check where Python has `_item_dir`, then 501 `Not in TakeTwo 1.0 yet.`; S07 write routes marked `// S07`. `POST .../cancel` is a no-op `{"ok": true}`.
+- `src/files.rs`: Starlette `FileResponse` behaviour on tower-http `ServeFile` (Range, `content-length`, `last-modified`, `accept-ranges`), with Python's `mimetypes` types (`audio/x-wav`; the preview route is explicitly `audio/wav`), Starlette's Content-Disposition rule and an ETag from mtime and size (Starlette md5-hashes the same two; the value differs and is not compared). UI: `spa()` and the `/assets` mount, only files inside the folder, else `index.html` with `Cache-Control: no-cache`; non-GET with a UI is 405 as in Python.
+- `rust/golden/record_http.py` (reuses `seed_python.seed` and `wait_ready`; own port list without 8796/8797; db.py clock pinned before seeding; fixed `Host` on every request; never asks `/api/catalog/library`, which calls PyPI) writes `rust/golden/http.json`: 152 cases in two phases (phase b after soft-deleting `cttrash01` through db.py; the Rust test does the same through the library). Audio is recorded by byte length.
+- `tests/http.rs` (8 tests): `parity_with_python` replays all 152 cases (asserted) on a library seeded by `seed::seed_into` with the same pinned clock, comparing status, body with key order (re-serialised strings), text, byte length, and the headers content-type, content-disposition, cache-control, x-preview-kind, content-range. With the clock pinned on both sides `updated` matches, so it is not skipped. Shape-only (top-level keys) for three answers, listed in `SHAPE_ONLY` with reasons: `/api/engines` (Python lists its MLX engines), `/api/integrations` (paths of this computer), `/api/diagnostics` (pid, start time, source hash). Nothing else is skipped. Also: guards before routing on a missing route, Origin on PUT settings (file written only when allowed), a Range request (bytes equal the file slice), `spa()` (index, client route, asset, three escape attempts, assets mount escape), 501 text and the id check before it, `serve` refusing without `TAKETWO_DATA` and on 8766 (child process; library not created). `parity_catches_key_order` keeps a key-order mutation in the suite.
+- `rust/scripts/contract.sh`; the Rust section of `contract/README.md` names it.
+
+Commands and results:
+- Acceptance 1 (`contract.sh -k ...` 9 filters): `Ran 20 tests`, `OK`, exit 0.
+- `cargo test -p taketwo-engine`: 4 + 8 + 2 passed. `cargo test --workspace`: exit 0, 183 passed (171 before + 12), 0 failed, 1 ignored as before.
+- `record.py && record_http.py && git diff --exit-code -- rust/golden`: exit 0; `record_http.py` run twice before: byte-identical.
+- Mutation check: dropping `review_count` from the list made 2 of 152 cases fail (the list in both phases); undone, green again.
+- Clean checkout: `git archive HEAD rust contract` into a scratch folder, plus the whisper.cpp submodule source (`git -C rust/third_party/whisper.cpp archive HEAD`, commit `868e555`, the one HEAD pins; `git archive` leaves submodules out and taketwo-voice's build.rs needs it), fresh target dir, `TAKETWO_DATA` unset: `cargo test -p taketwo-engine` 4 + 8 + 2 passed. Target was 1.9 GB; scratch folder and target deleted.
+- Full `contract.sh` (report only): `Ran 33 tests`, `FAILED (failures=7, errors=2)`, exit 1. The 9 are exactly the expected ones: Generations `test_creating_for_an_unknown_voice_is_404` and `test_an_empty_script_is_refused_before_anything_is_queued`; ReviewActions all 6; McpTools `test_mark_sounds_fine_round_trip`. All get 501 from the write routes. The other 4 McpTools tests pass against the Rust engine.
+- `df -g .`: 24 GB available at the end (21-23 during the clean build).
+- No model, no push. Ports bound only by `contract.sh` and `record_http.py` (dev ports), each stopped by pid; no dev port listening and no `rust/target` process afterwards.
+
+Not done or limited:
+- Multipart ranges (`bytes=0-1,5-6`): tower-http answers them differently from Starlette's multipart reply; the UI player sends single ranges. No case recorded.
+- CORS preflight with a foreign origin: Starlette answers 400 `Disallowed CORS origin`, tower-http answers without CORS headers. Not recorded; the browser blocks either way.
+- 501 write routes with an int part number (`regenerate`, `accept`, `select-take`) answer 501 without FastAPI's 422 check of the number.
+- `etag` value differs from Starlette's (not compared).
+
+Questions for the lead:
+1. The clean-checkout recipe needs the whisper.cpp submodule source added (above). Fine to keep that as the recipe from now on?
+2. `env.sh` makes a new empty `taketwo-data.*` folder in `$TMPDIR` each time it is sourced; about 48 such empty folders from earlier sessions are there. `contract.sh` removes the one it gets. Should `env.sh` stop creating one when the caller sets `TAKETWO_DATA`?
+
