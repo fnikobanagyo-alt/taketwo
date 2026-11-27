@@ -1,0 +1,15 @@
+[package]
+name = "taketwo"
+description = "TakeTwo window: starts its own taketwo-engine as a child and shows the engine's page (Tauri 2)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+# No model code, no engine library: the engine is a separate program found beside this one at run time.
+[dependencies]
+serde_json = { version = "1", features = ["preserve_order", "float_roundtrip"] }
+tauri = "2"
+taketwo-core = { path = "../taketwo-core" }
+
+[build-dependencies]
+tauri-build = "2"

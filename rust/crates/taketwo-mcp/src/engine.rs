@@ -71,15 +71,18 @@ pub fn read_address(file: &Path) -> Option<String> {
 }
 
 /// Start the engine for this library, detached: its own process group (so a signal to the MCP's group does
-/// not reach it), standard input, output and error all closed (output carries the MCP protocol). It stops by
-/// itself after 15 idle minutes (Franz's decision #12), not with the MCP. A thread reaps it when it exits.
+/// not reach it), standard input and output closed (output carries the MCP protocol), standard error appended
+/// to `<data>/engine.log` (lead decision 10). It stops by itself after 15 idle minutes
+/// (Franz's decision #12), not with the MCP. A thread reaps it when it exits.
 pub fn start_engine(program: &Path, data: &Path) -> std::io::Result<u32> {
+    std::fs::create_dir_all(data)?;
+    let log = std::fs::OpenOptions::new().create(true).append(true).open(data.join("engine.log"))?;
     let mut c = Command::new(program);
     c.args(["serve", "--idle-exit", "900"])
         .env("TAKETWO_DATA", data)
         .stdin(Stdio::null())
         .stdout(Stdio::null())
-        .stderr(Stdio::null());
+        .stderr(log);
     #[cfg(unix)]
     {
         use std::os::unix::process::CommandExt;

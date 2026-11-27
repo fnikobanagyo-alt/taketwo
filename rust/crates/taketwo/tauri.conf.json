@@ -1,0 +1,13 @@
+{
+  "productName": "TakeTwo",
+  "identifier": "app.taketwo.shell",
+  "build": {},
+  "app": {
+    "windows": [],
+    "security": { "csp": null }
+  },
+  "bundle": {
+    "active": false,
+    "icon": ["icons/taketwo.png", "icons/taketwo.ico"]
+  }
+}

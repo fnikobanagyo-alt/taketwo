@@ -8,6 +8,7 @@ members = [
     "crates/taketwo-voice",
     "crates/taketwo-engine",
     "crates/taketwo-mcp",
+    "crates/taketwo",
 ]
 resolver = "3"
 

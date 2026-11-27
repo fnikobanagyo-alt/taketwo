@@ -108,6 +108,7 @@ fn idle_exit_stops_by_itself_and_frees_port_and_lock() {
     assert!(status.success(), "{status:?}");
     assert!(t0.elapsed() >= Duration::from_millis(1500), "not before the idle time");
     assert!(!data.join("engine.json").exists(), "a clean exit removes the address file");
+    assert!(!data.join("engine.lock").exists(), "a clean exit removes the lock file");
     drop(TcpListener::bind(("127.0.0.1", e.port)).expect("the port is free again"));
     drop(EngineLock::acquire(&data.join("engine.lock")).expect("the lock is free again"));
 }

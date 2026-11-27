@@ -161,6 +161,10 @@ pub fn run(args: &[String]) -> Result<(), String> {
     }
     // The isolated address file goes before the lock, so a second engine never sees our stale address.
     let _ = std::fs::remove_file(a.data.join(paths::ADDRESS_FILE));
+    // The lock file goes too (lead decision 10, smoke check e), removed while still held.
+    // shortcut: an engine that opened the file just before this removal can lock the removed copy while a third
+    // creates a new one; acquire uses try_lock, so the window is microseconds. Compare the file id if it matters.
+    let _ = std::fs::remove_file(&lock.path);
     drop(lock);
     served
 }

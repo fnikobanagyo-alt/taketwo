@@ -498,6 +498,7 @@ async fn starts_an_engine_when_none_answers() {
     let cmd = String::from_utf8_lossy(&cmd.stdout);
     assert!(cmd.contains("taketwo-engine serve --idle-exit 900"), "{cmd}");
     assert!(!cmd.contains("--exit-with-stdin"), "{cmd}");
+    assert!(lib.data.join("engine.log").is_file(), "the started engine's standard error goes to engine.log");
     c.cancel().await.unwrap();
     // The engine outlives the MCP that started it (it stops after 15 idle minutes, decision #12).
     tokio::time::sleep(Duration::from_millis(300)).await;
