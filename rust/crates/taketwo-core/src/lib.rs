@@ -9,3 +9,4 @@ pub mod transcript;
 pub mod checks;
 pub mod ending_guard;
 pub mod delivery;
+pub mod render;

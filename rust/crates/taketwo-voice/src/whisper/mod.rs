@@ -11,11 +11,8 @@ use words::{SegmentTimes, Token};
 
 pub use taketwo_core::transcript::{Segment, Transcript, Word};
 
-pub trait Transcriber {
-    /// `audio` is 16 kHz mono f32 (resampling is the caller's job). `language` None = detect.
-    /// `words` = word timestamps. Setting `cancel` stops the run with an error.
-    fn transcribe(&mut self, audio: &[f32], language: Option<&str>, words: bool, cancel: &AtomicBool) -> Result<Transcript, String>;
-}
+/// The trait lives in taketwo-core (step S15) so the render pipeline can call it without linking whisper.cpp.
+pub use taketwo_core::transcript::Transcriber;
 
 /// Which cross-attention heads the DTW uses.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
