@@ -15,7 +15,7 @@ The loop appends one entry per session at the bottom: date, step id, what was bu
 | S07a Engine: write routes that start no job | done |
 | S07b Engine: worker, stub renderer, lifecycle | done (pushed `2e4d02a`, Windows `check` green) |
 | S08 MCP server | done (G4 evidence, judged again after S16 for mp3) |
-| S09 Tauri shell | next (lead decision 10) |
+| S09 Tauri shell | done (G3 pass, pushed `e9ee6a4`, Windows `check` green) |
 | S10 Audio DSP with Python parity vectors | todo |
 | S11 Delivery, ending guard, check decisions | todo |
 | S12 Qwen voice (real model, Metal) | todo |
@@ -35,10 +35,10 @@ The loop appends one entry per session at the bottom: date, step id, what was bu
 |---|---|---|
 | G1 | partial (text, library, captions, review, create logic, the worker and the MCP tools in; audio, checks and the render pipeline still to port) | Lead decision 10 below: `cargo test --workspace` exit 0 at `31b1140`, 233 passed, 0 failed, 1 ignored |
 | G2 | 33 of 33 at `31b1140` (judge again at the end; without `--stub-renderer` the paths that start a job still answer 501 until S16) | Lead decision 10 below: `contract.sh`, `Ran 33 tests`, `OK`, exit 0 |
-| G3 | not run | |
+| G3 | pass at `cbdc9b1` | S09 entry below: `smoke_shell.sh` checks a-i ok, `G3 PASS`, exit 0 (hidden window, page load fired) |
 | G4 | pass for wav, mp3 waits for S16 | S08 entry below: `cargo test -p taketwo-mcp` from no prebuilt engine, exit 0 (27 tests) |
 | G5 | not run | |
-| G6 | early evidence on `2e4d02a`: `check`, `build (cuda)` and `build (cuda,flash-attn)` all success (S08 and later are not pushed yet; judge again on the final commit) | Lead decision 10 below: run 45945950326, all three jobs `success` |
+| G6 | `check` success on `e9ee6a4` (run 45957448669, S09 entry); the two CUDA jobs of that run were still in progress when recorded; earlier all three success on `2e4d02a`; judge again on the final commit | Lead decision 10 below: run 45945950326, all three jobs `success` |
 | G7 | not run | |
 | G8 | pass so far (re-run at the end) | Lead decision 9 below: `g8.sh` `G8 PASS`, exit 0 at `1f5b85b`. Data differences are Franz's own app use, information only |
 
@@ -876,3 +876,54 @@ Left outside this loop until the end: the wiki receipt, the HANDOFFS note, `scri
 ### 2026-11-27, Franz's answers to the lead's S02 questions (relayed by the coordinator)
 - **NuGet: yes.** NuGet is an acceptable source for the Windows build tools.
 - **CUDA exe without a driver: yes.** The CUDA build of the Windows executables must answer `--version` (and refuse other commands with a clear message) on a machine with no NVIDIA driver. Delay-load the driver DLL (nvcuda.dll) so it is loaded only when the GPU is first used. Add a check for this to the Windows job.
+
+### 2026-11-27, S09 Tauri shell (builder, Opus)
+Built, on `rust/taketwo` (commits `63b3980`, `4ffdf58`, `cbdc9b1`, `aeb7c04`; `e9ee6a4` commits the coordinator's relayed S02 answers above unchanged, so the tree was clean for the push):
+- `rust/crates/taketwo` (program `taketwo`), Tauri 2, in the workspace. Dependencies: `tauri`, `tauri-build`, `taketwo-core`, `serde_json`; no plugin, no capabilities (the page uses no IPC), no `frontendDist`, `externalBin` or `beforeBuildCommand`. Identifier `app.taketwo.shell` (not Electron's `studio.voiceforge.app`). Icons `icons/taketwo.png` (sips, 256 px) and `icons/taketwo.ico` (one-off Pillow call from `backend/.venv`), from `desktop/build/icon.png`. `gen/` (Tauri's generated schemas) is ignored by a crate `.gitignore`.
+- Tauri crates pinned in `Cargo.lock` to the set released with `tauri` 2.10.3 (tauri-runtime 2.10.1, tauri-macros 2.5.5, tauri-codegen 2.5.5, tauri-utils 2.8.3, tauri-build 2.5.6): crates.io has newer sibling crates (tauri-runtime 2.12.4, tauri-macros 2.7.6, tauri-utils 2.10.4) that do not compile with tauri 2.10.3, the newest `tauri`. A `cargo update` would pull them again.
+- Shell behaviour as lead decision 10 item 3: `Mode::resolve(TAKETWO_DATA, false)` (live never asked for; without TAKETWO_DATA it prints core's "refusing to start" and exits 2 before anything), `--port` (core's port rules), `--ui` or `TAKETWO_UI` (needs `index.html`, else "Interface not built", exit 2), `--version`. Engine found beside `current_exe()`, started as `serve --exit-with-stdin [--port N] --ui <dir>`, stdin a held pipe, stdout read for the ready line (60 s), stderr appended to `<TAKETWO_DATA>/engine.log`; the shell prints what the engine appended there when it refuses or stops. Then health (raw `TcpStream` GET, 15 s), then one window `TakeTwo` at `/#/home`, `WebviewUrl::External`, incognito, `window.vfDesktop` init script, navigation limited to the engine's origin. Window close / quit: stdin closed, 5 s, kill, exit 0. Engine gone first: reason printed, exit 1. Second shell: `shortcut:` comment, the engine's lock refusal. `TAKETWO_SHELL_HIDDEN=1`: not visible, not focused, and on macOS the Accessory activation policy (no Dock icon). The **hidden** window fired page load; visible-but-unfocused was not needed. `TAKETWO_SHELL_CLOSE_AFTER_MS` closes through `Window::close`. Windows: `CREATE_NO_WINDOW` for the engine child, under `cfg(windows)`.
+- **Engine change (flag for the lead):** check e needs `engine.lock` gone, but the engine kept the file (confirmed: after `serve --idle-exit 1` the folder still held `engine.lock`). `serve.rs` now removes the lock file while still holding it, right after `engine.json`, with a `shortcut:` comment on the tiny unlink race (an engine that opened the file just before the removal could lock the removed copy while a third creates a new one; `try_lock` keeps the window to microseconds). `tests/lifecycle.rs` idle-exit test asserts the file is gone. The stale-lock test and the snapshot tests still pass.
+- MCP: `start_engine` appends the started engine's stderr to `<TAKETWO_DATA>/engine.log` (created if missing); `starts_an_engine_when_none_answers` asserts it exists. The seeder, snapshot tests and one-time copy did not trip over it.
+- `rust/scripts/smoke_shell.sh` (G3). Run 1 uses `TAKETWO_SHELL_CLOSE_AFTER_MS=20000` from its start (a-d take a few seconds; d also asserts the first shell is still alive). Its trap kills a pid only while its command line is still under `rust-taketwo/rust/target/`. It builds the UI with `npm run build -- --configLoader runner`: plain `npm run build` made vite write (and remove) a temp config file in the symlinked main-checkout `node_modules/.vite-temp` (an existing empty folder; only its mtime changed, once, during my first try); with the flag nothing under `node_modules` changed (checked with `find -newer`). It removes a `frontend/dist` it built itself, because `record_http.py`'s Python engine serves `frontend/dist` when it exists and the next acceptance command then changed `rust/golden/http.json` (seen once, file restored with `git checkout`). The home report leaves out Claude Code's own `Caches/claude-cli-nodejs/*/mcp-logs-taketwo` folders (other sessions write them).
+- Windows workflow, `check` job only: `cargo check --workspace --exclude taketwo`, plus a step `cargo check -p taketwo` with `continue-on-error: true` after the release-build step.
+- PLAN.md S09 text updated (lock-file single instance, free dev port, the smoke's checks, `--configLoader runner`).
+
+Acceptance commands (in order, at `cbdc9b1`, then 10 and 13 again after the last commit):
+1. `rm -rf frontend/dist && cargo test --workspace`: exit 0, **236 passed**, 0 failed, 1 ignored.
+2. `cargo build -p taketwo && scripts/smoke_shell.sh | grep -q '^G3 PASS$'`: exit 0. Tail:
+   ```
+   g ok: refusals exit 2 and start nothing
+   a ok: health, page, /assets/index-CnIcYKR7.js 200, fixture narrations listed
+   b ok: engine 86965 is the child of shell 86960
+   c ok: {"page":"loaded","url":"http://127.0.0.1:8790/#/home"}
+   d ok: second shell exited 1 with the engine's refusal; the first still answers
+   e ok: shell exited 0 by itself; engine gone, port free, engine.json and engine.lock gone
+   f ok: after kill -9 of shell 87153, engine 87158 gone and port free
+   h ok: no dev port listening, no rust/target process
+   HOME WRITES:
+   (end of HOME WRITES)
+   G3 PASS
+   ```
+   **HOME WRITES: none** (no entry matching taketwo under `Library/WebKit`, `Library/Caches`, `Library/HTTPStorages` newer than the marker, in all four smoke runs).
+3. `cargo tree -p taketwo -e normal` has no taketwo-voice, taketwo-engine, candle, whisper, qwen: exit 0.
+4. `git archive HEAD rust desktop/build` into a temp folder, `cargo check -p taketwo`: exit 0.
+5. `cargo test -p taketwo-engine --lib serve` ok, no `"--live"`, no `Application Support` / `Library/Logs` in `crates/taketwo/src`: exit 0.
+6. `rm -f target/debug/taketwo-engine && cargo build -p taketwo-mcp && cargo test -p taketwo-mcp`: exit 0.
+7. `rust/scripts/contract.sh`: `Ran 33 tests`, `OK`, exit 0.
+8. `record.py && record_http.py && git diff --exit-code -- rust/golden`: exit 0.
+9. `git diff --exit-code 31b1140 -- contract/... rust/scripts/g6.sh rust/scripts/g8.sh`: exit 0.
+10. Clean tree, no home path in HEAD, `backend/app mcp desktop frontend` same as `main`, `main` at `4448aaa`: exit 1 at first only because of the coordinator's uncommitted PROGRESS.md lines; exit 0 after `e9ee6a4`.
+11. `rust/scripts/g8.sh`: `G8 PASS`, exit 0.
+12. No dev port listening, no `rust/target` process: exit 0.
+13. After `git push origin rust/taketwo` (`2e4d02a..e9ee6a4`, one push round): `rust/scripts/g6.sh check` exit 0, `G6 PASS` for `check` (run 45957448669 on `e9ee6a4`, target `cbdc9b1`, check job 07:17:34-07:25:20 UTC); `origin/main` still `4448aaa`. The two CUDA jobs were `in_progress` when recorded, not waited for. **Windows `cargo check -p taketwo` step: `success`** (step conclusion from `gh run view --json jobs`; the step log was not readable while the run was still going).
+
+Disk: `df -g .` 17 GB free before, 11 GB after (`rust/target` is 21 GB, of which 4.1 GB `debug/incremental`). That is near the 10 GB line: the next step should start with the lead's call on cleaning `target`. No `cargo clean` was run.
+
+Slips, for the record: one `python3 -` call with no script (an empty heredoc mistake while editing; it ran nothing, read and wrote nothing).
+
+Not done (deferred, lead decision 10 item 7): application menu; opening outside links in the browser (they are refused now); **download handling for the audio and subtitle links (a WKWebView does not save `<a download>` by itself: needed for 1.0)**; splash and error page; microphone permission text (needs a bundle); the single-instance plugin; the app bundle (and so `custom-protocol`/release mode); the `live` feature. Also untested here: the shell on Windows beyond `cargo check`, and a visible window by hand.
+
+Questions for the lead:
+1. The engine now deletes `engine.lock` on a clean exit (above). Keep it, or should check e read "lock released" instead and the engine change be reverted?
+2. Keep the Tauri pins in `Cargo.lock` as they are, or pin them in `crates/taketwo/Cargo.toml` (`=2.10.1` etc.) so a `cargo update` cannot break the build?
+3. Disk is at 11 GB free: may the next builder delete `rust/target/debug/incremental` or run `cargo clean`?
