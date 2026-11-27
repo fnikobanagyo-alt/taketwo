@@ -9,6 +9,7 @@ use taketwo_core::library::Doc;
 use taketwo_core::reference::{self as rf, Models, Utterance};
 use taketwo_core::render::files::read_npy;
 use taketwo_core::render::models::fake::Fake;
+use taketwo_core::render::models::Restorer;
 use taketwo_core::render::RenderError;
 use taketwo_core::transcript::{Segment, Transcript, Word};
 
@@ -120,6 +121,11 @@ fn upload(dir: &Path, a: &[f32]) -> PathBuf {
 
 /// analyze over the fake: returns (analysis, out dir, the fake).
 fn run_analyze(dir: &Path, a: &[f32], tr: Transcript, embs: Vec<Vec<f32>>, studio: bool) -> (Result<Doc, RenderError>, PathBuf, Vec<(f64, String)>) {
+    run_analyze_with(dir, a, tr, embs, studio, None)
+}
+
+fn run_analyze_with(dir: &Path, a: &[f32], tr: Transcript, embs: Vec<Vec<f32>>, studio: bool, restorer: Option<&mut dyn Restorer>)
+                    -> (Result<Doc, RenderError>, PathBuf, Vec<(f64, String)>) {
     let src = upload(dir, a);
     let out = dir.join("voice");
     let fake = Fake::new(vec![], vec![tr], embs, 0.0, 0.0);
@@ -127,7 +133,7 @@ fn run_analyze(dir: &Path, a: &[f32], tr: Transcript, embs: Vec<Vec<f32>>, studi
     let cancel = AtomicBool::new(false);
     let mut seen = Vec::new();
     let mut progress = |p: f64, m: &str| seen.push((p, m.to_string()));
-    let mut m = Models { transcriber: &mut t, encoder: &mut e, cancel: &cancel };
+    let mut m = Models { transcriber: &mut t, encoder: &mut e, restorer: restorer.map(|r| &mut *r as &mut dyn Restorer), cancel: &cancel };
     let r = rf::analyze(&src, &out, Some("en"), false, 12.0, &mut progress, studio, &mut m);
     (r, out, seen)
 }
@@ -294,7 +300,66 @@ fn a_studio_request_runs_the_plain_path_with_a_tip() {
     let an = r.unwrap();
     assert_eq!((an["studio"].clone(), an["room_echo_after_db"].clone()), (json!(false), Value::Null));
     assert_eq!(an["tips"][0], rf::STUDIO_FALLBACK_TIP);
-    assert!(!rf::STUDIO_RESTORATION);
+    // a restorer whose files are missing: the same plain path, and it is never called
+    let tmp = tempfile::tempdir().unwrap();
+    let mut gone = Sidonish { calls: 0, available: false, fail: false };
+    let (r, _, _) = run_analyze_with(tmp.path(), &a, transcript(&times), vec![emb(1.0, 0.0); 8], true, Some(&mut gone));
+    let an = r.unwrap();
+    assert_eq!((an["studio"].clone(), gone.calls), (json!(false), 0));
+    assert_eq!(an["tips"][0], rf::STUDIO_FALLBACK_TIP);
+}
+
+/// A stand-in for Sidon: 16 kHz in, the same audio at 48 kHz out (each sample three times).
+struct Sidonish {
+    calls: usize,
+    available: bool,
+    fail: bool,
+}
+
+impl Restorer for Sidonish {
+    fn restore_segment(&mut self, x16: &[f32]) -> Result<Vec<f32>, String> {
+        self.calls += 1;
+        if self.fail {
+            return Err("RuntimeError: the predictor failed".into());
+        }
+        Ok(x16.iter().flat_map(|v| [*v; 3]).collect())
+    }
+    fn available(&self) -> bool {
+        self.available
+    }
+}
+
+#[test]
+fn a_studio_request_with_a_restorer_runs_the_studio_branch() {
+    if !have_ffmpeg("a_studio_request_with_a_restorer_runs_the_studio_branch") {
+        return;
+    }
+    let tmp = tempfile::tempdir().unwrap();
+    let (a, times) = speech(8);
+    let mut r = Sidonish { calls: 0, available: true, fail: false };
+    let (res, out, seen) = run_analyze_with(tmp.path(), &a, transcript(&times), vec![emb(1.0, 0.0); 8], true, Some(&mut r));
+    let an = res.unwrap();
+    assert_eq!(r.calls, 1, "a short sample is one segment");
+    assert_eq!((an["studio"].clone(), an["denoised"].clone()), (json!(true), json!(false)));
+    assert!(an["room_echo_after_db"].is_f64(), "{:?}", an["room_echo_after_db"]);
+    assert!(!an["tips"].as_array().unwrap().iter().any(|t| t == rf::STUDIO_FALLBACK_TIP));
+    let (y, sr) = audio::load(&out.join("studio.wav"), None).unwrap();
+    assert_eq!(sr, 48000);
+    assert!(!y.is_empty());
+    let msg = "Restoring to studio quality: removing echo, noise and mic colour";
+    let steps: Vec<f64> = seen.iter().filter(|(_, m)| m == msg).map(|(p, _)| *p).collect();
+    assert_eq!(steps, vec![0.08], "one segment reports no window progress");
+    let at = seen.iter().position(|(_, m)| m == msg).unwrap();
+    assert_eq!(seen[at - 1].1, "Decoding audio");
+    assert!(!seen.iter().any(|(_, m)| m == "Reducing background noise"));
+    // a restorer that fails on present files is an error, not a silent fallback
+    let tmp = tempfile::tempdir().unwrap();
+    let mut bad = Sidonish { calls: 0, available: true, fail: true };
+    let (res, _, _) = run_analyze_with(tmp.path(), &a, transcript(&times), vec![emb(1.0, 0.0); 8], true, Some(&mut bad));
+    match res {
+        Err(RenderError::Other(m)) => assert!(m.contains("the predictor failed"), "{m}"),
+        other => panic!("{other:?}"),
+    }
 }
 
 #[test]
@@ -344,7 +409,7 @@ fn refresh_clips_recuts_or_keeps_each_clip() {
     let fake = Fake::new(vec![], heard, vec![], 0.0, 0.0);
     let (mut t, mut e) = (fake.clone(), fake.clone());
     let cancel = AtomicBool::new(false);
-    let mut m = Models { transcriber: &mut t, encoder: &mut e, cancel: &cancel };
+    let mut m = Models { transcriber: &mut t, encoder: &mut e, restorer: None, cancel: &cancel };
     let rep = rf::refresh_clips(&out, &mut profile, &mut m).unwrap();
     assert_eq!(rep["updated"], json!([0]));
     assert!(rep["kept"].as_array().unwrap().contains(&json!(1)));

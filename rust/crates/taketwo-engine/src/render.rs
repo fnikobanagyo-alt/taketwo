@@ -247,7 +247,7 @@ impl Renderer for StubRenderer {
     }
     fn voice_tools(&self, cancel: Cancel, f: &mut dyn FnMut(&mut reference::Models) -> Result<(), RenderError>) -> Result<(), JobError> {
         let (mut t, mut e) = (StubModels, StubModels);
-        bridged(cancel, |flag| f(&mut reference::Models { transcriber: &mut t, encoder: &mut e, cancel: flag })).or_else(job_error)
+        bridged(cancel, |flag| f(&mut reference::Models { transcriber: &mut t, encoder: &mut e, restorer: None, cancel: flag })).or_else(job_error)
     }
     fn preview(&self, lib: &Library, pid: &str, cancel: Cancel) -> Result<Preview, JobError> {
         let downloaded = self.can_preview();

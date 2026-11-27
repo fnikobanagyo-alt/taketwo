@@ -1,6 +1,7 @@
 //! The model seams the render pipeline calls (step S15; S12, S13 and S14 implement them): `Voice`
 //! (engines.synthesize plus that call's engines.synthesis_report), `Transcriber` (ml.transcribe, moved here from
 //! taketwo-voice) and `SpeakerEncoder` (ml.speaker_embedding), with `cosine` as in ml.py.
+//! `Restorer` is `studio._restore_segment` (S18).
 //! `fake` replays recorded outputs in call order and records every call, for tests without a model.
 
 use crate::library::Doc;
@@ -38,6 +39,14 @@ pub trait Voice {
 pub trait SpeakerEncoder {
     /// `ml.speaker_embedding(audio, sr)`.
     fn embedding(&mut self, audio: &[f32], sr: u32) -> Result<Vec<f32>, String>;
+}
+
+/// Studio restoration (Sidon, step S18): `studio._restore_segment` behind a trait (the ONNX sessions in taketwo-voice).
+pub trait Restorer {
+    /// `_restore_segment(x16)`: one 16 kHz mono segment in, 48 kHz samples out (at most `3 * x16.len()`).
+    fn restore_segment(&mut self, x16: &[f32]) -> Result<Vec<f32>, String>;
+    /// Whether the model files are there; without them a studio request runs the plain path.
+    fn available(&self) -> bool;
 }
 
 /// `ml.cosine(a, b)` on float32 vectors: numpy keeps the dot product, the norms, their product and the `+ 1e-9`

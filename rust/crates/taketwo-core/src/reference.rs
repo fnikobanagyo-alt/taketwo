@@ -2,14 +2,14 @@
 //! scores its utterances, builds the voice fingerprint and cuts the reference clips; `refresh_clips` re-cuts a
 //! saved voice's clips inside real pauses. The models come in through the `Transcriber` and `SpeakerEncoder`
 //! traits (Whisper and the voice encoder in the engine, the scripted fake in tests).
-//! Studio restoration (Sidon, S18) is not ported: `STUDIO_RESTORATION` decides, and a studio request runs the
-//! plain path with a first tip saying so.
+//! Studio restoration (Sidon, S18) comes in through the optional `Restorer`: a studio request without one (or
+//! without its model files) runs the plain path with a first tip saying so.
 
 use crate::audio::{self, np::{mean_f64, percentile_f32, py_slice}, noisereduce, PyError};
 use crate::checks::py_round;
 use crate::delivery::{self, Prosody};
 use crate::library::Doc;
-use crate::render::models::{self, SpeakerEncoder, Transcriber};
+use crate::render::models::{self, Restorer, SpeakerEncoder, Transcriber};
 use crate::render::{files, narration, RenderError, CANCELLED};
 use crate::text::{py, score};
 use crate::transcript::{Segment, Transcript};
@@ -20,10 +20,11 @@ use std::sync::atomic::{AtomicBool, Ordering};
 /// config.py `MAX_REFERENCE_SECONDS` and `WORK_SR`.
 pub const MAX_REFERENCE_SECONDS: f64 = 300.0;
 pub const WORK_SR: u32 = 24000;
-/// Studio restoration (Sidon) is ported: S18 flips this, and `analyze` then needs its studio branch.
-pub const STUDIO_RESTORATION: bool = false;
-/// The first tip when a studio request ran the plain path.
-pub const STUDIO_FALLBACK_TIP: &str = "Studio restoration is not in TakeTwo 1.0 yet, so the plain clean-up was used (high-pass, noise reduction when needed, loudness).";
+/// The first tip when a studio request ran the plain path (no restorer, or the Sidon files are missing; Python
+/// would download them here, TakeTwo may not).
+pub const STUDIO_FALLBACK_TIP: &str = "Studio restoration needs the Sidon model files (sidon-predictor.onnx and sidon-vocoder.onnx in the models folder under sidon), which were not found, so the plain clean-up was used (high-pass, noise reduction when needed, loudness).";
+/// The progress text of the studio branch.
+const STUDIO_MSG: &str = "Restoring to studio quality: removing echo, noise and mic colour";
 
 pub type Progress<'a> = &'a mut dyn FnMut(f64, &str);
 
@@ -388,6 +389,8 @@ impl Utterance {
 pub struct Models<'a> {
     pub transcriber: &'a mut dyn Transcriber,
     pub encoder: &'a mut dyn SpeakerEncoder,
+    /// Sidon; `None` (the stub renderer, tests) means a studio request runs the plain path.
+    pub restorer: Option<&'a mut dyn Restorer>,
     pub cancel: &'a AtomicBool,
 }
 
@@ -397,7 +400,7 @@ pub struct Models<'a> {
 pub fn analyze(src: &Path, out_dir: &Path, language: Option<&str>, denoise: bool, target_window: f64, progress: Progress, studio_mode: bool,
                m: &mut Models) -> Result<Doc, RenderError> {
     let studio_asked = studio_mode;
-    let studio_mode = studio_mode && STUDIO_RESTORATION;
+    let studio_mode = studio_mode && m.restorer.as_ref().is_some_and(|r| r.available());
     std::fs::create_dir_all(out_dir).map_err(|e| format!("{}: {e}", out_dir.display()))?;
     progress(0.05, "Decoding audio");
     let clean_path = out_dir.join("clean.wav");
@@ -408,12 +411,18 @@ pub fn analyze(src: &Path, out_dir: &Path, language: Option<&str>, denoise: bool
         return Err(RenderError::Value("Sample is too short. Upload at least 3 seconds (30 s - 5 min recommended).".into()));
     }
     let echo_before = room_echo(&a, sr)?;
-    let echo_after: Option<f64> = None;
+    let mut echo_after: Option<f64> = None;
     let snr_before = audio::estimate_snr(&audio::highpass(&a, sr, 70.0).map_err(py_err)?, sr);
     if studio_mode {
-        return Err(RenderError::Other("Studio restoration (Sidon) is not ported yet.".into())); // S18
+        progress(0.08, STUDIO_MSG);
+        let r = m.restorer.as_deref_mut().expect("checked above");
+        let y = crate::studio::restore(&a, sr, r, &mut |p| progress(0.08 + 0.1 * p, STUDIO_MSG), m.cancel)?;
+        let studio_path = out_dir.join("studio.wav");
+        audio::save(&studio_path, &y, crate::studio::SR_OUT).map_err(|e| format!("{}: {e}", studio_path.display()))?;
+        a = audio::resample(&y, crate::studio::SR_OUT, sr);
+        echo_after = Some(room_echo(&a, sr)?);
     }
-    let mic_bands = delivery::ltas(&a, sr); // tonal fingerprint the output should match
+    let mic_bands = delivery::ltas(&a, sr); // tonal fingerprint the output should match (studio or original mic)
     a = audio::highpass(&a, sr, 70.0).map_err(py_err)?;
     let denoised = !studio_mode && (denoise || snr_before < 25.0);
     if denoised {

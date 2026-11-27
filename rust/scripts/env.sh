@@ -25,6 +25,15 @@ if [ -n "$_tt_ve" ] && [ ! -e "$TAKETWO_MODELS/voice-encoder/ve.safetensors" ]; 
     ln -s "$_tt_ve" "$TAKETWO_MODELS/voice-encoder/ve.safetensors"
 fi
 
+# Studio restoration (S18): the two Sidon fp16 ONNX files, read in place from the Hugging Face cache, the same way.
+for _tt_f in sidon-predictor.onnx sidon-vocoder.onnx; do
+    _tt_sid="$(find "$HOME/.cache/huggingface/hub/models--soniqo--Sidon-ONNX/snapshots" -path "*/fp16/$_tt_f" 2>/dev/null | head -1)"
+    if [ -n "$_tt_sid" ] && [ ! -e "$TAKETWO_MODELS/sidon/$_tt_f" ]; then
+        mkdir -p "$TAKETWO_MODELS/sidon"
+        ln -s "$_tt_sid" "$TAKETWO_MODELS/sidon/$_tt_f"
+    fi
+done
+
 # Keep the caller's TAKETWO_DATA when it names an existing folder; otherwise make a new temporary one.
 if [ -z "${TAKETWO_DATA:-}" ] || [ ! -d "$TAKETWO_DATA" ]; then
     _tt_tmp="${TMPDIR:-/tmp}"
@@ -32,5 +41,5 @@ if [ -z "${TAKETWO_DATA:-}" ] || [ ! -d "$TAKETWO_DATA" ]; then
 fi
 export TAKETWO_DATA
 
-unset _tt_rust _tt_qwen _tt_tmp _tt_ve
+unset _tt_rust _tt_qwen _tt_tmp _tt_ve _tt_f _tt_sid
 echo "TakeTwo dev env: isolated mode, TAKETWO_DATA=$TAKETWO_DATA, TAKETWO_MODELS=$TAKETWO_MODELS"
