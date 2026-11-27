@@ -144,6 +144,47 @@ pub fn py_slice(len: usize, lo: i64, hi: i64) -> std::ops::Range<usize> {
     lo..hi.max(lo)
 }
 
+/// `np.convolve(x, k, mode="same")` in float64: the output has the LONGER operand's length, centred in the full
+/// convolution at `(min(len) - 1) // 2`. Direct sums, as numpy does (an FFT would not keep exact zeros).
+pub fn convolve_same(x: &[f64], k: &[f64]) -> Vec<f64> {
+    let (a, v) = if k.len() > x.len() { (k, x) } else { (x, k) };
+    let (n, m) = (a.len(), v.len());
+    if m == 0 {
+        return Vec::new();
+    }
+    let start = (m - 1) / 2;
+    (start..start + n)
+        .map(|i| {
+            // full[i] = sum over j of a[i - j] * v[j]
+            let lo = (i + 1).saturating_sub(n);
+            let hi = i.min(m - 1);
+            (lo..=hi).map(|j| a[i - j] * v[j]).sum()
+        })
+        .collect()
+}
+
+/// `np.interp(x, xp, fp)` for increasing `xp` (numpy's formula: `slope * (x - xp[j]) + fp[j]`, exact at a knot,
+/// the end values outside the range).
+pub fn interp(x: &[f64], xp: &[f64], fp: &[f64]) -> Vec<f64> {
+    let last = xp.len() - 1;
+    x.iter()
+        .map(|&v| {
+            if v < xp[0] {
+                return fp[0];
+            }
+            if v >= xp[last] {
+                return fp[last];
+            }
+            let j = xp.partition_point(|&p| p <= v) - 1;
+            if xp[j] == v {
+                return fp[j];
+            }
+            let slope = (fp[j + 1] - fp[j]) / (xp[j + 1] - xp[j]);
+            slope * (v - xp[j]) + fp[j]
+        })
+        .collect()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -160,5 +201,9 @@ mod tests {
         assert_eq!(hanning(3), vec![0.0, 1.0, 0.0]);
         let v: Vec<f32> = (0..1000).map(|i| i as f32 * 0.1).collect();
         assert!((sum_f32(&v) - 49950.0).abs() < 0.1);
+        // np.convolve([1, 2, 3], [0, 1, 0.5], "same") == [1, 2.5, 4]; [1, 2] with [1, 1, 1, 1] == [1, 3, 3, 3] (numpy 2.4.6)
+        assert_eq!(convolve_same(&[1.0, 2.0, 3.0], &[0.0, 1.0, 0.5]), vec![1.0, 2.5, 4.0]);
+        assert_eq!(convolve_same(&[1.0, 2.0], &[1.0; 4]), vec![1.0, 3.0, 3.0, 3.0]);
+        assert_eq!(interp(&[-1.0, 0.0, 0.5, 1.0, 2.0], &[0.0, 1.0], &[10.0, 20.0]), vec![10.0, 10.0, 15.0, 20.0, 20.0]);
     }
 }

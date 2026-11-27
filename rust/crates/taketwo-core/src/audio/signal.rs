@@ -122,3 +122,69 @@ pub fn resample_poly(x: &[f32], up: u64, down: u64) -> Vec<f32> {
         })
         .collect()
 }
+
+/// `scipy.signal.firwin2(numtaps, freq, gain)` with scipy's defaults (fs = 2 so Nyquist is 1, Hamming window,
+/// `nfreqs = 1 + 2 ** ceil(log2(numtaps))`, linear interpolation onto that grid, the linear-phase shift, irfft).
+/// Type I only (odd `numtaps`, symmetric), the one `delivery.mic_match` uses.
+/// shortcut: no repeated-frequency nudging (`mic_match` passes `np.unique` points); add it if a caller repeats one.
+pub fn firwin2(numtaps: usize, freq: &[f64], gain: &[f64]) -> Vec<f64> {
+    assert!(numtaps % 2 == 1, "type I filter only");
+    assert!(freq.len() == gain.len() && freq[0] == 0.0 && freq[freq.len() - 1] == 1.0, "freq must run 0 to 1");
+    assert!(freq.windows(2).all(|w| w[1] > w[0]), "freq must be increasing");
+    let nfreqs = 1 + (1usize << (numtaps as f64).log2().ceil() as u32);
+    let step = 1.0 / (nfreqs - 1) as f64;
+    let mut x: Vec<f64> = (0..nfreqs).map(|i| i as f64 * step).collect();
+    x[nfreqs - 1] = 1.0;
+    let fx = super::np::interp(&x, freq, gain);
+    let n = 2 * (nfreqs - 1);
+    let fft = realfft::RealFftPlanner::<f64>::new().plan_fft_inverse(n);
+    let mut spec = fft.make_input_vec();
+    let phase = -((numtaps - 1) as f64) / 2.0 * PI;
+    for ((s, &g), &xi) in spec.iter_mut().zip(&fx).zip(&x) {
+        let th = phase * xi;
+        *s = realfft::num_complex::Complex::new(g * th.cos(), g * th.sin());
+    }
+    // irfft reads only the real part of the first and last bins
+    spec[0].im = 0.0;
+    spec[nfreqs - 1].im = 0.0;
+    let mut out = fft.make_output_vec();
+    fft.process(&mut spec, &mut out).expect("fft sizes");
+    let m = numtaps as f64 - 1.0;
+    (0..numtaps)
+        .map(|i| {
+            // general_hamming: 0.54 + 0.46 cos(fac), fac = linspace(-pi, pi, numtaps)
+            let fac = if i == numtaps - 1 { PI } else { i as f64 * (2.0 * PI / m) - PI };
+            out[i] / n as f64 * (0.54 + 0.46 * fac.cos())
+        })
+        .collect()
+}
+
+/// `scipy.signal.fftconvolve(a, k, mode="same")`: the full convolution by FFT (float64), cut to `len(a)`
+/// starting at `(len(k) - 1) // 2`. scipy transforms float32 input in single precision; float64 here is closer
+/// to the exact sum and well inside the 1e-4 sample tolerance.
+pub fn fftconvolve_same(a: &[f32], k: &[f64]) -> Vec<f64> {
+    if a.is_empty() || k.is_empty() {
+        return vec![0.0; a.len()];
+    }
+    let full = a.len() + k.len() - 1;
+    let n = full.next_power_of_two();
+    let mut planner = realfft::RealFftPlanner::<f64>::new();
+    let (fwd, inv) = (planner.plan_fft_forward(n), planner.plan_fft_inverse(n));
+    let spectrum = |v: &mut Vec<f64>| {
+        let mut s = fwd.make_output_vec();
+        fwd.process(v, &mut s).expect("fft sizes");
+        s
+    };
+    let mut pa = vec![0.0; n];
+    pa.iter_mut().zip(a).for_each(|(p, &x)| *p = x as f64);
+    let mut pk = vec![0.0; n];
+    pk[..k.len()].copy_from_slice(k);
+    let (sa, sk) = (spectrum(&mut pa), spectrum(&mut pk));
+    let mut prod: Vec<_> = sa.iter().zip(&sk).map(|(x, y)| x * y).collect();
+    prod[0].im = 0.0;
+    prod[n / 2].im = 0.0;
+    let mut out = inv.make_output_vec();
+    inv.process(&mut prod, &mut out).expect("fft sizes");
+    let start = (k.len() - 1) / 2;
+    out[start..start + a.len()].iter().map(|v| v / n as f64).collect()
+}

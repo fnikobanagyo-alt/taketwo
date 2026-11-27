@@ -1,9 +1,11 @@
 //! The parts of backend/app/pipeline.py that start no render (step S07a): the new narration document
 //! (`create_generation`, without the save) and the check of a re-spoken part's text (`clean_replacement`).
+//! Step S11b adds the final-mix edge check `processed_edge_issues` (`_processed_edge_issues`, used by `final_scan`).
 
 use crate::library::Doc;
 use crate::text::{self, Pronunciation, py};
 use serde_json::{Value, json};
+use std::collections::BTreeSet;
 
 /// delivery.py DEFAULT_VOICE_SETTINGS, same keys and order.
 pub fn default_voice_settings() -> Doc {
@@ -149,6 +151,46 @@ pub fn thousands(n: i64) -> String {
         out.push(c);
     }
     if n < 0 { format!("-{out}") } else { out }
+}
+
+/// `_processed_edge_issues(reference, processed, sr)`: speech missing at the edges of a processed part. Compares
+/// 10 ms frame levels; output within 5 frames counts as present; only a loss of 4 frames or more within 40 frames
+/// of the first or last expected frame is flagged. Same timeline and rate on both sides.
+pub fn processed_edge_issues(reference: &[f32], processed: &[f32], sr: u32) -> BTreeSet<&'static str> {
+    let peak = |a: &[f32]| a.iter().fold(0.0f32, |m, x| m.max(x.abs()));
+    if reference.is_empty() || peak(reference) < 1e-5f32 {
+        return BTreeSet::new();
+    }
+    if processed.is_empty() || peak(processed) < 1e-5f32 {
+        return BTreeSet::from(["processed_audio_missing"]);
+    }
+    let mut padded = processed[..processed.len().min(reference.len())].to_vec();
+    padded.resize(reference.len(), 0.0);
+    let rf = crate::audio::frame_db(reference, sr, 10);
+    let got = crate::audio::frame_db(&padded, sr, 10);
+    let fmax = |v: &[f32]| v.iter().copied().fold(f32::NEG_INFINITY, f32::max);
+    let (ref_top, got_top) = (fmax(&rf), fmax(&got));
+    let nearby: Vec<f32> = (0..got.len())
+        .map(|i| {
+            let lo = i as i64 - 5;
+            let w = &got[lo.max(0) as usize..(i + 6).min(got.len())];
+            // frames past either end are the -120 pad
+            if lo < 0 || i + 6 > got.len() { fmax(w).max(-120.0) } else { fmax(w) }
+        })
+        .collect();
+    let expected: Vec<bool> = rf.iter().map(|&d| d > ref_top - 35.0f32).collect();
+    let live: Vec<i64> = (0..expected.len()).filter(|&i| expected[i]).map(|i| i as i64).collect();
+    let mut run = 0;
+    for i in 0..expected.len().min(nearby.len()) {
+        let missing = expected[i] && nearby[i] < got_top - 60.0f32;
+        let i = i as i64;
+        let at_edge = !live.is_empty() && (i <= live[0] + 40 || i >= live[live.len() - 1] - 40);
+        run = if at_edge && missing { run + 1 } else { 0 };
+        if run >= 4 {
+            return BTreeSet::from(["processed_audio_cut_off"]);
+        }
+    }
+    BTreeSet::new()
 }
 
 #[cfg(test)]

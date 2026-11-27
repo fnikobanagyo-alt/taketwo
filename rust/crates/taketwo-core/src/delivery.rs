@@ -1,13 +1,16 @@
 //! The pitch measures and voice-settings mapping of backend/app/delivery.py (step S11a): `prosody` with a hand
 //! port of librosa 0.11.0 `yin`, `expressiveness`, `DEFAULT_VOICE_SETTINGS` (one definition:
-//! `pipeline::default_voice_settings`), `resolve` and `pick_variant`. `ltas`, `mic_match` and `backfill` are later steps.
-//! Parity vectors: rust/golden/record_checks.py -> rust/golden/checks.json, tests/delivery_golden.rs.
+//! `pipeline::default_voice_settings`), `resolve` and `pick_variant`. Step S11b adds the mic match: `ltas`,
+//! `mic_match` and the NaN-tolerant `mic.json` reader. `backfill` is a later step.
+//! Parity vectors: rust/golden/record_checks.py -> rust/golden/checks.json, tests/delivery_golden.rs;
+//! rust/golden/record_mastering.py -> rust/golden/mastering.json, tests/mastering_golden.rs.
 
 use crate::audio::{self, np};
 use crate::checks::py_round;
 use crate::library::Doc;
 use crate::text::py;
 use serde_json::Value;
+use std::path::Path;
 
 pub use crate::pipeline::default_voice_settings;
 
@@ -237,4 +240,118 @@ pub fn pick_variant(profile: &Doc, style: f64) -> Result<Value, String> {
         }
     }
     target.get("index").cloned().ok_or_else(|| "KeyError: 'index'".into())
+}
+
+// ---------------------------------------------------------------- mic match
+
+/// `BANDS`: 24 third-octave centres, 80 Hz to about 16 kHz (`80 * 2 ** (i / 3)`).
+pub fn bands() -> Vec<f64> {
+    (0..24).map(|i| 80.0 * 2f64.powf(i as f64 / 3.0)).collect()
+}
+
+/// `ltas(a, sr)`: long-term average spectrum of the louder 2048-sample frames in the 24 bands (dB). Empty under
+/// 8192 samples; NaN for a band with no FFT bin or at or above 0.92 x Nyquist.
+pub fn ltas(a: &[f32], sr: u32) -> Vec<f64> {
+    let n = 2048;
+    if a.len() < n * 4 {
+        return Vec::new();
+    }
+    let frames: Vec<&[f32]> = a[..a.len() / n * n].chunks_exact(n).collect();
+    let lvl: Vec<f32> = frames
+        .iter()
+        .map(|f| {
+            let sq: Vec<f32> = f.iter().map(|x| x * x).collect();
+            10.0f32 * (np::mean_f32(&sq) + 1e-12f32).log10()
+        })
+        .collect();
+    let line = np::percentile_f32(&lvl, 90.0).expect("frames") - 20.0f32;
+    let win = np::hanning(n);
+    let fft = realfft::RealFftPlanner::<f64>::new().plan_fft_forward(n);
+    let (mut buf, mut spec) = (fft.make_input_vec(), fft.make_output_vec());
+    let mut power = vec![0.0f64; n / 2 + 1];
+    let mut count = 0usize;
+    for (f, _) in frames.iter().zip(&lvl).filter(|(_, l)| **l > line) {
+        for ((b, &x), w) in buf.iter_mut().zip(*f).zip(&win) {
+            *b = x as f64 * w;
+        }
+        fft.process(&mut buf, &mut spec).expect("fft sizes");
+        // np.mean(axis=0) over rows adds them one after another
+        for (p, c) in power.iter_mut().zip(&spec) {
+            *p += c.re.hypot(c.im).powi(2);
+        }
+        count += 1;
+    }
+    power.iter_mut().for_each(|p| *p /= count as f64);
+    let val = 1.0 / (n as f64 * (1.0 / sr as f64));
+    let freqs: Vec<f64> = (0..=n / 2).map(|i| i as f64 * val).collect();
+    let k = 2f64.powf(1.0 / 6.0);
+    bands()
+        .into_iter()
+        .map(|f| {
+            let sel: Vec<f64> =
+                freqs.iter().zip(&power).filter(|(q, _)| **q >= f / k && **q < f * k).map(|(_, p)| *p).collect();
+            if !sel.is_empty() && f < sr as f64 / 2.0 * 0.92 {
+                10.0 * (np::mean_f64(&sel) + 1e-12).log10()
+            } else {
+                f64::NAN
+            }
+        })
+        .collect()
+}
+
+/// `mic_match(a, sr, ref_bands, max_db)` (Python default max_db = 6.0): a level-neutral, 3-band-smoothed EQ curve
+/// (capped at +/- max_db) from the output's to the reference's `ltas`, applied as a 1025-tap linear-phase FIR.
+/// Returns the filtered audio and the curve rounded to 0.1 dB; the input and an empty curve when the clip is under
+/// 8192 samples, the band counts differ, or fewer than 6 bands are finite on both sides.
+pub fn mic_match(a: &[f32], sr: u32, ref_bands: &[f64], max_db: f64) -> (Vec<f32>, Vec<f64>) {
+    let out_bands = ltas(a, sr);
+    if out_bands.is_empty() || ref_bands.len() != out_bands.len() {
+        return (a.to_vec(), Vec::new());
+    }
+    let mut diff: Vec<f64> = ref_bands.iter().zip(&out_bands).map(|(r, g)| r - g).collect();
+    let mut ok: Vec<f64> = diff.iter().copied().filter(|d| d.is_finite()).collect();
+    if ok.len() < 6 {
+        return (a.to_vec(), Vec::new());
+    }
+    ok.sort_by(|x, y| x.partial_cmp(y).expect("finite"));
+    let h = ok.len() / 2;
+    let median = if ok.len() % 2 == 1 { ok[h] } else { (ok[h - 1] + ok[h]) / 2.0 };
+    diff.iter_mut().filter(|d| d.is_finite()).for_each(|d| *d -= median);
+    let sm: Vec<f64> = (0..diff.len())
+        .map(|i| {
+            let w: Vec<f64> = diff[i.saturating_sub(1)..(i + 2).min(diff.len())].iter().copied().filter(|d| d.is_finite()).collect();
+            let v = if w.is_empty() { 0.0 } else { w.iter().sum::<f64>() / w.len() as f64 };
+            v.clamp(-max_db, max_db)
+        })
+        .collect();
+    let nyq = sr as f64 / 2.0;
+    // Points below 0.999 x Nyquist are already increasing and distinct, so np.unique keeps them all in order.
+    let mut fpts = vec![0.0];
+    let mut gains_db = vec![sm[0]];
+    for (f, g) in bands().iter().zip(&sm) {
+        if *f < nyq * 0.999 {
+            fpts.push(f.min(nyq * 0.999) / nyq);
+            gains_db.push(*g);
+        }
+    }
+    fpts.push(1.0);
+    gains_db.push(0.0);
+    let gains: Vec<f64> = gains_db.iter().map(|g| 10f64.powf(g / 20.0)).collect();
+    let fir = audio::signal::firwin2(1025, &fpts, &gains);
+    let out = audio::signal::fftconvolve_same(a, &fir).into_iter().map(|v| v as f32).collect();
+    (out, sm.iter().map(|g| py_round(*g, 1)).collect())
+}
+
+/// The `bands` of a `profiles/<id>/mic.json`. Python writes it with plain `json.dumps`, so missing bands are bare
+/// `NaN` (not JSON): this reads the list token by token (`NaN`, `Infinity`, `-Infinity` and numbers).
+pub fn read_mic_bands(path: &Path) -> Result<Vec<f64>, String> {
+    let text = std::fs::read_to_string(path).map_err(|e| format!("{}: {e}", path.display()))?;
+    let key = text.find("\"bands\"").ok_or("mic.json has no bands")?;
+    let open = key + text[key..].find('[').ok_or("bands is not a list")?;
+    let close = open + text[open..].find(']').ok_or("bands list is not closed")?;
+    let body = text[open + 1..close].trim();
+    if body.is_empty() {
+        return Ok(Vec::new());
+    }
+    body.split(',').map(|t| t.trim().parse::<f64>().map_err(|e| format!("mic.json band {t:?}: {e}"))).collect()
 }
