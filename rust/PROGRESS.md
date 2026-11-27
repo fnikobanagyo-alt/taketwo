@@ -33,7 +33,7 @@ The loop appends one entry per session at the bottom: date, step id, what was bu
 
 | Gate | Status | Evidence |
 |---|---|---|
-| G1 | partial (text, library, captions, review, create logic, the worker, the MCP tools and Whisper word grouping in; audio, checks and the render pipeline still to port) | Lead decision 10 below (233 passed at `31b1140`); S13 entry: `cargo test --workspace` exit 0 at `f4e5664` |
+| G1 | partial (text, library, captions, review, create logic, the worker, the MCP tools and Whisper word grouping in; audio, checks and the render pipeline still to port) | Lead decision 10 below (233 passed at `31b1140`); the S13 builder's acceptance run reported `cargo test --workspace` exit 0 at `f4e5664` (not rerun by the lead) |
 | G2 | 33 of 33 at `31b1140` (judge again at the end; without `--stub-renderer` the paths that start a job still answer 501 until S16) | Lead decision 10 below: `contract.sh`, `Ran 33 tests`, `OK`, exit 0 |
 | G3 | pass at `cbdc9b1` | S09 entry below: `smoke_shell.sh` checks a-i ok, `G3 PASS`, exit 0 (hidden window, page load fired) |
 | G4 | pass for wav, mp3 waits for S16 | S08 entry below: `cargo test -p taketwo-mcp` from no prebuilt engine, exit 0 (27 tests) |
@@ -1263,10 +1263,10 @@ Not in this step: no model, no synthesis (0 takes), no engine, MCP or shell chan
 
 Acceptance commands, all must exit 0 (WT is the worktree root; quote it):
 - `cd "$WT/rust" && source scripts/env.sh >/dev/null && cargo test --workspace`
-- `cd "$WT/rust" && source scripts/env.sh >/dev/null && set -o pipefail && cargo test -p taketwo-core audio 2>&1 | tee /dev/stderr | grep -q 'test result: ok. [1-9]'`
+- `cd "$WT/rust" && source scripts/env.sh >/dev/null && set -o pipefail && cargo test -p taketwo-core audio 2>&1 | tee /dev/stderr | grep -c 'test result: ok. [1-9]' >/dev/null` (`grep -c` reads all the output, so `tee` is not cut off)
 - `cd "$WT" && HF_HUB_OFFLINE=1 backend/.venv/bin/python -B rust/golden/record_audio.py && git diff --exit-code -- rust/golden && test -z "$(git status --porcelain -- rust/golden)"`
 - `cd "$WT" && test -s rust/golden/audio.json && test "$(du -sk rust/golden/audio | cut -f1)" -le 8192`
-- `cd "$WT" && test -z "$(git diff f4e5664..HEAD -- rust/Cargo.lock | grep '^-[^-]')"`
+- `cd "$WT" && pv() { git show "$1:rust/Cargo.lock" | awk '/^name = /{n=$3} /^version = /{print n, $3}' | sort -u; } && test -z "$(comm -23 <(pv f4e5664) <(pv HEAD))"` (every package and version locked at `f4e5664` is still locked; new ones may be added)
 - `cd "$WT" && test -z "$(git diff --stat f4e5664..HEAD -- rust/crates/taketwo-engine rust/crates/taketwo-mcp rust/crates/taketwo rust/crates/taketwo-voice rust/third_party .github)"`
 - `cd "$WT/rust" && ! cargo tree -p taketwo-mcp -e normal | grep -q -i -e taketwo-voice -e candle -e whisper -e qwen`
 - `cd "$WT" && rust/scripts/contract.sh`
