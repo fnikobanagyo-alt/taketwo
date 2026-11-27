@@ -1,6 +1,8 @@
 //! Models behind traits. Filled in from step S02 on (see rust/PLAN.md).
 //! S02: only a link check that touches Candle (qwen_tts), whisper.cpp and ONNX Runtime.
 
+pub mod whisper;
+
 use std::ffi::{CStr, c_char};
 
 unsafe extern "C" {

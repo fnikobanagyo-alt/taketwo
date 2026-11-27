@@ -5865,9 +5865,15 @@ name = "taketwo-voice"
 version = "0.1.0"
 dependencies = [
  "candle-core",
+ "cc",
  "cmake",
+ "hound",
+ "libc",
  "ort",
  "qwen_tts",
+ "serde",
+ "serde_json",
+ "taketwo-core",
 ]
 
 [[package]]

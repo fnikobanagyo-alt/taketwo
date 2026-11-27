@@ -46,6 +46,15 @@ fn main() {
     }
     let out = cfg.build();
 
+    // The flat C shim over whisper.h (src/whisper_shim.c); static CRT on MSVC like the rest.
+    println!("cargo:rerun-if-changed=src/whisper_shim.c");
+    cc::Build::new()
+        .file("src/whisper_shim.c")
+        .include(src.join("include"))
+        .include(src.join("ggml/include"))
+        .static_crt(true)
+        .compile("taketwo_whisper_shim");
+
     for dir in ["lib", "lib64"] {
         println!("cargo:rustc-link-search=native={}", out.join(dir).display());
     }
