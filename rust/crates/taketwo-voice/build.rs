@@ -33,6 +33,13 @@ fn main() {
         .define("GGML_METAL", "OFF")
         .define("GGML_BLAS", "OFF")
         .define("GGML_CUDA", if cuda { "ON" } else { "OFF" });
+    if std::env::var("CARGO_CFG_TARGET_ENV").as_deref() == Ok("msvc") {
+        // Static CRT (/MT): esaxx-rs (via tokenizers) and candle's moe kernels are built /MT, and MSVC
+        // refuses to mix runtimes. CMP0091 NEW makes CMake honour the runtime for C, C++ and CUDA.
+        cfg.static_crt(true)
+            .define("CMAKE_POLICY_DEFAULT_CMP0091", "NEW")
+            .define("CMAKE_MSVC_RUNTIME_LIBRARY", "MultiThreaded");
+    }
     if cuda {
         let cap = std::env::var("CUDA_COMPUTE_CAP").unwrap_or_else(|_| "86".into());
         cfg.define("CMAKE_CUDA_ARCHITECTURES", cap);
