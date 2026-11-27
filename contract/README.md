@@ -70,7 +70,7 @@ To run the suite by hand, start the engine on a port in 8790-8799 and run:
 TAKETWO_URL=http://127.0.0.1:8791 python3 -m unittest discover -s contract
 ```
 
-The `McpTools` tests run the current Python MCP server's tool functions against the engine. When the Rust `taketwo-mcp` exists, point equivalent calls at it.
+The `McpTools` tests run the Python MCP server's tool functions (`mcp/taketwo_mcp.py`) against the engine under test, so `contract.sh` still runs them against the Rust engine. The same calls against the Rust `taketwo-mcp` program live in `rust/crates/taketwo-mcp/tests/tools.rs` (`all_twelve_tools`, each `McpTools` case named in a comment): an rmcp client starts the built program against a stub engine on a seeded temporary library. Run them with `cd rust && source scripts/env.sh && cargo test -p taketwo-mcp` (it builds `taketwo-engine` itself).
 
 ## What is covered
 
