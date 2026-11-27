@@ -21,7 +21,7 @@ The loop appends one entry per session at the bottom: date, step id, what was bu
 | S11b Mic match, master chain, final-mix edge check | todo (before S16; sentence pauses moved to S15) |
 | S12 Qwen voice (real model, Metal) | done, accepted (lead decision 17; pushed `ae905d1`, Windows `check` green, run 45993201520; CUDA jobs on it still running when read) |
 | S13 Whisper with word timings | done, accepted (lead decision 13: heads = all heads of the top two decoder layers; pushed `c123c7b`, Windows `check` green, run 45968817348) |
-| S14 Speaker encoder | next (lead decision 17) |
+| S14 Speaker encoder | done (no push; `taketwo_voice::encoder`, CPU f32; 6 golden tests on 4 say clips + ignored `encoder_parity`: cosine rust/python >= 0.9999998, largest similarity difference 3.6e-7; `1e78b80`) |
 | S15 Render pipeline A | done (no push; `taketwo_core::render`, 47 golden render cases + 6 widen vectors bit-equal, 27 ported tests; `5dc3606`) |
 | S16 Render pipeline B | todo |
 | S17 Voice creation | todo |
@@ -1962,3 +1962,47 @@ Acceptance commands (the lead runs them; `WT` is the worktree):
 - `cd "$WT/rust" && test -z "$(ls -A target/debug/incremental 2>/dev/null)" && test "$(df -g . | tail -1 | awk '{print $4}')" -ge 8`
 - `cd "$WT" && rust/scripts/g8.sh`
 - `lsof -nP -iTCP -sTCP:LISTEN | grep -E ':(879[0-589])' ; pgrep -fl 'rust-taketwo/rust/target/'` shows nothing of ours
+
+### 2026-11-27, builder (Opus), S14 Speaker encoder (no push)
+Code commit `1e78b80`. Nothing pushed (`origin/rust/taketwo` still `ae905d1`).
+
+- **Disk:** 12 GB free at start. I deleted 13 old hash folders under `target/debug/build/<crate>/`, biggest first and keeping the two newest per crate, until 14 GB was free. No `cargo clean`. 13 GB was free after the builds.
+- **Where:** new module `crates/taketwo-voice/src/encoder.rs` and recorder `golden/record_encoder.py`.
+  - Golden data: `golden/encoder.json`, plus `golden/encoder/` at 1480 KB (4 wavs, resampled and mel arrays, the FIR and the mel filterbank).
+  - `.gitignore` has one negation, `!/rust/golden/encoder/*.wav`. The clips are synthetic.
+  - `taketwo-voice` gained `realfft = "3.5"`, which was already in `Cargo.lock` (one dependency line in the lock).
+  - `env.sh` links `rust/.models/voice-encoder/ve.safetensors` to the Hugging Face cache file, found with `find`.
+  - No change to core/src, engine, mcp, shell, vendor or `.github`.
+- **Port:** the whole of `ml.speaker_embedding`.
+  - Resample: mlx-audio's kaiser_best FIR (`taketwo_core::audio::signal::firwin_kaiser`, 385 taps for 24→16 kHz). The filter is kept in float64, as scipy does with a given window, and `padtype="edge"` is a clamped input index.
+  - Trim: float32 squares, numpy pairwise mean (`np::mean_f32`), dB in float64.
+  - Mel: symmetric Hann 400, reflect pad 200, hop 160, |X|², slaney filterbank. The FFT and band sums run in float64.
+  - Partials: `get_frame_step`/`get_num_wins` at rate 1.3, giving step 77, with zero-pad to `target_n`.
+  - Model: 3-layer LSTM (gates i, f, g, o; bias_ih + bias_hh), projection, ReLU, then L2 per partial.
+  - Normalisation: mean, L2, `utt_to_spk` L2, then ml.py's `/(norm + 1e-9)`, all in float32.
+  - `VoiceEncoder` implements `SpeakerEncoder` unchanged. It loads once (on first use or `load()`) and has `unload()`. The path is `TAKETWO_VOICE_ENCODER`, else `$TAKETWO_MODELS/voice-encoder/ve.safetensors`.
+  - Device: plain CPU f32 Rust (Candle only reads the safetensors). It builds with no feature.
+- **Recorder:** ran once after the 8766 idle check (`"running":null,"queued":0`), with no Rust model test running.
+  - It sets `HF_HUB_OFFLINE=1` and loads with `local_files_only=True`, then sets `ml._spk` itself, so the download fallback is never reached.
+  - Clips: a = Samantha, 4 s at 24 kHz; b = Samantha, 1.1 s at 24 kHz, one partial; c = Samantha, 3 s at 16 kHz with 0.5 s of silence each side, trim 6656..32768; d = Daniel, 4 s at 24 kHz.
+  - Self-check: its own staged pipeline reproduces the real `ml.speaker_embedding` within 1e-6.
+  - The smallest trim margin to the threshold is 0.066 dB (clip b).
+- **No-weights tests** (`cargo test -p taketwo-voice encoder`), 7 passed. Each reads 4 golden cases.
+  - FIR: max difference 5.6e-17.
+  - Resample: bit-equal on all 4 clips, edges included. The chained resample into trim gives the recorded bounds.
+  - Trim: exact.
+  - Mel filterbank: max difference 1.9e-8.
+  - Mel: tolerance is 1e-4·peak + 1e-3·|v|. The measured maximum is 2.0e-5 absolute, 1.3e-6 of peak, which is 0.2% of the tolerance.
+  - Partials: exact, plus the edges 1, 160 and 161 frames.
+  - Short input returns an error.
+- **Ignored `encoder_parity`** (with weights; debug build):
+  - Cosine between the Rust and Python embedding: a 0.99999988, b 1.0, c 0.99999988, d 1.0. The largest element difference is 4.3e-7.
+  - Over the 6 pairs, comparing rust/rust, rust vs the Python embedding of the other clip, and the Python embedding vs Rust, the largest difference from Python's `ml.cosine` is 3.6e-7 (the bar is 0.005).
+  - `taketwo_core::render::cosine` on Python embeddings against the recorded `ml.cosine`: largest difference 5.4e-7, which is under 1e-6. This closes the summation-order question S15 left open.
+  - Output: `rust/out/encoder_parity.json`.
+- **Speed, measured in the debug build:** 7.2 s for a 4 s clip (3 partials), 2.4 s for a 1-partial clip, load 3 ms. Release was not measured, to save disk. S16 should know that debug is slow; the LSTM is plain loops.
+- **Acceptance:**
+  - Plain shell (no cmake, `env.sh` not sourced): `cargo test --workspace` exits 0, with 337 passed, 0 failed and 4 ignored.
+  - The other commands all pass, and `g8.sh` reports G8 PASS.
+  - No listener on 8790-8799 and no process of ours left.
+- **Rule slips:** none known. No model synthesis, no take, no push, and no claim about sound.
