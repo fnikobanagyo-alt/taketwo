@@ -1,5 +1,6 @@
 //! The HTTP API, ported from backend/app/main.py (read side, step S06): the same routes, status codes,
-//! `{"detail": ...}` texts and JSON key order. Write routes answer 501 until S07.
+//! `{"detail": ...}` texts and JSON key order. Step S07a adds the write routes that start no job; the paths
+//! that would start one answer 501 until S07b (the worker), a speed change until S16.
 
 use crate::files;
 use axum::Router;
@@ -15,7 +16,8 @@ use std::collections::HashMap;
 use std::path::PathBuf;
 use std::sync::Arc;
 use taketwo_core::library::{self, Doc, Library, is_plain_name};
-use taketwo_core::text::{self, Pronunciation, py};
+use taketwo_core::text::py;
+use taketwo_core::pipeline::{self, Fail, NewNarration};
 use taketwo_core::{captions, review};
 use tower_http::cors::{AllowHeaders, AllowMethods, AllowOrigin, CorsLayer};
 
@@ -32,6 +34,38 @@ pub struct AppState {
     /// The built React UI (`--ui`); None when not given or missing.
     pub ui: Option<PathBuf>,
     pub started: f64,
+    /// Shows a file or folder in the file manager: `reveal_in_file_manager` when serving, a recorder in tests.
+    pub reveal: Box<dyn Fn(&std::path::Path) + Send + Sync>,
+}
+
+/// main.py `_reveal`: a file selected, or a folder opened, in the system file manager.
+pub fn reveal_in_file_manager(target: &std::path::Path) {
+    use std::process::Command;
+    let file = target.is_file();
+    let mut cmd = if cfg!(target_os = "macos") {
+        let mut c = Command::new("open");
+        if file {
+            c.arg("-R");
+        }
+        c.arg(target);
+        c
+    } else if cfg!(windows) {
+        let mut c = Command::new("explorer");
+        if file {
+            c.arg(format!("/select,{}", target.display()));
+        } else {
+            c.arg(target);
+        }
+        c
+    } else {
+        let mut c = Command::new("xdg-open");
+        c.arg(if file { target.parent().unwrap_or(target) } else { target });
+        c
+    };
+    // Python waits up to 10 s and ignores the result; the opener returns at once, so a spawn is enough.
+    if let Err(e) = cmd.spawn() {
+        eprintln!("taketwo-engine: could not open the file manager: {e}");
+    }
 }
 
 type St = State<Arc<AppState>>;
@@ -422,14 +456,6 @@ fn lower_field(g: &Doc, k: &str) -> Result<String, String> {
     }
 }
 
-fn pronunciations(s: &Doc) -> Vec<Pronunciation> {
-    let field = |p: &Value, k: &str| p.get(k).and_then(Value::as_str).unwrap_or("").to_string();
-    s.get("pronunciations")
-        .and_then(Value::as_array)
-        .map(|a| a.iter().map(|p| Pronunciation { from: field(p, "from"), to: field(p, "to") }).collect())
-        .unwrap_or_default()
-}
-
 async fn search_generations(st: &AppState, uri: &Uri) -> Response {
     let qs = query(uri);
     let arg = |k: &str| qs.get(k).cloned().unwrap_or_default();
@@ -446,8 +472,7 @@ async fn search_generations(st: &AppState, uri: &Uri) -> Response {
         let want = if py::strip(&same).is_empty() {
             String::new()
         } else {
-            let strip = s.get("strip_citations").is_none_or(py::truthy);
-            py::strip(&text::clean_text(&same, &pronunciations(&s), strip)).to_string()
+            py::strip(&pipeline::clean_with_settings(&same, &s)).to_string()
         };
         let mut out = Vec::new();
         for g in st.lib.list_generations()? {
@@ -515,7 +540,12 @@ async fn get_generation(State(st): St, Path(gid): Path<String>, uri: Uri) -> Res
     if gid == "search" {
         return search_generations(&st, &uri).await;
     }
-    let mut g = match live_gen(&st.lib, &gid) {
+    generation_answer(&st, &gid)
+}
+
+/// The `get_generation` answer, which the accept routes return too.
+fn generation_answer(st: &AppState, gid: &str) -> Response {
+    let mut g = match live_gen(&st.lib, gid) {
         Ok(g) => g,
         Err(r) => return r,
     };
@@ -686,6 +716,422 @@ async fn get_job() -> Response {
     detail(404, "Not found")
 }
 
+// ------------------------------------------------------------------ request bodies (pydantic, lax mode)
+
+/// A JSON body for a pydantic model, field by field in the model's order; errors are collected as
+/// FastAPI reports them (all of them, after any path errors).
+struct Fields {
+    body: Doc,
+    errors: Vec<Value>,
+}
+
+fn field_error(kind: &str, name: &str, msg: &str, input: &Value) -> Value {
+    json!({"type": kind, "loc": ["body", name], "msg": msg, "input": input})
+}
+
+impl Fields {
+    /// The body itself: missing, not JSON, or not an object are one error at `["body"]`.
+    fn parse(body: &Bytes) -> Result<Fields, Value> {
+        match serde_json::from_slice::<Value>(body) {
+            Ok(Value::Object(m)) => Ok(Fields { body: m, errors: Vec::new() }),
+            Ok(other) => Err(json!({"type": "model_attributes_type", "loc": ["body"],
+                                    "msg": "Input should be a valid dictionary or object to extract fields from", "input": other})),
+            Err(_) if body.is_empty() => Err(json!({"type": "missing", "loc": ["body"], "msg": "Field required", "input": null})),
+            Err(e) => Err(json!({"type": "json_invalid", "loc": ["body", 0], "msg": "JSON decode error", "input": {}, "ctx": {"error": e.to_string()}})),
+        }
+    }
+
+    /// The value of `name`; a missing required field is an error. Null counts as given.
+    fn get(&mut self, name: &str, required: bool) -> Option<Value> {
+        match self.body.get(name) {
+            Some(v) => Some(v.clone()),
+            None => {
+                if required {
+                    let input = Value::Object(self.body.clone());
+                    self.errors.push(json!({"type": "missing", "loc": ["body", name], "msg": "Field required", "input": input}));
+                }
+                None
+            }
+        }
+    }
+
+    fn fail(&mut self, kind: &str, name: &str, msg: &str, v: &Value) -> Option<Value> {
+        self.errors.push(field_error(kind, name, msg, v));
+        None
+    }
+
+    /// `str` (required) or `str | None`.
+    fn text(&mut self, name: &str, required: bool) -> Option<String> {
+        match self.get(name, required)? {
+            Value::String(t) => Some(t),
+            Value::Null if !required => None,
+            v => self.fail("string_type", name, "Input should be a valid string", &v).and(None),
+        }
+    }
+
+    /// `float` (null refused) or `float | None`.
+    fn float(&mut self, name: &str, nullable: bool) -> Option<f64> {
+        match self.get(name, false)? {
+            Value::Number(n) => n.as_f64(),
+            Value::Null if nullable => None,
+            Value::String(t) => match py::strip(&t).parse::<f64>() {
+                Ok(x) => Some(x),
+                Err(_) => self.fail("float_parsing", name, "Input should be a valid number, unable to parse string as a number", &Value::String(t)).and(None),
+            },
+            v => self.fail("float_type", name, "Input should be a valid number", &v).and(None),
+        }
+    }
+
+    /// `int`, required.
+    fn int(&mut self, name: &str) -> Option<i64> {
+        match self.get(name, true)? {
+            Value::Number(n) => match (n.as_i64(), n.as_f64()) {
+                (Some(i), _) => Some(i),
+                (None, Some(f)) if f.fract() == 0.0 && f.abs() < 9.2e18 => Some(f as i64),
+                _ => self.fail("int_from_float", name, "Input should be a valid integer, got a number with a fractional part", &Value::Number(n)).and(None),
+            },
+            Value::String(t) => match parse_int(&t) {
+                Some(i) => Some(i),
+                None => self.fail("int_parsing", name, "Input should be a valid integer, unable to parse string as an integer", &Value::String(t)).and(None),
+            },
+            v => self.fail("int_type", name, "Input should be a valid integer", &v).and(None),
+        }
+    }
+
+    /// `bool | None`.
+    fn flag(&mut self, name: &str) -> Option<bool> {
+        match self.get(name, false)? {
+            Value::Bool(b) => Some(b),
+            Value::Null => None,
+            Value::Number(n) if n.as_i64() == Some(0) || n.as_i64() == Some(1) => Some(n.as_i64() == Some(1)),
+            Value::String(t) => match parse_bool(&t) {
+                Some(b) => Some(b),
+                None => self.fail("bool_parsing", name, "Input should be a valid boolean, unable to interpret input", &Value::String(t)).and(None),
+            },
+            v => self.fail("bool_type", name, "Input should be a valid boolean", &v).and(None),
+        }
+    }
+
+    /// `dict = {}`.
+    fn dict(&mut self, name: &str) -> Value {
+        match self.get(name, false) {
+            None => json!({}),
+            Some(v @ Value::Object(_)) => v,
+            Some(v) => {
+                self.fail("dict_type", name, "Input should be a valid dictionary", &v);
+                json!({})
+            }
+        }
+    }
+}
+
+
+/// FastAPI's order: one part number in the path, then the body. The caller reads the body's fields and
+/// then calls `finish_422`, so every error comes back in one 422.
+fn part_and_body(ci: &str, body: &Bytes) -> (Option<i64>, Vec<Value>, Option<Fields>) {
+    let mut errors = Vec::new();
+    let n = parse_int(ci);
+    if n.is_none() {
+        errors.push(int_error("path", "ci", ci));
+    }
+    let fields = match Fields::parse(body) {
+        Ok(f) => Some(f),
+        Err(e) => {
+            errors.push(e);
+            None
+        }
+    };
+    (n, errors, fields)
+}
+
+/// Body errors found while reading fields join the earlier ones.
+fn finish_422(mut errors: Vec<Value>, fields: Option<&Fields>) -> Option<Response> {
+    errors.extend(fields.map(|f| f.errors.clone()).unwrap_or_default());
+    if errors.is_empty() { None } else { Some(invalid(errors)) }
+}
+
+// ------------------------------------------------------------------ narration writes (S07a)
+
+const BUSY: &str = "This narration is busy. Try again when it finishes.";
+
+fn chunk_count(g: &Doc) -> Result<i64, Response> {
+    match g.get("chunks").and_then(Value::as_array) {
+        Some(c) => Ok(c.len() as i64),
+        None => Err(ise("chunks is not a list".into())),
+    }
+}
+
+fn chunk(g: &Doc, ci: i64) -> &Value {
+    &g["chunks"][ci as usize]
+}
+
+/// main.py `_idle_gen`. No worker yet, so the stored status is the only busy case.
+fn idle_gen(lib: &Library, gid: &str, ci: i64) -> Result<Doc, Response> {
+    let g = live_gen(lib, gid)?;
+    if !(0 <= ci && ci < chunk_count(&g)?) {
+        return Err(detail(404, "No such part"));
+    }
+    if matches!(g.get("status").and_then(Value::as_str), Some("queued" | "running")) {
+        return Err(detail(409, BUSY));
+    }
+    Ok(g)
+}
+
+fn save_accepted(st: &AppState, gid: &str, mut g: Doc, ci: i64, on: bool) -> Response {
+    let clock = || st.lib.now();
+    if let Err(e) = review::set_accepted(&mut g, ci, on, &clock).and_then(|()| st.lib.put_generation(&mut g)) {
+        return ise(e);
+    }
+    generation_answer(st, gid)
+}
+
+async fn accept_part(State(st): St, Path((gid, ci)): Path<(String, String)>) -> Response {
+    let ci = match path_ints(&[("ci", &ci)]) {
+        Ok(v) => v[0],
+        Err(r) => return r,
+    };
+    let g = match idle_gen(&st.lib, &gid, ci) {
+        Ok(g) => g,
+        Err(r) => return r,
+    };
+    if !chunk(&g, ci).get("file").is_some_and(py::truthy) {
+        return detail(400, "This part has no audio yet.");
+    }
+    let targets = match review::fix_targets(&g) {
+        Ok(t) => t,
+        Err(e) => return ise(e),
+    };
+    if !targets.contains(&ci) && !chunk(&g, ci).get("accepted").is_some_and(py::truthy) {
+        return detail(400, "This part doesn't need review, so there is nothing to mark.");
+    }
+    save_accepted(&st, &gid, g, ci, true)
+}
+
+async fn unaccept_part(State(st): St, Path((gid, ci)): Path<(String, String)>) -> Response {
+    let ci = match path_ints(&[("ci", &ci)]) {
+        Ok(v) => v[0],
+        Err(r) => return r,
+    };
+    match idle_gen(&st.lib, &gid, ci) {
+        Ok(g) => save_accepted(&st, &gid, g, ci, false),
+        Err(r) => r,
+    }
+}
+
+/// Soft delete; an unknown id answers 200 as in Python.
+async fn delete_generation(State(st): St, Path(gid): Path<String>) -> Response {
+    if let Err(r) = item_id_ok(&gid) {
+        return r;
+    }
+    match st.lib.set_generation_deleted(&gid, true) {
+        Ok(_) => ok_json(json!({"ok": true, "undo": format!("/api/generations/{gid}/restore")})),
+        Err(e) => ise(e),
+    }
+}
+
+async fn restore_generation(State(st): St, Path(gid): Path<String>) -> Response {
+    match st.lib.set_generation_deleted(&gid, false) {
+        Ok(Some(g)) => ok_json(Value::Object(g)),
+        Ok(None) => detail(404, "Not found"),
+        Err(e) => ise(e),
+    }
+}
+
+async fn patch_generation(State(st): St, Path(gid): Path<String>, body: Bytes) -> Response {
+    let mut f = match Fields::parse(&body) {
+        Ok(f) => f,
+        Err(e) => return invalid(vec![e]),
+    };
+    let (title, favorite, speed) = (f.text("title", false), f.flag("favorite"), f.float("speed", true));
+    if let Some(r) = finish_422(Vec::new(), Some(&f)) {
+        return r;
+    }
+    let g = match live_gen(&st.lib, &gid) {
+        Ok(g) => g,
+        Err(r) => return r,
+    };
+    let mut fields = Doc::new();
+    if let Some(t) = title.as_deref().map(py::strip).filter(|t| !t.is_empty()) {
+        fields.insert("title".into(), t.chars().take(120).collect::<String>().into());
+    }
+    if let Some(b) = favorite {
+        fields.insert("favorite".into(), b.into());
+    }
+    let stored = g.get("speed").filter(|v| py::truthy(v)).and_then(Value::as_f64).unwrap_or(1.0);
+    if speed.is_some_and(|x| (x - stored).abs() > 1e-3) {
+        return not_yet(); // S16: retime (Python re-times the finished audio here); nothing is changed
+    }
+    let doc = if fields.is_empty() { st.lib.get_generation(&gid) } else { st.lib.patch_generation_meta(&gid, &fields) };
+    match doc {
+        Ok(Some(d)) => ok_json(Value::Object(d)),
+        Ok(None) => detail(404, "Not found"),
+        Err(e) => ise(e),
+    }
+}
+
+/// `POST /api/generations/reveal`: the folder narrations are kept in.
+fn reveal_narrations_folder(st: &AppState) -> Response {
+    let dir = st.lib.generations_dir();
+    if let Err(e) = std::fs::create_dir_all(&dir) {
+        return ise(format!("{}: {e}", dir.display()));
+    }
+    (st.reveal)(&dir);
+    ok_json(json!({"path": dir.to_string_lossy()}))
+}
+
+async fn reveal_narration(State(st): St, Path(gid): Path<String>) -> Response {
+    if let Err(r) = live_gen(&st.lib, &gid).and_then(|_| item_id_ok(&gid)) {
+        return r;
+    }
+    let gdir = st.lib.generations_dir().join(&gid);
+    let target = [gdir.join("final.mp3"), gdir.join("final.wav")].into_iter().find(|f| f.exists()).unwrap_or(gdir);
+    if !target.exists() {
+        return detail(404, "This narration has no files yet");
+    }
+    (st.reveal)(&target);
+    ok_json(json!({"path": target.to_string_lossy()}))
+}
+
+/// main.py `_client`: the TakeTwo window, the MCP server, or anything else.
+fn client(headers: &HeaderMap) -> &'static str {
+    let h = |n: &str| headers.get(n).and_then(|v| v.to_str().ok()).filter(|v| !v.is_empty());
+    match h("x-taketwo-client").or_else(|| h("x-voiceforge-client")) {
+        Some("app") => "app",
+        Some("mcp") => "mcp",
+        _ => "api",
+    }
+}
+
+/// The one engine TakeTwo 1.0 has (the `/api/engines` stub and the settings default).
+const ENGINE_ID: &str = "qwen3-tts-1.7b";
+
+async fn create_generation(State(st): St, headers: HeaderMap, body: Bytes) -> Response {
+    let mut f = match Fields::parse(&body) {
+        Ok(f) => f,
+        Err(e) => return invalid(vec![e]),
+    };
+    let profile_id = f.text("profile_id", true);
+    let text = f.text("text", true);
+    let engine = f.text("engine", false);
+    let language = f.text("language", false);
+    let params = f.dict("params");
+    let speed = f.float("speed", false);
+    let voice_settings = f.dict("voice_settings");
+    let title = f.text("title", false);
+    if let Some(r) = finish_422(Vec::new(), Some(&f)) {
+        return r;
+    }
+    let (Some(profile_id), Some(text)) = (profile_id, text) else { return ise("checked above".into()) };
+    let run = || -> Result<Response, String> {
+        let Some(p) = st.lib.get_profile(&profile_id)? else { return Ok(detail(404, "Voice not found")) };
+        if p.get("status").and_then(Value::as_str) != Some("ready") {
+            return Ok(detail(400, "This voice is still being analyzed."));
+        }
+        // updates.blocking_reason() is not ported: TakeTwo 1.0 has no updater.
+        let s = library::get_settings(&st.lib.settings_path())?;
+        let first = [engine.clone().map(Value::from), p.get("default_engine").cloned(), s.get("default_engine").cloned()]
+            .into_iter()
+            .flatten()
+            .find(py::truthy);
+        let engine = match first.as_ref().and_then(Value::as_str) {
+            Some(ENGINE_ID) => ENGINE_ID,
+            _ => return Ok(detail(404, "Unknown model")),
+        };
+        let words = py::split(&text).len() as i64;
+        if words > MAX_SCRIPT_WORDS {
+            return Ok(detail(400, &format!(
+                "Script is {} words. The limit is {} per narration; split it into parts.",
+                pipeline::thousands(words), pipeline::thousands(MAX_SCRIPT_WORDS)
+            )));
+        }
+        // The duplicate check needs the queue: S07b.
+        let language = [language.clone().map(Value::from), p.get("language").cloned()]
+            .into_iter()
+            .flatten()
+            .find(py::truthy)
+            .unwrap_or_else(|| "en".into());
+        let req = NewNarration {
+            profile: &p, text: &text, engine, language, params: params.clone(), speed, voice_settings: voice_settings.as_object(),
+            title: title.as_deref(), source: client(&headers),
+        };
+        match pipeline::create_generation("unsaved", &req, &s) {
+            Ok(_) => Ok(not_yet()), // S07b: save the document and queue the render; nothing is written yet
+            Err(Fail::Value(m)) => Ok(detail(400, &m)),
+            Err(Fail::Other(e)) => Err(e),
+        }
+    };
+    run().unwrap_or_else(ise)
+}
+
+async fn resume_generation(State(st): St, Path(gid): Path<String>) -> Response {
+    match live_gen(&st.lib, &gid) {
+        Ok(_) => not_yet(), // S07b: queue the unfinished parts
+        Err(r) => r,
+    }
+}
+
+async fn regenerate(State(st): St, Path((gid, ci)): Path<(String, String)>, body: Bytes) -> Response {
+    let (ci, errors, mut f) = part_and_body(&ci, &body);
+    let new_text = f.as_mut().and_then(|f| f.text("text", false));
+    if let Some(r) = finish_422(errors, f.as_ref()) {
+        return r;
+    }
+    let Some(ci) = ci else { return ise("checked above".into()) };
+    let g = match live_gen(&st.lib, &gid) {
+        Ok(g) => g,
+        Err(r) => return r,
+    };
+    match chunk_count(&g) {
+        Ok(n) if 0 <= ci && ci < n => {}
+        Ok(_) => return detail(404, "No such chunk"),
+        Err(r) => return r,
+    }
+    if let Some(t) = new_text.as_deref().filter(|t| !py::strip(t).is_empty()) {
+        let s = match library::get_settings(&st.lib.settings_path()) {
+            Ok(s) => s,
+            Err(e) => return ise(e),
+        };
+        match pipeline::clean_replacement(t, &g, &s) {
+            Ok(_) => {}
+            Err(Fail::Value(m)) => return detail(400, &m),
+            Err(Fail::Other(e)) => return ise(e),
+        }
+    }
+    not_yet() // S07b: re-speak the part
+}
+
+async fn select_take(State(st): St, Path((gid, ci)): Path<(String, String)>, body: Bytes) -> Response {
+    let (ci, errors, mut f) = part_and_body(&ci, &body);
+    let take = f.as_mut().and_then(|f| f.int("take"));
+    if let Some(r) = finish_422(errors, f.as_ref()) {
+        return r;
+    }
+    let (Some(ci), Some(take)) = (ci, take) else { return ise("checked above".into()) };
+    let g = match idle_gen(&st.lib, &gid, ci) {
+        Ok(g) => g,
+        Err(r) => return r,
+    };
+    let kept = chunk(&g, ci).get("takes").and_then(Value::as_array).is_some_and(|ts| {
+        ts.iter().any(|x| x.get("take").and_then(Value::as_f64).is_some_and(|k| k == take as f64))
+    });
+    if !kept {
+        return detail(404, "That take is no longer kept.");
+    }
+    not_yet() // S07b: switch the take and re-mix
+}
+
+async fn fix_remaining(State(st): St, Path(gid): Path<String>) -> Response {
+    let g = match live_gen(&st.lib, &gid) {
+        Ok(g) => g,
+        Err(r) => return r,
+    };
+    match review::fix_targets(&g) {
+        Ok(t) if t.is_empty() => detail(400, "Nothing left to fix."),
+        Ok(_) => not_yet(), // S07b: re-record the parts that need it
+        Err(e) => ise(e),
+    }
+}
+
 // ------------------------------------------------------------------ not in 1.0 yet
 
 fn method_not_allowed() -> Response {
@@ -698,8 +1144,8 @@ async fn profile_post(Path(pid): Path<String>) -> Response {
 }
 
 /// POST on `/api/generations/{gid}`: only `reveal` exists there.
-async fn generation_post(Path(gid): Path<String>) -> Response {
-    if gid == "reveal" { not_yet() /* S07 */ } else { method_not_allowed() }
+async fn generation_post(State(st): St, Path(gid): Path<String>) -> Response {
+    if gid == "reveal" { reveal_narrations_folder(&st) } else { method_not_allowed() }
 }
 
 /// Write routes whose id Python checks with `_item_dir` first.
@@ -782,23 +1228,23 @@ pub fn router(state: Arc<AppState>) -> Router {
         .route("/api/profiles/{pid}/reanalyze", post(|| async { not_yet() }))
         .route("/api/profiles/{pid}/refresh", post(|| async { not_yet() }))
         .route("/api/profiles/{pid}/audio/{name}", get(profile_audio))
-        .route("/api/generations", get(list_generations).post(|| async { not_yet() /* S07 */ }))
+        .route("/api/generations", get(list_generations).post(create_generation))
         .route(
             "/api/generations/{gid}",
-            get(get_generation).post(generation_post).patch(|| async { not_yet() /* S07 */ }).delete(delete_checked /* S07 */),
+            get(get_generation).post(generation_post).patch(patch_generation).delete(delete_generation),
         )
         .route("/api/generations/{gid}/cancel", post(cancel_generation))
-        .route("/api/generations/{gid}/resume", post(|| async { not_yet() /* S07 */ }))
-        .route("/api/generations/{gid}/reveal", post(|| async { not_yet() /* S07 */ }))
-        .route("/api/generations/{gid}/restore", post(|| async { not_yet() /* S07 */ }))
-        .route("/api/generations/{gid}/fix-remaining", post(|| async { not_yet() /* S07 */ }))
+        .route("/api/generations/{gid}/resume", post(resume_generation))
+        .route("/api/generations/{gid}/reveal", post(reveal_narration))
+        .route("/api/generations/{gid}/restore", post(restore_generation))
+        .route("/api/generations/{gid}/fix-remaining", post(fix_remaining))
         .route("/api/generations/{gid}/subtitles", get(subtitles))
         .route("/api/generations/{gid}/timings", get(generation_timings))
         .route("/api/generations/{gid}/audio", get(generation_audio))
         .route("/api/generations/{gid}/chunks/{ci}/audio", get(chunk_audio))
-        .route("/api/generations/{gid}/chunks/{ci}/regenerate", post(|| async { not_yet() /* S07 */ }))
-        .route("/api/generations/{gid}/chunks/{ci}/accept", post(|| async { not_yet() /* S07 */ }).delete(|| async { not_yet() /* S07 */ }))
-        .route("/api/generations/{gid}/chunks/{ci}/select-take", post(|| async { not_yet() /* S07 */ }))
+        .route("/api/generations/{gid}/chunks/{ci}/regenerate", post(regenerate))
+        .route("/api/generations/{gid}/chunks/{ci}/accept", post(accept_part).delete(unaccept_part))
+        .route("/api/generations/{gid}/chunks/{ci}/select-take", post(select_take))
         .route("/api/generations/{gid}/chunks/{ci}/takes/{k}/audio", get(take_audio))
         .route("/api/jobs/{jid}", get(get_job))
         .route("/api/transcripts", get(|| async { not_yet() }).post(|| async { not_yet() }))

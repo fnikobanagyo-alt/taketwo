@@ -53,6 +53,17 @@ rust/scripts/contract.sh -k Health    # arguments go to unittest, and its exit c
 2. It reads the port from the engine's ready line (`{"ready":true,"port":N,"pid":P}`, 30 s limit) and runs the suite with `TAKETWO_URL` pointing at it.
 3. It stops that engine by its own pid and deletes the library.
 
+Since step S07a the Rust engine passes all 33 (`Ran 33 tests`, `OK`).
+
+### Not judged by this suite yet
+
+The suite checks refusals and library writes, not rendering. On the Rust engine these paths answer 501 `{"detail": "Not in TakeTwo 1.0 yet."}` after all their checks pass, and change nothing:
+
+- until S07b (the worker): creating a narration, resume, re-speaking a part (`regenerate`), switching to a kept take (`select-take`) and `fix-remaining`;
+- until S16: `PATCH` with a `speed` that differs from the stored one by more than 0.001.
+
+`rust/crates/taketwo-engine/tests/http.rs` checks that each of them answers 501 and leaves every file and document unchanged.
+
 To run the suite by hand, start the engine on a port in 8790-8799 and run:
 
 ```sh

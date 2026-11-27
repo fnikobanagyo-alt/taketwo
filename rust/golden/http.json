@@ -1,5 +1,6 @@
 {
  "clock_start": 1800000000.0,
+ "engine_clock_start": 1900000000.0,
  "clock_step": 0.25,
  "phases": [
   {
@@ -4727,6 +4728,4150 @@
        "content-range": null
       },
       "json": []
+     }
+    }
+   ]
+  },
+  {
+   "name": "c",
+   "setup": [],
+   "cases": [
+    {
+     "method": "POST",
+     "path": "/api/generations/cttrash01/restore",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "id": "cttrash01",
+       "profile_id": "ctvoice01",
+       "profile_name": "Contract Voice",
+       "engine": "qwen3-tts-1.7b",
+       "language": "en",
+       "status": "done",
+       "source": "api",
+       "speed": 1.0,
+       "duration": 2.5,
+       "file": "final.wav",
+       "created": 1700000100.0,
+       "title": "Delete and restore",
+       "text": "A narration to delete and bring back.",
+       "cleaned_text": "A narration to delete and bring back.",
+       "message": "Done. All parts passed the automated checks.",
+       "timeline": [
+        {
+         "i": 0,
+         "start": 0.0,
+         "end": 2.3
+        }
+       ],
+       "chunks": [
+        {
+         "i": 0,
+         "text": "A narration to delete and bring back.",
+         "pause_after": "end",
+         "status": "ok",
+         "issues": [],
+         "file": "chunk_000.wav",
+         "heard": "A narration to delete and bring back.",
+         "pitch_hz": 180.0
+        }
+       ],
+       "updated": 1800000003.0
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/cttrash01",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "id": "cttrash01",
+       "profile_id": "ctvoice01",
+       "profile_name": "Contract Voice",
+       "engine": "qwen3-tts-1.7b",
+       "language": "en",
+       "status": "done",
+       "source": "api",
+       "speed": 1.0,
+       "duration": 2.5,
+       "file": "final.wav",
+       "created": 1700000100.0,
+       "title": "Delete and restore",
+       "text": "A narration to delete and bring back.",
+       "cleaned_text": "A narration to delete and bring back.",
+       "message": "Done. All parts passed the automated checks.",
+       "timeline": [
+        {
+         "i": 0,
+         "start": 0.0,
+         "end": 2.3
+        }
+       ],
+       "chunks": [
+        {
+         "i": 0,
+         "text": "A narration to delete and bring back.",
+         "pause_after": "end",
+         "status": "ok",
+         "issues": [],
+         "file": "chunk_000.wav",
+         "heard": "A narration to delete and bring back.",
+         "pitch_hz": 180.0
+        }
+       ],
+       "updated": 1800000003.0,
+       "outcome": "clean",
+       "review": [],
+       "job": null
+      }
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/generations/ctaccept01/chunks/1/accept",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "id": "ctaccept01",
+       "profile_id": "ctvoice01",
+       "profile_name": "Contract Voice",
+       "engine": "qwen3-tts-1.7b",
+       "language": "en",
+       "status": "done",
+       "source": "api",
+       "speed": 1.0,
+       "duration": 4.0,
+       "file": "final.wav",
+       "created": 1700000300.0,
+       "title": "Sounds fine test",
+       "text": "First line here. Second line ends here.",
+       "cleaned_text": "First line here. Second line ends here.",
+       "message": "Done. You marked 1 part as sounding fine; every other part passed the checks.",
+       "timeline": [
+        {
+         "i": 0,
+         "start": 0.0,
+         "end": 1.6
+        },
+        {
+         "i": 1,
+         "start": 1.9,
+         "end": 3.8
+        }
+       ],
+       "chunks": [
+        {
+         "i": 0,
+         "text": "First line here.",
+         "pause_after": "sentence",
+         "status": "ok",
+         "issues": [],
+         "file": "chunk_000.wav",
+         "heard": "First line here.",
+         "pitch_hz": 180.0
+        },
+        {
+         "i": 1,
+         "text": "Second line ends here.",
+         "pause_after": "end",
+         "status": "flagged",
+         "issues": [
+          "end_word_missing"
+         ],
+         "file": "chunk_001.wav",
+         "heard": "Second line ends",
+         "pitch_hz": 181.0,
+         "accepted": {
+          "by": "person",
+          "at": 1900000000.5
+         }
+        }
+       ],
+       "updated": 1900000001.0,
+       "flagged": [],
+       "outcome": "clean",
+       "review": [],
+       "job": null
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/ctaccept01",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "id": "ctaccept01",
+       "profile_id": "ctvoice01",
+       "profile_name": "Contract Voice",
+       "engine": "qwen3-tts-1.7b",
+       "language": "en",
+       "status": "done",
+       "source": "api",
+       "speed": 1.0,
+       "duration": 4.0,
+       "file": "final.wav",
+       "created": 1700000300.0,
+       "title": "Sounds fine test",
+       "text": "First line here. Second line ends here.",
+       "cleaned_text": "First line here. Second line ends here.",
+       "message": "Done. You marked 1 part as sounding fine; every other part passed the checks.",
+       "timeline": [
+        {
+         "i": 0,
+         "start": 0.0,
+         "end": 1.6
+        },
+        {
+         "i": 1,
+         "start": 1.9,
+         "end": 3.8
+        }
+       ],
+       "chunks": [
+        {
+         "i": 0,
+         "text": "First line here.",
+         "pause_after": "sentence",
+         "status": "ok",
+         "issues": [],
+         "file": "chunk_000.wav",
+         "heard": "First line here.",
+         "pitch_hz": 180.0
+        },
+        {
+         "i": 1,
+         "text": "Second line ends here.",
+         "pause_after": "end",
+         "status": "flagged",
+         "issues": [
+          "end_word_missing"
+         ],
+         "file": "chunk_001.wav",
+         "heard": "Second line ends",
+         "pitch_hz": 181.0,
+         "accepted": {
+          "by": "person",
+          "at": 1900000000.5
+         }
+        }
+       ],
+       "updated": 1900000001.0,
+       "flagged": [],
+       "outcome": "clean",
+       "review": [],
+       "job": null
+      }
+     }
+    },
+    {
+     "method": "DELETE",
+     "path": "/api/generations/ctaccept01/chunks/1/accept",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "id": "ctaccept01",
+       "profile_id": "ctvoice01",
+       "profile_name": "Contract Voice",
+       "engine": "qwen3-tts-1.7b",
+       "language": "en",
+       "status": "done",
+       "source": "api",
+       "speed": 1.0,
+       "duration": 4.0,
+       "file": "final.wav",
+       "created": 1700000300.0,
+       "title": "Sounds fine test",
+       "text": "First line here. Second line ends here.",
+       "cleaned_text": "First line here. Second line ends here.",
+       "message": "Done, needs review: part 2.",
+       "timeline": [
+        {
+         "i": 0,
+         "start": 0.0,
+         "end": 1.6
+        },
+        {
+         "i": 1,
+         "start": 1.9,
+         "end": 3.8
+        }
+       ],
+       "chunks": [
+        {
+         "i": 0,
+         "text": "First line here.",
+         "pause_after": "sentence",
+         "status": "ok",
+         "issues": [],
+         "file": "chunk_000.wav",
+         "heard": "First line here.",
+         "pitch_hz": 180.0
+        },
+        {
+         "i": 1,
+         "text": "Second line ends here.",
+         "pause_after": "end",
+         "status": "flagged",
+         "issues": [
+          "end_word_missing"
+         ],
+         "file": "chunk_001.wav",
+         "heard": "Second line ends",
+         "pitch_hz": 181.0,
+         "accepted": null
+        }
+       ],
+       "updated": 1900000001.5,
+       "flagged": [
+        1
+       ],
+       "outcome": "needs_listen",
+       "review": [
+        {
+         "part": 2,
+         "text": "Second line ends here.",
+         "issues": [
+          "end_word_missing"
+         ],
+         "reasons": [
+          "Last word missing"
+         ],
+         "start": 1.9,
+         "end": 3.8,
+         "heard": "Second line ends",
+         "pitch_hz": 181.0,
+         "voice_pitch_hz": 180.0,
+         "checked_by": [
+          "take check"
+         ],
+         "take": 1
+        }
+       ],
+       "job": null
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/ctaccept01",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "id": "ctaccept01",
+       "profile_id": "ctvoice01",
+       "profile_name": "Contract Voice",
+       "engine": "qwen3-tts-1.7b",
+       "language": "en",
+       "status": "done",
+       "source": "api",
+       "speed": 1.0,
+       "duration": 4.0,
+       "file": "final.wav",
+       "created": 1700000300.0,
+       "title": "Sounds fine test",
+       "text": "First line here. Second line ends here.",
+       "cleaned_text": "First line here. Second line ends here.",
+       "message": "Done, needs review: part 2.",
+       "timeline": [
+        {
+         "i": 0,
+         "start": 0.0,
+         "end": 1.6
+        },
+        {
+         "i": 1,
+         "start": 1.9,
+         "end": 3.8
+        }
+       ],
+       "chunks": [
+        {
+         "i": 0,
+         "text": "First line here.",
+         "pause_after": "sentence",
+         "status": "ok",
+         "issues": [],
+         "file": "chunk_000.wav",
+         "heard": "First line here.",
+         "pitch_hz": 180.0
+        },
+        {
+         "i": 1,
+         "text": "Second line ends here.",
+         "pause_after": "end",
+         "status": "flagged",
+         "issues": [
+          "end_word_missing"
+         ],
+         "file": "chunk_001.wav",
+         "heard": "Second line ends",
+         "pitch_hz": 181.0,
+         "accepted": null
+        }
+       ],
+       "updated": 1900000001.5,
+       "flagged": [
+        1
+       ],
+       "outcome": "needs_listen",
+       "review": [
+        {
+         "part": 2,
+         "text": "Second line ends here.",
+         "issues": [
+          "end_word_missing"
+         ],
+         "reasons": [
+          "Last word missing"
+         ],
+         "start": 1.9,
+         "end": 3.8,
+         "heard": "Second line ends",
+         "pitch_hz": 181.0,
+         "voice_pitch_hz": 180.0,
+         "checked_by": [
+          "take check"
+         ],
+         "take": 1
+        }
+       ],
+       "job": null
+      }
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/generations/ctaccept01/chunks/0/accept",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 400,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "This part doesn't need review, so there is nothing to mark."
+      }
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/generations/ctpending01/chunks/0/accept",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 400,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "This part has no audio yet."
+      }
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/generations/ctaccept01/chunks/5/accept",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 404,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "No such part"
+      }
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/generations/ctaccept01/chunks/x/accept",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 422,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": [
+        {
+         "type": "int_parsing",
+         "loc": [
+          "path",
+          "ci"
+         ],
+         "msg": "Input should be a valid integer, unable to parse string as an integer",
+         "input": "x"
+        }
+       ]
+      }
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/generations/ctaccept01/chunks/-1/accept",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 404,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "No such part"
+      }
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/generations/nosuchid/chunks/0/accept",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 404,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "Not found"
+      }
+     }
+    },
+    {
+     "method": "DELETE",
+     "path": "/api/generations/ctaccept01/chunks/9/accept",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 404,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "No such part"
+      }
+     }
+    },
+    {
+     "method": "DELETE",
+     "path": "/api/generations/nosuchid/chunks/0/accept",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 404,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "Not found"
+      }
+     }
+    },
+    {
+     "method": "DELETE",
+     "path": "/api/generations/cttrash01",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "ok": true,
+       "undo": "/api/generations/cttrash01/restore"
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": [
+       {
+        "id": "ctclean01",
+        "profile_id": "ctvoice01",
+        "profile_name": "Contract Voice",
+        "engine": "qwen3-tts-1.7b",
+        "language": "en",
+        "status": "done",
+        "source": "mcp",
+        "speed": 1.25,
+        "duration": 7.4,
+        "file": "final.wav",
+        "created": 1700000500.0,
+        "title": "Rivers and towns",
+        "message": "Done. All parts passed the automated checks.",
+        "timeline": [
+         {
+          "i": 0,
+          "start": 0.0,
+          "end": 5.2
+         },
+         {
+          "i": 1,
+          "start": 5.9,
+          "end": 7.1
+         }
+        ],
+        "updated": 1800000001.0,
+        "outcome": "clean",
+        "review_count": 0,
+        "text_preview": "Welcome to the show &amp; thanks for listening [1]. Today we talk about rivers — and the towns along them.\n\nThe Nile is long."
+       },
+       {
+        "id": "ctreview01",
+        "profile_id": "ctvoice01",
+        "profile_name": "Contract Voice",
+        "engine": "qwen3-tts-1.7b",
+        "language": "en",
+        "status": "done",
+        "source": "app",
+        "speed": 1.0,
+        "duration": 6.0,
+        "file": "final.wav",
+        "created": 1700000400.0,
+        "title": "Three parts to review",
+        "message": "Done, needs review: part 2, 3.",
+        "timeline": [
+         {
+          "i": 0,
+          "start": 0.0,
+          "end": 1.5
+         },
+         {
+          "i": 1,
+          "start": 1.8,
+          "end": 3.4
+         },
+         {
+          "i": 2,
+          "start": 3.7,
+          "end": 5.6
+         }
+        ],
+        "updated": 1800000001.5,
+        "outcome": "needs_listen",
+        "review_count": 2,
+        "text_preview": "Part one is fine. Part two ends early. It&#39;s part three."
+       },
+       {
+        "id": "ctaccept01",
+        "profile_id": "ctvoice01",
+        "profile_name": "Contract Voice",
+        "engine": "qwen3-tts-1.7b",
+        "language": "en",
+        "status": "done",
+        "source": "api",
+        "speed": 1.0,
+        "duration": 4.0,
+        "file": "final.wav",
+        "created": 1700000300.0,
+        "title": "Sounds fine test",
+        "message": "Done, needs review: part 2.",
+        "timeline": [
+         {
+          "i": 0,
+          "start": 0.0,
+          "end": 1.6
+         },
+         {
+          "i": 1,
+          "start": 1.9,
+          "end": 3.8
+         }
+        ],
+        "updated": 1900000001.5,
+        "flagged": [
+         1
+        ],
+        "outcome": "needs_listen",
+        "review_count": 1,
+        "text_preview": "First line here. Second line ends here."
+       },
+       {
+        "id": "ctpending01",
+        "profile_id": "ctvoice01",
+        "profile_name": "Contract Voice",
+        "engine": "qwen3-tts-1.7b",
+        "language": "en",
+        "status": "cancelled",
+        "source": "api",
+        "speed": 1.0,
+        "created": 1700000200.0,
+        "title": "Not rendered yet",
+        "message": "Cancelled before it started",
+        "updated": 1800000002.5,
+        "outcome": null,
+        "review_count": 0,
+        "text_preview": "Not rendered yet. This one was stopped."
+       }
+      ]
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/search?q=delete",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": []
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/cttrash01",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 404,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "Not found"
+      }
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/generations/cttrash01/restore",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "id": "cttrash01",
+       "profile_id": "ctvoice01",
+       "profile_name": "Contract Voice",
+       "engine": "qwen3-tts-1.7b",
+       "language": "en",
+       "status": "done",
+       "source": "api",
+       "speed": 1.0,
+       "duration": 2.5,
+       "file": "final.wav",
+       "created": 1700000100.0,
+       "title": "Delete and restore",
+       "text": "A narration to delete and bring back.",
+       "cleaned_text": "A narration to delete and bring back.",
+       "message": "Done. All parts passed the automated checks.",
+       "timeline": [
+        {
+         "i": 0,
+         "start": 0.0,
+         "end": 2.3
+        }
+       ],
+       "chunks": [
+        {
+         "i": 0,
+         "text": "A narration to delete and bring back.",
+         "pause_after": "end",
+         "status": "ok",
+         "issues": [],
+         "file": "chunk_000.wav",
+         "heard": "A narration to delete and bring back.",
+         "pitch_hz": 180.0
+        }
+       ],
+       "updated": 1800000003.0
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/cttrash01",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "id": "cttrash01",
+       "profile_id": "ctvoice01",
+       "profile_name": "Contract Voice",
+       "engine": "qwen3-tts-1.7b",
+       "language": "en",
+       "status": "done",
+       "source": "api",
+       "speed": 1.0,
+       "duration": 2.5,
+       "file": "final.wav",
+       "created": 1700000100.0,
+       "title": "Delete and restore",
+       "text": "A narration to delete and bring back.",
+       "cleaned_text": "A narration to delete and bring back.",
+       "message": "Done. All parts passed the automated checks.",
+       "timeline": [
+        {
+         "i": 0,
+         "start": 0.0,
+         "end": 2.3
+        }
+       ],
+       "chunks": [
+        {
+         "i": 0,
+         "text": "A narration to delete and bring back.",
+         "pause_after": "end",
+         "status": "ok",
+         "issues": [],
+         "file": "chunk_000.wav",
+         "heard": "A narration to delete and bring back.",
+         "pitch_hz": 180.0
+        }
+       ],
+       "updated": 1800000003.0,
+       "outcome": "clean",
+       "review": [],
+       "job": null
+      }
+     }
+    },
+    {
+     "method": "DELETE",
+     "path": "/api/generations/nosuchid",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "ok": true,
+       "undo": "/api/generations/nosuchid/restore"
+      }
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/generations/nosuchid/restore",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 404,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "Not found"
+      }
+     }
+    },
+    {
+     "method": "PATCH",
+     "path": "/api/generations/ctclean01",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": {
+      "title": "Renamed"
+     },
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "id": "ctclean01",
+       "profile_id": "ctvoice01",
+       "profile_name": "Contract Voice",
+       "engine": "qwen3-tts-1.7b",
+       "language": "en",
+       "status": "done",
+       "source": "mcp",
+       "speed": 1.25,
+       "duration": 7.4,
+       "file": "final.wav",
+       "created": 1700000500.0,
+       "title": "Renamed",
+       "text": "Welcome to the show &amp; thanks for listening [1]. Today we talk about rivers — and the towns along them.\n\nThe Nile is long.",
+       "cleaned_text": "Welcome to the show & thanks for listening. Today we talk about rivers, and the towns along them.\n\nThe Nile is long.",
+       "message": "Done. All parts passed the automated checks.",
+       "timeline": [
+        {
+         "i": 0,
+         "start": 0.0,
+         "end": 5.2
+        },
+        {
+         "i": 1,
+         "start": 5.9,
+         "end": 7.1
+        }
+       ],
+       "chunks": [
+        {
+         "i": 0,
+         "text": "Welcome to the show & thanks for listening. Today we talk about rivers, and the towns along them.",
+         "pause_after": "paragraph",
+         "status": "ok",
+         "issues": [],
+         "file": "chunk_000.wav",
+         "pitch_hz": 181.0,
+         "dur": 6.5,
+         "heard": "Welcome to the show and thanks for listening. Today we talk about rivers and the towns along them.",
+         "words": [
+          {
+           "word": "Welcome",
+           "start": 0.0,
+           "end": 0.4
+          },
+          {
+           "word": "to",
+           "start": 0.4,
+           "end": 0.5
+          },
+          {
+           "word": "the",
+           "start": 0.5,
+           "end": 0.6
+          },
+          {
+           "word": "show",
+           "start": 0.6,
+           "end": 1.0
+          },
+          {
+           "word": "and",
+           "start": 1.0,
+           "end": 1.2
+          },
+          {
+           "word": "thanks",
+           "start": 1.2,
+           "end": 1.6
+          },
+          {
+           "word": "for",
+           "start": 1.6,
+           "end": 1.8
+          },
+          {
+           "word": "listening.",
+           "start": 1.8,
+           "end": 2.5
+          },
+          {
+           "word": "Today",
+           "start": 2.9,
+           "end": 3.3
+          },
+          {
+           "word": "we",
+           "start": 3.3,
+           "end": 3.4
+          },
+          {
+           "word": "talk",
+           "start": 3.4,
+           "end": 3.7
+          },
+          {
+           "word": "about",
+           "start": 3.7,
+           "end": 4.0
+          },
+          {
+           "word": "rivers",
+           "start": 4.0,
+           "end": 4.5
+          },
+          {
+           "word": "and",
+           "start": 4.7,
+           "end": 4.9
+          },
+          {
+           "word": "the",
+           "start": 4.9,
+           "end": 5.0
+          },
+          {
+           "word": "towns",
+           "start": 5.0,
+           "end": 5.4
+          },
+          {
+           "word": "along",
+           "start": 5.4,
+           "end": 5.8
+          },
+          {
+           "word": "them.",
+           "start": 5.8,
+           "end": 6.4
+          }
+         ]
+        },
+        {
+         "i": 1,
+         "text": "The Nile is long.",
+         "pause_after": "end",
+         "status": "ok",
+         "issues": [],
+         "file": "chunk_001.wav",
+         "pitch_hz": 179.0,
+         "dur": 1.5,
+         "heard": "The Nile is long."
+        }
+       ],
+       "updated": 1900000002.0
+      }
+     }
+    },
+    {
+     "method": "PATCH",
+     "path": "/api/generations/ctclean01",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": {
+      "favorite": true
+     },
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "id": "ctclean01",
+       "profile_id": "ctvoice01",
+       "profile_name": "Contract Voice",
+       "engine": "qwen3-tts-1.7b",
+       "language": "en",
+       "status": "done",
+       "source": "mcp",
+       "speed": 1.25,
+       "duration": 7.4,
+       "file": "final.wav",
+       "created": 1700000500.0,
+       "title": "Renamed",
+       "text": "Welcome to the show &amp; thanks for listening [1]. Today we talk about rivers — and the towns along them.\n\nThe Nile is long.",
+       "cleaned_text": "Welcome to the show & thanks for listening. Today we talk about rivers, and the towns along them.\n\nThe Nile is long.",
+       "message": "Done. All parts passed the automated checks.",
+       "timeline": [
+        {
+         "i": 0,
+         "start": 0.0,
+         "end": 5.2
+        },
+        {
+         "i": 1,
+         "start": 5.9,
+         "end": 7.1
+        }
+       ],
+       "chunks": [
+        {
+         "i": 0,
+         "text": "Welcome to the show & thanks for listening. Today we talk about rivers, and the towns along them.",
+         "pause_after": "paragraph",
+         "status": "ok",
+         "issues": [],
+         "file": "chunk_000.wav",
+         "pitch_hz": 181.0,
+         "dur": 6.5,
+         "heard": "Welcome to the show and thanks for listening. Today we talk about rivers and the towns along them.",
+         "words": [
+          {
+           "word": "Welcome",
+           "start": 0.0,
+           "end": 0.4
+          },
+          {
+           "word": "to",
+           "start": 0.4,
+           "end": 0.5
+          },
+          {
+           "word": "the",
+           "start": 0.5,
+           "end": 0.6
+          },
+          {
+           "word": "show",
+           "start": 0.6,
+           "end": 1.0
+          },
+          {
+           "word": "and",
+           "start": 1.0,
+           "end": 1.2
+          },
+          {
+           "word": "thanks",
+           "start": 1.2,
+           "end": 1.6
+          },
+          {
+           "word": "for",
+           "start": 1.6,
+           "end": 1.8
+          },
+          {
+           "word": "listening.",
+           "start": 1.8,
+           "end": 2.5
+          },
+          {
+           "word": "Today",
+           "start": 2.9,
+           "end": 3.3
+          },
+          {
+           "word": "we",
+           "start": 3.3,
+           "end": 3.4
+          },
+          {
+           "word": "talk",
+           "start": 3.4,
+           "end": 3.7
+          },
+          {
+           "word": "about",
+           "start": 3.7,
+           "end": 4.0
+          },
+          {
+           "word": "rivers",
+           "start": 4.0,
+           "end": 4.5
+          },
+          {
+           "word": "and",
+           "start": 4.7,
+           "end": 4.9
+          },
+          {
+           "word": "the",
+           "start": 4.9,
+           "end": 5.0
+          },
+          {
+           "word": "towns",
+           "start": 5.0,
+           "end": 5.4
+          },
+          {
+           "word": "along",
+           "start": 5.4,
+           "end": 5.8
+          },
+          {
+           "word": "them.",
+           "start": 5.8,
+           "end": 6.4
+          }
+         ]
+        },
+        {
+         "i": 1,
+         "text": "The Nile is long.",
+         "pause_after": "end",
+         "status": "ok",
+         "issues": [],
+         "file": "chunk_001.wav",
+         "pitch_hz": 179.0,
+         "dur": 1.5,
+         "heard": "The Nile is long."
+        }
+       ],
+       "updated": 1900000002.25,
+       "favorite": true
+      }
+     }
+    },
+    {
+     "method": "PATCH",
+     "path": "/api/generations/ctclean01",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": {
+      "title": "  Both at once  ",
+      "favorite": false
+     },
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "id": "ctclean01",
+       "profile_id": "ctvoice01",
+       "profile_name": "Contract Voice",
+       "engine": "qwen3-tts-1.7b",
+       "language": "en",
+       "status": "done",
+       "source": "mcp",
+       "speed": 1.25,
+       "duration": 7.4,
+       "file": "final.wav",
+       "created": 1700000500.0,
+       "title": "Both at once",
+       "text": "Welcome to the show &amp; thanks for listening [1]. Today we talk about rivers — and the towns along them.\n\nThe Nile is long.",
+       "cleaned_text": "Welcome to the show & thanks for listening. Today we talk about rivers, and the towns along them.\n\nThe Nile is long.",
+       "message": "Done. All parts passed the automated checks.",
+       "timeline": [
+        {
+         "i": 0,
+         "start": 0.0,
+         "end": 5.2
+        },
+        {
+         "i": 1,
+         "start": 5.9,
+         "end": 7.1
+        }
+       ],
+       "chunks": [
+        {
+         "i": 0,
+         "text": "Welcome to the show & thanks for listening. Today we talk about rivers, and the towns along them.",
+         "pause_after": "paragraph",
+         "status": "ok",
+         "issues": [],
+         "file": "chunk_000.wav",
+         "pitch_hz": 181.0,
+         "dur": 6.5,
+         "heard": "Welcome to the show and thanks for listening. Today we talk about rivers and the towns along them.",
+         "words": [
+          {
+           "word": "Welcome",
+           "start": 0.0,
+           "end": 0.4
+          },
+          {
+           "word": "to",
+           "start": 0.4,
+           "end": 0.5
+          },
+          {
+           "word": "the",
+           "start": 0.5,
+           "end": 0.6
+          },
+          {
+           "word": "show",
+           "start": 0.6,
+           "end": 1.0
+          },
+          {
+           "word": "and",
+           "start": 1.0,
+           "end": 1.2
+          },
+          {
+           "word": "thanks",
+           "start": 1.2,
+           "end": 1.6
+          },
+          {
+           "word": "for",
+           "start": 1.6,
+           "end": 1.8
+          },
+          {
+           "word": "listening.",
+           "start": 1.8,
+           "end": 2.5
+          },
+          {
+           "word": "Today",
+           "start": 2.9,
+           "end": 3.3
+          },
+          {
+           "word": "we",
+           "start": 3.3,
+           "end": 3.4
+          },
+          {
+           "word": "talk",
+           "start": 3.4,
+           "end": 3.7
+          },
+          {
+           "word": "about",
+           "start": 3.7,
+           "end": 4.0
+          },
+          {
+           "word": "rivers",
+           "start": 4.0,
+           "end": 4.5
+          },
+          {
+           "word": "and",
+           "start": 4.7,
+           "end": 4.9
+          },
+          {
+           "word": "the",
+           "start": 4.9,
+           "end": 5.0
+          },
+          {
+           "word": "towns",
+           "start": 5.0,
+           "end": 5.4
+          },
+          {
+           "word": "along",
+           "start": 5.4,
+           "end": 5.8
+          },
+          {
+           "word": "them.",
+           "start": 5.8,
+           "end": 6.4
+          }
+         ]
+        },
+        {
+         "i": 1,
+         "text": "The Nile is long.",
+         "pause_after": "end",
+         "status": "ok",
+         "issues": [],
+         "file": "chunk_001.wav",
+         "pitch_hz": 179.0,
+         "dur": 1.5,
+         "heard": "The Nile is long."
+        }
+       ],
+       "updated": 1900000002.5,
+       "favorite": false
+      }
+     }
+    },
+    {
+     "method": "PATCH",
+     "path": "/api/generations/ctclean01",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": {
+      "title": "   "
+     },
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "id": "ctclean01",
+       "profile_id": "ctvoice01",
+       "profile_name": "Contract Voice",
+       "engine": "qwen3-tts-1.7b",
+       "language": "en",
+       "status": "done",
+       "source": "mcp",
+       "speed": 1.25,
+       "duration": 7.4,
+       "file": "final.wav",
+       "created": 1700000500.0,
+       "title": "Both at once",
+       "text": "Welcome to the show &amp; thanks for listening [1]. Today we talk about rivers — and the towns along them.\n\nThe Nile is long.",
+       "cleaned_text": "Welcome to the show & thanks for listening. Today we talk about rivers, and the towns along them.\n\nThe Nile is long.",
+       "message": "Done. All parts passed the automated checks.",
+       "timeline": [
+        {
+         "i": 0,
+         "start": 0.0,
+         "end": 5.2
+        },
+        {
+         "i": 1,
+         "start": 5.9,
+         "end": 7.1
+        }
+       ],
+       "chunks": [
+        {
+         "i": 0,
+         "text": "Welcome to the show & thanks for listening. Today we talk about rivers, and the towns along them.",
+         "pause_after": "paragraph",
+         "status": "ok",
+         "issues": [],
+         "file": "chunk_000.wav",
+         "pitch_hz": 181.0,
+         "dur": 6.5,
+         "heard": "Welcome to the show and thanks for listening. Today we talk about rivers and the towns along them.",
+         "words": [
+          {
+           "word": "Welcome",
+           "start": 0.0,
+           "end": 0.4
+          },
+          {
+           "word": "to",
+           "start": 0.4,
+           "end": 0.5
+          },
+          {
+           "word": "the",
+           "start": 0.5,
+           "end": 0.6
+          },
+          {
+           "word": "show",
+           "start": 0.6,
+           "end": 1.0
+          },
+          {
+           "word": "and",
+           "start": 1.0,
+           "end": 1.2
+          },
+          {
+           "word": "thanks",
+           "start": 1.2,
+           "end": 1.6
+          },
+          {
+           "word": "for",
+           "start": 1.6,
+           "end": 1.8
+          },
+          {
+           "word": "listening.",
+           "start": 1.8,
+           "end": 2.5
+          },
+          {
+           "word": "Today",
+           "start": 2.9,
+           "end": 3.3
+          },
+          {
+           "word": "we",
+           "start": 3.3,
+           "end": 3.4
+          },
+          {
+           "word": "talk",
+           "start": 3.4,
+           "end": 3.7
+          },
+          {
+           "word": "about",
+           "start": 3.7,
+           "end": 4.0
+          },
+          {
+           "word": "rivers",
+           "start": 4.0,
+           "end": 4.5
+          },
+          {
+           "word": "and",
+           "start": 4.7,
+           "end": 4.9
+          },
+          {
+           "word": "the",
+           "start": 4.9,
+           "end": 5.0
+          },
+          {
+           "word": "towns",
+           "start": 5.0,
+           "end": 5.4
+          },
+          {
+           "word": "along",
+           "start": 5.4,
+           "end": 5.8
+          },
+          {
+           "word": "them.",
+           "start": 5.8,
+           "end": 6.4
+          }
+         ]
+        },
+        {
+         "i": 1,
+         "text": "The Nile is long.",
+         "pause_after": "end",
+         "status": "ok",
+         "issues": [],
+         "file": "chunk_001.wav",
+         "pitch_hz": 179.0,
+         "dur": 1.5,
+         "heard": "The Nile is long."
+        }
+       ],
+       "updated": 1900000002.5,
+       "favorite": false
+      }
+     }
+    },
+    {
+     "method": "PATCH",
+     "path": "/api/generations/ctclean01",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": {
+      "title": "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT éééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééé"
+     },
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "id": "ctclean01",
+       "profile_id": "ctvoice01",
+       "profile_name": "Contract Voice",
+       "engine": "qwen3-tts-1.7b",
+       "language": "en",
+       "status": "done",
+       "source": "mcp",
+       "speed": 1.25,
+       "duration": 7.4,
+       "file": "final.wav",
+       "created": 1700000500.0,
+       "title": "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT éééééééééééééééééééééééééééééééééééééééééééééééééééééé",
+       "text": "Welcome to the show &amp; thanks for listening [1]. Today we talk about rivers — and the towns along them.\n\nThe Nile is long.",
+       "cleaned_text": "Welcome to the show & thanks for listening. Today we talk about rivers, and the towns along them.\n\nThe Nile is long.",
+       "message": "Done. All parts passed the automated checks.",
+       "timeline": [
+        {
+         "i": 0,
+         "start": 0.0,
+         "end": 5.2
+        },
+        {
+         "i": 1,
+         "start": 5.9,
+         "end": 7.1
+        }
+       ],
+       "chunks": [
+        {
+         "i": 0,
+         "text": "Welcome to the show & thanks for listening. Today we talk about rivers, and the towns along them.",
+         "pause_after": "paragraph",
+         "status": "ok",
+         "issues": [],
+         "file": "chunk_000.wav",
+         "pitch_hz": 181.0,
+         "dur": 6.5,
+         "heard": "Welcome to the show and thanks for listening. Today we talk about rivers and the towns along them.",
+         "words": [
+          {
+           "word": "Welcome",
+           "start": 0.0,
+           "end": 0.4
+          },
+          {
+           "word": "to",
+           "start": 0.4,
+           "end": 0.5
+          },
+          {
+           "word": "the",
+           "start": 0.5,
+           "end": 0.6
+          },
+          {
+           "word": "show",
+           "start": 0.6,
+           "end": 1.0
+          },
+          {
+           "word": "and",
+           "start": 1.0,
+           "end": 1.2
+          },
+          {
+           "word": "thanks",
+           "start": 1.2,
+           "end": 1.6
+          },
+          {
+           "word": "for",
+           "start": 1.6,
+           "end": 1.8
+          },
+          {
+           "word": "listening.",
+           "start": 1.8,
+           "end": 2.5
+          },
+          {
+           "word": "Today",
+           "start": 2.9,
+           "end": 3.3
+          },
+          {
+           "word": "we",
+           "start": 3.3,
+           "end": 3.4
+          },
+          {
+           "word": "talk",
+           "start": 3.4,
+           "end": 3.7
+          },
+          {
+           "word": "about",
+           "start": 3.7,
+           "end": 4.0
+          },
+          {
+           "word": "rivers",
+           "start": 4.0,
+           "end": 4.5
+          },
+          {
+           "word": "and",
+           "start": 4.7,
+           "end": 4.9
+          },
+          {
+           "word": "the",
+           "start": 4.9,
+           "end": 5.0
+          },
+          {
+           "word": "towns",
+           "start": 5.0,
+           "end": 5.4
+          },
+          {
+           "word": "along",
+           "start": 5.4,
+           "end": 5.8
+          },
+          {
+           "word": "them.",
+           "start": 5.8,
+           "end": 6.4
+          }
+         ]
+        },
+        {
+         "i": 1,
+         "text": "The Nile is long.",
+         "pause_after": "end",
+         "status": "ok",
+         "issues": [],
+         "file": "chunk_001.wav",
+         "pitch_hz": 179.0,
+         "dur": 1.5,
+         "heard": "The Nile is long."
+        }
+       ],
+       "updated": 1900000002.75,
+       "favorite": false
+      }
+     }
+    },
+    {
+     "method": "PATCH",
+     "path": "/api/generations/ctclean01",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": {
+      "speed": 1.25
+     },
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "id": "ctclean01",
+       "profile_id": "ctvoice01",
+       "profile_name": "Contract Voice",
+       "engine": "qwen3-tts-1.7b",
+       "language": "en",
+       "status": "done",
+       "source": "mcp",
+       "speed": 1.25,
+       "duration": 7.4,
+       "file": "final.wav",
+       "created": 1700000500.0,
+       "title": "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT éééééééééééééééééééééééééééééééééééééééééééééééééééééé",
+       "text": "Welcome to the show &amp; thanks for listening [1]. Today we talk about rivers — and the towns along them.\n\nThe Nile is long.",
+       "cleaned_text": "Welcome to the show & thanks for listening. Today we talk about rivers, and the towns along them.\n\nThe Nile is long.",
+       "message": "Done. All parts passed the automated checks.",
+       "timeline": [
+        {
+         "i": 0,
+         "start": 0.0,
+         "end": 5.2
+        },
+        {
+         "i": 1,
+         "start": 5.9,
+         "end": 7.1
+        }
+       ],
+       "chunks": [
+        {
+         "i": 0,
+         "text": "Welcome to the show & thanks for listening. Today we talk about rivers, and the towns along them.",
+         "pause_after": "paragraph",
+         "status": "ok",
+         "issues": [],
+         "file": "chunk_000.wav",
+         "pitch_hz": 181.0,
+         "dur": 6.5,
+         "heard": "Welcome to the show and thanks for listening. Today we talk about rivers and the towns along them.",
+         "words": [
+          {
+           "word": "Welcome",
+           "start": 0.0,
+           "end": 0.4
+          },
+          {
+           "word": "to",
+           "start": 0.4,
+           "end": 0.5
+          },
+          {
+           "word": "the",
+           "start": 0.5,
+           "end": 0.6
+          },
+          {
+           "word": "show",
+           "start": 0.6,
+           "end": 1.0
+          },
+          {
+           "word": "and",
+           "start": 1.0,
+           "end": 1.2
+          },
+          {
+           "word": "thanks",
+           "start": 1.2,
+           "end": 1.6
+          },
+          {
+           "word": "for",
+           "start": 1.6,
+           "end": 1.8
+          },
+          {
+           "word": "listening.",
+           "start": 1.8,
+           "end": 2.5
+          },
+          {
+           "word": "Today",
+           "start": 2.9,
+           "end": 3.3
+          },
+          {
+           "word": "we",
+           "start": 3.3,
+           "end": 3.4
+          },
+          {
+           "word": "talk",
+           "start": 3.4,
+           "end": 3.7
+          },
+          {
+           "word": "about",
+           "start": 3.7,
+           "end": 4.0
+          },
+          {
+           "word": "rivers",
+           "start": 4.0,
+           "end": 4.5
+          },
+          {
+           "word": "and",
+           "start": 4.7,
+           "end": 4.9
+          },
+          {
+           "word": "the",
+           "start": 4.9,
+           "end": 5.0
+          },
+          {
+           "word": "towns",
+           "start": 5.0,
+           "end": 5.4
+          },
+          {
+           "word": "along",
+           "start": 5.4,
+           "end": 5.8
+          },
+          {
+           "word": "them.",
+           "start": 5.8,
+           "end": 6.4
+          }
+         ]
+        },
+        {
+         "i": 1,
+         "text": "The Nile is long.",
+         "pause_after": "end",
+         "status": "ok",
+         "issues": [],
+         "file": "chunk_001.wav",
+         "pitch_hz": 179.0,
+         "dur": 1.5,
+         "heard": "The Nile is long."
+        }
+       ],
+       "updated": 1900000002.75,
+       "favorite": false
+      }
+     }
+    },
+    {
+     "method": "PATCH",
+     "path": "/api/generations/ctclean01",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": {},
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "id": "ctclean01",
+       "profile_id": "ctvoice01",
+       "profile_name": "Contract Voice",
+       "engine": "qwen3-tts-1.7b",
+       "language": "en",
+       "status": "done",
+       "source": "mcp",
+       "speed": 1.25,
+       "duration": 7.4,
+       "file": "final.wav",
+       "created": 1700000500.0,
+       "title": "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT éééééééééééééééééééééééééééééééééééééééééééééééééééééé",
+       "text": "Welcome to the show &amp; thanks for listening [1]. Today we talk about rivers — and the towns along them.\n\nThe Nile is long.",
+       "cleaned_text": "Welcome to the show & thanks for listening. Today we talk about rivers, and the towns along them.\n\nThe Nile is long.",
+       "message": "Done. All parts passed the automated checks.",
+       "timeline": [
+        {
+         "i": 0,
+         "start": 0.0,
+         "end": 5.2
+        },
+        {
+         "i": 1,
+         "start": 5.9,
+         "end": 7.1
+        }
+       ],
+       "chunks": [
+        {
+         "i": 0,
+         "text": "Welcome to the show & thanks for listening. Today we talk about rivers, and the towns along them.",
+         "pause_after": "paragraph",
+         "status": "ok",
+         "issues": [],
+         "file": "chunk_000.wav",
+         "pitch_hz": 181.0,
+         "dur": 6.5,
+         "heard": "Welcome to the show and thanks for listening. Today we talk about rivers and the towns along them.",
+         "words": [
+          {
+           "word": "Welcome",
+           "start": 0.0,
+           "end": 0.4
+          },
+          {
+           "word": "to",
+           "start": 0.4,
+           "end": 0.5
+          },
+          {
+           "word": "the",
+           "start": 0.5,
+           "end": 0.6
+          },
+          {
+           "word": "show",
+           "start": 0.6,
+           "end": 1.0
+          },
+          {
+           "word": "and",
+           "start": 1.0,
+           "end": 1.2
+          },
+          {
+           "word": "thanks",
+           "start": 1.2,
+           "end": 1.6
+          },
+          {
+           "word": "for",
+           "start": 1.6,
+           "end": 1.8
+          },
+          {
+           "word": "listening.",
+           "start": 1.8,
+           "end": 2.5
+          },
+          {
+           "word": "Today",
+           "start": 2.9,
+           "end": 3.3
+          },
+          {
+           "word": "we",
+           "start": 3.3,
+           "end": 3.4
+          },
+          {
+           "word": "talk",
+           "start": 3.4,
+           "end": 3.7
+          },
+          {
+           "word": "about",
+           "start": 3.7,
+           "end": 4.0
+          },
+          {
+           "word": "rivers",
+           "start": 4.0,
+           "end": 4.5
+          },
+          {
+           "word": "and",
+           "start": 4.7,
+           "end": 4.9
+          },
+          {
+           "word": "the",
+           "start": 4.9,
+           "end": 5.0
+          },
+          {
+           "word": "towns",
+           "start": 5.0,
+           "end": 5.4
+          },
+          {
+           "word": "along",
+           "start": 5.4,
+           "end": 5.8
+          },
+          {
+           "word": "them.",
+           "start": 5.8,
+           "end": 6.4
+          }
+         ]
+        },
+        {
+         "i": 1,
+         "text": "The Nile is long.",
+         "pause_after": "end",
+         "status": "ok",
+         "issues": [],
+         "file": "chunk_001.wav",
+         "pitch_hz": 179.0,
+         "dur": 1.5,
+         "heard": "The Nile is long."
+        }
+       ],
+       "updated": 1900000002.75,
+       "favorite": false
+      }
+     }
+    },
+    {
+     "method": "PATCH",
+     "path": "/api/generations/ctclean01",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": {
+      "favorite": "yes"
+     },
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "id": "ctclean01",
+       "profile_id": "ctvoice01",
+       "profile_name": "Contract Voice",
+       "engine": "qwen3-tts-1.7b",
+       "language": "en",
+       "status": "done",
+       "source": "mcp",
+       "speed": 1.25,
+       "duration": 7.4,
+       "file": "final.wav",
+       "created": 1700000500.0,
+       "title": "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT éééééééééééééééééééééééééééééééééééééééééééééééééééééé",
+       "text": "Welcome to the show &amp; thanks for listening [1]. Today we talk about rivers — and the towns along them.\n\nThe Nile is long.",
+       "cleaned_text": "Welcome to the show & thanks for listening. Today we talk about rivers, and the towns along them.\n\nThe Nile is long.",
+       "message": "Done. All parts passed the automated checks.",
+       "timeline": [
+        {
+         "i": 0,
+         "start": 0.0,
+         "end": 5.2
+        },
+        {
+         "i": 1,
+         "start": 5.9,
+         "end": 7.1
+        }
+       ],
+       "chunks": [
+        {
+         "i": 0,
+         "text": "Welcome to the show & thanks for listening. Today we talk about rivers, and the towns along them.",
+         "pause_after": "paragraph",
+         "status": "ok",
+         "issues": [],
+         "file": "chunk_000.wav",
+         "pitch_hz": 181.0,
+         "dur": 6.5,
+         "heard": "Welcome to the show and thanks for listening. Today we talk about rivers and the towns along them.",
+         "words": [
+          {
+           "word": "Welcome",
+           "start": 0.0,
+           "end": 0.4
+          },
+          {
+           "word": "to",
+           "start": 0.4,
+           "end": 0.5
+          },
+          {
+           "word": "the",
+           "start": 0.5,
+           "end": 0.6
+          },
+          {
+           "word": "show",
+           "start": 0.6,
+           "end": 1.0
+          },
+          {
+           "word": "and",
+           "start": 1.0,
+           "end": 1.2
+          },
+          {
+           "word": "thanks",
+           "start": 1.2,
+           "end": 1.6
+          },
+          {
+           "word": "for",
+           "start": 1.6,
+           "end": 1.8
+          },
+          {
+           "word": "listening.",
+           "start": 1.8,
+           "end": 2.5
+          },
+          {
+           "word": "Today",
+           "start": 2.9,
+           "end": 3.3
+          },
+          {
+           "word": "we",
+           "start": 3.3,
+           "end": 3.4
+          },
+          {
+           "word": "talk",
+           "start": 3.4,
+           "end": 3.7
+          },
+          {
+           "word": "about",
+           "start": 3.7,
+           "end": 4.0
+          },
+          {
+           "word": "rivers",
+           "start": 4.0,
+           "end": 4.5
+          },
+          {
+           "word": "and",
+           "start": 4.7,
+           "end": 4.9
+          },
+          {
+           "word": "the",
+           "start": 4.9,
+           "end": 5.0
+          },
+          {
+           "word": "towns",
+           "start": 5.0,
+           "end": 5.4
+          },
+          {
+           "word": "along",
+           "start": 5.4,
+           "end": 5.8
+          },
+          {
+           "word": "them.",
+           "start": 5.8,
+           "end": 6.4
+          }
+         ]
+        },
+        {
+         "i": 1,
+         "text": "The Nile is long.",
+         "pause_after": "end",
+         "status": "ok",
+         "issues": [],
+         "file": "chunk_001.wav",
+         "pitch_hz": 179.0,
+         "dur": 1.5,
+         "heard": "The Nile is long."
+        }
+       ],
+       "updated": 1900000003.0,
+       "favorite": true
+      }
+     }
+    },
+    {
+     "method": "PATCH",
+     "path": "/api/generations/ctclean01",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": {
+      "title": 5
+     },
+     "response": {
+      "status": 422,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": [
+        {
+         "type": "string_type",
+         "loc": [
+          "body",
+          "title"
+         ],
+         "msg": "Input should be a valid string",
+         "input": 5
+        }
+       ]
+      }
+     }
+    },
+    {
+     "method": "PATCH",
+     "path": "/api/generations/ctclean01",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": {
+      "favorite": "maybe",
+      "title": null
+     },
+     "response": {
+      "status": 422,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": [
+        {
+         "type": "bool_parsing",
+         "loc": [
+          "body",
+          "favorite"
+         ],
+         "msg": "Input should be a valid boolean, unable to interpret input",
+         "input": "maybe"
+        }
+       ]
+      }
+     }
+    },
+    {
+     "method": "PATCH",
+     "path": "/api/generations/ctclean01",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 422,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": [
+        {
+         "type": "missing",
+         "loc": [
+          "body"
+         ],
+         "msg": "Field required",
+         "input": null
+        }
+       ]
+      }
+     }
+    },
+    {
+     "method": "PATCH",
+     "path": "/api/generations/ctclean01",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": {
+      "title": "Rivers and towns",
+      "favorite": false
+     },
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "id": "ctclean01",
+       "profile_id": "ctvoice01",
+       "profile_name": "Contract Voice",
+       "engine": "qwen3-tts-1.7b",
+       "language": "en",
+       "status": "done",
+       "source": "mcp",
+       "speed": 1.25,
+       "duration": 7.4,
+       "file": "final.wav",
+       "created": 1700000500.0,
+       "title": "Rivers and towns",
+       "text": "Welcome to the show &amp; thanks for listening [1]. Today we talk about rivers — and the towns along them.\n\nThe Nile is long.",
+       "cleaned_text": "Welcome to the show & thanks for listening. Today we talk about rivers, and the towns along them.\n\nThe Nile is long.",
+       "message": "Done. All parts passed the automated checks.",
+       "timeline": [
+        {
+         "i": 0,
+         "start": 0.0,
+         "end": 5.2
+        },
+        {
+         "i": 1,
+         "start": 5.9,
+         "end": 7.1
+        }
+       ],
+       "chunks": [
+        {
+         "i": 0,
+         "text": "Welcome to the show & thanks for listening. Today we talk about rivers, and the towns along them.",
+         "pause_after": "paragraph",
+         "status": "ok",
+         "issues": [],
+         "file": "chunk_000.wav",
+         "pitch_hz": 181.0,
+         "dur": 6.5,
+         "heard": "Welcome to the show and thanks for listening. Today we talk about rivers and the towns along them.",
+         "words": [
+          {
+           "word": "Welcome",
+           "start": 0.0,
+           "end": 0.4
+          },
+          {
+           "word": "to",
+           "start": 0.4,
+           "end": 0.5
+          },
+          {
+           "word": "the",
+           "start": 0.5,
+           "end": 0.6
+          },
+          {
+           "word": "show",
+           "start": 0.6,
+           "end": 1.0
+          },
+          {
+           "word": "and",
+           "start": 1.0,
+           "end": 1.2
+          },
+          {
+           "word": "thanks",
+           "start": 1.2,
+           "end": 1.6
+          },
+          {
+           "word": "for",
+           "start": 1.6,
+           "end": 1.8
+          },
+          {
+           "word": "listening.",
+           "start": 1.8,
+           "end": 2.5
+          },
+          {
+           "word": "Today",
+           "start": 2.9,
+           "end": 3.3
+          },
+          {
+           "word": "we",
+           "start": 3.3,
+           "end": 3.4
+          },
+          {
+           "word": "talk",
+           "start": 3.4,
+           "end": 3.7
+          },
+          {
+           "word": "about",
+           "start": 3.7,
+           "end": 4.0
+          },
+          {
+           "word": "rivers",
+           "start": 4.0,
+           "end": 4.5
+          },
+          {
+           "word": "and",
+           "start": 4.7,
+           "end": 4.9
+          },
+          {
+           "word": "the",
+           "start": 4.9,
+           "end": 5.0
+          },
+          {
+           "word": "towns",
+           "start": 5.0,
+           "end": 5.4
+          },
+          {
+           "word": "along",
+           "start": 5.4,
+           "end": 5.8
+          },
+          {
+           "word": "them.",
+           "start": 5.8,
+           "end": 6.4
+          }
+         ]
+        },
+        {
+         "i": 1,
+         "text": "The Nile is long.",
+         "pause_after": "end",
+         "status": "ok",
+         "issues": [],
+         "file": "chunk_001.wav",
+         "pitch_hz": 179.0,
+         "dur": 1.5,
+         "heard": "The Nile is long."
+        }
+       ],
+       "updated": 1900000003.25,
+       "favorite": false
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/ctclean01",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "id": "ctclean01",
+       "profile_id": "ctvoice01",
+       "profile_name": "Contract Voice",
+       "engine": "qwen3-tts-1.7b",
+       "language": "en",
+       "status": "done",
+       "source": "mcp",
+       "speed": 1.25,
+       "duration": 7.4,
+       "file": "final.wav",
+       "created": 1700000500.0,
+       "title": "Rivers and towns",
+       "text": "Welcome to the show &amp; thanks for listening [1]. Today we talk about rivers — and the towns along them.\n\nThe Nile is long.",
+       "cleaned_text": "Welcome to the show & thanks for listening. Today we talk about rivers, and the towns along them.\n\nThe Nile is long.",
+       "message": "Done. All parts passed the automated checks.",
+       "timeline": [
+        {
+         "i": 0,
+         "start": 0.0,
+         "end": 5.2
+        },
+        {
+         "i": 1,
+         "start": 5.9,
+         "end": 7.1
+        }
+       ],
+       "chunks": [
+        {
+         "i": 0,
+         "text": "Welcome to the show & thanks for listening. Today we talk about rivers, and the towns along them.",
+         "pause_after": "paragraph",
+         "status": "ok",
+         "issues": [],
+         "file": "chunk_000.wav",
+         "pitch_hz": 181.0,
+         "dur": 6.5,
+         "heard": "Welcome to the show and thanks for listening. Today we talk about rivers and the towns along them.",
+         "words": [
+          {
+           "word": "Welcome",
+           "start": 0.0,
+           "end": 0.4
+          },
+          {
+           "word": "to",
+           "start": 0.4,
+           "end": 0.5
+          },
+          {
+           "word": "the",
+           "start": 0.5,
+           "end": 0.6
+          },
+          {
+           "word": "show",
+           "start": 0.6,
+           "end": 1.0
+          },
+          {
+           "word": "and",
+           "start": 1.0,
+           "end": 1.2
+          },
+          {
+           "word": "thanks",
+           "start": 1.2,
+           "end": 1.6
+          },
+          {
+           "word": "for",
+           "start": 1.6,
+           "end": 1.8
+          },
+          {
+           "word": "listening.",
+           "start": 1.8,
+           "end": 2.5
+          },
+          {
+           "word": "Today",
+           "start": 2.9,
+           "end": 3.3
+          },
+          {
+           "word": "we",
+           "start": 3.3,
+           "end": 3.4
+          },
+          {
+           "word": "talk",
+           "start": 3.4,
+           "end": 3.7
+          },
+          {
+           "word": "about",
+           "start": 3.7,
+           "end": 4.0
+          },
+          {
+           "word": "rivers",
+           "start": 4.0,
+           "end": 4.5
+          },
+          {
+           "word": "and",
+           "start": 4.7,
+           "end": 4.9
+          },
+          {
+           "word": "the",
+           "start": 4.9,
+           "end": 5.0
+          },
+          {
+           "word": "towns",
+           "start": 5.0,
+           "end": 5.4
+          },
+          {
+           "word": "along",
+           "start": 5.4,
+           "end": 5.8
+          },
+          {
+           "word": "them.",
+           "start": 5.8,
+           "end": 6.4
+          }
+         ]
+        },
+        {
+         "i": 1,
+         "text": "The Nile is long.",
+         "pause_after": "end",
+         "status": "ok",
+         "issues": [],
+         "file": "chunk_001.wav",
+         "pitch_hz": 179.0,
+         "dur": 1.5,
+         "heard": "The Nile is long."
+        }
+       ],
+       "updated": 1900000003.25,
+       "favorite": false,
+       "outcome": "clean",
+       "review": [],
+       "job": null
+      }
+     }
+    },
+    {
+     "method": "PATCH",
+     "path": "/api/generations/nosuchid",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": {},
+     "response": {
+      "status": 404,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "Not found"
+      }
+     }
+    },
+    {
+     "method": "PATCH",
+     "path": "/api/generations/cttrash01",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": {
+      "speed": 1.0
+     },
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "id": "cttrash01",
+       "profile_id": "ctvoice01",
+       "profile_name": "Contract Voice",
+       "engine": "qwen3-tts-1.7b",
+       "language": "en",
+       "status": "done",
+       "source": "api",
+       "speed": 1.0,
+       "duration": 2.5,
+       "file": "final.wav",
+       "created": 1700000100.0,
+       "title": "Delete and restore",
+       "text": "A narration to delete and bring back.",
+       "cleaned_text": "A narration to delete and bring back.",
+       "message": "Done. All parts passed the automated checks.",
+       "timeline": [
+        {
+         "i": 0,
+         "start": 0.0,
+         "end": 2.3
+        }
+       ],
+       "chunks": [
+        {
+         "i": 0,
+         "text": "A narration to delete and bring back.",
+         "pause_after": "end",
+         "status": "ok",
+         "issues": [],
+         "file": "chunk_000.wav",
+         "heard": "A narration to delete and bring back.",
+         "pitch_hz": 180.0
+        }
+       ],
+       "updated": 1800000003.0
+      }
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/generations",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": {
+      "profile_id": "nosuchvoice",
+      "text": "Hello."
+     },
+     "response": {
+      "status": 404,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "Voice not found"
+      }
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/generations",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": {
+      "profile_id": "ctvoice01",
+      "text": "Hello.",
+      "engine": "nosuchmodel"
+     },
+     "response": {
+      "status": 404,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "Unknown model"
+      }
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/generations",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": {
+      "profile_id": "ctvoice01",
+      "text": "word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word "
+     },
+     "response": {
+      "status": 400,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "Script is 10,001 words. The limit is 10,000 per narration; split it into parts."
+      }
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/generations",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": {
+      "profile_id": "ctvoice01",
+      "text": "[1] [2]"
+     },
+     "response": {
+      "status": 400,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "Nothing to say: the script is empty after cleanup."
+      }
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/generations",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": {
+      "profile_id": "ctvoice01",
+      "text": "  \n "
+     },
+     "response": {
+      "status": 400,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "Nothing to say: the script is empty after cleanup."
+      }
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/generations",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": {
+      "profile_id": "ctvoice01"
+     },
+     "response": {
+      "status": 422,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": [
+        {
+         "type": "missing",
+         "loc": [
+          "body",
+          "text"
+         ],
+         "msg": "Field required",
+         "input": {
+          "profile_id": "ctvoice01"
+         }
+        }
+       ]
+      }
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/generations",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 422,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": [
+        {
+         "type": "missing",
+         "loc": [
+          "body"
+         ],
+         "msg": "Field required",
+         "input": null
+        }
+       ]
+      }
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/generations",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": {
+      "profile_id": 5,
+      "text": [
+       "x"
+      ],
+      "params": 1
+     },
+     "response": {
+      "status": 422,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": [
+        {
+         "type": "string_type",
+         "loc": [
+          "body",
+          "profile_id"
+         ],
+         "msg": "Input should be a valid string",
+         "input": 5
+        },
+        {
+         "type": "string_type",
+         "loc": [
+          "body",
+          "text"
+         ],
+         "msg": "Input should be a valid string",
+         "input": [
+          "x"
+         ]
+        },
+        {
+         "type": "dict_type",
+         "loc": [
+          "body",
+          "params"
+         ],
+         "msg": "Input should be a valid dictionary",
+         "input": 1
+        }
+       ]
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/status",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "loaded_engine": null,
+       "running": null,
+       "queued": 0,
+       "queue": [],
+       "duplicates": [],
+       "max_script_words": 10000
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": [
+       {
+        "id": "ctclean01",
+        "profile_id": "ctvoice01",
+        "profile_name": "Contract Voice",
+        "engine": "qwen3-tts-1.7b",
+        "language": "en",
+        "status": "done",
+        "source": "mcp",
+        "speed": 1.25,
+        "duration": 7.4,
+        "file": "final.wav",
+        "created": 1700000500.0,
+        "title": "Rivers and towns",
+        "message": "Done. All parts passed the automated checks.",
+        "timeline": [
+         {
+          "i": 0,
+          "start": 0.0,
+          "end": 5.2
+         },
+         {
+          "i": 1,
+          "start": 5.9,
+          "end": 7.1
+         }
+        ],
+        "updated": 1900000003.25,
+        "favorite": false,
+        "outcome": "clean",
+        "review_count": 0,
+        "text_preview": "Welcome to the show &amp; thanks for listening [1]. Today we talk about rivers — and the towns along them.\n\nThe Nile is long."
+       },
+       {
+        "id": "ctreview01",
+        "profile_id": "ctvoice01",
+        "profile_name": "Contract Voice",
+        "engine": "qwen3-tts-1.7b",
+        "language": "en",
+        "status": "done",
+        "source": "app",
+        "speed": 1.0,
+        "duration": 6.0,
+        "file": "final.wav",
+        "created": 1700000400.0,
+        "title": "Three parts to review",
+        "message": "Done, needs review: part 2, 3.",
+        "timeline": [
+         {
+          "i": 0,
+          "start": 0.0,
+          "end": 1.5
+         },
+         {
+          "i": 1,
+          "start": 1.8,
+          "end": 3.4
+         },
+         {
+          "i": 2,
+          "start": 3.7,
+          "end": 5.6
+         }
+        ],
+        "updated": 1800000001.5,
+        "outcome": "needs_listen",
+        "review_count": 2,
+        "text_preview": "Part one is fine. Part two ends early. It&#39;s part three."
+       },
+       {
+        "id": "ctaccept01",
+        "profile_id": "ctvoice01",
+        "profile_name": "Contract Voice",
+        "engine": "qwen3-tts-1.7b",
+        "language": "en",
+        "status": "done",
+        "source": "api",
+        "speed": 1.0,
+        "duration": 4.0,
+        "file": "final.wav",
+        "created": 1700000300.0,
+        "title": "Sounds fine test",
+        "message": "Done, needs review: part 2.",
+        "timeline": [
+         {
+          "i": 0,
+          "start": 0.0,
+          "end": 1.6
+         },
+         {
+          "i": 1,
+          "start": 1.9,
+          "end": 3.8
+         }
+        ],
+        "updated": 1900000001.5,
+        "flagged": [
+         1
+        ],
+        "outcome": "needs_listen",
+        "review_count": 1,
+        "text_preview": "First line here. Second line ends here."
+       },
+       {
+        "id": "ctpending01",
+        "profile_id": "ctvoice01",
+        "profile_name": "Contract Voice",
+        "engine": "qwen3-tts-1.7b",
+        "language": "en",
+        "status": "cancelled",
+        "source": "api",
+        "speed": 1.0,
+        "created": 1700000200.0,
+        "title": "Not rendered yet",
+        "message": "Cancelled before it started",
+        "updated": 1800000002.5,
+        "outcome": null,
+        "review_count": 0,
+        "text_preview": "Not rendered yet. This one was stopped."
+       },
+       {
+        "id": "cttrash01",
+        "profile_id": "ctvoice01",
+        "profile_name": "Contract Voice",
+        "engine": "qwen3-tts-1.7b",
+        "language": "en",
+        "status": "done",
+        "source": "api",
+        "speed": 1.0,
+        "duration": 2.5,
+        "file": "final.wav",
+        "created": 1700000100.0,
+        "title": "Delete and restore",
+        "message": "Done. All parts passed the automated checks.",
+        "timeline": [
+         {
+          "i": 0,
+          "start": 0.0,
+          "end": 2.3
+         }
+        ],
+        "updated": 1800000003.0,
+        "outcome": "clean",
+        "review_count": 0,
+        "text_preview": "A narration to delete and bring back."
+       }
+      ]
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/generations/nosuchid/chunks/0/regenerate",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": {},
+     "response": {
+      "status": 404,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "Not found"
+      }
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/generations/ctreview01/chunks/9/regenerate",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": {},
+     "response": {
+      "status": 404,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "No such chunk"
+      }
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/generations/ctreview01/chunks/1/regenerate",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": {
+      "text": "[1] [2]"
+     },
+     "response": {
+      "status": 400,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "The new text is empty after cleanup."
+      }
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/generations/ctreview01/chunks/1/regenerate",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": {
+      "text": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+     },
+     "response": {
+      "status": 400,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "This part would be 300 characters; a part can be at most 220. Split the text into two parts."
+      }
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/generations/ctreview01/chunks/x/regenerate",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 422,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": [
+        {
+         "type": "int_parsing",
+         "loc": [
+          "path",
+          "ci"
+         ],
+         "msg": "Input should be a valid integer, unable to parse string as an integer",
+         "input": "x"
+        },
+        {
+         "type": "missing",
+         "loc": [
+          "body"
+         ],
+         "msg": "Field required",
+         "input": null
+        }
+       ]
+      }
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/generations/ctreview01/chunks/9/select-take",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": {
+      "take": 1
+     },
+     "response": {
+      "status": 404,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "No such part"
+      }
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/generations/ctreview01/chunks/1/select-take",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": {
+      "take": 9
+     },
+     "response": {
+      "status": 404,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "That take is no longer kept."
+      }
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/generations/ctreview01/chunks/1/select-take",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": {
+      "take": "x"
+     },
+     "response": {
+      "status": 422,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": [
+        {
+         "type": "int_parsing",
+         "loc": [
+          "body",
+          "take"
+         ],
+         "msg": "Input should be a valid integer, unable to parse string as an integer",
+         "input": "x"
+        }
+       ]
+      }
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/generations/ctreview01/chunks/1/select-take",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": {},
+     "response": {
+      "status": 422,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": [
+        {
+         "type": "missing",
+         "loc": [
+          "body",
+          "take"
+         ],
+         "msg": "Field required",
+         "input": {}
+        }
+       ]
+      }
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/generations/ctclean01/fix-remaining",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 400,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "Nothing left to fix."
+      }
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/generations/nosuchid/fix-remaining",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 404,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "Not found"
+      }
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/generations/nosuchid/resume",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 404,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "Not found"
+      }
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/generations/cttrash01/chunks/0/accept",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 400,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "This part doesn't need review, so there is nothing to mark."
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/status",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "loaded_engine": null,
+       "running": null,
+       "queued": 0,
+       "queue": [],
+       "duplicates": [],
+       "max_script_words": 10000
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "d",
+   "setup": [
+    {
+     "set_status": [
+      "generations",
+      "ctaccept01",
+      "running"
+     ]
+    }
+   ],
+   "cases": [
+    {
+     "method": "POST",
+     "path": "/api/generations/ctaccept01/chunks/1/accept",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 409,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "This narration is busy. Try again when it finishes."
+      }
+     }
+    },
+    {
+     "method": "DELETE",
+     "path": "/api/generations/ctaccept01/chunks/1/accept",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 409,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "This narration is busy. Try again when it finishes."
+      }
+     }
+    },
+    {
+     "method": "POST",
+     "path": "/api/generations/ctaccept01/chunks/1/select-take",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": {
+      "take": 1
+     },
+     "response": {
+      "status": 409,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "This narration is busy. Try again when it finishes."
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/ctaccept01",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "id": "ctaccept01",
+       "profile_id": "ctvoice01",
+       "profile_name": "Contract Voice",
+       "engine": "qwen3-tts-1.7b",
+       "language": "en",
+       "status": "running",
+       "source": "api",
+       "speed": 1.0,
+       "duration": 4.0,
+       "file": "final.wav",
+       "created": 1700000300.0,
+       "title": "Sounds fine test",
+       "text": "First line here. Second line ends here.",
+       "cleaned_text": "First line here. Second line ends here.",
+       "message": "Done, needs review: part 2.",
+       "timeline": [
+        {
+         "i": 0,
+         "start": 0.0,
+         "end": 1.6
+        },
+        {
+         "i": 1,
+         "start": 1.9,
+         "end": 3.8
+        }
+       ],
+       "chunks": [
+        {
+         "i": 0,
+         "text": "First line here.",
+         "pause_after": "sentence",
+         "status": "ok",
+         "issues": [],
+         "file": "chunk_000.wav",
+         "heard": "First line here.",
+         "pitch_hz": 180.0
+        },
+        {
+         "i": 1,
+         "text": "Second line ends here.",
+         "pause_after": "end",
+         "status": "flagged",
+         "issues": [
+          "end_word_missing"
+         ],
+         "file": "chunk_001.wav",
+         "heard": "Second line ends",
+         "pitch_hz": 181.0,
+         "accepted": null
+        }
+       ],
+       "updated": 1800000003.75,
+       "flagged": [
+        1
+       ],
+       "outcome": null,
+       "review": [],
+       "job": null
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "e",
+   "setup": [
+    {
+     "set_status": [
+      "generations",
+      "ctaccept01",
+      "done"
+     ]
+    },
+    {
+     "set_status": [
+      "profiles",
+      "ctvoice01",
+      "analyzing"
+     ]
+    }
+   ],
+   "cases": [
+    {
+     "method": "POST",
+     "path": "/api/generations",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": {
+      "profile_id": "ctvoice01",
+      "text": "Hello."
+     },
+     "response": {
+      "status": 400,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "detail": "This voice is still being analyzed."
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/profiles/ctvoice01",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "id": "ctvoice01",
+       "name": "Contract Voice",
+       "language": "en",
+       "status": "analyzing",
+       "pitch_hz": 180.0,
+       "speech_rate_wps": 2.6,
+       "studio": true,
+       "description": "Synthetic voice for the contract suite",
+       "created": 1700000000.0,
+       "updated": 1800000004.75,
+       "job": null
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/generations/ctaccept01",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "id": "ctaccept01",
+       "profile_id": "ctvoice01",
+       "profile_name": "Contract Voice",
+       "engine": "qwen3-tts-1.7b",
+       "language": "en",
+       "status": "done",
+       "source": "api",
+       "speed": 1.0,
+       "duration": 4.0,
+       "file": "final.wav",
+       "created": 1700000300.0,
+       "title": "Sounds fine test",
+       "text": "First line here. Second line ends here.",
+       "cleaned_text": "First line here. Second line ends here.",
+       "message": "Done, needs review: part 2.",
+       "timeline": [
+        {
+         "i": 0,
+         "start": 0.0,
+         "end": 1.6
+        },
+        {
+         "i": 1,
+         "start": 1.9,
+         "end": 3.8
+        }
+       ],
+       "chunks": [
+        {
+         "i": 0,
+         "text": "First line here.",
+         "pause_after": "sentence",
+         "status": "ok",
+         "issues": [],
+         "file": "chunk_000.wav",
+         "heard": "First line here.",
+         "pitch_hz": 180.0
+        },
+        {
+         "i": 1,
+         "text": "Second line ends here.",
+         "pause_after": "end",
+         "status": "flagged",
+         "issues": [
+          "end_word_missing"
+         ],
+         "file": "chunk_001.wav",
+         "heard": "Second line ends",
+         "pitch_hz": 181.0,
+         "accepted": null
+        }
+       ],
+       "updated": 1800000004.25,
+       "flagged": [
+        1
+       ],
+       "outcome": "needs_listen",
+       "review": [
+        {
+         "part": 2,
+         "text": "Second line ends here.",
+         "issues": [
+          "end_word_missing"
+         ],
+         "reasons": [
+          "Last word missing"
+         ],
+         "start": 1.9,
+         "end": 3.8,
+         "heard": "Second line ends",
+         "pitch_hz": 181.0,
+         "voice_pitch_hz": 180.0,
+         "checked_by": [
+          "take check"
+         ],
+         "take": 1
+        }
+       ],
+       "job": null
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "f",
+   "setup": [
+    {
+     "set_status": [
+      "profiles",
+      "ctvoice01",
+      "ready"
+     ]
+    }
+   ],
+   "cases": [
+    {
+     "method": "GET",
+     "path": "/api/profiles/ctvoice01",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "id": "ctvoice01",
+       "name": "Contract Voice",
+       "language": "en",
+       "status": "ready",
+       "pitch_hz": 180.0,
+       "speech_rate_wps": 2.6,
+       "studio": true,
+       "description": "Synthetic voice for the contract suite",
+       "created": 1700000000.0,
+       "updated": 1800000005.25,
+       "job": null
+      }
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/profiles",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": [
+       {
+        "id": "ctvoice01",
+        "name": "Contract Voice",
+        "language": "en",
+        "status": "ready",
+        "pitch_hz": 180.0,
+        "speech_rate_wps": 2.6,
+        "studio": true,
+        "description": "Synthetic voice for the contract suite",
+        "created": 1700000000.0,
+        "updated": 1800000005.25
+       }
+      ]
+     }
+    },
+    {
+     "method": "GET",
+     "path": "/api/status",
+     "headers": {
+      "Host": "127.0.0.1:8790",
+      "Origin": "http://127.0.0.1:8790"
+     },
+     "body": null,
+     "response": {
+      "status": 200,
+      "headers": {
+       "content-type": "application/json",
+       "content-disposition": null,
+       "cache-control": null,
+       "x-preview-kind": null,
+       "content-range": null
+      },
+      "json": {
+       "loaded_engine": null,
+       "running": null,
+       "queued": 0,
+       "queue": [],
+       "duplicates": [],
+       "max_script_words": 10000
+      }
      }
     }
    ]

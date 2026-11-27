@@ -8,9 +8,10 @@
 set -uo pipefail
 
 WT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-source "$WT/rust/scripts/env.sh" >/dev/null   # makes its own temp TAKETWO_DATA; removed below
-ENV_DATA="$TAKETWO_DATA"
 DATA="$(mktemp -d "${TMPDIR:-/tmp}/taketwo-contract.XXXXXX")"
+mkdir "$DATA/library"
+export TAKETWO_DATA="$DATA/library"
+source "$WT/rust/scripts/env.sh" >/dev/null   # keeps this TAKETWO_DATA
 LOG="$DATA.log"
 PID=""
 
@@ -19,13 +20,12 @@ cleanup() {
         kill "$PID" 2>/dev/null
         wait "$PID" 2>/dev/null
     fi
-    rm -rf "$DATA" "$ENV_DATA" "$LOG"
+    rm -rf "$DATA" "$LOG"
 }
 trap cleanup EXIT INT TERM
 
 (cd "$WT/rust" && cargo build -q -p taketwo-engine) || exit 2
 BIN="$WT/rust/target/debug/taketwo-engine"
-export TAKETWO_DATA="$DATA/library"
 "$BIN" seed --fixture "$WT/contract/fixture.json" >/dev/null || exit 2
 
 "$BIN" serve >"$LOG" 2>&1 &

@@ -8,6 +8,8 @@ Writes rust/golden/library.sqlite3 (a database written by db.py, synthetic docum
 rust/golden/library.json (a JSON copy of its documents, settings vectors, and what
 contract/seed_python.py seed() writes into a temporary folder, recorded in a child process).
 db.py's clock is pinned, so both files come out byte-identical on every run.
+Writes rust/golden/pipeline.json (step S07a): pipeline.create_generation documents (id replaced) and
+clean_replacement results.
 Writes rust/golden/review.json (step S05): tools.py captions, timings, subtitles and download header,
 and pipeline.py review rules, "Sounds fine" and take bookkeeping, on synthetic documents
 (pipeline's clock pinned; take files live in the temporary generations folder, paths recorded relative).
@@ -756,6 +758,92 @@ def record_review(config) -> dict:
     return data
 
 
+# ---- step S07a: the new narration document and a re-spoken part's text ------------------------------
+
+PIPELINE_OUT = HERE / "pipeline.json"
+CREATE_CLOCK0 = 1800005000.0
+LONG_TITLE = "A title that goes on " + "and on " * 30
+
+
+def _err(fn, *args, **kw):
+    """{"result": ...} or {"error": <exception name>, "message": str(e)}: ValueError texts reach the user as 400s."""
+    try:
+        return {"result": fn(*args, **kw)}
+    except Exception as e:  # noqa: BLE001 - the Rust port must fail the same cases
+        return {"error": type(e).__name__, "message": str(e)}
+
+
+def create_cases(db) -> list[dict]:
+    s = db.get_settings()
+    s_pron = {**s, "pronunciations": [{"from": "Nile", "to": "Nyle"}], "strip_citations": False}
+    voice = {"id": "s07voice", "name": "Golden Voice", "language": "en", "status": "ready"}
+    nine = "One two three four five six seven eight nine words here."
+    eight = "One two three four five six seven eight."
+    base = {"profile": voice, "text": "Hello there. The Nile is long [1].", "engine": "qwen3-tts-1.7b", "language": "en",
+            "params": {}, "s": s, "speed": 1.0, "voice_settings": {}, "title": None, "source": "api"}
+    specs = [
+        {"title": "  Given title  "},
+        {"title": LONG_TITLE},
+        {"title": "   ", "text": nine},
+        {"text": nine},
+        {"text": eight},
+        {"title": "", "text": "Short."},
+        {"speed": 0.5},
+        {"speed": 1.7},
+        {"speed": None},
+        {"speed": 0.0},
+        {"speed": 1.1, "params": {"temperature": 0.6, "top_k": None}},
+        {"voice_settings": {"stability": 0.9, "bogus": 1, "studio_finish": False}},
+        {"voice_settings": None},
+        {"source": "app"},
+        {"source": "mcp"},
+        {"source": "weird"},
+        {"text": "[1] [2]"},
+        {"text": "   \n\n  "},
+        {"text": "[1] [2]", "s": s_pron},
+        {"text": "The Nile [3]. " * 40, "s": {**s, "max_chunk_chars": 80}},
+        {"text": "First paragraph here.\n\nSecond one, longer than the first one.", "language": "de", "engine": "other-engine"},
+        {"text": "It&#39;s “quoted” text…", "s": s_pron},
+    ]
+    return [{**base, **sp} for sp in specs]
+
+
+def record_create(db, pipeline) -> list[dict]:
+    pin_clock(db, CREATE_CLOCK0)
+    out = []
+    for c in create_cases(db):
+        got = _err(pipeline.create_generation, copy.deepcopy(c["profile"]), c["text"], c["engine"], c["language"],
+                   copy.deepcopy(c["params"]), copy.deepcopy(c["s"]), c["speed"], copy.deepcopy(c["voice_settings"]),
+                   title=c["title"], source=c["source"])
+        if "result" in got:
+            gid = got["result"]["id"]
+            assert (pipeline.GENERATIONS_DIR / gid).is_dir() and db.get_generation(gid) is not None
+            db.delete_generation(gid)  # it wrote only into this recorder's temporary library
+            got["result"]["id"] = "GID"
+        out.append({**c, "out": got})
+    return out
+
+
+def record_replacement(db, pipeline) -> list[dict]:
+    s = db.get_settings()
+    gen = {"id": "s07gen", "settings": {"max_chunk_chars": 40}}
+    specs = [
+        ("A fine new line.", gen, s),
+        ("[1] [2]", gen, s),
+        ("   ", gen, s),
+        ("x" * 41, gen, s),
+        ("x" * 40, gen, s),
+        ("Word " * 30, {"id": "g", "settings": {}}, s),
+        ("Word " * 60, {"id": "g"}, s),
+        ("Word " * 60, {"id": "g", "settings": None}, {**s, "max_chunk_chars": 500}),
+        ("Word " * 10, {"id": "g", "settings": {"max_chunk_chars": 0}}, {**s, "max_chunk_chars": 30}),
+        ("The Nile [2].", gen, {**s, "strip_citations": False, "pronunciations": [{"from": "Nile", "to": "Nyle"}]}),
+        ("It&#39;s “quoted”…", gen, s),
+    ]
+    return [{"text": t, "gen": g, "s": ss, "out": _err(pipeline.clean_replacement, t, copy.deepcopy(g), copy.deepcopy(ss))}
+            for t, g, ss in specs]
+
+
 def main() -> None:
     tmp = Path(tempfile.mkdtemp(prefix="taketwo-golden."))
     try:
@@ -814,6 +902,11 @@ def main() -> None:
         rev = record_review(config)
         REVIEW_OUT.write_text(json.dumps(rev, ensure_ascii=True, indent=1, allow_nan=False) + "\n")
         print({k: (len(v) if isinstance(v, list) else v) for k, v in rev.items()})
+
+        pipe = {"create_clock_start": CREATE_CLOCK0, "clock_step": 0.25,
+                "create": record_create(db, pipeline), "replacement": record_replacement(db, pipeline)}
+        PIPELINE_OUT.write_text(json.dumps(pipe, ensure_ascii=True, indent=1, allow_nan=False) + "\n")
+        print({k: len(v) for k, v in pipe.items() if isinstance(v, list)})
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
 

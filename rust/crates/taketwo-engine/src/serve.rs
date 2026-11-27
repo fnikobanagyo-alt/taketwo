@@ -1,5 +1,5 @@
-//! `taketwo-engine serve [--port N] [--ui DIR]`: isolated mode only in step S06 (no lock file, idle exit,
-//! parent watch or address file yet; those are S07).
+//! `taketwo-engine serve [--port N] [--ui DIR]`: isolated mode only (no lock file, idle exit,
+//! parent watch or address file yet; those are S07b).
 
 use crate::api::{self, AppState};
 use std::ffi::OsStr;
@@ -77,7 +77,7 @@ pub fn run(args: &[String]) -> Result<(), String> {
     let port = listener.local_addr().map_err(|e| e.to_string())?.port();
     let ui = a.ui.filter(|d| d.is_dir());
     let started = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).map(|d| d.as_secs_f64()).unwrap_or(0.0);
-    let app = api::router(Arc::new(AppState { lib, ui, started }));
+    let app = api::router(Arc::new(AppState { lib, ui, started, reveal: Box::new(api::reveal_in_file_manager) }));
     let rt = tokio::runtime::Builder::new_multi_thread().worker_threads(4).enable_all().build().map_err(|e| e.to_string())?;
     rt.block_on(async move {
         let listener = tokio::net::TcpListener::from_std(listener).map_err(|e| e.to_string())?;

@@ -10,7 +10,7 @@ use serde_json::Value;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 use std::sync::{Arc, Mutex};
-use taketwo_core::library::Library;
+use taketwo_core::library::{self, Library};
 use taketwo_engine::api::{AppState, router};
 use taketwo_engine::seed;
 use tower::ServiceExt;
@@ -29,25 +29,38 @@ fn wt() -> PathBuf {
 
 struct Engine {
     _tmp: tempfile::TempDir,
+    /// What record_http.py does through db.py in its own process (seeding, setup steps), with its own clock.
+    setup: Library,
     state: Arc<AppState>,
     app: Router,
+    revealed: Arc<Mutex<Vec<PathBuf>>>,
 }
 
-/// A seeded temporary library. `clock` pins the library clock as record_http.py pins db.py's.
-fn engine(clock: Option<(f64, f64)>, ui: Option<PathBuf>) -> Engine {
+fn stepping(lib: Library, clock: Option<(f64, f64)>) -> Library {
+    let Some((start, step)) = clock else { return lib };
+    let t = Mutex::new(start);
+    lib.with_clock(move || {
+        let mut t = t.lock().unwrap();
+        *t += step;
+        *t
+    })
+}
+
+/// A seeded temporary library. `clocks` pin the two clocks as record_http.py pins them: the recorder's
+/// (seeding and setup steps) and the engine child's (every request), each `(start, step)`.
+/// The opener only records what would be shown: no test opens the file manager.
+fn engine(clocks: Option<((f64, f64), (f64, f64))>, ui: Option<PathBuf>) -> Engine {
     let tmp = tempfile::tempdir().unwrap();
-    let mut lib = Library::open(&tmp.path().join("library")).unwrap();
-    if let Some((start, step)) = clock {
-        let t = Mutex::new(start);
-        lib = lib.with_clock(move || {
-            let mut t = t.lock().unwrap();
-            *t += step;
-            *t
-        });
-    }
-    seed::seed_into(&lib, &wt().join("contract/fixture.json")).unwrap();
-    let state = Arc::new(AppState { lib, ui, started: 1.0 });
-    Engine { _tmp: tmp, app: router(state.clone()), state }
+    let dir = tmp.path().join("library");
+    let setup = stepping(Library::open(&dir).unwrap(), clocks.map(|c| c.0));
+    seed::seed_into(&setup, &wt().join("contract/fixture.json")).unwrap();
+    let lib = stepping(Library::open(&dir).unwrap(), clocks.map(|c| c.1));
+    library::startup_repairs(&lib).unwrap(); // as serve does, and as main.py does on import
+    let revealed = Arc::new(Mutex::new(Vec::new()));
+    let seen = revealed.clone();
+    let reveal = Box::new(move |p: &Path| seen.lock().unwrap().push(p.to_path_buf()));
+    let state = Arc::new(AppState { lib, ui, started: 1.0, reveal });
+    Engine { _tmp: tmp, setup, app: router(state.clone()), state, revealed }
 }
 
 struct Answer {
@@ -121,13 +134,13 @@ fn compare(case: &Value, got: &Answer) -> Vec<String> {
 }
 
 async fn replay(golden: &Value) -> (usize, Vec<String>) {
-    let e = engine(Some((golden["clock_start"].as_f64().unwrap(), golden["clock_step"].as_f64().unwrap())), None);
+    let step = golden["clock_step"].as_f64().unwrap();
+    let e = engine(Some(((golden["clock_start"].as_f64().unwrap(), step), (golden["engine_clock_start"].as_f64().unwrap(), step))), None);
     let mut failures = Vec::new();
     let mut n = 0;
     for phase in golden["phases"].as_array().unwrap() {
         for step in phase["setup"].as_array().unwrap() {
-            let gid = step["soft_delete"].as_str().expect("known setup step");
-            assert!(e.state.lib.set_generation_deleted(gid, true).unwrap().is_some());
+            run_setup(&e.setup, step);
         }
         for case in phase["cases"].as_array().unwrap() {
             let path = case["path"].as_str().unwrap();
@@ -147,6 +160,25 @@ async fn replay(golden: &Value) -> (usize, Vec<String>) {
     (n, failures)
 }
 
+/// record_http.py `run_setup`, through the library.
+fn run_setup(lib: &Library, step: &Value) {
+    if let Some(gid) = step["soft_delete"].as_str() {
+        assert!(lib.set_generation_deleted(gid, true).unwrap().is_some());
+        return;
+    }
+    let s = step["set_status"].as_array().expect("known setup step");
+    let (table, id, status) = (s[0].as_str().unwrap(), s[1].as_str().unwrap(), s[2].clone());
+    if table == "generations" {
+        let mut d = lib.get_generation(id).unwrap().unwrap();
+        d.insert("status".into(), status);
+        lib.put_generation(&mut d).unwrap();
+    } else {
+        let mut d = lib.get_profile(id).unwrap().unwrap();
+        d.insert("status".into(), status);
+        lib.put_profile(&mut d).unwrap();
+    }
+}
+
 fn golden() -> Value {
     serde_json::from_str(&std::fs::read_to_string(wt().join("rust/golden/http.json")).unwrap()).unwrap()
 }
@@ -155,7 +187,7 @@ fn golden() -> Value {
 async fn parity_with_python() {
     let g = golden();
     let (n, failures) = replay(&g).await;
-    assert_eq!(n, 152, "number of recorded cases");
+    assert_eq!(n, 223, "number of recorded cases");
     assert!(failures.is_empty(), "{} of {n} cases differ from Python:\n{}", failures.len(), failures.join("\n"));
 }
 
@@ -254,19 +286,104 @@ async fn spa_serves_only_files_inside_the_ui_folder() {
 }
 
 #[tokio::test]
-async fn write_routes_answer_501_after_their_id_check() {
+async fn routes_outside_1_0_answer_501_after_their_id_check() {
     let e = engine(None, None);
-    for (m, p) in [("POST", "/api/generations"), ("DELETE", "/api/generations/ctclean01"), ("PATCH", "/api/generations/ctclean01"),
-                   ("POST", "/api/generations/ctaccept01/chunks/1/accept"), ("POST", "/api/generations/reveal"),
-                   ("POST", "/api/profiles/upgrade-all"), ("GET", "/api/transcripts"), ("POST", "/api/designs")] {
+    for (m, p) in [("POST", "/api/profiles/upgrade-all"), ("GET", "/api/transcripts"), ("POST", "/api/designs"), ("DELETE", "/api/profiles/ctvoice01")] {
         let a = send(&e.app, m, p, &LOCAL, None).await;
         assert_eq!((a.status, json(&a)), (501, serde_json::json!({"detail": "Not in TakeTwo 1.0 yet."})), "{m} {p}");
     }
-    let a = send(&e.app, "DELETE", "/api/generations/bad.id", &LOCAL, None).await;
+    let a = send(&e.app, "DELETE", "/api/transcripts/bad.id", &LOCAL, None).await;
     assert_eq!(a.status, 400);
-    assert_eq!(e.state.lib.list_generations().unwrap().len(), 5, "nothing deleted");
     let a = send(&e.app, "GET", "/api/catalog/library", &LOCAL, None).await;
     assert_eq!(a.status, 200);
+}
+
+/// Every file under the library (path and bytes) and every stored document.
+fn snapshot(e: &Engine) -> (Vec<(String, Vec<u8>)>, Vec<Value>, Vec<Value>) {
+    fn walk(root: &Path, dir: &Path, out: &mut Vec<(String, Vec<u8>)>) {
+        let mut entries: Vec<_> = std::fs::read_dir(dir).unwrap().map(|d| d.unwrap().path()).collect();
+        entries.sort();
+        for p in entries {
+            let rel = p.strip_prefix(root).unwrap().to_string_lossy().into_owned();
+            if p.is_dir() {
+                out.push((rel + "/", Vec::new()));
+                walk(root, &p, out);
+            } else if !rel.starts_with("voiceforge.db") {
+                out.push((rel, std::fs::read(&p).unwrap())); // the database is compared through its documents
+            } else {
+                out.push((rel, Vec::new()));
+            }
+        }
+    }
+    let mut files = Vec::new();
+    walk(e.state.lib.dir(), e.state.lib.dir(), &mut files);
+    let docs = |v: Vec<library::Doc>| v.into_iter().map(Value::Object).collect::<Vec<_>>();
+    (files, docs(e.state.lib.list_generations().unwrap()), docs(e.state.lib.list_profiles().unwrap()))
+}
+
+/// The paths that would start a job (S07b) or re-time the audio (S16) answer 501 after their checks
+/// and change nothing: no folder, no file, no document.
+#[tokio::test]
+async fn job_paths_answer_501_and_change_nothing() {
+    let e = engine(None, None);
+    // A kept earlier take, so the take switch passes its checks (the fixture keeps none).
+    let mut g = e.setup.get_generation("ctreview01").unwrap().unwrap();
+    g["chunks"][1].as_object_mut().unwrap().insert("takes".into(), serde_json::json!([{"take": 1, "text": "Part two ends early."}]));
+    e.setup.put_generation(&mut g).unwrap();
+    let before = snapshot(&e);
+    let cases: [(&str, &str, Option<&str>); 9] = [
+        ("POST", "/api/generations", Some(r#"{"profile_id": "ctvoice01", "text": "Hello there. A new narration."}"#)),
+        ("POST", "/api/generations", Some(r#"{"profile_id": "ctvoice01", "text": "Hi.", "engine": "qwen3-tts-1.7b", "speed": 2, "title": "T"}"#)),
+        ("POST", "/api/generations/ctpending01/resume", None),
+        ("POST", "/api/generations/ctreview01/chunks/1/regenerate", Some("{}")),
+        ("POST", "/api/generations/ctreview01/chunks/1/regenerate", Some(r#"{"text": "Part two, said again."}"#)),
+        ("POST", "/api/generations/ctreview01/chunks/1/select-take", Some(r#"{"take": 1}"#)),
+        ("POST", "/api/generations/ctreview01/fix-remaining", None),
+        ("PATCH", "/api/generations/ctclean01", Some(r#"{"speed": 1.0, "title": "Not saved", "favorite": true}"#)),
+        ("PATCH", "/api/generations/ctreview01", Some(r#"{"speed": 1.3}"#)),
+    ];
+    for (m, p, body) in cases {
+        let a = send(&e.app, m, p, &[("host", "127.0.0.1:8790"), ("origin", "http://127.0.0.1:8790")], body).await;
+        assert_eq!((a.status, json(&a)), (501, serde_json::json!({"detail": "Not in TakeTwo 1.0 yet."})), "{m} {p} {body:?}");
+        assert!(snapshot(&e) == before, "{m} {p} changed the library");
+    }
+    // An equal speed is ignored, so the edit goes through.
+    let a = send(&e.app, "PATCH", "/api/generations/ctclean01", &LOCAL, Some(r#"{"speed": 1.2505, "title": "Saved"}"#)).await;
+    assert_eq!((a.status, json(&a)["title"].as_str()), (200, Some("Saved")));
+}
+
+#[tokio::test]
+async fn reveal_calls_the_injected_opener() {
+    let e = engine(None, None);
+    let gens = e.state.lib.generations_dir();
+    let reveal = |gid: &str| format!("/api/generations/{gid}/reveal");
+    let a = send(&e.app, "POST", &reveal("ctclean01"), &LOCAL, None).await;
+    assert_eq!((a.status, json(&a)["path"].as_str().map(PathBuf::from)), (200, Some(gens.join("ctclean01/final.wav"))));
+    let a = send(&e.app, "POST", &reveal("ctpending01"), &LOCAL, None).await;
+    assert_eq!((a.status, json(&a)["path"].as_str().map(PathBuf::from)), (200, Some(gens.join("ctpending01"))), "no audio: the folder");
+    let a = send(&e.app, "POST", "/api/generations/reveal", &LOCAL, None).await;
+    assert_eq!((a.status, json(&a)["path"].as_str().map(PathBuf::from)), (200, Some(gens.clone())));
+    assert_eq!(*e.revealed.lock().unwrap(), vec![gens.join("ctclean01/final.wav"), gens.join("ctpending01"), gens.clone()]);
+    assert_eq!(send(&e.app, "DELETE", "/api/generations/cttrash01", &LOCAL, None).await.status, 200);
+    let a = send(&e.app, "POST", &reveal("cttrash01"), &LOCAL, None).await;
+    assert_eq!((a.status, json(&a)["detail"].as_str()), (404, Some("Not found")), "deleted narration");
+    std::fs::remove_dir_all(gens.join("ctpending01")).unwrap(); // a temporary library
+    let a = send(&e.app, "POST", &reveal("ctpending01"), &LOCAL, None).await;
+    assert_eq!((a.status, json(&a)["detail"].as_str()), (404, Some("This narration has no files yet")));
+    assert_eq!(e.revealed.lock().unwrap().len(), 3, "refusals open nothing");
+}
+
+#[tokio::test]
+async fn other_websites_cannot_delete_or_edit() {
+    let e = engine(None, None);
+    let before = snapshot(&e);
+    for origin in ["https://evil.example", "null", "http://127.0.0.1:3000"] {
+        let h = [("host", "127.0.0.1:8790"), ("origin", origin)];
+        assert_eq!(send(&e.app, "DELETE", "/api/generations/cttrash01", &h, None).await.status, 403, "{origin}");
+        assert_eq!(send(&e.app, "PATCH", "/api/generations/ctclean01", &h, Some(r#"{"title": "Hacked", "favorite": true}"#)).await.status, 403);
+        assert_eq!(send(&e.app, "POST", "/api/generations/ctaccept01/chunks/1/accept", &h, None).await.status, 403);
+    }
+    assert!(snapshot(&e) == before, "a refused write changed the library");
 }
 
 fn engine_bin(home: &Path) -> Command {

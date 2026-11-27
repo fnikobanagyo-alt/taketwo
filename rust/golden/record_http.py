@@ -1,4 +1,4 @@
-"""Record what the Python engine answers over HTTP, for the Rust engine's parity test (step S06).
+"""Record what the Python engine answers over HTTP, for the Rust engine's parity test (steps S06, S07a).
 
     backend/.venv/bin/python -B rust/golden/record_http.py
 
@@ -13,6 +13,15 @@ computer, the process id, the engine list of the Python app); for those only the
 is recorded. `/api/catalog/library` is never requested: Python asks PyPI there.
 Between the two phases the recorder soft-deletes `cttrash01` through db.py, as the Rust test does
 through the library, so the soft-deleted 404s are covered without a write route.
+
+Step S07a adds write phases (c to f): accept and its undo, delete and restore, title and favourite edits,
+and every refusal of the routes that would start a job, each change undone or followed by the read that
+shows it. Setup steps between phases (a narration "running", a voice "analyzing", and back) are made
+through db.py here and through the library in the Rust test. The engine runs as a child of this script
+(`--serve`), with db.py's and pipeline.py's clocks pinned to one stepping counter (so `updated`,
+`accepted.at` and `deleted_at` are the same on every run) and `worker.submit` replaced by a function that
+raises: no recorded request can start a job or load a model. Never recorded: reveal (it opens the file
+manager), a create, resume, re-speak, take switch or fix that passes its checks, a speed change.
 """
 from __future__ import annotations
 
@@ -24,6 +33,7 @@ import socket
 import subprocess
 import sys
 import tempfile
+import time
 import types
 from pathlib import Path
 
@@ -34,6 +44,7 @@ OUT = HERE / "http.json"
 PORTS = [8790, 8791, 8792, 8793, 8794, 8795, 8798, 8799]  # never 8765-8785 (Franz's app), not 8796/8797 (busy)
 HOST = "127.0.0.1:8790"  # sent on every request; the guard compares Origin with it
 CLOCK0 = 1800000000.0
+ENGINE_CLOCK0 = 1900000000.0  # the engine child's own counter (a second process, as in the Rust test's second library handle)
 HEADERS = ("content-type", "content-disposition", "cache-control", "x-preview-kind", "content-range")
 SHAPE_ONLY = {"/api/engines", "/api/integrations", "/api/diagnostics"}
 
@@ -43,6 +54,7 @@ import seed_python  # noqa: E402  (reused: seed() and wait_ready())
 GENS = ["ctclean01", "ctreview01", "ctaccept01", "ctpending01", "cttrash01"]
 VOICE = "ctvoice01"
 TEXTS = {g["id"]: g["text"] for g in json.loads((WT / "contract" / "fixture.json").read_text())["generations"]}
+TITLES = {g["id"]: g["title"] for g in json.loads((WT / "contract" / "fixture.json").read_text())["generations"]}
 
 
 def q(path: str, **params) -> str:
@@ -161,6 +173,97 @@ def cases_phase_b() -> list[dict]:
     return c
 
 
+def _case(method, path, body=None, headers=None) -> dict:
+    return {"method": method, "path": path, "headers": {"Host": HOST, "Origin": "http://" + HOST, **(headers or {})}, "body": body}
+
+
+def cases_phase_c() -> list[dict]:
+    """Writes that start no job, from the app's own page (local Origin)."""
+    w, G = _case, "/api/generations"
+    title = TITLES["ctclean01"]
+    return [
+        # restore the narration phase b soft-deleted, then accept and its undo, each followed by the read
+        w("POST", f"{G}/cttrash01/restore"), w("GET", f"{G}/cttrash01"),
+        w("POST", f"{G}/ctaccept01/chunks/1/accept"), w("GET", f"{G}/ctaccept01"),
+        w("DELETE", f"{G}/ctaccept01/chunks/1/accept"), w("GET", f"{G}/ctaccept01"),
+        # the contract's three accept refusals, and other refusals
+        w("POST", f"{G}/ctaccept01/chunks/0/accept"), w("POST", f"{G}/ctpending01/chunks/0/accept"),
+        w("POST", f"{G}/ctaccept01/chunks/5/accept"), w("POST", f"{G}/ctaccept01/chunks/x/accept"),
+        w("POST", f"{G}/ctaccept01/chunks/-1/accept"), w("POST", f"{G}/nosuchid/chunks/0/accept"),
+        w("DELETE", f"{G}/ctaccept01/chunks/9/accept"), w("DELETE", f"{G}/nosuchid/chunks/0/accept"),
+        # delete and restore
+        w("DELETE", f"{G}/cttrash01"), w("GET", G), w("GET", q(f"{G}/search", q="delete")), w("GET", f"{G}/cttrash01"),
+        w("POST", f"{G}/cttrash01/restore"), w("GET", f"{G}/cttrash01"),
+        w("DELETE", f"{G}/nosuchid"), w("POST", f"{G}/nosuchid/restore"),
+        # title and favourite
+        w("PATCH", f"{G}/ctclean01", {"title": "Renamed"}), w("PATCH", f"{G}/ctclean01", {"favorite": True}),
+        w("PATCH", f"{G}/ctclean01", {"title": "  Both at once  ", "favorite": False}),
+        w("PATCH", f"{G}/ctclean01", {"title": "   "}), w("PATCH", f"{G}/ctclean01", {"title": "T" * 65 + " " + "é" * 64}),
+        w("PATCH", f"{G}/ctclean01", {"speed": 1.25}), w("PATCH", f"{G}/ctclean01", {}),
+        w("PATCH", f"{G}/ctclean01", {"favorite": "yes"}), w("PATCH", f"{G}/ctclean01", {"title": 5}),
+        w("PATCH", f"{G}/ctclean01", {"favorite": "maybe", "title": None}), w("PATCH", f"{G}/ctclean01"),
+        w("PATCH", f"{G}/ctclean01", {"title": title, "favorite": False}), w("GET", f"{G}/ctclean01"),
+        w("PATCH", f"{G}/nosuchid", {}), w("PATCH", f"{G}/cttrash01", {"speed": 1.0}),
+        # create: every refusal before the job
+        w("POST", G, {"profile_id": "nosuchvoice", "text": "Hello."}),
+        w("POST", G, {"profile_id": VOICE, "text": "Hello.", "engine": "nosuchmodel"}),
+        w("POST", G, {"profile_id": VOICE, "text": "word " * 10_001}),
+        w("POST", G, {"profile_id": VOICE, "text": "[1] [2]"}),
+        w("POST", G, {"profile_id": VOICE, "text": "  \n "}),
+        w("POST", G, {"profile_id": VOICE}), w("POST", G), w("POST", G, {"profile_id": 5, "text": ["x"], "params": 1}),
+        w("GET", "/api/status"), w("GET", G),
+        # re-speak, take switch, fix, resume: every refusal
+        w("POST", f"{G}/nosuchid/chunks/0/regenerate", {}), w("POST", f"{G}/ctreview01/chunks/9/regenerate", {}),
+        w("POST", f"{G}/ctreview01/chunks/1/regenerate", {"text": "[1] [2]"}),
+        w("POST", f"{G}/ctreview01/chunks/1/regenerate", {"text": "x" * 300}),
+        w("POST", f"{G}/ctreview01/chunks/x/regenerate"),
+        w("POST", f"{G}/ctreview01/chunks/9/select-take", {"take": 1}),
+        w("POST", f"{G}/ctreview01/chunks/1/select-take", {"take": 9}),
+        w("POST", f"{G}/ctreview01/chunks/1/select-take", {"take": "x"}),
+        w("POST", f"{G}/ctreview01/chunks/1/select-take", {}),
+        w("POST", f"{G}/ctclean01/fix-remaining"), w("POST", f"{G}/nosuchid/fix-remaining"),
+        w("POST", f"{G}/nosuchid/resume"), w("POST", f"{G}/cttrash01/chunks/0/accept"),
+        w("GET", "/api/status"),
+    ]
+
+
+def cases_phase_d() -> list[dict]:
+    """ctaccept01 stored as running: the busy refusals."""
+    G = "/api/generations"
+    return [_case("POST", f"{G}/ctaccept01/chunks/1/accept"), _case("DELETE", f"{G}/ctaccept01/chunks/1/accept"),
+            _case("POST", f"{G}/ctaccept01/chunks/1/select-take", {"take": 1}), _case("GET", f"{G}/ctaccept01")]
+
+
+def cases_phase_e() -> list[dict]:
+    """ctaccept01 done again; the voice stored as still analyzing."""
+    return [_case("POST", "/api/generations", {"profile_id": VOICE, "text": "Hello."}), _case("GET", f"/api/profiles/{VOICE}"),
+            _case("GET", "/api/generations/ctaccept01")]
+
+
+def cases_phase_f() -> list[dict]:
+    """The voice ready again."""
+    return [_case("GET", f"/api/profiles/{VOICE}"), _case("GET", "/api/profiles"), _case("GET", "/api/status")]
+
+
+SETUP = {
+    "a": [], "b": [{"soft_delete": "cttrash01"}],
+    "c": [], "d": [{"set_status": ["generations", "ctaccept01", "running"]}],
+    "e": [{"set_status": ["generations", "ctaccept01", "done"]}, {"set_status": ["profiles", VOICE, "analyzing"]}],
+    "f": [{"set_status": ["profiles", VOICE, "ready"]}],
+}
+
+
+def run_setup(db, step: dict) -> None:
+    if "soft_delete" in step:
+        assert db.set_generation_deleted(step["soft_delete"], True)
+        return
+    table, id_, status = step["set_status"]
+    get, put = (db.get_generation, db.put_generation) if table == "generations" else (db.get_profile, db.put_profile)
+    doc = get(id_)
+    doc["status"] = status
+    put(doc)
+
+
 def send(port: int, case: dict) -> dict:
     conn = http.client.HTTPConnection("127.0.0.1", port, timeout=30)
     data = json.dumps(case["body"]).encode() if case["body"] is not None else None
@@ -191,14 +294,34 @@ def send(port: int, case: dict) -> dict:
     return out
 
 
-def pin_clock(db) -> None:
-    t = [CLOCK0]
+def pin_clock(db, start: float = CLOCK0, pipeline=None) -> None:
+    t = [start]
 
     def now() -> float:
         t[0] += 0.25
         return t[0]
 
     db.time = types.SimpleNamespace(time=now)
+    if pipeline is not None:  # "Sounds fine" stamps with pipeline.time; the same counter, as the Rust library clock
+        pipeline.time = types.SimpleNamespace(**{k: getattr(time, k) for k in ("sleep", "monotonic", "perf_counter")}, time=now)
+
+
+def serve_child(port: int) -> None:
+    """The Python engine with pinned clocks and no worker, in this process (started by main())."""
+    sys.path.insert(0, str(BACKEND))
+    from app import config, db, pipeline, worker
+
+    assert config.DATA_DIR.resolve() == Path(os.environ["TAKETWO_DATA"]).resolve(), config.DATA_DIR
+    pin_clock(db, ENGINE_CLOCK0, pipeline)
+
+    def no_job(*args, **kwargs):
+        raise RuntimeError("record_http.py must never start a job")
+
+    worker.submit = no_job
+    import uvicorn
+    from app import main as engine
+
+    uvicorn.run(engine.app, host="127.0.0.1", port=port, log_level="warning")
 
 
 def free_port() -> int:
@@ -229,16 +352,22 @@ def main() -> int:
         port = free_port()
         env = {**os.environ, "HF_HOME": str(tmp / "hf")}
         log = open(tmp / "engine.log", "w+b")
-        proc = subprocess.Popen([sys.executable, "-B", "-m", "uvicorn", "app.main:app", "--host", "127.0.0.1", "--port", str(port)],
+        proc = subprocess.Popen([sys.executable, "-B", str(Path(__file__).resolve()), "--serve", str(port)],
                                 cwd=BACKEND, env=env, stdout=log, stderr=subprocess.STDOUT)
         seed_python.wait_ready(f"http://127.0.0.1:{port}", proc)
         phases = []
-        for name, cases in (("a", cases_phase_a()), ("b", cases_phase_b())):
-            if name == "b":
-                assert db.set_generation_deleted("cttrash01", True)
-            phases.append({"name": name, "setup": [] if name == "a" else [{"soft_delete": "cttrash01"}],
-                           "cases": [{**c, "response": send(port, c)} for c in cases]})
-        OUT.write_text(json.dumps({"clock_start": CLOCK0, "clock_step": 0.25, "phases": phases}, indent=1, ensure_ascii=False) + "\n")
+        for name, cases in (("a", cases_phase_a()), ("b", cases_phase_b()), ("c", cases_phase_c()), ("d", cases_phase_d()),
+                            ("e", cases_phase_e()), ("f", cases_phase_f())):
+            for step in SETUP[name]:
+                run_setup(db, step)
+            phases.append({"name": name, "setup": SETUP[name], "cases": [{**c, "response": send(port, c)} for c in cases]})
+        for p in phases:
+            for c in p["cases"]:
+                assert c["response"]["status"] != 500, c  # 500 here means a case reached worker.submit
+        log.seek(0)
+        assert b"must never start a job" not in log.read(), "a recorded request tried to start a job"
+        OUT.write_text(json.dumps({"clock_start": CLOCK0, "engine_clock_start": ENGINE_CLOCK0, "clock_step": 0.25, "phases": phases},
+                                  indent=1, ensure_ascii=False) + "\n")
         print(f"wrote {OUT.relative_to(WT)}: {sum(len(p['cases']) for p in phases)} cases")
         return 0
     finally:
@@ -253,4 +382,7 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    if sys.argv[1:2] == ["--serve"]:
+        serve_child(int(sys.argv[2]))
+    else:
+        raise SystemExit(main())

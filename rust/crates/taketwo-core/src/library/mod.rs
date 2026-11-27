@@ -88,6 +88,11 @@ impl Library {
         self
     }
 
+    /// One reading of the library clock (pipeline.py's `time.time()`; tests pin it with `with_clock`).
+    pub fn now(&self) -> f64 {
+        (self.clock)()
+    }
+
     pub fn dir(&self) -> &Path {
         &self.dir
     }
