@@ -24,5 +24,6 @@ taketwo-core = { path = "../taketwo-core" }
 taketwo-voice = { path = "../taketwo-voice" }
 
 [dev-dependencies]
+libc = "0.2"
 http-body-util = "0.1"
 tempfile = "3"
