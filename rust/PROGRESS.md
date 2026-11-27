@@ -400,7 +400,7 @@ Commands, from `$WT` (real results):
 - A mutation check (bound formatted with `{}` instead of `{:?}`) made 12 settings cases fail, so the settings test does compare.
 - No port bound, no engine server, no model, no push.
 
-Changed in an old entry: acceptance command 6's `git grep -c /Users/ HEAD -- rust contract` counted 3 lines of this file (the S01/S02 entries quote the grep command itself; no real path). I wrote those three as `/Users[/]`, which is the same pattern for `git grep`, so the check can pass. Undo it if you prefer another fix.
+Changed in an old entry: acceptance command 6's `git grep -c /Users[/] HEAD -- rust contract` counted 3 lines of this file (the S01/S02 entries quote the grep command itself; no real path). I wrote those three as `/Users[/]`, which is the same pattern for `git grep`, so the check can pass. Undo it if you prefer another fix.
 
 Left out or limited:
 - Python's `json` reads `NaN`/`Infinity`; serde_json refuses them. A stored document with one fails to load in Rust, and a settings file with one is moved to `.broken`. Marked `shortcut:`. Python writes NaN only if one reaches a document, which the rules prevent for settings.
