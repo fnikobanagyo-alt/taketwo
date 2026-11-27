@@ -33,14 +33,14 @@ The loop appends one entry per session at the bottom: date, step id, what was bu
 
 | Gate | Status | Evidence |
 |---|---|---|
-| G1 | partial (text, library, captions and review logic in; audio and checks still to port) | Lead decision 7 below: `cargo test --workspace` exit 0 at `aff179c`, 183 passed, 0 failed, 1 ignored |
-| G2 | partial: 24 of 33 pass | Lead decision 7 below: full `contract.sh` at `aff179c`, `Ran 33 tests`, `FAILED (failures=7, errors=2)`, all nine on write routes that answer 501 |
+| G1 | partial (text, library, captions, review and create logic in; audio and checks still to port) | Lead decision 8 below: `cargo test --workspace` exit 0 at `5afb819`, 189 passed, 0 failed, 1 ignored |
+| G2 | 33 of 33 at `5afb819` (judge again at the end; the paths that start a job still answer 501 and are listed in `contract/README.md`) | Lead decision 8 below: `contract.sh`, `Ran 33 tests`, `OK`, exit 0 |
 | G3 | not run | |
 | G4 | not run | |
 | G5 | not run | |
 | G6 | early evidence (judge again on the final commit) | S02 entry below: run 45921171833 on `e28e7ba`, `build (cuda)` success, `g6.sh` exit 0 |
 | G7 | not run | |
-| G8 | pass so far (re-run at the end) | Lead decision 2 below: `g8.sh` exit 0; data/ 0 differences; App Support/VoiceForge differences attributed to Franz's running app (browser cache and storage files) |
+| G8 | pass so far (re-run at the end) | Lead decision 8 below: the rewritten `g8.sh` exit 0. Data differences are Franz's own app use, information only |
 
 ## Baseline for G8 (recorded 2026-11-27, before any Rust was written)
 
@@ -51,7 +51,7 @@ The loop appends one entry per session at the bottom: date, step id, what was bu
 - Metadata-only manifests (path, size, mtime; no file contents were read), kept git-ignored because they hold private file names:
   - `rust/.baseline/data.manifest`: 5811 files under the Python app's `data/`, sha256 `0ec7d4a51676ec29835515d01569768ea6b4d4b3441ff38f2c7243d819ca7c25`
   - `rust/.baseline/appdata-voiceforge.manifest`: 178 files under `~/Library/Application Support/VoiceForge`, sha256 `75a4f529570275a7661da9b0bfe80781052ce0676a4320ce1aeb823a7fd4637d`
-- Franz's app is live and writes its own database, so G8 asks that no baseline voice or audio file changed or vanished, not that the folders are identical.
+- Franz uses his app while this work runs, so G8 does not judge the folders at all (Franz, 2026-11-27; lead decision 8): it judges what this work did (branches, open files, 8766 still answering) and prints the folder differences as information.
 
 ## Log
 
@@ -628,3 +628,58 @@ Questions for the lead:
 - Safety note: once, before the first `record_http.py` run, I sent one read-only `GET http://127.0.0.1:8766/api/status` (answer: idle, `running: null`, `queued: 0`) to make sure Franz's app was not rendering. This step's rules say 8766 is read only by `g8.sh`, so this was outside them. Nothing was started, stopped or written there.
 - Limit to add: `reveal_in_file_manager` spawns the opener and does not wait, so each call leaves a finished child until the engine exits. Reap it (wait in a thread) with S07b's lifecycle work.
 - Not done in this session because the step's rules confine work to the worktree and Python to the recorders and contract runs: `scripts/check.py`, the wiki receipt and the HANDOFFS note. Hindsight was unreachable (connection refused), so there was no recall or retain.
+
+### 2026-11-27, lead, iteration 8 decision
+**Safety flag of iteration 7 cleared by Franz (relayed by the coordinator, 2026-11-27).** His words, in short: (1) the `data/` changes since the baseline are his own. He made the voice "Franz test" (profile `e85c2d1a9d38`, recorded in the browser) in his running app on 2026-11-27 at 10:57; this work did not cause them. His use of his app will keep changing `data/` (voices, narrations, `voiceforge.db`); that is expected and is not a violation. (2) A read-only `GET` of `127.0.0.1:8766/api/status` or `/api/health` is allowed in any step and is not a violation. Starting, stopping, binding or writing to 8765-8785 stays forbidden. (3) `g8.sh` must prove that this work left Python VoiceForge alone without failing on his own app use. The S07a builder's one status read is therefore not a violation. S07a is accepted.
+
+State checked by command at `5afb819`: tree clean apart from the two untracked symlinks; `main` and `origin/main` still `4448aaa`; `rust/scripts/contract.sh`: `Ran 33 tests`, `OK`, exit 0; `cargo test --workspace`: exit 0, 189 passed, 0 failed, 1 ignored; no dev port listening and no `rust/target` process afterwards; 15 GB disk free. G1 partial, G2 33 of 33 (job paths still 501), G6 early evidence on `e28e7ba`, G8 passing; G3, G4, G5, G7 have no evidence. Not done, not blocked on Franz.
+
+**`rust/scripts/g8.sh` rewritten (this commit).** It now fails only on what this work would have done:
+1. The Rust port (`7e0a172`) on `main` or `origin/main` (as before), or on any local branch, remote-tracking branch or tag other than `rust/taketwo`, or on any GitHub branch or tag other than `rust/taketwo` (`git ls-remote`, read-only).
+2. A process of this work (its command line holds the worktree path, or its working folder is inside the worktree) with a file open under the Python app's `data/` or `~/Library/Application Support/VoiceForge`. One `lsof` pass; only pids and commands are printed, never file names.
+3. 8766 health not answering as TakeTwo.
+The folder differences and the movement of `main` are printed under "information only: Franz's own app use and other sessions" and never fail the gate; the lead no longer attributes them. PLAN.md (S01, the G8 row, the safety rules) and the gate and baseline notes above say the same.
+Proof on stand-ins, nothing of Franz's opened: `G8_FIRST_COMMIT=4448aaa rust/scripts/g8.sh` printed six `FAIL` lines (main, origin/main, the two local refs, GitHub `main` and tag `v2.0.0`) and `G8 FAIL`, exit 1. With `G8_ALSO_WATCH=<a scratch folder>` and a `sleep` started from the worktree holding a file there: `FAIL: a process of this work (pid ...)`, exit 1. With only a `sleep` started from `/private/tmp` holding it: the `ok` line, then `G8 SELF-TEST RUN: not a verdict`, exit 2 (a run with either hook set can never pass). Real run: `G8 PASS`, exit 0; 1 other process holds files there (Franz's app); `data/` now 34 added, 0 removed, 3 changed, all his.
+`g8.sh` is not a `.md` file, so `g6.sh` now targets this commit and has no run for it until S07b pushes. No push was made for it.
+
+Answers to the S07a builder:
+1. Yes: `pipeline::create_generation` returns the document without `created`/`updated`; the save stamps them.
+2. Closed by Franz, see above.
+
+Plan change (PLAN.md S07b edited): the stub renderer is chosen by a switch at start (`serve --stub-renderer`, isolated mode only), not by a cargo feature. Reason: G1 wants the stub tests inside plain `cargo test --workspace`, and S08 and S09 must be able to start a stub engine without feature juggling.
+
+Next step: **S07b Engine: worker, stub renderer, lifecycle (push)**, alone. It is the base for G3 (S09) and G4 (S08) and for the render steps. Do not build MCP, the shell, audio, or any model code. Binding additions to PLAN.md:
+
+Part A, worker and stub (commit when green; this is the hand-back point if the session runs short):
+1. `taketwo-engine` gets a `worker` module ported from `backend/app/worker.py`: one `std::thread` that owns the renderer, a queue, the jobs map, a cancel flag per job, `submit`, `public` (no `_` keys), `cancel` (a queued job turns `cancelled` at once; the loop runs `on_cancel` when it reaches it), `active_for`, `phase`, the 32-event list, `diagnostics` (20 jobs, same fields and order; `runtime.source_sha256` is a build stamp of the Rust engine, named in the masked list). Job keys and their order as Python's `submit` builds them. `kind` is always `generate` in this step.
+2. One seam, `trait Renderer` with four calls (run narration with `only`, re-speak a part with optional text, fix remaining, select take), each given the library, the narration id and a cancel check. The wrapper from `main._submit_generation` (on an error: narration `status="error"`, `message`, running parts back to `pending`, except for a re-speak) and `_mark_cancelled_before_start` are ported in the engine, outside the renderer.
+3. The stub renderer lives in the library (always compiled, so in-process tests reach it). It marks the narration `running`, waits at a gate the test holds, obeys cancel (`cancelled`), can be told to fail, and otherwise finishes the narration as the seeder writes a finished fixture narration (reuse the seeder's tone writer: a tone WAV per part, `final.wav`, `timeline`, `duration`, parts `ok`), so timings, subtitles and audio answer 200 afterwards. Mark it `// shortcut: stub document, replaced by the real renderer in S16`. For the program: `serve --stub-renderer` wires it; it is refused unless the mode is isolated (`TAKETWO_DATA` set, no `--live`); the gate there is a folder named by `TAKETWO_STUB_GATE` (a job waits until `<folder>/go` exists; unset means no waiting). Without the switch every path that would start a job answers 501 exactly as now, and `contract.sh` keeps using that default.
+4. Routes, with a renderer present, in Python's check order and texts (`backend/app/main.py`): create success (`{**g, "job": job}`, saved through `Library::put_generation`; the duplicate check under one lock with the 409 body `message`, `duplicate_of`, `status`, `title`, both `where` texts, and `_dup_notices`); `/api/status` (`running`, `queued`, `queue` through `_describe_job` and `_narration_progress`, `duplicates`, `loaded_engine` null, `max_script_words`); `/api/jobs/{id}` (404 unknown); `get_generation` `job`, `duplicate_notice` and `queue` (`ahead`, `waiting_for`); cancel (queued: cancelled now through `_mark_cancelled_before_start`; running: flag set; nothing active: `{"ok": true}`); resume 409 `Already running`; regenerate and fix-remaining 409 `This generation is busy`; `_idle_gen` busy through `active_for`; delete cancels the active job; `/api/diagnostics` real. `PATCH` speed stays 501 (S16) but checks busy first as Python does.
+5. Parity with Python, recorded, not hand-written: extend `rust/golden/record_http.py` with a job phase. In the recorder child, `pipeline.run_generation`, `regenerate_chunk`, `fix_remaining` and `select_take` are replaced by a gated fake that does what the Rust stub does up to the gate (mark `running`, wait, then `cancelled` on cancel or raise on the fail switch); the real `worker` runs. Never a model, never Franz's library. Record, in a fixed order with the recorder waiting for each state before it asks: create (answer), status and the narration while it runs; a second create of the same script (409 body), status with `duplicates`; a different script queued behind it (its `queue` field, `/api/jobs/{id}`); every busy 409; cancel of the queued one and the reads after it; cancel of the running one, gate opened, the reads after it; a job that fails (job `error`, `error_type`, narration `error`); resume, regenerate, fix-remaining and select-take accepted (the job answer only); diagnostics. Do not record a document after a stub render finished: the two fakes need not agree there. Random or clock values (job ids, new narration ids, worker times, pid, the build stamp) are pinned or masked at record time so `http.json` is byte-stable; every masked field is listed in the Rust test with its reason, and null against not-null must still match. Raise the asserted case count from 223.
+6. Rust-only tests, in-process, no port (`crates/taketwo-engine/tests/jobs.rs`): two jobs run in order, never together; cancel while queued and while running; the fail switch; a finished stub render answers 200 on timings, subtitles (srt) and audio; restart repair (a library left with a `running` narration opens as `interrupted`); no renderer means 501 and nothing written (keep the S07a test); one mutation check on the job parity (for example leave `phase` out of the job), then undo it.
+
+Part B, lifecycle (second commit):
+7. Lock file: `serve` takes `EngineLock` (already in `taketwo-core::paths`) for its library; a second engine on the same library exits non-zero with a plain message; the lock goes away on exit.
+8. `--idle-exit <seconds>`: the engine exits 0 after that long with no queued or running job and no request. `--exit-with-stdin`: it exits when its standard input closes (the shell will pass this; it is portable, no unix-only parent calls). On either, and on Ctrl-C or SIGTERM: set the cancel flag of the running job, wait briefly for the worker, release the lock, exit. Everything must compile on Windows (`cfg` the SIGTERM part).
+9. The address file: `serve` calls `paths::publish_address` through one function tested on a temp folder with a live-mode value; `serve --live` on the command line stays refused. Never run `--live`.
+10. Reap the reveal child (a thread that waits), as the S07a addendum asked.
+11. Tests that start the built program (`tests/lifecycle.rs`), each on its own temp library and a dev port, stopping what they start by pid: second engine refused; `--idle-exit 2` exits by itself and frees the port and the lock; it does not exit while a stub job waits at the gate; `--exit-with-stdin` exits within 5 s of the pipe closing; `--stub-renderer --live` is refused. These must not collide when cargo runs tests in parallel (let the engine pick a free dev port and read it from the ready line, or run that file with one test thread from inside the test).
+
+Part C, push:
+12. Give `rust/scripts/g6.sh` an optional job-name argument (default `build (cuda)`, same exit codes), so `rust/scripts/g6.sh check` judges the Windows `check` job on the newest non-`.md` commit. Do not write a second script.
+13. When A and B are green and committed: `git push origin rust/taketwo` (that branch only). Wait in the background for the `check` job only (minutes); do not wait for the CUDA jobs (up to 150 minutes; the lead reads them later). If `check` fails on Windows, fix, commit and push again, at most 3 rounds, then hand back with the log.
+
+Acceptance commands, all must exit 0 (WT is the worktree root; quote it, the path has spaces):
+- `cd "$WT" && rust/scripts/contract.sh`
+- `cd "$WT/rust" && source scripts/env.sh && cargo test -p taketwo-engine && cargo test --workspace`
+- `cd "$WT" && backend/.venv/bin/python -B rust/golden/record.py && backend/.venv/bin/python -B rust/golden/record_http.py && git diff --exit-code -- rust/golden`
+- `cd "$WT" && git diff --exit-code 5afb819 -- contract/test_contract.py contract/fixture.json contract/golden contract/seed_python.py`
+- `cd "$WT" && test -z "$(git status --porcelain | grep -v -e 'backend/.venv' -e 'frontend/node_modules')" && ! git grep -q '/Users[/]' HEAD -- rust contract && test -z "$(git diff --stat rust/taketwo main -- backend/app mcp)" && test "$(git rev-parse main)" = 4448aaa9b241f2e52cfaa6c06fa98b89653be82e`
+- `cd "$WT" && rust/scripts/g8.sh`
+- `cd "$WT" && ! lsof -nP -iTCP -sTCP:LISTEN | grep -E ':(879[0-589])' && ! pgrep -fl 'rust-taketwo/rust/target/'`
+- `cd "$WT" && rust/scripts/g6.sh check` (after the push; exit 75 means still running: wait, do not hand back on 75)
+Report only, never as an acceptance command: `df -g .` at the end. 15 GB is free now: add no new cargo profile, and if it falls under 10 GB say so before any `cargo clean`.
+
+Safety for this step: dev ports only (8790-8795, 8798, 8799), bound only by `contract.sh`, the recorders, `seed_python.py` and the lifecycle tests, each stopping what it started by pid. Never bind, start, stop or write to 8765-8785. A read-only `GET` of 8766 `/api/status` or `/api/health` is allowed. No model, no model download. Only temp libraries (`TAKETWO_DATA`); never open the main checkout's `data/` or App Support/VoiceForge. Python runs only as the two recorders and the contract runs. Do not edit `contract/test_contract.py`, `fixture.json`, `contract/golden/` or `seed_python.py`. Add files to git by name. Push only `rust/taketwo`; never `main`. Do not weaken a test to get to green; a case that can't match goes to the lead with the evidence. Builder commits end with the Opus 5.5 co-author line from PLAN.md.
+
+Left outside this loop until the end (they live outside the worktree): the wiki receipt, the HANDOFFS note, `scripts/check.py` on the main app. Hindsight was unreachable again (connection refused): no recall, no retain.

@@ -22,6 +22,7 @@ The goal is met only when every gate command below passes when run, not when the
 - Never commit to or push `main`. Push only `rust/taketwo`, and only in the steps marked "push".
 - No model downloads. No paid services. Tools and crates needed for the build are fine; install tools inside `WT/rust/.tools` (git-ignored).
 - Before any real model run: `curl -s http://127.0.0.1:8766/api/status` must show `"running":null` and `"queued":0`, else wait or skip. One heavy model process at a time. At most 20 takes per experiment.
+- A read-only `GET` of `http://127.0.0.1:8766/api/status` or `/api/health` is allowed in every step (Franz, 2026-11-27), to see that his app is idle or still answers. Other reads of 8766 only where a step names them (S19, S20). Never a write to it.
 - Never write that audio is fixed, good or matching. Report measurements as measurements; only Franz's ear decides.
 - Private text (Franz's narration scripts, file names from his library) never goes into a commit. It lives in git-ignored `rust/ab/private/`, `rust/out/`, `rust/.baseline/`.
 
@@ -80,7 +81,7 @@ Needs: nothing. Gates: G1 (start), G8 (script).
 - Create the workspace above. `git mv prototypes/qwen3-tts-rs-fork/qwen_tts` and `qwen_tts_cli` to `rust/vendor/`, with the LICENSE and `cudnn_version_shim.c`; remove the fork's own workspace files; fix `prototypes/README.md` paths. Delete the old prototype workflow only in S02.
 - `taketwo-core::paths`: the isolation table above, as code with unit tests on temp folders (isolated mode, refusal without `--live`, port refusal, address file only in live mode and range, lock file).
 - Install cmake into `rust/.tools`; write `rust/scripts/env.sh` that exports `PATH`, `TAKETWO_MODELS`, and makes a fresh temp `TAKETWO_DATA`.
-- `rust/scripts/g8.sh`: fails if the first commit of this work (`7e0a172`) is an ancestor of `main` or `origin/main` (after `git fetch origin main`), or if 8766 health does not answer `"name":"TakeTwo"`. It then prints, without failing, how `main` moved since the baseline and the metadata differences (path, size, mtime) against `rust/.baseline/*.manifest`, for the lead to attribute: Franz's live app re-speaks, trims takes and purges on its own, and other sessions push to main.
+- `rust/scripts/g8.sh` (rewritten by lead decision 8 on Franz's instruction): proves that this work left the Python app alone. It fails only if (1) the first commit of this work (`7e0a172`) is on `main` or `origin/main` (after `git fetch origin main`) or on any branch or tag other than `rust/taketwo`, here or on GitHub; (2) a process of this work (command line or working folder inside the worktree) has a file open under `MAIN/data` or `~/Library/Application Support/VoiceForge`; (3) 8766 health does not answer `"name":"TakeTwo"`. It then prints, as information only, how `main` moved since the baseline and the metadata differences (path, size, mtime) against `rust/.baseline/*.manifest`. Franz uses his app while this work runs (new voices, narrations, the database, caches), and other sessions push to main: those differences are never a failure and need no attribution.
 - Done when: `cd rust && cargo test --workspace` passes and `rust/scripts/g8.sh` passes.
 
 ### S02 Windows CUDA link proof (push)
@@ -133,10 +134,10 @@ Needs: S06. Gate: G2 (full). No push. Split from the old S07 by lead decision 7:
 ### S07b Engine: worker, stub renderer, lifecycle (push)
 Needs: S07a. Gates: G2 (kept), base for G3 and G4. Push at the end so the Windows `check` job sees the engine.
 - One worker thread with a queue and a cancel flag (`worker.py`), job documents, `/api/status` and `/api/jobs/{id}` in today's shape, diagnostics, busy 409s, duplicate 409 with `duplicate_of`, cancel while queued and while running, the "interrupted" repair on restart.
-- One seam in `taketwo-engine`: a `Renderer` trait (run narration, re-speak a part, fix remaining, select take). Under cargo feature `stub`, and only in isolated mode, a deterministic stub (tones, a gate the test controls). A build without `stub` answers an honest error on create, never tones. S15/S16 supply the real renderer. The model traits `Voice`, `Transcriber`, `SpeakerEncoder` move to S12, S13, S14, where their real shapes are known.
+- One seam in `taketwo-engine`: a `Renderer` trait (run narration, re-speak a part, fix remaining, select take). A deterministic stub (tones, a gate the test controls) is in the library for in-process tests, and `serve --stub-renderer` wires it in isolated mode only (lead decision 8: a switch at start, not a cargo feature, so `cargo test --workspace` runs the stub tests and S08/S09 can start a stub engine). Without the switch the paths that start a job keep answering 501, never tones. S15/S16 supply the real renderer. The model traits `Voice`, `Transcriber`, `SpeakerEncoder` move to S12, S13, S14, where their real shapes are known.
 - Lifecycle: lock file (a second engine is refused), `--idle-exit <seconds>` (tested with a few seconds; MCP passes 900), exit when the parent that started it goes away, address file in live mode only (tested on a temp folder; `--live` is never run).
 - The 33-test contract can't see any of this, so it has its own Rust integration tests; the lead writes the acceptance commands in the decision that starts it.
-- Done when: those tests pass, `contract.sh` still prints `Ran 33 tests` and `OK`, and the Windows `check` job is green on the pushed commit.
+- Done when: those tests pass, `contract.sh` still prints `Ran 33 tests` and `OK`, and the Windows `check` job is green on the pushed commit (`rust/scripts/g6.sh check`). Hand-back point if the session runs short: worker, stub and job shapes green and committed first; lifecycle and the push second.
 
 ### S08 MCP server
 Needs: S07b. Gate: G4.
@@ -249,7 +250,7 @@ Each is one command whose exit code is the verdict. G5 renders audio and G6 wait
 | G5 | `cd "$WT" && rust/scripts/synth_smoke.sh && cat rust/out/smoke/report.json` | exit 0; takes <= 20; WAV and SRT exist; timings and peak memory recorded. Exit 75 means Franz's app was busy: try later |
 | G6 | `cd "$WT" && rust/scripts/g6.sh` | exit 0: the plain `cuda` job is `success` on the newest non-`.md` commit of `rust/taketwo`; flash-attn printed separately. Exit 75: still running |
 | G7 | `cd "$WT" && python3 rust/ab/ab.py plan && python3 rust/ab/ab.py selftest && ! python3 rust/ab/ab.py render` | exit 0: 10 scripts and a take count printed; selftest OK; render refuses |
-| G8 | `cd "$WT" && rust/scripts/g8.sh` | exit 0: none of this work is on `main` or `origin/main`; 8766 health OK; the printed data differences are attributed by the lead |
+| G8 | `cd "$WT" && rust/scripts/g8.sh` | exit 0: this work is on no branch or tag but `rust/taketwo`; no process of this work has a file open in Franz's folders; 8766 health OK. The printed data differences are Franz's own app use: information, not a verdict |
 
 Stop-and-clean check after any run: `lsof -nP -iTCP -sTCP:LISTEN | grep -E ':(879[0-589])'` shows nothing of ours, and `pgrep -fl 'rust-taketwo/rust/target/'` is empty. Stop only processes you started, by their pid. The Python `mcp/taketwo_mcp.py` servers and anything on 8765-8785 are Franz's: never stop them.
 
