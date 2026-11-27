@@ -239,13 +239,15 @@ Needs: S15, S11b, and S12, S13, S14 (the real renderer is built from the three m
 Needs: S13, S14, S16. Gate: G5 (part).
 - Port `reference.py` (`analyze`, utterances, pause valleys, `snap_window`, window choice, `room_echo`, tips, `refresh_clips`) and the profile routes: create (multipart upload, ffmpeg decode, length limits), patch, delete, re-analyze, refresh, analysis, `make_preview`, `delivery.backfill`.
 - The two `make_preview` tests of `test_audit_fixes.py` that S15 left unassigned belong here (lead decision 16).
-- Without Sidon (S18) the "studio" option answers with a clear "not available yet" and the plain path is used.
+- Without Sidon (S18) a studio request runs the plain path: `studio` is stored as `false` and the first tip says studio restoration is not in TakeTwo 1.0 yet. Never an error (create defaults `studio` to true).
+- `noisereduce` (stationary, `prop_decrease` 0.75) is ported here by hand, not in S18: `analyze` calls it only on the plain path (lead decision 20).
+- Also here: the three S16 gaps (panic guard in the real renderer, `regenerate_chunk` clean-up on every exit, a cancel-word test). Preview takes go through the take cap. Binding detail: lead decision 20 in PROGRESS.md.
 - Tests on the stub with `say`-made clips; vectors for the pure parts from `rust/golden/record.py`.
-- Done when: `cargo test -p taketwo-engine profiles` passes.
+- Done when: `cargo test -p taketwo-core --test reference` and `cargo test -p taketwo-engine --test profiles` pass (named targets: a name filter passes with zero matching tests).
 
 ### S18 Studio restoration (Sidon)
 Needs: S17. Gate: G5 (the smoke reports whether studio ran); it completes decision #4.
-- Port `studio.restore`: the w2v-BERT feature extractor by hand, Sidon predictor and vocoder through `ort` (fp16, local files), 20 s chunks with 1 s overlap; `noisereduce` by hand where `reference.py` uses it.
+- Port `studio.restore`: the w2v-BERT feature extractor by hand, Sidon predictor and vocoder through `ort` (fp16, local files), 20 s chunks with 1 s overlap (`noisereduce` moved to S17). No gate needs this step; if the gates pass first it stays owed under decision #4 and the final report says so.
 - Check (ignored test): Rust and Python outputs on one `say` clip with added noise; record length, loudness and spectral distance. No claim about sound.
 - If it does not fit in one session, record what is left; G5 does not depend on it.
 - Done when: `cargo test -p taketwo-voice -- --ignored sidon_parity` has run with numbers in PROGRESS.md.
