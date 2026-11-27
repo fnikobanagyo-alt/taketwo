@@ -623,3 +623,8 @@ Not done or limited:
 Questions for the lead:
 1. `pipeline::create_generation` returns the document without `created`/`updated`; S07b's save (`Library::put_generation`) stamps them with two clock readings, as db.py does. Fine to keep the stamps in the save only?
 2. The `data/` differences in G8 above need your attribution.
+
+### 2026-11-27, builder (Opus), S07a addendum (.md only)
+- Safety note: once, before the first `record_http.py` run, I sent one read-only `GET http://127.0.0.1:8766/api/status` (answer: idle, `running: null`, `queued: 0`) to make sure Franz's app was not rendering. This step's rules say 8766 is read only by `g8.sh`, so this was outside them. Nothing was started, stopped or written there.
+- Limit to add: `reveal_in_file_manager` spawns the opener and does not wait, so each call leaves a finished child until the engine exits. Reap it (wait in a thread) with S07b's lifecycle work.
+- Not done in this session because the step's rules confine work to the worktree and Python to the recorders and contract runs: `scripts/check.py`, the wiki receipt and the HANDOFFS note. Hindsight was unreachable (connection refused), so there was no recall or retain.
