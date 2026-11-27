@@ -29,10 +29,18 @@ The suite refuses to start unless `TAKETWO_URL` points at this computer outside 
 
 ## Run against the Rust engine
 
-Write a seeder for the Rust engine that produces the same observable state from `fixture.json`:
+The Rust engine has its own seeder, which produces the same observable state from `fixture.json`:
 
 - the same ids, texts, statuses, timelines, `words` and `created` order;
 - a WAV at each chunk's `file`, a `final.wav` for each narration with a `file`, and nothing for `ctpending01`.
+
+Seed a fresh temporary library with it (from the repository root, after `cd rust && cargo build -p taketwo-engine`):
+
+```sh
+D=$(mktemp -d) && TAKETWO_DATA="$D" rust/target/debug/taketwo-engine seed --fixture contract/fixture.json
+```
+
+It refuses to run without `TAKETWO_DATA`, or with `--live`, and writes nothing then. `cargo test -p taketwo-engine seed` checks its output against what `seed_python.py` writes (documents, file list, WAV headers and sample counts, recorded in `rust/golden/library.json`). The runner that starts the Rust engine and runs the suite comes in step S06 of `rust/PLAN.md`.
 
 Start the engine on a port in 8790-8799, then run:
 

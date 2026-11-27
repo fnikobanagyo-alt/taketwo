@@ -10,7 +10,9 @@ dirs = "6"
 fancy-regex = "0.17"
 num-bigint = "0.4"
 regex = "1"
-serde_json = "1"
+rusqlite = { version = "0.43", features = ["bundled"] }
+serde = "1"
+serde_json = { version = "1", features = ["preserve_order", "float_roundtrip"] }
 unicode-normalization = "0.1"
 
 [dev-dependencies]

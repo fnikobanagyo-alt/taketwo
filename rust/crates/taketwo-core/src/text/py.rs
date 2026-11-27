@@ -65,6 +65,13 @@ const ND_ZEROS: [u32; 66] = [
     0x1e140, 0x1e2f0, 0x1e950, 0x1fbf0,
 ];
 
+/// `str.isdecimal()` for one character (Unicode `Nd`, Python's `\d`).
+pub fn is_decimal(c: char) -> bool {
+    static D: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"\A\p{Nd}\z").expect("valid regex"));
+    let mut buf = [0u8; 4];
+    c.is_ascii_digit() || (!c.is_ascii() && D.is_match(c.encode_utf8(&mut buf)))
+}
+
 /// The value of a `\d` character, as Python's `int()` reads it.
 pub fn digit_value(c: char) -> u32 {
     let cp = c as u32;
@@ -83,6 +90,7 @@ mod tests {
         assert_eq!(split(" a\u{1f}b  c "), vec!["a", "b", "c"]);
         assert_eq!(digit_value('٣'), 3);
         assert_eq!(digit_value('7'), 7);
+        assert!(is_decimal('٣') && is_decimal('\u{ff12}') && !is_decimal('²') && !is_decimal('a'));
         let c: Vec<char> = "ab c".chars().collect();
         assert!(boundary(&c, 0) && !boundary(&c, 1) && boundary(&c, 2) && boundary(&c, 4));
     }

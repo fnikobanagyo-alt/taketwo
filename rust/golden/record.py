@@ -1,9 +1,13 @@
-"""Record Python parity vectors for the Rust `text` module (step S03).
+"""Record Python parity vectors for the Rust `text` module (step S03) and `library` module (step S04).
 
     backend/.venv/bin/python -B rust/golden/record.py
 
 Writes rust/golden/text.json: synthetic inputs and what the Python app returns for them
 (textproc, ml.normalize_for_wer, ml.wer, difflib ratio, pipeline word coverage).
+Writes rust/golden/library.sqlite3 (a database written by db.py, synthetic documents only) and
+rust/golden/library.json (a JSON copy of its documents, settings vectors, and what
+contract/seed_python.py seed() writes into a temporary folder, recorded in a child process).
+db.py's clock is pinned, so both files come out byte-identical on every run.
 Safety: the data folder is a fresh temporary folder (checked before any other app import),
 Hugging Face is offline, and the Whisper normalizer comes from tokenizer files only.
 No model is loaded or downloaded: ml.stt_model is replaced by a function that raises.
@@ -15,14 +19,20 @@ import json
 import os
 import random
 import shutil
+import sqlite3
+import subprocess
 import sys
 import tempfile
+import types
+import wave
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 WT = HERE.parent.parent
 BACKEND = WT / "backend"
 OUT = HERE / "text.json"
+LIB_OUT = HERE / "library.json"
+LIB_DB = HERE / "library.sqlite3"
 SPELLING = WT / "rust/crates/taketwo-core/data/whisper_normalizer.json"
 
 
@@ -253,6 +263,212 @@ def random_sentences(n: int, seed: int) -> list[tuple[str, str]]:
     return out
 
 
+# ---- step S04: library store, settings and seeder -------------------------------------------
+
+CLOCK0 = 1800000000.0
+DAY = 86400.0
+
+
+def pin_clock(db, start: float = CLOCK0, step: float = 0.25) -> None:
+    """db.py reads time.time(); a fixed, stepping clock makes every recorded file identical across runs."""
+    t = [start]
+
+    def now() -> float:
+        t[0] += step
+        return t[0]
+
+    db.time = types.SimpleNamespace(time=now)
+
+
+def record_database(db) -> dict:
+    """Synthetic documents written through db.py, then copied (SQLite backup API) to rust/golden/library.sqlite3."""
+    assert db.DB_PATH.parent.name.startswith("taketwo-golden."), db.DB_PATH
+    assert db.list_profiles() == [] and db.list_generations() == []
+    pin_clock(db)
+    odd = {"zeta": 1, "alpha": [0.1, 1e-07, 1e22, 1e16, -0.0, 5e-324, 1.7976931348623157e308, 2.5, 3.0],
+           "ints": [0, -1, 2**63 - 1, -(2**63), 2**64 - 1], "text": "Café ✓ \U0001F600 \"q\" \\ \u0000\t\n end",
+           "empty": {}, "none": None, "flags": [True, False], "nested": {"b": {"d": 1, "c": [{"y": 2, "x": 1}]}, "a": ""}}
+    for p in [
+        {"id": "vlib01", "name": "Library Voice", "language": "en", "status": "ready", "pitch_hz": 182.25,
+         "speech_rate_wps": 2.6, "studio": True, "created": 1700000000.0, "extra": odd},
+        {"id": "vlib02", "name": "Analyzing Voice", "language": "de", "status": "analyzing"},  # no created: set from the clock
+        {"id": "vlib03", "name": "Queued Voice", "status": "queued", "created": 1700000100.5},
+        {"id": "vlib04", "name": "Broken Voice", "status": "error", "error": "Old error", "created": 1700000200.0},
+        {"id": "vlib05", "name": "No status voice", "created": 1700000300.0},
+    ]:
+        db.put_profile(p)
+    chunk = lambda i, st, **kw: {"i": i, "text": f"Part {i} text.", "status": st, **kw}
+    for g in [
+        {"id": "glib01", "profile_id": "vlib01", "status": "running", "title": "Running one", "created": 1700001000.0,
+         "chunks": [chunk(0, "done", file="chunk_000.wav"), chunk(1, "running"), chunk(2, "pending"), chunk(3, "running")]},
+        {"id": "glib02", "profile_id": "vlib01", "status": "queued", "title": "Queued one", "created": 1700001100.0,
+         "chunks": [chunk(0, "pending")]},
+        {"id": "glib03", "profile_id": "vlib01", "status": "done", "title": "Done one", "favorite": False,
+         "created": 1700001200.0, "duration": 4.0, "file": "final.wav", "chunks": [chunk(0, "done", file="chunk_000.wav")], "extra": odd},
+        {"id": "glib04", "profile_id": "vlib02", "status": "done", "created": 1700001300.0, "chunks": [],
+         "deleted_at": CLOCK0 - 8 * DAY},  # soft-deleted more than 7 days before the pinned clock
+        {"id": "glib05", "profile_id": "vlib02", "status": "done", "created": 1700001400.0, "chunks": []},
+        {"id": "glib06", "profile_id": "vlib03", "status": "cancelled", "created": 1700001500.0, "chunks": [chunk(0, "pending")]},
+        {"id": "glib07", "status": "error", "message": "No voice", "created": 1700001600.0, "chunks": [], "deleted_at": 0},
+        {"id": "glib08", "profile_id": "vlib01", "status": "interrupted", "chunks": [chunk(0, "running")]},  # no created
+    ]:
+        db.put_generation(g)
+    assert db.patch_generation_meta("glib03", {"title": "Renamed ✓", "favorite": True, "status": "ignored"})
+    assert db.set_generation_deleted("glib05", True)
+    assert db.set_generation_deleted("glib06", True) and db.set_generation_deleted("glib06", False)
+    live = db.get_generation("glib02")
+    live["progress"], live["title"] = 0.5, "stale title"
+    assert db.put_generation_live(live)
+    assert not db.put_generation_live({"id": "missing01", "status": "done"})
+    with db._lock:
+        rows = {t: [list(r) for r in db._db.execute(f"SELECT * FROM {t} ORDER BY id")] for t in ("profiles", "generations")}
+    for t in rows:
+        for r in rows[t]:
+            r.pop()  # the doc column; its parsed copy is recorded below
+    if LIB_DB.exists():
+        LIB_DB.unlink()
+    dst = sqlite3.connect(LIB_DB)
+    with db._lock:
+        db._db.backup(dst)
+    dst.close()
+    return {"file": LIB_DB.name, "clock_start": CLOCK0, "profiles": db.list_profiles(),
+            "generations": db.list_generations(), "columns": rows}
+
+
+def _outcome(fn, *args):
+    try:
+        return {"ok": fn(*args)}
+    except Exception as e:  # the class is recorded too, so anything other than ValueError shows
+        return {"error_type": type(e).__name__, "error": str(e)}
+
+
+def checked_patches(db) -> list[dict]:
+    import math
+
+    pats = []
+    for k, (lo, hi, typ) in db.SETTING_RULES.items():
+        if typ is int:
+            vals = [lo, hi, lo - 1, hi + 1, lo + 0.7, hi + 0.5, lo - 0.5, str(lo), str(hi + 1), float(hi)]
+        else:
+            vals = [lo, hi, math.nextafter(lo, -math.inf), math.nextafter(hi, math.inf), math.nextafter(lo, math.inf),
+                    math.nextafter(hi, -math.inf), lo - 1e-9, hi + 1e-9, repr(lo), repr(hi), "nan", "inf", "-inf", "1e999"]
+            if float(lo).is_integer():
+                vals.append(int(lo))
+            if float(hi).is_integer():
+                vals.append(int(hi))
+        vals += [True, False, None, "", "abc", [], {}]
+        pats += [{k: v} for v in vals]
+    pats += [{"compare_takes": v} for v in [
+        " 2 ", "+2", "02", "0_2", "1__2", "_2", "2_", "2.0", "2e0", "0x2", "2 3", "\t2\n", " 2 ", "٣", "２",
+        "-0", "١", "2.9", 2.9, 3.99, 0.99, -0.99, 1e300, -1e300, "nan", "inf", "Infinity"]]
+    pats += [{"max_wer": v} for v in [
+        "0.1", " .1 ", "1e-1", "1E-1", "+0.1", "0.1_0", "0._1", "0_.1", "٠.١", "NaN", "-nan", "+Infinity",
+        "infinity", "-1e999", "0.1f", " ", "0,1", "1_0e-2", "1e-0_1", ".5", "5.", ".", "e1", "0.12\n"]]
+    pats += [{"seed": v} for v in ["2147483647", "2147483648", "99999999999999999999", 2**31, 2**31 - 1, -1, "-0", 2**63, 2**64 - 1]]
+    pats += [{"check_updates": v} for v in [True, False, 1, 0, "true", None]]
+    pats += [{"update_dismissed": v} for v in [
+        "", "2.1.0", "0.0.0", "1234.1234.1234", "12345.1.1", "2.1", "2.1.0.1", "v2.1.0", " 2.1.0", "2.1.0\n",
+        "٢.١.٠", "2..1", 210, 2.1, None, False]]
+    pats += [{"custom_engines": v} for v in [
+        [], [{"id": "a", "repo": "b/c"}], [{"id": "a", "repo": "b", "name": "x"}], [{"id": "a"}], [{"id": 1, "repo": "b"}],
+        [{"id": "a", "repo": None}], [{"id": "a", "repo": "b"}, 1], "x", [1], {"id": "a", "repo": "b"}, None]]
+    pats += [{"zzz": 1}, {"pronunciations": [{"from": "a", "to": "b"}]}, {"default_engine": 5}, {"strip_citations": "no"},
+             {}, {"max_attempts": 3, "max_wer": 2, "check_updates": 1}, {"check_updates": 1, "max_wer": 2},
+             {"zzz": 1, "max_attempts": "4", "target_lufs": -16}, {"max_wer": "0.2", "update_dismissed": "x"}]
+    return pats
+
+
+SETTINGS_FILES = [
+    None, "{}", '{"max_attempts": 5, "zzz": 1}', '{"custom_engines": [{"id": "a"}], "seed": 7}',
+    '{"custom_engines": [{"id": "a", "repo": "b"}]}', '{"custom_engines": "bad", "b": 1}', "", "{", "[1, 2]", "null", '"x"',
+    "﻿{}", b"\xff\xfe{}", '{"seed": 1, "max_attempts": 2, "seed": 3}', '{"b": 1, "a": 2, "b": 3}', '{"seed": "abc"}',
+    '  {"seed": 5}\n\n', '{"seed": 5} x', '{"custom_engines": null}',
+]
+
+SAVES = [
+    (None, {"max_attempts": "5"}), (None, {"zzz": 1, "seed": 9}), ('{"zzz": 1}', {"seed": 9}), (None, {"max_wer": 9}),
+    ("{broken", {"seed": 1}), ("{broken", {"seed": -1}), ('{"custom_engines": [1]}', {}), (None, {}),
+    (None, {"target_lufs": -16}), ('{"seed": 5}', {"seed": 6, "check_updates": "x"}),
+    (None, {"custom_engines": [{"id": "m", "repo": "org/model"}], "pronunciations": [{"from": "SQL", "to": "sequel"}]}),
+]
+
+
+def _settings_file(config, content) -> dict:
+    for n in ("settings.json", "settings.json.broken", "settings.json.tmp"):
+        (config.DATA_DIR / n).unlink(missing_ok=True)
+    if content is None:
+        return {"file": None}
+    if isinstance(content, bytes):
+        config.SETTINGS_PATH.write_bytes(content)
+        return {"file_hex": content.hex()}
+    config.SETTINGS_PATH.write_text(content)
+    return {"file": content}
+
+
+def _settings_after(config) -> dict:
+    p = config.SETTINGS_PATH
+    return {"settings_exists": p.exists(), "broken_exists": p.with_name("settings.json.broken").exists(),
+            "tmp_exists": p.with_name("settings.json.tmp").exists(),
+            "file_after": json.loads(p.read_text()) if p.exists() else None}
+
+
+def record_settings(db, config) -> dict:
+    assert config.SETTINGS_PATH.parent.name.startswith("taketwo-golden."), config.SETTINGS_PATH
+    checked = [{"patch": p, **_outcome(db._checked, p)} for p in checked_patches(db)]
+    gets = []
+    for f in SETTINGS_FILES:
+        case = _settings_file(config, f)
+        gets.append({**case, **_outcome(db.get_settings), **_settings_after(config)})
+    saves = []
+    for f, patch in SAVES:
+        case = _settings_file(config, f)
+        saves.append({**case, "patch": patch, **_outcome(db.save_settings, patch), **_settings_after(config)})
+    _settings_file(config, None)
+    rules = [{"key": k, "lo": lo, "hi": hi, "type": t.__name__} for k, (lo, hi, t) in db.SETTING_RULES.items()]
+    return {"defaults": [config.DEFAULT_SETTINGS], "rules": rules, "gen_meta_keys": [list(db.GEN_META_KEYS)],
+            "checked": checked, "get_settings": gets, "save_settings": saves}
+
+
+def seed_golden() -> list[dict]:
+    """Runs seed_python.seed() in a child process: db.py opens one database at import, so the seed gets its own."""
+    tmp = Path(tempfile.mkdtemp(prefix="taketwo-seed."))
+    try:
+        env = {**os.environ, "TAKETWO_DATA": str(tmp), "VOICEFORGE_DATA": str(tmp), "HF_HUB_OFFLINE": "1"}
+        out = subprocess.run([sys.executable, "-B", str(Path(__file__).resolve()), "--seed-golden"],
+                             env=env, check=True, capture_output=True, text=True).stdout
+        return [json.loads(out.strip().splitlines()[-1])]
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+
+
+def seed_child() -> None:
+    data = Path(os.environ["TAKETWO_DATA"])
+    assert data.name.startswith("taketwo-seed.") and os.environ["VOICEFORGE_DATA"] == str(data), data
+    sys.path.insert(0, str(BACKEND))
+    from app import config
+
+    assert config.DATA_DIR.resolve() == data.resolve(), config.DATA_DIR  # never the real library
+    from app import db
+
+    pin_clock(db)
+    sys.path.insert(0, str(WT / "contract"))
+    import seed_python
+
+    seed_python.seed(data)
+    files = []
+    for f in sorted(data.rglob("*")):
+        rel = f.relative_to(data).as_posix()
+        if f.is_dir():
+            files.append({"path": rel + "/"})
+        elif f.suffix == ".wav":
+            with wave.open(str(f)) as w:
+                files.append({"path": rel, "channels": w.getnchannels(), "sample_width": w.getsampwidth(),
+                              "rate": w.getframerate(), "frames": w.getnframes(), "bytes": f.stat().st_size})
+        else:
+            files.append({"path": rel})
+    print(json.dumps({"files": files, "profiles": db.list_profiles(), "generations": db.list_generations()}, allow_nan=False))
+
+
 def main() -> None:
     tmp = Path(tempfile.mkdtemp(prefix="taketwo-golden."))
     try:
@@ -301,9 +517,18 @@ def main() -> None:
         }
         OUT.write_text(json.dumps(data, ensure_ascii=True, indent=1) + "\n")
         print({k: len(v) for k, v in data.items()})
+
+        from app import db
+
+        lib = {"database": record_database(db), **record_settings(db, config), "seed": seed_golden()}
+        LIB_OUT.write_text(json.dumps(lib, ensure_ascii=True, indent=1, allow_nan=False) + "\n")
+        print({k: len(v) for k, v in lib.items()})
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
 
 
 if __name__ == "__main__":
-    main()
+    if sys.argv[1:] == ["--seed-golden"]:
+        seed_child()
+    else:
+        main()

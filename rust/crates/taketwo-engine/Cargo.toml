@@ -9,4 +9,10 @@ cuda = ["taketwo-voice/cuda"]
 flash-attn = ["taketwo-voice/flash-attn"]
 
 [dependencies]
+hound = "3.5"
+serde_json = "1"
+taketwo-core = { path = "../taketwo-core" }
 taketwo-voice = { path = "../taketwo-voice" }
+
+[dev-dependencies]
+tempfile = "3"
