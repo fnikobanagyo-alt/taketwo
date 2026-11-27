@@ -455,7 +455,8 @@ def cmd_render(a) -> int:
     proc = None
     try:
         base_lib = build_library(a.source, plan, tmp)
-        for label, template in (("a", a.engine_a_cmd), ("b", a.engine_b_cmd)):
+        # the Rust engine (b) first, so a 501 or a failed voice copy shows before a Python take is spent (lead decision 12)
+        for label, template in (("b", a.engine_b_cmd), ("a", a.engine_a_cmd)):
             lib = tmp / f"library-{label}"
             shutil.copytree(base_lib, lib)
             folder = out / "render" / label

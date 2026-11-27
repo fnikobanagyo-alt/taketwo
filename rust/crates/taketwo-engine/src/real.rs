@@ -56,7 +56,12 @@ impl Voice for Capped<'_> {
                 return Err(format!("TAKETWO_MAX_TAKES is {cap}: this engine run has recorded all {cap} takes it may, so the narration stops here."));
             }
         }
-        self.used.fetch_add(1, Ordering::SeqCst);
+        let n = self.used.fetch_add(1, Ordering::SeqCst) + 1;
+        // one stderr line per synthesis call (lead decision 21); never part of a reply
+        match self.cap {
+            Some(cap) => eprintln!("take {n} of {cap}"),
+            None => eprintln!("take {n}"),
+        }
         self.inner.synthesize(engine, text, ref_wav, ref_text, language, params, seed, expected_seconds, cancel)
     }
 }
