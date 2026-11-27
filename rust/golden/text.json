@@ -1,0 +1,5566 @@
+{
+ "normalize": [
+  {
+   "text": "",
+   "output": ""
+  },
+  {
+   "text": "   ",
+   "output": ""
+  },
+  {
+   "text": "\n",
+   "output": ""
+  },
+  {
+   "text": "Hello, World!",
+   "output": "hello world"
+  },
+  {
+   "text": "  leading and trailing  ",
+   "output": "leading and trailing"
+  },
+  {
+   "text": "one",
+   "output": "one"
+  },
+  {
+   "text": "ones",
+   "output": "ones"
+  },
+  {
+   "text": "one two three four",
+   "output": "1234"
+  },
+  {
+   "text": "twenty one",
+   "output": "21"
+  },
+  {
+   "text": "twenty-one",
+   "output": "21"
+  },
+  {
+   "text": "nineteen ninety nine",
+   "output": "1999"
+  },
+  {
+   "text": "two thousand and twenty",
+   "output": "2020"
+  },
+  {
+   "text": "one hundred and five",
+   "output": "105"
+  },
+  {
+   "text": "a hundred people",
+   "output": "a 100 people"
+  },
+  {
+   "text": "three million",
+   "output": "3000000"
+  },
+  {
+   "text": "one oh one",
+   "output": "101"
+  },
+  {
+   "text": "zero zero seven",
+   "output": "007"
+  },
+  {
+   "text": "0 oh",
+   "output": "0"
+  },
+  {
+   "text": "oh my god",
+   "output": "0 my god"
+  },
+  {
+   "text": "double five",
+   "output": "55"
+  },
+  {
+   "text": "triple zero",
+   "output": "000"
+  },
+  {
+   "text": "double trouble",
+   "output": "double trouble"
+  },
+  {
+   "text": "two point five",
+   "output": "2.5"
+  },
+  {
+   "text": "point five",
+   "output": ".5"
+  },
+  {
+   "text": "point",
+   "output": "point"
+  },
+  {
+   "text": "point hundred",
+   "output": "100"
+  },
+  {
+   "text": "five point",
+   "output": "5 point"
+  },
+  {
+   "text": "three and a half",
+   "output": "3.5"
+  },
+  {
+   "text": "and a half",
+   "output": ""
+  },
+  {
+   "text": "half past one",
+   "output": "half past one"
+  },
+  {
+   "text": "one and two",
+   "output": "one and 2"
+  },
+  {
+   "text": "ten thousand two hundred and fifty",
+   "output": "10250"
+  },
+  {
+   "text": "five hundred thousand",
+   "output": "500000"
+  },
+  {
+   "text": "1.5 million",
+   "output": "1500000"
+  },
+  {
+   "text": ".5 million",
+   "output": ".5 1000000"
+  },
+  {
+   "text": "1.2.3 million",
+   "output": "one.2.3 1000000"
+  },
+  {
+   "text": "one decillion",
+   "output": "1000000000000000000000000000000000"
+  },
+  {
+   "text": "one decillion decillion",
+   "output": "1000000000000000000000000000000000"
+  },
+  {
+   "text": "123456789012345678901234567890123456789012345 decillion",
+   "output": "123456789357345678901234567890123456789012000"
+  },
+  {
+   "text": "99999999999999999999 hundred",
+   "output": "100000000000000098900"
+  },
+  {
+   "text": "seven hundreds",
+   "output": "700s"
+  },
+  {
+   "text": "two thousands",
+   "output": "2000s"
+  },
+  {
+   "text": "millions of years",
+   "output": "1000000s of years"
+  },
+  {
+   "text": "first second third",
+   "output": "1st 2nd 3rd"
+  },
+  {
+   "text": "the fourth fifth and sixth",
+   "output": "the 4th 5th and 6th"
+  },
+  {
+   "text": "eighth ninth",
+   "output": "8th ninth"
+  },
+  {
+   "text": "nineth",
+   "output": "9th"
+  },
+  {
+   "text": "twelfth night",
+   "output": "12th night"
+  },
+  {
+   "text": "twentieth century",
+   "output": "20th century"
+  },
+  {
+   "text": "twenty first century",
+   "output": "21st century"
+  },
+  {
+   "text": "one hundredth",
+   "output": "100th"
+  },
+  {
+   "text": "millionth",
+   "output": "1000000th"
+  },
+  {
+   "text": "the 21st",
+   "output": "the 21st"
+  },
+  {
+   "text": "1st",
+   "output": "1st"
+  },
+  {
+   "text": "the 1960s",
+   "output": "the 1960s"
+  },
+  {
+   "text": "sixes and sevens",
+   "output": "6s and 7s"
+  },
+  {
+   "text": "the twenties",
+   "output": "the 20s"
+  },
+  {
+   "text": "the nineteen twenties",
+   "output": "the 1920s"
+  },
+  {
+   "text": "twenty twenties",
+   "output": "2020s"
+  },
+  {
+   "text": "thirty fifth",
+   "output": "35th"
+  },
+  {
+   "text": "two hundred thirty fifth",
+   "output": "235th"
+  },
+  {
+   "text": "$20 million",
+   "output": "$20000000"
+  },
+  {
+   "text": "$20",
+   "output": "$20"
+  },
+  {
+   "text": "20 dollars",
+   "output": "$20"
+  },
+  {
+   "text": "five dollars",
+   "output": "$5"
+  },
+  {
+   "text": "dollars",
+   "output": "dollars"
+  },
+  {
+   "text": "$2 and 7 cents",
+   "output": "$2.07"
+  },
+  {
+   "text": "$2 and \u00a27",
+   "output": "$2.07"
+  },
+  {
+   "text": "\u00a30.50",
+   "output": "\u00a250"
+  },
+  {
+   "text": "\u20ac3.05",
+   "output": "\u20ac3.05"
+  },
+  {
+   "text": "fifty cents",
+   "output": "\u00a250"
+  },
+  {
+   "text": "5 pounds",
+   "output": "\u00a35"
+  },
+  {
+   "text": "ten euros",
+   "output": "\u20ac10"
+  },
+  {
+   "text": "a pound of flour",
+   "output": "a pound of flour"
+  },
+  {
+   "text": "five percent",
+   "output": "5%"
+  },
+  {
+   "text": "ten per cent",
+   "output": "10%"
+  },
+  {
+   "text": "per cent",
+   "output": "per cent"
+  },
+  {
+   "text": "per",
+   "output": "per"
+  },
+  {
+   "text": "50%",
+   "output": "50%"
+  },
+  {
+   "text": "100 % sure",
+   "output": "100 sure"
+  },
+  {
+   "text": "the % sign",
+   "output": "the sign"
+  },
+  {
+   "text": "minus three",
+   "output": "-3"
+  },
+  {
+   "text": "minus",
+   "output": "minus"
+  },
+  {
+   "text": "plus five",
+   "output": "+5"
+  },
+  {
+   "text": "negative 2.5",
+   "output": "-2.5"
+  },
+  {
+   "text": "positive thinking",
+   "output": "positive thinking"
+  },
+  {
+   "text": "+5 points",
+   "output": "5 points"
+  },
+  {
+   "text": "-3 degrees",
+   "output": "3 degrees"
+  },
+  {
+   "text": "1,000,000 people",
+   "output": "1000000 people"
+  },
+  {
+   "text": "1,2,3",
+   "output": "12 3"
+  },
+  {
+   "text": "3.0",
+   "output": "3"
+  },
+  {
+   "text": "007",
+   "output": "7"
+  },
+  {
+   "text": "3.14159",
+   "output": "3.14159"
+  },
+  {
+   "text": "192.168.0.1",
+   "output": "192.168.0 one"
+  },
+  {
+   "text": "2 1/2",
+   "output": "2 one 2"
+  },
+  {
+   "text": "4.5.6",
+   "output": "4.5.6"
+  },
+  {
+   "text": "$5.$5",
+   "output": "$5 $5"
+  },
+  {
+   "text": "1s",
+   "output": "ones"
+  },
+  {
+   "text": "the 1 and only",
+   "output": "the one and only"
+  },
+  {
+   "text": "1 s",
+   "output": "ones"
+  },
+  {
+   "text": "11 s",
+   "output": "11s"
+  },
+  {
+   "text": "number 1",
+   "output": "number one"
+  },
+  {
+   "text": "I won't go",
+   "output": "i will not go"
+  },
+  {
+   "text": "you can't",
+   "output": "you can not"
+  },
+  {
+   "text": "let's go",
+   "output": "let us go"
+  },
+  {
+   "text": "it ain't so",
+   "output": "it aint so"
+  },
+  {
+   "text": "y'all",
+   "output": "you all"
+  },
+  {
+   "text": "I wanna",
+   "output": "i want to"
+  },
+  {
+   "text": "gotta go",
+   "output": "got to go"
+  },
+  {
+   "text": "gonna",
+   "output": "going to"
+  },
+  {
+   "text": "i'ma",
+   "output": "i am going to"
+  },
+  {
+   "text": "imma",
+   "output": "i am going to"
+  },
+  {
+   "text": "woulda coulda shoulda",
+   "output": "would have could have should have"
+  },
+  {
+   "text": "yes ma'am",
+   "output": "yes madam"
+  },
+  {
+   "text": "it's been",
+   "output": "it has been"
+  },
+  {
+   "text": "she'd been",
+   "output": "she had been"
+  },
+  {
+   "text": "he's gone",
+   "output": "he has gone"
+  },
+  {
+   "text": "they'd gone",
+   "output": "they had gone"
+  },
+  {
+   "text": "we'd done",
+   "output": "we had done"
+  },
+  {
+   "text": "she's got",
+   "output": "she has got"
+  },
+  {
+   "text": "don't",
+   "output": "do not"
+  },
+  {
+   "text": "they're",
+   "output": "they are"
+  },
+  {
+   "text": "it's",
+   "output": "it is"
+  },
+  {
+   "text": "I'd",
+   "output": "i would"
+  },
+  {
+   "text": "we'll",
+   "output": "we will"
+  },
+  {
+   "text": "isn't",
+   "output": "is not"
+  },
+  {
+   "text": "I've",
+   "output": "i have"
+  },
+  {
+   "text": "I'm",
+   "output": "i am"
+  },
+  {
+   "text": "rock 'n' roll",
+   "output": "rock n roll"
+  },
+  {
+   "text": "the dog 's bone",
+   "output": "the dog is bone"
+  },
+  {
+   "text": "Mr Smith",
+   "output": "mister smith"
+  },
+  {
+   "text": "Mrs. Jones",
+   "output": "missus jones"
+  },
+  {
+   "text": "Dr. Who",
+   "output": "doctor who"
+  },
+  {
+   "text": "St. John",
+   "output": "saint john"
+  },
+  {
+   "text": "Prof Plum",
+   "output": "professor plum"
+  },
+  {
+   "text": "Capt. Hook",
+   "output": "captain hook"
+  },
+  {
+   "text": "Gov",
+   "output": "governor"
+  },
+  {
+   "text": "Ald",
+   "output": "alderman"
+  },
+  {
+   "text": "Gen. Lee",
+   "output": "general lee"
+  },
+  {
+   "text": "Sen Rep Pres Rev Hon",
+   "output": "senator representative president reverend honorable"
+  },
+  {
+   "text": "Asst Assoc Lt Col",
+   "output": "assistant associate lieutenant colonel"
+  },
+  {
+   "text": "Jr. and Sr.",
+   "output": "junior and senior"
+  },
+  {
+   "text": "John Esq",
+   "output": "john esquire"
+  },
+  {
+   "text": "mister",
+   "output": "mister"
+  },
+  {
+   "text": "street",
+   "output": "street"
+  },
+  {
+   "text": "dr.",
+   "output": "doctor"
+  },
+  {
+   "text": "drs",
+   "output": "drs"
+  },
+  {
+   "text": "stop",
+   "output": "stop"
+  },
+  {
+   "text": "colour",
+   "output": "color"
+  },
+  {
+   "text": "The organisation's favourite colours",
+   "output": "the organization is favorite colors"
+  },
+  {
+   "text": "realise",
+   "output": "realize"
+  },
+  {
+   "text": "analyse",
+   "output": "analyze"
+  },
+  {
+   "text": "centre theatre",
+   "output": "center theater"
+  },
+  {
+   "text": "travelled",
+   "output": "traveled"
+  },
+  {
+   "text": "grey",
+   "output": "gray"
+  },
+  {
+   "text": "aeroplane",
+   "output": "airplane"
+  },
+  {
+   "text": "programme",
+   "output": "program"
+  },
+  {
+   "text": "defence",
+   "output": "defense"
+  },
+  {
+   "text": "licence",
+   "output": "license"
+  },
+  {
+   "text": "caf\u00e9",
+   "output": "cafe"
+  },
+  {
+   "text": "cafe\u0301",
+   "output": "cafe"
+  },
+  {
+   "text": "na\u00efve",
+   "output": "naive"
+  },
+  {
+   "text": "nai\u0308ve",
+   "output": "naive"
+  },
+  {
+   "text": "\u0153uvre",
+   "output": "oeuvre"
+  },
+  {
+   "text": "Stra\u00dfe",
+   "output": "strasse"
+  },
+  {
+   "text": "\u00c6r\u00f8",
+   "output": "aero"
+  },
+  {
+   "text": "\u00f0\u00fe",
+   "output": "dth"
+  },
+  {
+   "text": "\u0141\u00f3d\u017a",
+   "output": "lodz"
+  },
+  {
+   "text": "\u00c5ngstr\u00f6m",
+   "output": "angstrom"
+  },
+  {
+   "text": "pi\u00f1ata",
+   "output": "pinata"
+  },
+  {
+   "text": "\u0395\u03bb\u03bb\u03b7\u03bd\u03b9\u03ba\u03ac",
+   "output": "\u03b5\u03bb\u03bb\u03b7\u03bd\u03b9\u03ba\u03b1"
+  },
+  {
+   "text": "\u0420\u0443\u0441\u0441\u043a\u0438\u0439",
+   "output": "\u0440\u0443\u0441\u0441\u043a\u0438\u0438"
+  },
+  {
+   "text": "\u65e5\u672c\u8a9e\u306e\u30c6\u30ad\u30b9\u30c8",
+   "output": "\u65e5\u672c\u8a9e\u306e\u30c6\u30ad\u30b9\u30c8"
+  },
+  {
+   "text": "\ud55c\uad6d\uc5b4",
+   "output": "\u1112\u1161\u11ab\u1100\u116e\u11a8\u110b\u1165"
+  },
+  {
+   "text": "x\u00b2",
+   "output": "x 2"
+  },
+  {
+   "text": "\u00bd",
+   "output": "one 2"
+  },
+  {
+   "text": "\uff11\uff12\uff13",
+   "output": "123"
+  },
+  {
+   "text": "\u0663 dollars",
+   "output": "$3"
+  },
+  {
+   "text": "Hello \ud83d\ude00 world",
+   "output": "hello world"
+  },
+  {
+   "text": "a\u001cb",
+   "output": "a b"
+  },
+  {
+   "text": "tab\there",
+   "output": "tab here"
+  },
+  {
+   "text": "line\nbreak",
+   "output": "line break"
+  },
+  {
+   "text": "a\u00a0b",
+   "output": "a b"
+  },
+  {
+   "text": "smart \u201cquotes\u201d and \u2018single\u2019",
+   "output": "smart quotes and single"
+  },
+  {
+   "text": "em\u2014dash",
+   "output": "em dash"
+  },
+  {
+   "text": "en\u2013dash",
+   "output": "en dash"
+  },
+  {
+   "text": "hide-working",
+   "output": "hide working"
+  },
+  {
+   "text": "hideworking",
+   "output": "hideworking"
+  },
+  {
+   "text": "e.g. this",
+   "output": "e g this"
+  },
+  {
+   "text": "U.S.A.",
+   "output": "u s a"
+  },
+  {
+   "text": "end.",
+   "output": "end"
+  },
+  {
+   "text": "a..b",
+   "output": "a b"
+  },
+  {
+   "text": "wait...",
+   "output": "wait ."
+  },
+  {
+   "text": "#hashtag",
+   "output": "hashtag"
+  },
+  {
+   "text": "@user",
+   "output": "user"
+  },
+  {
+   "text": "a & b",
+   "output": "a b"
+  },
+  {
+   "text": "100\u00b0",
+   "output": "100"
+  },
+  {
+   "text": "\u00a92024",
+   "output": "2024"
+  },
+  {
+   "text": "\u2122",
+   "output": "TM"
+  },
+  {
+   "text": "a/b",
+   "output": "a b"
+  },
+  {
+   "text": "C++",
+   "output": "c"
+  },
+  {
+   "text": "under_score",
+   "output": "under score"
+  },
+  {
+   "text": "x*y",
+   "output": "x y"
+  },
+  {
+   "text": "\u00dcn\u00efc\u00f6d\u00e9",
+   "output": "unicode"
+  },
+  {
+   "text": "[inaudible] hello",
+   "output": "hello"
+  },
+  {
+   "text": "(laughs) yes",
+   "output": "yes"
+  },
+  {
+   "text": "<unk> word",
+   "output": "word"
+  },
+  {
+   "text": "[a] b [c]",
+   "output": "b"
+  },
+  {
+   "text": "(unclosed",
+   "output": "unclosed"
+  },
+  {
+   "text": "a [b",
+   "output": "a b"
+  },
+  {
+   "text": "um uh hmm mm mhm mmm",
+   "output": ""
+  },
+  {
+   "text": "umbrella",
+   "output": "umbrella"
+  },
+  {
+   "text": "hmmm",
+   "output": "hmmm"
+  },
+  {
+   "text": "summary",
+   "output": "summary"
+  },
+  {
+   "text": "mmmm",
+   "output": "mmmm"
+  },
+  {
+   "text": "12",
+   "output": "12"
+  },
+  {
+   "text": "thousandth 0 thirty ninety thirtieth",
+   "output": "1000th 309030th"
+  },
+  {
+   "text": "third thirteenth nine fifty dollars two fifty",
+   "output": "3rd 13th $950 250"
+  },
+  {
+   "text": "three 10 5th 007",
+   "output": "3 10 5th 7"
+  },
+  {
+   "text": "forty 2nd 2nd one four cent positive 7",
+   "output": "40 2nd 2nd \u00a214 +7"
+  },
+  {
+   "text": "dollar +6 two half two",
+   "output": "dollar 62 half 2"
+  },
+  {
+   "text": "colour third colour negative ninety and fifth forty",
+   "output": "color 3rd color -90 and 5th 40"
+  },
+  {
+   "text": "2nd point negative twenty cents",
+   "output": "2nd \u00a220"
+  },
+  {
+   "text": "thirtieth won't negative half",
+   "output": "30th will not negative half"
+  },
+  {
+   "text": "$5 1st",
+   "output": "$5 1st"
+  },
+  {
+   "text": "ten twenty ones \u00a33 eight",
+   "output": "1021s \u00a338"
+  },
+  {
+   "text": "ninety 7 eight seven one $5 20 +6",
+   "output": "90 7871 $5 20 6"
+  },
+  {
+   "text": "hundredth",
+   "output": "100th"
+  },
+  {
+   "text": "twentieth sixes per 1000",
+   "output": "20th 6s per 1000"
+  },
+  {
+   "text": "fourth oh nine 99 ones",
+   "output": "4th 09 991s"
+  },
+  {
+   "text": "won't it's",
+   "output": "will not it is"
+  },
+  {
+   "text": "apples it's a negative dollar +6 hundredth hundred",
+   "output": "apples it is a -dollar 600th 100"
+  },
+  {
+   "text": "second fifth ten ten twos three -4",
+   "output": "2nd 5th 10102s 3 4"
+  },
+  {
+   "text": "three 12 seven thousand 2.25",
+   "output": "3 127000 2.25"
+  },
+  {
+   "text": "5th",
+   "output": "5th"
+  },
+  {
+   "text": "7 seven thirteenth point",
+   "output": "7713th point"
+  },
+  {
+   "text": "four dollar five twentieth -4",
+   "output": "$4 520th 4"
+  },
+  {
+   "text": "12 thirty and and thousandth",
+   "output": "1230 and and 1000th"
+  },
+  {
+   "text": "a thousandth",
+   "output": "a 1000th"
+  },
+  {
+   "text": "7 3.0 two double ten ninety ones ninety",
+   "output": "7 32101091s 90"
+  },
+  {
+   "text": "forty apples dollars per pounds cent",
+   "output": "40 apples dollars per pounds cent"
+  },
+  {
+   "text": "millionth 1st and twenty one mr minus thousand",
+   "output": "1000000th 1st and 21 mister -1000"
+  },
+  {
+   "text": "fourth second negative dollars nine",
+   "output": "4th 2nd -dollars 9"
+  },
+  {
+   "text": "forty positive",
+   "output": "40 positive"
+  },
+  {
+   "text": "dollar thirty",
+   "output": "dollar 30"
+  },
+  {
+   "text": "twentieth eleven second 10 won't",
+   "output": "20th 112nd 10 will not"
+  },
+  {
+   "text": "cent 0 2 millionth 0.5 twos",
+   "output": "cent 0 2000000th 0.52s"
+  },
+  {
+   "text": "o thousand apples plus half ten decillion",
+   "output": "0 apples plus half 10000000000000000000000000000000000"
+  },
+  {
+   "text": "twenty three forty nineteen",
+   "output": "234019"
+  },
+  {
+   "text": "eight 1 six",
+   "output": "8 16"
+  },
+  {
+   "text": "dollars the the ninety sixes $5 thirtieth 2nd",
+   "output": "dollars the the 96s $530th 2nd"
+  },
+  {
+   "text": "+6 fifty zero 1st thirty five",
+   "output": "6500 1st 35"
+  },
+  {
+   "text": "per",
+   "output": "per"
+  },
+  {
+   "text": "triple",
+   "output": "triple"
+  },
+  {
+   "text": "triple percent pounds first a",
+   "output": "triple percent pounds 1st a"
+  },
+  {
+   "text": "six it's 0.5 point pounds",
+   "output": "6 it is \u00a25"
+  },
+  {
+   "text": "dollars",
+   "output": "dollars"
+  },
+  {
+   "text": "$5",
+   "output": "$5"
+  },
+  {
+   "text": "third point 2.25 millions",
+   "output": "3rd .2.25 1000000s"
+  },
+  {
+   "text": "o plus 10 thirteen five",
+   "output": "0 +10135"
+  },
+  {
+   "text": "colour pounds",
+   "output": "color pounds"
+  },
+  {
+   "text": "and 1 billion 10 thirty eight twelve twelve",
+   "output": "and 1000000000 10381212"
+  },
+  {
+   "text": "eleven",
+   "output": "11"
+  },
+  {
+   "text": "and a five",
+   "output": "and a 5"
+  },
+  {
+   "text": "triple 100 dollar nineteen 2nd first point fifth",
+   "output": "triple $100 19 2nd 1st 5th"
+  },
+  {
+   "text": "oh nine billion third 1 twelfth 100 seven",
+   "output": "9000000003rd 112th 107"
+  },
+  {
+   "text": "2nd billion three",
+   "output": "2nd 1000000003"
+  },
+  {
+   "text": "3.0 thirteenth third",
+   "output": "313th 3rd"
+  },
+  {
+   "text": "1.5 99 plus million +6 dollar eleven",
+   "output": "one.5 99 +1000000 $6 11"
+  },
+  {
+   "text": "point billion the point",
+   "output": "1000000000 the point"
+  },
+  {
+   "text": "thirty twenties 99 twentieth twelve seven dollar",
+   "output": "3020s 9920th $127"
+  },
+  {
+   "text": "1000 triple dollars minus",
+   "output": "1000 triple dollars minus"
+  },
+  {
+   "text": "007 -4 21st hundred 1000 one fifth ten",
+   "output": "7 4 21st 100 10015th 10"
+  },
+  {
+   "text": "7 1.5 one 5th six 12 third",
+   "output": "7 one.51 5th 6 123rd"
+  },
+  {
+   "text": "1960s positive nine 2.25 007 eight per",
+   "output": "1960s +9 2.25 78 per"
+  },
+  {
+   "text": "triple",
+   "output": "triple"
+  },
+  {
+   "text": "hundredth",
+   "output": "100th"
+  },
+  {
+   "text": "tens two eleven thirteenth",
+   "output": "10s 21113th"
+  },
+  {
+   "text": "point fourth nineteen triple ninety won't thirteen 007",
+   "output": "4th 19 triple 90 will not 13 7"
+  },
+  {
+   "text": "2.25 2 first sixes hundredth fifty",
+   "output": "2.25 21st 6s 100th 50"
+  },
+  {
+   "text": "mr two minus",
+   "output": "mister 2 minus"
+  },
+  {
+   "text": "millionth 7 second 99 ninety hundredth eleven",
+   "output": "1000000th 72nd 999000th 11"
+  },
+  {
+   "text": "thirteen billion thousandth seven hundreds five",
+   "output": "13000000000th 700s 5"
+  },
+  {
+   "text": "thirty nineteen plus",
+   "output": "3019 plus"
+  },
+  {
+   "text": "thirteen thirtieth ones",
+   "output": "1330th ones"
+  },
+  {
+   "text": "1000 cent",
+   "output": "\u00a21000"
+  },
+  {
+   "text": "1960s 21st eleven",
+   "output": "1960s 21st 11"
+  },
+  {
+   "text": "-4 seven",
+   "output": "47"
+  },
+  {
+   "text": "tens hundredth billion pounds",
+   "output": "10s 100th \u00a31000000000"
+  },
+  {
+   "text": "10 \u20ac2.5 percent nineteen thirteenth double",
+   "output": "10 \u20ac2.5% 1913th double"
+  },
+  {
+   "text": "0 a second thirtieth oh negative sixes ninety",
+   "output": "0 a 2nd 30th 0 -6s 90"
+  },
+  {
+   "text": "six fourth seven third",
+   "output": "64th 73rd"
+  },
+  {
+   "text": "hundreds 1960s percent 20 99",
+   "output": "100s 1960s percent 20 99"
+  },
+  {
+   "text": "12",
+   "output": "12"
+  },
+  {
+   "text": "pounds ones it's 20 ten and",
+   "output": "pounds ones it is 2010 and"
+  },
+  {
+   "text": "trillion $5 first",
+   "output": "1000000000000 $51st"
+  },
+  {
+   "text": "positive",
+   "output": "positive"
+  },
+  {
+   "text": "apples 1.5 seven",
+   "output": "apples one.57"
+  },
+  {
+   "text": "half sixes 100",
+   "output": "half 6s 100"
+  },
+  {
+   "text": "eight seven",
+   "output": "87"
+  },
+  {
+   "text": "20 thirty percent nineteen 7 100 zero first",
+   "output": "2030% 19 7 10001st"
+  },
+  {
+   "text": "hundred thirty ten twelve thousands",
+   "output": "1301012000s"
+  },
+  {
+   "text": "two 10 +6 colour and thousands third",
+   "output": "2 10 6 color and 1000s 3rd"
+  },
+  {
+   "text": "and hundred cent",
+   "output": "and \u00a2100"
+  },
+  {
+   "text": "2.25 21st dollars euros thirtieth thirteen oh",
+   "output": "2.25 21st dollars euros 30th 130"
+  },
+  {
+   "text": "negative eleven 99 three 10 thirty fifty",
+   "output": "-11 993 103050"
+  },
+  {
+   "text": "euros",
+   "output": "euros"
+  },
+  {
+   "text": "nineteen minus",
+   "output": "19 minus"
+  },
+  {
+   "text": "cents thousands -4 pounds fourth",
+   "output": "cents 1000s \u00a34 4th"
+  },
+  {
+   "text": "two positive five \u00a33",
+   "output": "2 +5 \u00a33"
+  },
+  {
+   "text": "millions \u00a33",
+   "output": "1000000s \u00a33"
+  },
+  {
+   "text": "negative nine 0.5",
+   "output": "-9 0.5"
+  },
+  {
+   "text": "one it's hundreds hundred five twos thirty it's",
+   "output": "one it is 100s 1052s 30 it is"
+  },
+  {
+   "text": "and 3.0",
+   "output": "and 3"
+  },
+  {
+   "text": "1000 dollars",
+   "output": "$1000"
+  },
+  {
+   "text": "hundredth won't cents",
+   "output": "100th will not cents"
+  },
+  {
+   "text": "cent 100 sixes euros dollar nineteen",
+   "output": "cent 106s euros dollar 19"
+  },
+  {
+   "text": "two cents \u20ac2.5",
+   "output": "\u00a22 \u20ac2.5"
+  },
+  {
+   "text": "two 1000 thousands mr 0 millionth",
+   "output": "2 1000s mister 0th"
+  },
+  {
+   "text": "nine and",
+   "output": "9 and"
+  },
+  {
+   "text": "billion thousand trillion seven",
+   "output": "1000000007"
+  },
+  {
+   "text": "thousand zero percent 007 cents",
+   "output": "10000% \u00a27"
+  },
+  {
+   "text": "three \u20ac2.5 thirty zero",
+   "output": "3 \u20ac2.5300"
+  },
+  {
+   "text": "$5 two triple third minus",
+   "output": "$52 triple 3rd minus"
+  },
+  {
+   "text": "pounds 1st -4 and mr 0.5",
+   "output": "pounds 1st 4 and mister 0.5"
+  },
+  {
+   "text": "the 1.5 2nd 007",
+   "output": "the one.5 2nd 7"
+  },
+  {
+   "text": "1.5 decillion twenty thirteen 1000",
+   "output": "150000000000000000000000000000002013 1000"
+  },
+  {
+   "text": "1.5 thirty second eight millionth plus 0",
+   "output": "one.532nd 8000000th +0"
+  },
+  {
+   "text": "million cent 99 hundredth nine nineteen 5 2.25",
+   "output": "\u00a21000000 9900th 919 5 2.25"
+  },
+  {
+   "text": "fifth 2nd",
+   "output": "5th 2nd"
+  },
+  {
+   "text": "99 $5 four thirty",
+   "output": "99 $5430"
+  },
+  {
+   "text": "trillion colour 12 mr",
+   "output": "1000000000000 color 12 mister"
+  },
+  {
+   "text": "five 7 ones five dollar 1st",
+   "output": "5 71s $5 1st"
+  },
+  {
+   "text": "100",
+   "output": "100"
+  },
+  {
+   "text": "three ten cent thousand third",
+   "output": "\u00a2310 1003rd"
+  },
+  {
+   "text": "thirtieth hundreds and first 0.5",
+   "output": "30th 100s and 1st 0.5"
+  },
+  {
+   "text": "thousandth",
+   "output": "1000th"
+  },
+  {
+   "text": "dollars",
+   "output": "dollars"
+  },
+  {
+   "text": "ninety thirtieth sixes \u20ac2.5 21st 3.0 seven",
+   "output": "9030th 6s \u20ac2.5 21st 37"
+  },
+  {
+   "text": "mr decillion triple eight 7",
+   "output": "mister 1000000000000000000000000000000000888 7"
+  },
+  {
+   "text": "\u20ac2.5 thirty",
+   "output": "\u20ac2.530"
+  },
+  {
+   "text": "point 99 pounds first decillion sixes sixes",
+   "output": " .99 1st 1000000000000000000000000000000006s 6s"
+  },
+  {
+   "text": "apples the and plus fifth twentieth 0 zero",
+   "output": "apples the and +5th 20th 0"
+  },
+  {
+   "text": "21st nineteen thirteenth +6",
+   "output": "21st 1913th 6"
+  },
+  {
+   "text": "$5 o o",
+   "output": "$500"
+  },
+  {
+   "text": "1000 half decillion 10 double trillion billion",
+   "output": "1000 half 1000000000000000000000000000000000 10 double 1000000000000"
+  },
+  {
+   "text": "5th the thirtieth 007 ones hundreds",
+   "output": "5th the 30th 71s 100s"
+  },
+  {
+   "text": "five 20 third tens twelve billion cent",
+   "output": "5 23rd 10s \u00a212000000000"
+  },
+  {
+   "text": "\u00a33 5 second twelve five o nine thirty",
+   "output": "\u00a33 52nd 1250930"
+  },
+  {
+   "text": "sixes 3.0 ones $5 pounds \u00a33 eight twos",
+   "output": "6s 31s \u00a35 \u00a3382s"
+  },
+  {
+   "text": "eleven $5 5 colour 1",
+   "output": "11 $5 5 color one"
+  },
+  {
+   "text": "a $5 2.25 three",
+   "output": "a $5 2.253"
+  },
+  {
+   "text": "0 colour 1960s cent thousandth fifth zero",
+   "output": "0 color 1960s cent 1000th 5th 0"
+  },
+  {
+   "text": "and cents ones ten million",
+   "output": "and cents ones 10000000"
+  },
+  {
+   "text": "thirteen",
+   "output": "13"
+  },
+  {
+   "text": "ninety twenties eleven negative 12 six",
+   "output": "9020s 11 -126"
+  },
+  {
+   "text": "2",
+   "output": "2"
+  },
+  {
+   "text": "1st 99 trillion fourth nineteen 1st 5",
+   "output": "1st 99000000000004th 19 1st 5"
+  },
+  {
+   "text": "-4",
+   "output": "4"
+  },
+  {
+   "text": "three 2.25 hundreds 1st thousandth ten",
+   "output": "3 225s 1st 1000th 10"
+  },
+  {
+   "text": "1.5 5th 0.5",
+   "output": "one.5 5th 0.5"
+  },
+  {
+   "text": "21st percent hundredth thirteenth dollar",
+   "output": "21st percent 100th 13th dollar"
+  },
+  {
+   "text": "double",
+   "output": "double"
+  },
+  {
+   "text": "3.0 dollars 1 plus",
+   "output": "$3 one plus"
+  },
+  {
+   "text": "$5 third",
+   "output": "$53rd"
+  },
+  {
+   "text": "apples twenties five",
+   "output": "apples 20s 5"
+  },
+  {
+   "text": "7",
+   "output": "7"
+  },
+  {
+   "text": "and 3.0 won't plus 1 10",
+   "output": "and 3 will not +one 10"
+  },
+  {
+   "text": "mr thousandth thirtieth thousandth 99",
+   "output": "mister 1000th 30th 1000th 99"
+  },
+  {
+   "text": "sixes millionth third plus million",
+   "output": "6s 1000000th 3rd +1000000"
+  },
+  {
+   "text": "first thirteen 2nd triple dollars",
+   "output": "1st 13 2nd triple dollars"
+  },
+  {
+   "text": "dollar 2nd",
+   "output": "dollar 2nd"
+  },
+  {
+   "text": "2nd apples millionth won't it's 2nd",
+   "output": "2nd apples 1000000th will not it is 2nd"
+  },
+  {
+   "text": "twenties per 21st triple 1st \u20ac2.5",
+   "output": "20s per 21st triple 1st \u20ac2.5"
+  },
+  {
+   "text": "0 -4 a twelfth",
+   "output": "0 4 a 12th"
+  },
+  {
+   "text": "o 3.0 thirteen",
+   "output": "0 313"
+  },
+  {
+   "text": "forty 5 positive a 12",
+   "output": "40 5 positive a 12"
+  },
+  {
+   "text": "20",
+   "output": "20"
+  },
+  {
+   "text": "two twenty eleven",
+   "output": "22011"
+  },
+  {
+   "text": "million",
+   "output": "1000000"
+  },
+  {
+   "text": "millionth million",
+   "output": "1000000th 1000000"
+  },
+  {
+   "text": "triple 0.5 percent thirtieth 0 four euros triple",
+   "output": "triple 0.5% 30th \u20ac4 triple"
+  },
+  {
+   "text": "four point",
+   "output": "4 point"
+  },
+  {
+   "text": "eleven euros hundred it's 99 twenty $5",
+   "output": "\u20ac11 100 it is 9920 $5"
+  },
+  {
+   "text": "eight $5 eight cent",
+   "output": "8 \u00a258"
+  },
+  {
+   "text": "thirty ninety",
+   "output": "3090"
+  },
+  {
+   "text": "thirteenth it's it's fourth",
+   "output": "13th it is it is 4th"
+  },
+  {
+   "text": "forty thousand thirteenth a four",
+   "output": "40013th a 4"
+  },
+  {
+   "text": "tens +6 thirtieth third 1",
+   "output": "10s 630th 3rd one"
+  },
+  {
+   "text": "100 two cent half 1960s half twos ninety",
+   "output": "\u00a2102 half 1960s half 2s 90"
+  },
+  {
+   "text": "7 hundreds thirteenth won't first half 0",
+   "output": "700s 13th will not 1st half 0"
+  },
+  {
+   "text": "one colour twos",
+   "output": "one color 2s"
+  },
+  {
+   "text": "5th 007 2nd",
+   "output": "5th 7 2nd"
+  },
+  {
+   "text": "first $5",
+   "output": "1st $5"
+  },
+  {
+   "text": "four 1.5 nineteen colour 1 1000 double",
+   "output": "4 one.519 color one 1000 double"
+  },
+  {
+   "text": "won't forty thousands half ten \u00a33 hundreds minus",
+   "output": "will not 40000s half 10 \u00a3300s minus"
+  },
+  {
+   "text": "eleven",
+   "output": "11"
+  },
+  {
+   "text": "5 1960s thirteen three",
+   "output": "5 1960s 133"
+  },
+  {
+   "text": "thirteenth millionth \u20ac2.5",
+   "output": "13th 1000000th \u20ac2.5"
+  },
+  {
+   "text": "mr second thirteen",
+   "output": "mister 2nd 13"
+  },
+  {
+   "text": "forty hundreds thirteenth thousands eight ten 100",
+   "output": "4000s 13th 1000s 810 100"
+  },
+  {
+   "text": "20 fifty",
+   "output": "2050"
+  },
+  {
+   "text": "four ones fifty twelfth thirteenth millionth",
+   "output": "41s 5012th 13th 1000000th"
+  },
+  {
+   "text": "$5 four",
+   "output": "$54"
+  },
+  {
+   "text": "apples",
+   "output": "apples"
+  },
+  {
+   "text": "20 percent 5 thousands 1.5 0 the",
+   "output": "20% 5000s one.5 0 the"
+  },
+  {
+   "text": "mr",
+   "output": "mister"
+  },
+  {
+   "text": "and millions 12 one seven",
+   "output": "and 1000000s 1217"
+  },
+  {
+   "text": "thirteenth 1 pounds ones 5th twelfth thirty",
+   "output": "13th one ones 5th 12th 30"
+  },
+  {
+   "text": "double thirtieth percent 21st 5 minus second thousandth",
+   "output": "double 30th percent 21st 5 -2nd 1000th"
+  },
+  {
+   "text": "seven oh 1 eight",
+   "output": "70 18"
+  },
+  {
+   "text": "apples and \u00a33",
+   "output": "apples and \u00a33"
+  },
+  {
+   "text": "twenty 10 thirty 0.5 half millionth millions",
+   "output": "20 1030 0.5 half 1000000th 1000000s"
+  },
+  {
+   "text": "1st and \u20ac2.5 a third 1960s trillion",
+   "output": "1st and \u20ac2.5 a 3rd 1960s 1000000000000"
+  },
+  {
+   "text": "twelfth",
+   "output": "12th"
+  },
+  {
+   "text": "positive millionth decillion 99",
+   "output": "+1000000th 1000000000000000000000000000000000 99"
+  },
+  {
+   "text": "three o 1.5 euros fifty 2nd",
+   "output": "30 one.5 50 2nd"
+  },
+  {
+   "text": "third 1 thousand",
+   "output": "3rd 1000"
+  },
+  {
+   "text": "ten \u20ac2.5 +6 positive 21st",
+   "output": "10 \u20ac2.5 6 positive 21st"
+  },
+  {
+   "text": "three nine 2nd $5 10",
+   "output": "39 2nd $5 10"
+  },
+  {
+   "text": "double \u00a33 cents tens",
+   "output": "double \u00a23 10s"
+  },
+  {
+   "text": "euros fourth and ones ten two 0 hundreds",
+   "output": "euros 4th and ones 102 0s"
+  },
+  {
+   "text": "thirtieth 3.0",
+   "output": "30th 3"
+  },
+  {
+   "text": "colour decillion 3.0 triple second triple thirty",
+   "output": "color 1000000000000000000000000000000000 3 triple 2nd triple 30"
+  },
+  {
+   "text": "it's ten",
+   "output": "it is 10"
+  },
+  {
+   "text": "trillion half per 2 thousandth cent 7",
+   "output": "1000000000000 half per 2000th cent 7"
+  },
+  {
+   "text": "million hundreds it's cent 1960s it's trillion",
+   "output": "1000000s it is cent 1960s it is 1000000000000"
+  },
+  {
+   "text": "forty",
+   "output": "40"
+  },
+  {
+   "text": "1.5",
+   "output": "one.5"
+  },
+  {
+   "text": "100 2 positive 0.5 ninety thousand euros 1.5",
+   "output": "100 2 \u20ac590 one.5"
+  },
+  {
+   "text": "ten per the percent cents fifty half seven",
+   "output": "10 per the percent cents 50 half 7"
+  },
+  {
+   "text": "$5",
+   "output": "$5"
+  },
+  {
+   "text": "five millionth 2.25 half millionth the",
+   "output": "5000000th 2.25 half 1000000th the"
+  },
+  {
+   "text": "7",
+   "output": "7"
+  },
+  {
+   "text": "thirteen",
+   "output": "13"
+  },
+  {
+   "text": "trillion thousand three eight",
+   "output": "10000000000038"
+  },
+  {
+   "text": "\u00a33 third twelfth 5th",
+   "output": "\u00a333rd 12th 5th"
+  },
+  {
+   "text": "positive million",
+   "output": "+1000000"
+  },
+  {
+   "text": "twenties point 0",
+   "output": "20s .0"
+  },
+  {
+   "text": "007",
+   "output": "7"
+  },
+  {
+   "text": "triple thousand dollar o dollar and cents",
+   "output": "triple $1000 $0 and cents"
+  },
+  {
+   "text": "won't mr oh half 21st a nineteen cent",
+   "output": "will not mister 0 half 21st a \u00a219"
+  },
+  {
+   "text": "100",
+   "output": "100"
+  },
+  {
+   "text": "point ninety twenty 3.0",
+   "output": ".9020 3"
+  },
+  {
+   "text": "cents million",
+   "output": "cents 1000000"
+  },
+  {
+   "text": "oh hundredth million percent five hundredth and a",
+   "output": "0th 1000000% 500th and a"
+  },
+  {
+   "text": "hundredth twenties five nine 3.0 thirtieth",
+   "output": "100th 20s 59 330th"
+  },
+  {
+   "text": "hundreds 1 thirteen five trillion thousand +6",
+   "output": "100s 1135000000000000 6"
+  },
+  {
+   "text": "tens twenties percent dollar",
+   "output": "10s 20s percent dollar"
+  },
+  {
+   "text": "three ninety second three",
+   "output": "392nd 3"
+  },
+  {
+   "text": "thousand two and \u20ac2.5 1960s trillion",
+   "output": "1002 and \u20ac2.5 1960s 1000000000000"
+  },
+  {
+   "text": "seven 5th thousandth won't six",
+   "output": "7 5th 1000th will not 6"
+  },
+  {
+   "text": "10 point four thirtieth thousand",
+   "output": "10.430th 1000"
+  },
+  {
+   "text": "and 0.5 thirteen twentieth",
+   "output": "and 0.51320th"
+  },
+  {
+   "text": "negative half",
+   "output": "negative half"
+  },
+  {
+   "text": "colour cents 0 triple 10",
+   "output": "color cents 0 triple 10"
+  },
+  {
+   "text": "1",
+   "output": "one"
+  },
+  {
+   "text": "and fifty",
+   "output": "and 50"
+  },
+  {
+   "text": "cents trillion millionth million first 1000 six 1st",
+   "output": "cents 1000000000000th 1000001st 1006 1st"
+  },
+  {
+   "text": "12 $5",
+   "output": "12 $5"
+  },
+  {
+   "text": "2nd hundred",
+   "output": "2nd 100"
+  },
+  {
+   "text": "dollar 12 minus 1.5 one",
+   "output": "dollar 12 -one.51"
+  },
+  {
+   "text": "millionth plus twos third \u20ac2.5 dollars apples millionth",
+   "output": "1000000th +2s 3rd $2.5 apples 1000000th"
+  },
+  {
+   "text": "point thousandth positive eleven zero euros billion",
+   "output": "1000th \u20ac110 1000000000"
+  },
+  {
+   "text": "-4 ones first millionth euros ninety thousands",
+   "output": "41s 1st 1000000th euros 90000s"
+  },
+  {
+   "text": "thirteen 1.5 euros 5 positive 1000 a",
+   "output": "13 one.5 5 +1000 a"
+  },
+  {
+   "text": "three",
+   "output": "3"
+  },
+  {
+   "text": "ninety hundreds point one hundredth hundreds won't",
+   "output": "9000s 10th 100s will not"
+  },
+  {
+   "text": "plus fourth",
+   "output": "+4th"
+  },
+  {
+   "text": "3.0 hundreds ten",
+   "output": "300s 10"
+  },
+  {
+   "text": "1 triple second thirteenth 2nd 100",
+   "output": "one triple 2nd 13th 2nd 100"
+  },
+  {
+   "text": "\u00a33 millionth hundreds",
+   "output": "\u00a33000000th 100s"
+  },
+  {
+   "text": "thousand 20 second",
+   "output": "1000 22nd"
+  },
+  {
+   "text": "forty it's 21st hundredth nineteen 3.0 sixes and",
+   "output": "40 it is 21st 100th 19 36s and"
+  },
+  {
+   "text": "007 and five",
+   "output": "7 and 5"
+  },
+  {
+   "text": "-4 +6 twos 1000",
+   "output": "4 62s 1000"
+  },
+  {
+   "text": "2.25 thousands 2nd cent",
+   "output": "2250s 2nd cent"
+  },
+  {
+   "text": "plus tens the 1960s hundreds 1000",
+   "output": "+10s the 1960s 100s 1000"
+  },
+  {
+   "text": "billion ten and three",
+   "output": "1000000010 and 3"
+  },
+  {
+   "text": "decillion 1960s fourth thirteen four triple",
+   "output": "1000000000000000000000000000000000 1960s 4th 134 triple"
+  },
+  {
+   "text": "two 7 seven twentieth twelfth",
+   "output": "2 7720th 12th"
+  },
+  {
+   "text": "1st twelfth oh euros fifty",
+   "output": "1st 12th \u00a250"
+  },
+  {
+   "text": "point four 1000",
+   "output": ".4 1000"
+  },
+  {
+   "text": "decillion 5 thousand 1000",
+   "output": "1000000000000000000000000000000000 5000 1000"
+  },
+  {
+   "text": "7 5th the 2nd sixes hundredth",
+   "output": "7 5th the 2nd 6s 100th"
+  },
+  {
+   "text": "ones",
+   "output": "ones"
+  },
+  {
+   "text": "99 007 twentieth 0 point millions 20",
+   "output": "99 720th 0s 20"
+  },
+  {
+   "text": "hundreds cent mr 1000 three",
+   "output": "100s cent mister 1003"
+  },
+  {
+   "text": "apples $5 mr a \u20ac2.5 double",
+   "output": "apples $5 mister a \u20ac2.5 double"
+  },
+  {
+   "text": "o negative million \u20ac2.5 point thirty triple three",
+   "output": "0 -1000000 \u20ac2.5.30333"
+  },
+  {
+   "text": "cents million thirteen oh 99 tens 100 pounds",
+   "output": "cents 10000130 9910s \u00a3100"
+  },
+  {
+   "text": "negative seven 100 six",
+   "output": "-7 106"
+  },
+  {
+   "text": "0 \u00a33 thirtieth o twenty",
+   "output": "0 \u00a3330th 020"
+  },
+  {
+   "text": "5th",
+   "output": "5th"
+  },
+  {
+   "text": "cents",
+   "output": "cents"
+  },
+  {
+   "text": "trillion",
+   "output": "1000000000000"
+  },
+  {
+   "text": "six per 2.25 thirtieth nine",
+   "output": "6 per 2.2530th 9"
+  },
+  {
+   "text": "colour ones zero 12",
+   "output": "color ones 0 12"
+  },
+  {
+   "text": "5 and cents per 007",
+   "output": "5 and cents per 7"
+  },
+  {
+   "text": "1",
+   "output": "one"
+  },
+  {
+   "text": "nine cent",
+   "output": "\u00a29"
+  },
+  {
+   "text": "5th",
+   "output": "5th"
+  },
+  {
+   "text": "nineteen",
+   "output": "19"
+  },
+  {
+   "text": "nineteen o",
+   "output": "190"
+  },
+  {
+   "text": "dollar thousand thirty eleven and twelfth",
+   "output": "dollar 103011 and 12th"
+  },
+  {
+   "text": "millionth 100",
+   "output": "1000000th 100"
+  },
+  {
+   "text": "7",
+   "output": "7"
+  },
+  {
+   "text": "2nd \u00a33 and +6 thirteenth oh",
+   "output": "2nd \u00a33 and 613th 0"
+  },
+  {
+   "text": "seven 1st o cents seven",
+   "output": "7 1st \u00a20 7"
+  },
+  {
+   "text": "1000 5 o o ones pounds ninety",
+   "output": "1000 5001s pounds 90"
+  },
+  {
+   "text": "euros minus twelfth twenty",
+   "output": "euros -12th 20"
+  },
+  {
+   "text": "thirty won't",
+   "output": "30 will not"
+  },
+  {
+   "text": "99",
+   "output": "99"
+  },
+  {
+   "text": "twelfth thirtieth millionth thousands",
+   "output": "12th 30th 1000000th 1000s"
+  },
+  {
+   "text": "seven twenty million",
+   "output": "720000000"
+  }
+ ],
+ "wer": [
+  {
+   "reference": "",
+   "hypothesis": "",
+   "wer": 0.0
+  },
+  {
+   "reference": "",
+   "hypothesis": "hello",
+   "wer": 1.0
+  },
+  {
+   "reference": "hello",
+   "hypothesis": "",
+   "wer": 1.0
+  },
+  {
+   "reference": "   ",
+   "hypothesis": "  ",
+   "wer": 0.0
+  },
+  {
+   "reference": "(only brackets)",
+   "hypothesis": "",
+   "wer": 1.0
+  },
+  {
+   "reference": "hello world",
+   "hypothesis": "hello world",
+   "wer": 0.0
+  },
+  {
+   "reference": "hello world",
+   "hypothesis": "hello there world",
+   "wer": 0.5
+  },
+  {
+   "reference": "the quick brown fox",
+   "hypothesis": "the quick brown",
+   "wer": 0.25
+  },
+  {
+   "reference": "the quick brown fox",
+   "hypothesis": "quick brown fox jumps",
+   "wer": 0.5
+  },
+  {
+   "reference": "hide-working",
+   "hypothesis": "hideworking",
+   "wer": 0.0
+  },
+  {
+   "reference": "hide working",
+   "hypothesis": "hideworking",
+   "wer": 0.0
+  },
+  {
+   "reference": "She said (quietly) hello.",
+   "hypothesis": "She said quietly hello.",
+   "wer": 0.0
+  },
+  {
+   "reference": "Use the [red] button",
+   "hypothesis": "Use the red button",
+   "wer": 0.0
+  },
+  {
+   "reference": "{curly} braces",
+   "hypothesis": "curly braces",
+   "wer": 0.0
+  },
+  {
+   "reference": "I have 20 apples",
+   "hypothesis": "I have twenty apples",
+   "wer": 0.0
+  },
+  {
+   "reference": "It costs $5",
+   "hypothesis": "It costs five dollars",
+   "wer": 0.0
+  },
+  {
+   "reference": "Mr. Smith arrived.",
+   "hypothesis": "Mister Smith arrived",
+   "wer": 0.0
+  },
+  {
+   "reference": "The colour is grey.",
+   "hypothesis": "the color is gray",
+   "wer": 0.0
+  },
+  {
+   "reference": "won't",
+   "hypothesis": "will not",
+   "wer": 0.0
+  },
+  {
+   "reference": "Scadutree",
+   "hypothesis": "Skadu tree",
+   "wer": 0.2222222222222222
+  },
+  {
+   "reference": "Beneath the Scadutree.",
+   "hypothesis": "Beneath the Skadu tree.",
+   "wer": 0.10526315789473684
+  },
+  {
+   "reference": "When the long day was finally over they asked me to come home.",
+   "hypothesis": "the long day was finally over they asked me to come home.",
+   "wer": 0.07692307692307693
+  },
+  {
+   "reference": "two twin demigods: Miquella and Malenia.",
+   "hypothesis": "two twin demigods, Mykela and Melania.",
+   "wer": 0.3333333333333333
+  },
+  {
+   "reference": "a b c d e",
+   "hypothesis": "e d c b a",
+   "wer": 0.8
+  },
+  {
+   "reference": "one",
+   "hypothesis": "two three four five",
+   "wer": 1.0
+  },
+  {
+   "reference": "abc",
+   "hypothesis": "xyz",
+   "wer": 1.0
+  },
+  {
+   "reference": "caf\u00e9 au lait",
+   "hypothesis": "cafe au lait",
+   "wer": 0.0
+  },
+  {
+   "reference": "hello",
+   "hypothesis": "hello hello hello",
+   "wer": 2.0
+  },
+  {
+   "reference": "The year 1999 was long.",
+   "hypothesis": "the year nineteen ninety nine was long",
+   "wer": 0.0
+  },
+  {
+   "reference": "um so yes",
+   "hypothesis": "so yes",
+   "wer": 0.0
+  },
+  {
+   "reference": "(laughs)",
+   "hypothesis": "ha",
+   "wer": 1.0
+  },
+  {
+   "reference": "ab",
+   "hypothesis": "ba",
+   "wer": 1.0
+  },
+  {
+   "reference": "the cat sat on the mat",
+   "hypothesis": "a cat sat on a mat",
+   "wer": 0.3333333333333333
+  },
+  {
+   "reference": "Hello, world!",
+   "hypothesis": "hello world",
+   "wer": 0.0
+  },
+  {
+   "reference": "\u65e5\u672c\u8a9e",
+   "hypothesis": "\u65e5\u672c\u8a9e",
+   "wer": 0.0
+  },
+  {
+   "reference": "x",
+   "hypothesis": "y",
+   "wer": 1.0
+  },
+  {
+   "reference": "long stood one a home 20.",
+   "hypothesis": "long stood one a home 20",
+   "wer": 0.0
+  },
+  {
+   "reference": "five a twenty over a home.",
+   "hypothesis": "f i 20 ve a twenty over a home",
+   "wer": 0.6666666666666666
+  },
+  {
+   "reference": "they one.",
+   "hypothesis": "they one",
+   "wer": 0.0
+  },
+  {
+   "reference": "a they a 20 long me tall.",
+   "hypothesis": "a they a 20 me tall",
+   "wer": 0.14285714285714285
+  },
+  {
+   "reference": "20 won't day come five.",
+   "hypothesis": "2 won't day come five",
+   "wer": 0.11764705882352941
+  },
+  {
+   "reference": "home five a $5 over scadu won't 20 tall.",
+   "hypothesis": "home five a $5 ove scadu won't 2 0 tall",
+   "wer": 0.06666666666666667
+  },
+  {
+   "reference": "day they home five.",
+   "hypothesis": "day they h o me five",
+   "wer": 0.16666666666666666
+  },
+  {
+   "reference": "come twenty.",
+   "hypothesis": "lo ng twenty",
+   "wer": 1.0
+  },
+  {
+   "reference": "five to to tree $5 scadu five skadu home.",
+   "hypothesis": "five to to tree $5 scadu five skadu home",
+   "wer": 0.0
+  },
+  {
+   "reference": "scadu won't home a me.",
+   "hypothesis": "scad won't ho me x me",
+   "wer": 0.21052631578947367
+  },
+  {
+   "reference": "$5 come scadu.",
+   "hypothesis": "$5 come scadu",
+   "wer": 0.0
+  },
+  {
+   "reference": "me long they stood.",
+   "hypothesis": "m x long stood they stood",
+   "wer": 0.75
+  },
+  {
+   "reference": "20 asked tall tree won't stood they.",
+   "hypothesis": "20 tall tree won't stood they",
+   "wer": 0.125
+  },
+  {
+   "reference": "they won't they.",
+   "hypothesis": "they won't they",
+   "wer": 0.0
+  },
+  {
+   "reference": "five day asked me the long tall 20.",
+   "hypothesis": "five day aske me the long tall",
+   "wer": 0.25
+  },
+  {
+   "reference": "stood stood stood stood come scadu one stood a.",
+   "hypothesis": "stood stood stood come scadu one stood a",
+   "wer": 0.1111111111111111
+  },
+  {
+   "reference": "day come to $5 a come the five.",
+   "hypothesis": "day come to $5 a the five",
+   "wer": 0.125
+  },
+  {
+   "reference": "home.",
+   "hypothesis": "ho me",
+   "wer": 0.0
+  },
+  {
+   "reference": "tree $5 tree scadu come.",
+   "hypothesis": "tree $5 tree scadu come",
+   "wer": 0.0
+  },
+  {
+   "reference": "skadu scadu scadu me home long come to.",
+   "hypothesis": "skadu scadu sc me home long come to",
+   "wer": 0.125
+  },
+  {
+   "reference": "tree long 20 the twenty me one home asked.",
+   "hypothesis": "tree long 20 th twenty they me one home asked",
+   "wer": 0.3333333333333333
+  },
+  {
+   "reference": "they stood they over.",
+   "hypothesis": "the st ood over",
+   "wer": 0.75
+  },
+  {
+   "reference": "$5 tree skadu tree.",
+   "hypothesis": "skadu tree",
+   "wer": 0.5
+  },
+  {
+   "reference": "over to over scadu $5 $5 the scadu.",
+   "hypothesis": "over over scadu $5 $5 the sc adu",
+   "wer": 0.14814814814814814
+  },
+  {
+   "reference": "scadu day tall one.",
+   "hypothesis": "scadu d ay tall",
+   "wer": 0.4
+  },
+  {
+   "reference": "day day.",
+   "hypothesis": "day",
+   "wer": 0.5
+  },
+  {
+   "reference": "one long $5 $5 scadu won't tree long.",
+   "hypothesis": "long $5 $5 scadu won't tree long",
+   "wer": 0.1111111111111111
+  },
+  {
+   "reference": "twenty long.",
+   "hypothesis": "th twenty lon",
+   "wer": 1.0
+  },
+  {
+   "reference": "five to asked 20.",
+   "hypothesis": "tree five to asked 2 0",
+   "wer": 0.75
+  },
+  {
+   "reference": "20 long twenty.",
+   "hypothesis": "20 long twenty",
+   "wer": 0.0
+  },
+  {
+   "reference": "day $5 the long day long scadu $5.",
+   "hypothesis": "day $5 the long day long scadu $5",
+   "wer": 0.0
+  },
+  {
+   "reference": "a to won't twenty twenty 20 scadu come 20.",
+   "hypothesis": "a to won't twenty twenty 20 scadu come 20",
+   "wer": 0.0
+  },
+  {
+   "reference": "over asked a come.",
+   "hypothesis": "asked a skadu come",
+   "wer": 0.5
+  },
+  {
+   "reference": "20 scadu twenty they twenty asked 20 over skadu.",
+   "hypothesis": "20 sc adu twenty they twenty asked 20 over skadu",
+   "wer": 0.0
+  },
+  {
+   "reference": "skadu to home won't they tall home.",
+   "hypothesis": "skadu to home won't they tall hom",
+   "wer": 0.06666666666666667
+  },
+  {
+   "reference": "long one.",
+   "hypothesis": "lo ng long one",
+   "wer": 1.0
+  },
+  {
+   "reference": "stood scadu.",
+   "hypothesis": "tall stood scadu",
+   "wer": 0.5
+  },
+  {
+   "reference": "stood to tall over tree to home tree the.",
+   "hypothesis": "stood to tall over tree to tr ee the",
+   "wer": 0.2222222222222222
+  },
+  {
+   "reference": "twenty $5 me twenty home come.",
+   "hypothesis": "$5 me twenty home come",
+   "wer": 0.16666666666666666
+  },
+  {
+   "reference": "asked a day asked long.",
+   "hypothesis": "asked a day aske twenty lo ng",
+   "wer": 0.2222222222222222
+  },
+  {
+   "reference": "home asked a day tall home.",
+   "hypothesis": "home asked day tall",
+   "wer": 0.3333333333333333
+  },
+  {
+   "reference": "$5 they.",
+   "hypothesis": "$5 they",
+   "wer": 0.0
+  },
+  {
+   "reference": "come skadu the to 20.",
+   "hypothesis": "day twenty come skadu the to 2",
+   "wer": 0.6
+  },
+  {
+   "reference": "a day over me one.",
+   "hypothesis": "a day tree skadu over me one",
+   "wer": 0.4
+  },
+  {
+   "reference": "asked.",
+   "hypothesis": "asked",
+   "wer": 0.0
+  },
+  {
+   "reference": "the.",
+   "hypothesis": "t he",
+   "wer": 0.0
+  },
+  {
+   "reference": "come won't one tall won't scadu 20 stood.",
+   "hypothesis": "come won't stood one to tall won't scadu 20 stood",
+   "wer": 0.2
+  },
+  {
+   "reference": "a long the home one asked.",
+   "hypothesis": "home a long th home one as ked",
+   "wer": 0.5
+  },
+  {
+   "reference": "a skadu day day asked.",
+   "hypothesis": "a skad da asked",
+   "wer": 0.5882352941176471
+  },
+  {
+   "reference": "me.",
+   "hypothesis": "m",
+   "wer": 1.0
+  },
+  {
+   "reference": "to.",
+   "hypothesis": "twenty",
+   "wer": 1.0
+  },
+  {
+   "reference": "home.",
+   "hypothesis": "",
+   "wer": 1.0
+  },
+  {
+   "reference": "stood.",
+   "hypothesis": "stood",
+   "wer": 0.0
+  },
+  {
+   "reference": "me one they home five.",
+   "hypothesis": "me one th ey home five",
+   "wer": 0.0
+  },
+  {
+   "reference": "long me $5 one long a twenty one.",
+   "hypothesis": "me $5 long a twenty one twenty",
+   "wer": 0.5
+  },
+  {
+   "reference": "long.",
+   "hypothesis": "",
+   "wer": 1.0
+  },
+  {
+   "reference": "a one the one 20 won't they scadu asked.",
+   "hypothesis": "a one the one 20 won't they scadu asked",
+   "wer": 0.0
+  },
+  {
+   "reference": "home twenty 20 home won't twenty home scadu.",
+   "hypothesis": "home twenty 20 they home twenty home scadu",
+   "wer": 0.3333333333333333
+  },
+  {
+   "reference": "scadu stood home scadu won't me a $5.",
+   "hypothesis": "scadu stood scadu won't me a $5",
+   "wer": 0.1111111111111111
+  },
+  {
+   "reference": "asked one me $5 five long.",
+   "hypothesis": "asked one me $5 five long",
+   "wer": 0.0
+  }
+ ],
+ "ratio": [
+  {
+   "a": "",
+   "b": "",
+   "ratio": 1.0
+  },
+  {
+   "a": "a",
+   "b": "",
+   "ratio": 0.0
+  },
+  {
+   "a": "",
+   "b": "a",
+   "ratio": 0.0
+  },
+  {
+   "a": "abc",
+   "b": "abc",
+   "ratio": 1.0
+  },
+  {
+   "a": "abc",
+   "b": "xyz",
+   "ratio": 0.0
+  },
+  {
+   "a": "home",
+   "b": "come",
+   "ratio": 0.75
+  },
+  {
+   "a": "scadutree",
+   "b": "skadu",
+   "ratio": 0.5714285714285714
+  },
+  {
+   "a": "scadutree",
+   "b": "skadutree",
+   "ratio": 0.8888888888888888
+  },
+  {
+   "a": "scadutree",
+   "b": "skadutreestood",
+   "ratio": 0.6956521739130435
+  },
+  {
+   "a": "miquella",
+   "b": "mykela",
+   "ratio": 0.5714285714285714
+  },
+  {
+   "a": "malenia",
+   "b": "melania",
+   "ratio": 0.7142857142857143
+  },
+  {
+   "a": "abcd",
+   "b": "bcda",
+   "ratio": 0.75
+  },
+  {
+   "a": "abxcd",
+   "b": "abcd",
+   "ratio": 0.8888888888888888
+  },
+  {
+   "a": "private",
+   "b": "privateer",
+   "ratio": 0.875
+  },
+  {
+   "a": "aaaa",
+   "b": "aa",
+   "ratio": 0.6666666666666666
+  },
+  {
+   "a": "ab",
+   "b": "ba",
+   "ratio": 0.5
+  },
+  {
+   "a": "hello",
+   "b": "hallo",
+   "ratio": 0.8
+  },
+  {
+   "a": "kitten",
+   "b": "sitting",
+   "ratio": 0.6153846153846154
+  },
+  {
+   "a": "tolkien",
+   "b": "tolkein",
+   "ratio": 0.8571428571428571
+  },
+  {
+   "a": "dr",
+   "b": "doctor",
+   "ratio": 0.5
+  },
+  {
+   "a": "1999",
+   "b": "1990",
+   "ratio": 0.75
+  },
+  {
+   "a": "na\u00efve",
+   "b": "naive",
+   "ratio": 0.8
+  },
+  {
+   "a": "\u65e5\u672c\u8a9e",
+   "b": "\u65e5\u672c",
+   "ratio": 0.8
+  },
+  {
+   "a": "qwertyuiop",
+   "b": "poiuytrewq",
+   "ratio": 0.1
+  },
+  {
+   "a": "thequickbrownfox",
+   "b": "quickbrownthefox",
+   "ratio": 0.8125
+  },
+  {
+   "a": "abcabcabc",
+   "b": "cabcab",
+   "ratio": 0.8
+  },
+  {
+   "a": "aaaaaaaaaa",
+   "b": "aaabaaaaaa",
+   "ratio": 0.6
+  },
+  {
+   "a": "xabababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababab",
+   "b": "ababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababababy",
+   "ratio": 0.0
+  },
+  {
+   "a": "thethethethethethethethethethethethethethethethethethethethethethethethethethethethethethethethethethethethethethethethethethethethethethethethethethethethethethethethethethethethethethethethethethethethethetheend",
+   "b": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeethethethethethethethethethethethethethethethethethethethethethethethethethethethethethethethethethethethethethethethethethethethethethethethethethethethethethethethethethethethethe",
+   "ratio": 0.0
+  },
+  {
+   "a": "abcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghijabcdefghij",
+   "b": "jihgfedcbajihgfedcbajihgfedcbajihgfedcbajihgfedcbajihgfedcbajihgfedcbajihgfedcbajihgfedcbajihgfedcbajihgfedcbajihgfedcbajihgfedcbajihgfedcbajihgfedcbajihgfedcbajihgfedcbajihgfedcbajihgfedcbajihgfedcbajihgfedcba",
+   "ratio": 0.0
+  },
+  {
+   "a": "mississippi",
+   "b": "missisippi",
+   "ratio": 0.9523809523809523
+  },
+  {
+   "a": "returning",
+   "b": "returninghome",
+   "ratio": 0.8181818181818182
+  },
+  {
+   "a": "cbbccaa",
+   "b": "cbccaabbaacc",
+   "ratio": 0.631578947368421
+  },
+  {
+   "a": "acbbccccac",
+   "b": "",
+   "ratio": 0.0
+  },
+  {
+   "a": "aaaaacab",
+   "b": "bcaca",
+   "ratio": 0.46153846153846156
+  },
+  {
+   "a": "bbacabcbbc",
+   "b": "c",
+   "ratio": 0.18181818181818182
+  },
+  {
+   "a": "bacb",
+   "b": "",
+   "ratio": 0.0
+  },
+  {
+   "a": "c",
+   "b": "ababbaacaaaa",
+   "ratio": 0.15384615384615385
+  },
+  {
+   "a": "bcbbacc",
+   "b": "cbb",
+   "ratio": 0.6
+  },
+  {
+   "a": "b",
+   "b": "abaaa",
+   "ratio": 0.3333333333333333
+  },
+  {
+   "a": "aaabbaccabc",
+   "b": "cab",
+   "ratio": 0.42857142857142855
+  },
+  {
+   "a": "babbaabcba",
+   "b": "abc",
+   "ratio": 0.46153846153846156
+  },
+  {
+   "a": "caaaabbacb",
+   "b": "baaa",
+   "ratio": 0.42857142857142855
+  },
+  {
+   "a": "cca",
+   "b": "",
+   "ratio": 0.0
+  },
+  {
+   "a": "bbcbacbca",
+   "b": "acabac",
+   "ratio": 0.5333333333333333
+  },
+  {
+   "a": "caa",
+   "b": "ccacbbcabaa",
+   "ratio": 0.42857142857142855
+  },
+  {
+   "a": "a",
+   "b": "baccbbbc",
+   "ratio": 0.2222222222222222
+  },
+  {
+   "a": "bcacaaa",
+   "b": "ccccaba",
+   "ratio": 0.42857142857142855
+  },
+  {
+   "a": "caa",
+   "b": "bbaa",
+   "ratio": 0.5714285714285714
+  },
+  {
+   "a": "",
+   "b": "bb",
+   "ratio": 0.0
+  },
+  {
+   "a": "caababbc",
+   "b": "cccacaabbcb",
+   "ratio": 0.631578947368421
+  },
+  {
+   "a": "",
+   "b": "",
+   "ratio": 1.0
+  },
+  {
+   "a": "cabacbbaa",
+   "b": "b",
+   "ratio": 0.2
+  },
+  {
+   "a": "bcacccab",
+   "b": "acbab",
+   "ratio": 0.6153846153846154
+  },
+  {
+   "a": "abcaccbbcaca",
+   "b": "a",
+   "ratio": 0.15384615384615385
+  },
+  {
+   "a": "abbcbbcccb",
+   "b": "bcaccab",
+   "ratio": 0.23529411764705882
+  },
+  {
+   "a": "abaacabcc",
+   "b": "babbacc",
+   "ratio": 0.625
+  },
+  {
+   "a": "cab",
+   "b": "bbabbcbacb",
+   "ratio": 0.3076923076923077
+  },
+  {
+   "a": "aabacbaaabba",
+   "b": "abaabbbabbc",
+   "ratio": 0.6086956521739131
+  },
+  {
+   "a": "bcbccbba",
+   "b": "",
+   "ratio": 0.0
+  },
+  {
+   "a": "cacc",
+   "b": "cbbc",
+   "ratio": 0.5
+  },
+  {
+   "a": "cacabbaabaaa",
+   "b": "abaccccbac",
+   "ratio": 0.36363636363636365
+  },
+  {
+   "a": "abb",
+   "b": "ca",
+   "ratio": 0.4
+  },
+  {
+   "a": "bccaaabbcccc",
+   "b": "abcaabcba",
+   "ratio": 0.5714285714285714
+  },
+  {
+   "a": "bacabcc",
+   "b": "cbbbcaaccc",
+   "ratio": 0.5882352941176471
+  },
+  {
+   "a": "a",
+   "b": "bab",
+   "ratio": 0.5
+  },
+  {
+   "a": "bbcabcaa",
+   "b": "bcbbbaa",
+   "ratio": 0.6666666666666666
+  },
+  {
+   "a": "abaacbcabacc",
+   "b": "ccbbccaa",
+   "ratio": 0.3
+  },
+  {
+   "a": "ccbccca",
+   "b": "ccbbcbca",
+   "ratio": 0.8
+  },
+  {
+   "a": "accb",
+   "b": "babcacacb",
+   "ratio": 0.6153846153846154
+  },
+  {
+   "a": "",
+   "b": "acbccaba",
+   "ratio": 0.0
+  },
+  {
+   "a": "aacbbbbabba",
+   "b": "bbcba",
+   "ratio": 0.375
+  },
+  {
+   "a": "bca",
+   "b": "acaa",
+   "ratio": 0.5714285714285714
+  },
+  {
+   "a": "aaa",
+   "b": "bbcbacbabc",
+   "ratio": 0.3076923076923077
+  },
+  {
+   "a": "accbcaccb",
+   "b": "",
+   "ratio": 0.0
+  },
+  {
+   "a": "cbccac",
+   "b": "ccc",
+   "ratio": 0.6666666666666666
+  },
+  {
+   "a": "cac",
+   "b": "caaccbabc",
+   "ratio": 0.5
+  },
+  {
+   "a": "aaaaa",
+   "b": "aca",
+   "ratio": 0.5
+  },
+  {
+   "a": "babb",
+   "b": "caabccaa",
+   "ratio": 0.3333333333333333
+  },
+  {
+   "a": "ccb",
+   "b": "acccb",
+   "ratio": 0.75
+  },
+  {
+   "a": "caabaaac",
+   "b": "ccbaaaaaa",
+   "ratio": 0.5882352941176471
+  },
+  {
+   "a": "bc",
+   "b": "c",
+   "ratio": 0.6666666666666666
+  },
+  {
+   "a": "",
+   "b": "cb",
+   "ratio": 0.0
+  },
+  {
+   "a": "a",
+   "b": "bbbcb",
+   "ratio": 0.0
+  },
+  {
+   "a": "acbacc",
+   "b": "",
+   "ratio": 0.0
+  },
+  {
+   "a": "abb",
+   "b": "cbbac",
+   "ratio": 0.5
+  },
+  {
+   "a": "ac",
+   "b": "abaccbccaccb",
+   "ratio": 0.2857142857142857
+  },
+  {
+   "a": "bbaccababccb",
+   "b": "babacaabbbaa",
+   "ratio": 0.3333333333333333
+  },
+  {
+   "a": "ccaab",
+   "b": "bbacbcacab",
+   "ratio": 0.6666666666666666
+  },
+  {
+   "a": "bcacabca",
+   "b": "c",
+   "ratio": 0.2222222222222222
+  },
+  {
+   "a": "c",
+   "b": "bbb",
+   "ratio": 0.0
+  },
+  {
+   "a": "aacbaabb",
+   "b": "bccc",
+   "ratio": 0.16666666666666666
+  },
+  {
+   "a": "ccacbc",
+   "b": "c",
+   "ratio": 0.2857142857142857
+  },
+  {
+   "a": "cababbabc",
+   "b": "cabbbbcbc",
+   "ratio": 0.7777777777777778
+  },
+  {
+   "a": "bcbb",
+   "b": "bcbcccbaaa",
+   "ratio": 0.5714285714285714
+  },
+  {
+   "a": "acabcbabc",
+   "b": "accbaa",
+   "ratio": 0.6666666666666666
+  },
+  {
+   "a": "cbbaac",
+   "b": "c",
+   "ratio": 0.2857142857142857
+  },
+  {
+   "a": "aaccaac",
+   "b": "baaabc",
+   "ratio": 0.46153846153846156
+  },
+  {
+   "a": "ab",
+   "b": "acbbcbc",
+   "ratio": 0.4444444444444444
+  },
+  {
+   "a": "cbbccabca",
+   "b": "bac",
+   "ratio": 0.16666666666666666
+  },
+  {
+   "a": "ccbb",
+   "b": "cccc",
+   "ratio": 0.5
+  },
+  {
+   "a": "cacbaaaccac",
+   "b": "",
+   "ratio": 0.0
+  },
+  {
+   "a": "aabbbacaaa",
+   "b": "baacacac",
+   "ratio": 0.5555555555555556
+  },
+  {
+   "a": "bbbab",
+   "b": "bcaaa",
+   "ratio": 0.4
+  },
+  {
+   "a": "cabbcbb",
+   "b": "abaccbbccabc",
+   "ratio": 0.42105263157894735
+  },
+  {
+   "a": "cabba",
+   "b": "abccbcbb",
+   "ratio": 0.46153846153846156
+  },
+  {
+   "a": "aabaccacbbcc",
+   "b": "baabc",
+   "ratio": 0.47058823529411764
+  },
+  {
+   "a": "bbabcbcccbb",
+   "b": "bbbabcca",
+   "ratio": 0.631578947368421
+  },
+  {
+   "a": "b",
+   "b": "abcbc",
+   "ratio": 0.3333333333333333
+  },
+  {
+   "a": "accbbc",
+   "b": "cc",
+   "ratio": 0.5
+  },
+  {
+   "a": "aa",
+   "b": "bbaacacacbac",
+   "ratio": 0.2857142857142857
+  },
+  {
+   "a": "baccbcababca",
+   "b": "aacca",
+   "ratio": 0.47058823529411764
+  },
+  {
+   "a": "c",
+   "b": "bacabcbbbb",
+   "ratio": 0.18181818181818182
+  },
+  {
+   "a": "bcabb",
+   "b": "caccabcb",
+   "ratio": 0.6153846153846154
+  },
+  {
+   "a": "",
+   "b": "babccacbcaab",
+   "ratio": 0.0
+  },
+  {
+   "a": "aacacb",
+   "b": "ababbcbbab",
+   "ratio": 0.5
+  },
+  {
+   "a": "cabc",
+   "b": "aa",
+   "ratio": 0.3333333333333333
+  },
+  {
+   "a": "bacbabaaabac",
+   "b": "ccb",
+   "ratio": 0.26666666666666666
+  },
+  {
+   "a": "cababbabc",
+   "b": "cbbbbbcc",
+   "ratio": 0.5882352941176471
+  },
+  {
+   "a": "ababaaabccba",
+   "b": "aabbbacbca",
+   "ratio": 0.5454545454545454
+  },
+  {
+   "a": "ababca",
+   "b": "ccbccaacaa",
+   "ratio": 0.375
+  },
+  {
+   "a": "aaa",
+   "b": "bccca",
+   "ratio": 0.25
+  },
+  {
+   "a": "cbacccc",
+   "b": "aaba",
+   "ratio": 0.36363636363636365
+  },
+  {
+   "a": "abaacbcbab",
+   "b": "bbacb",
+   "ratio": 0.5333333333333333
+  },
+  {
+   "a": "ccabaca",
+   "b": "c",
+   "ratio": 0.25
+  },
+  {
+   "a": "cbcacb",
+   "b": "",
+   "ratio": 0.0
+  },
+  {
+   "a": "ccbabc",
+   "b": "b",
+   "ratio": 0.2857142857142857
+  },
+  {
+   "a": "acacabcbccbb",
+   "b": "bccabaabcabb",
+   "ratio": 0.6666666666666666
+  },
+  {
+   "a": "cbcc",
+   "b": "bbaaa",
+   "ratio": 0.2222222222222222
+  },
+  {
+   "a": "aacccaaab",
+   "b": "",
+   "ratio": 0.0
+  },
+  {
+   "a": "ccaaaaa",
+   "b": "b",
+   "ratio": 0.0
+  },
+  {
+   "a": "abbcac",
+   "b": "acb",
+   "ratio": 0.4444444444444444
+  },
+  {
+   "a": "bbcacbc",
+   "b": "bacccabbabb",
+   "ratio": 0.4444444444444444
+  },
+  {
+   "a": "bacbacbbac",
+   "b": "abcbcabccca",
+   "ratio": 0.5714285714285714
+  },
+  {
+   "a": "cacccacac",
+   "b": "aaaabcbcbb",
+   "ratio": 0.21052631578947367
+  },
+  {
+   "a": "b",
+   "b": "babc",
+   "ratio": 0.4
+  },
+  {
+   "a": "ac",
+   "b": "ccacbacb",
+   "ratio": 0.4
+  },
+  {
+   "a": "aaabcbacb",
+   "b": "ac",
+   "ratio": 0.36363636363636365
+  },
+  {
+   "a": "ababacab",
+   "b": "ccbcccaaabba",
+   "ratio": 0.4
+  },
+  {
+   "a": "cb",
+   "b": "c",
+   "ratio": 0.6666666666666666
+  },
+  {
+   "a": "abcaba",
+   "b": "bacaccabb",
+   "ratio": 0.5333333333333333
+  },
+  {
+   "a": "abbbcccbb",
+   "b": "bcbbaca",
+   "ratio": 0.5
+  },
+  {
+   "a": "bccbbaba",
+   "b": "ccbc",
+   "ratio": 0.5
+  },
+  {
+   "a": "cbbcaa",
+   "b": "b",
+   "ratio": 0.2857142857142857
+  },
+  {
+   "a": "cba",
+   "b": "cacacbc",
+   "ratio": 0.4
+  },
+  {
+   "a": "aaccbc",
+   "b": "caaccb",
+   "ratio": 0.8333333333333334
+  },
+  {
+   "a": "aaacaaccb",
+   "b": "",
+   "ratio": 0.0
+  },
+  {
+   "a": "acba",
+   "b": "aabbc",
+   "ratio": 0.4444444444444444
+  },
+  {
+   "a": "abccaa",
+   "b": "abbb",
+   "ratio": 0.4
+  },
+  {
+   "a": "babaa",
+   "b": "caab",
+   "ratio": 0.4444444444444444
+  },
+  {
+   "a": "baacc",
+   "b": "accaaaca",
+   "ratio": 0.46153846153846156
+  },
+  {
+   "a": "cbbb",
+   "b": "abcbbaaabac",
+   "ratio": 0.5333333333333333
+  },
+  {
+   "a": "abacaccbbbc",
+   "b": "accabaca",
+   "ratio": 0.5263157894736842
+  },
+  {
+   "a": "acca",
+   "b": "abcacaa",
+   "ratio": 0.5454545454545454
+  },
+  {
+   "a": "cbcbbcaab",
+   "b": "aaabccaaaacb",
+   "ratio": 0.5714285714285714
+  },
+  {
+   "a": "cbabaaaccbbc",
+   "b": "acbcccc",
+   "ratio": 0.5263157894736842
+  },
+  {
+   "a": "cacaacbacbc",
+   "b": "bccabbcaccbb",
+   "ratio": 0.5217391304347826
+  },
+  {
+   "a": "",
+   "b": "cca",
+   "ratio": 0.0
+  },
+  {
+   "a": "babacacbb",
+   "b": "bcbaaaac",
+   "ratio": 0.47058823529411764
+  },
+  {
+   "a": "cccacaabba",
+   "b": "bcccbcbacca",
+   "ratio": 0.5714285714285714
+  },
+  {
+   "a": "baabcc",
+   "b": "babbbbcac",
+   "ratio": 0.6666666666666666
+  },
+  {
+   "a": "",
+   "b": "bc",
+   "ratio": 0.0
+  },
+  {
+   "a": "ac",
+   "b": "ccaaabc",
+   "ratio": 0.4444444444444444
+  },
+  {
+   "a": "ab",
+   "b": "bbbaaccc",
+   "ratio": 0.2
+  },
+  {
+   "a": "abbacabba",
+   "b": "bbb",
+   "ratio": 0.5
+  },
+  {
+   "a": "aaabccacb",
+   "b": "ccabbabba",
+   "ratio": 0.4444444444444444
+  },
+  {
+   "a": "bba",
+   "b": "ca",
+   "ratio": 0.4
+  },
+  {
+   "a": "abacbbb",
+   "b": "bccabac",
+   "ratio": 0.5714285714285714
+  },
+  {
+   "a": "baacbb",
+   "b": "caca",
+   "ratio": 0.4
+  },
+  {
+   "a": "bcbcccababa",
+   "b": "cb",
+   "ratio": 0.3076923076923077
+  },
+  {
+   "a": "ac",
+   "b": "a",
+   "ratio": 0.6666666666666666
+  },
+  {
+   "a": "bbabb",
+   "b": "ccab",
+   "ratio": 0.4444444444444444
+  },
+  {
+   "a": "cabaaa",
+   "b": "caaabbbb",
+   "ratio": 0.5714285714285714
+  },
+  {
+   "a": "cacccbbc",
+   "b": "cbaabcc",
+   "ratio": 0.5333333333333333
+  },
+  {
+   "a": "babcbaa",
+   "b": "bbca",
+   "ratio": 0.7272727272727273
+  },
+  {
+   "a": "aa",
+   "b": "cbcacbccaac",
+   "ratio": 0.3076923076923077
+  },
+  {
+   "a": "bcabacbabab",
+   "b": "abbbbbc",
+   "ratio": 0.2222222222222222
+  },
+  {
+   "a": "aaba",
+   "b": "abccaca",
+   "ratio": 0.5454545454545454
+  },
+  {
+   "a": "bbabcbccbca",
+   "b": "ababba",
+   "ratio": 0.35294117647058826
+  },
+  {
+   "a": "bcbbcb",
+   "b": "aaab",
+   "ratio": 0.2
+  },
+  {
+   "a": "bcbbc",
+   "b": "cb",
+   "ratio": 0.5714285714285714
+  },
+  {
+   "a": "cbbacc",
+   "b": "aca",
+   "ratio": 0.4444444444444444
+  },
+  {
+   "a": "cbbbbbbaebcadbeacbacddbccbdeedcdcacecdeebddebcbbecccdcecdbedebebbcbadddadabbddcbdccbcebebdbeaeeaceecbcbbeabbadeeeadcaeabcadcceeadecaaccbdeeedbbcadebbcdbcdebcbecdbcdacddaaaeacbddedcacedbbaacbbccedcacbacddeedacecbacbebabbadcaccbabbedbedeaeaaebecedcbeccacaaba",
+   "b": "ecacdbecaaacddddcbbdcaeaecccbbcdbddcbdeedbddbaeadebbaaebcadeeabdaeabcebaedcbdaeabceeaedcbeaedbeaacbdcbcbceacbbbeaaebeeadcdeedeedadeccdabcdeaddcaddddeaacbabeccebdecabaabaedbcbabbaabdebdadebaaceaeebadcdcbcceedccbaabaacb",
+   "ratio": 0.0
+  },
+  {
+   "a": "ecaaddeaaeedbdbdccaadaacdadbaebbcbddaccccbabbebdaedaddebbedaddcddcaebdbeeaddaeedbeaebabdadcdacbddebdbdedaddbbedbaaadeeddebdaddedaeeeaadbbaadebddadabcdebbbabeacbdbdaebadaaeadebbeaadebdcbdebbbeeeaedebdedbccdaaddbbcadbeceeeaebdcbdadcabacdaaaacaebede",
+   "b": "eadeaececaddaebcbaebadecdcdbdbaeedcaacdbdaadeadecbaeecacdabecacdadbdacbbcdbcedbaacbabbccedecaabcaebbadddccecadcbdadbaabacbbacdbbeecaacdddddacedebccddeaebaceaccdededbabdeaebadddebdeacddacbcdcbccccbacabbccecadabedddcdaacbbaaaadbbbdbcaedeaadeedadcaeccbadeadacdbcdbecdedccdbceaadbdeccdebdeaddeeacccaedaeacbbaedabd",
+   "ratio": 0.0036036036036036037
+  },
+  {
+   "a": "baaabaebccaeddacdbaadcdebbbaaceeaacbccedcbbcebccadbabebeddcaaaeacdadeccdeaebcecbcdccddedbbabdbedbebacbcaeeedceecabaeedecdbceaaedbcbaaaedbbdbdecbeeaadbdbdcecbdadceaccddbcbcbcbcdbcecdaddcdeaedaaaeedabaadaddecaaebcdaeccaecbebeedbbbebceeeedbccdeacacabcbaeacbaeeacaabbadbcaeadcebecdbeaccbdaeabdaaacbcddcbcebceadadaceade",
+   "b": "ceabcadddcbceacdbcecebacebbbeaaceebaedcecbddedcbacacabedeeadbebdbcbbadadcdcbebacebabbdecddeebdcebbcceeaabebecceccededbaecadecdbcecdceedadcededbaeeabeacbbbbaabadedccdabddebdcabacddedeebbbdcaacabeeeaabecaebedebeddccdaedaeaaaceedaacddeacdceeddeceacbeccebddaecebbbcdadbccdebebcaedeeeeadbcededdcacaadebdecdeabbeadcbcbea",
+   "ratio": 0.0
+  },
+  {
+   "a": "ceacdddbbebabeacaebcecabdebbdcebbeebbcdbaecdccaddbbcaebbdccbbbccccbaaeebcaebebacaabbaabeccdcadcaddcecdbaaecdcccdbdaacadbacacccdddebbaadeaadddaebbabbcbeccbddbadecdbdbeacedecbeeacbccccaedeebbdedaceeddbecdbabedbabdbaeccbddeecabdcacadbecbecadcdaddcaccaebbabdbabbabbbbdcedeecebaadbccdbedd",
+   "b": "ababdceeaabcadecabcaebcbdbacacabcadabddccccbdddccbbbbdaeedcccabdbededacddbaececcebccbeaeeebdbeacdbccbdeabbadedacccbcbdaacacccbdeecebbdbaaececbccddecaebcebdbbbdeaaeedeeacddebeeeddddceeedeaadebdbedebbcbaeababdddabeeeebdcdeddcadbbaecadecaaddddcbddbebadecccbbe",
+   "ratio": 0.0
+  },
+  {
+   "a": "ccedbeccbeabcaacdbbdacbbeaededbaedeaaeabebbedecccedeadcecbabbbbcccedebbdcdbebaeaacccdeeebdabddbbaaeacdcdbbadcccedebcbdcaabaeadddeebcdeaeceadeaeadcddbbcbbdebcbdecbeaaaedadbbedacdbbaebdcbaecdeceddbdcdb",
+   "b": "edeecbeabdcddeaccdbaaececacdbecdaccebcdabeceddaabcdeeceeaaaaeaaadebabebddddcbadecadaaecbbbdbeabaaebebbebacbabbecaeacdbbbabaeecaebdeccbcecebaabdcbedadbbaaabdaeeaedaebaaccdcdccbaabbbcdddbacadaceeabbabbdceebceacbebddddeeadabbeaacabbbddbdaaecedddedceaaedebceddcacebdbadddacccecebaaedbcdeceabccbebcdbbeaedca",
+   "ratio": 0.0
+  },
+  {
+   "a": "caddcbcaecdabebbadebeeecdaccbbdceacebcedacbbabbccbbbccbeeadacdebcaaccdadbcaaebeeedcdadadabebcaecededeadceeacbdcebaeacedaadcedbcbbaeecbecacaeaeabcdaeedadcaeccdddcebbdbacdebaaeeddaddaadcdaaddbccbdbcdadbaecddabcdebbeaacededeadcdcddacddbbbedcbebeeabaccbbbdadeebaddcacccbaededaeacaceaeecdcdebcebeb",
+   "b": "aacdbcebacdcaeacdbbbdbdeabcaaadeeaaddbddbdeababadbcedccdaeadbeabdcedbdddadaadeaccabbddbaaddcecadbbbdeceededeadcacaabcecadccbceceaadacadacadcabdbebacbbeebdaacdddbdebcdaecedeabcbccabbeecdbeddebdcbceaededabadbccbadbbdbcdaabcdeabcddcbe",
+   "ratio": 0.0
+  },
+  {
+   "a": "dbddcacbdbcceaadabeeaadddaddecaedbabbbabcbdaeeabacedbddaccebacdeebececaacacececbacdbbcdaaeccdcbaceccaddcdcbabbecadededeebbbdaabbcddaacaebcbdddbcceababdbabaedaecddebbbaceadaaadbccccedacaeebbdcbbcaaadbedeedcdaeacbddedeeebcbcdadebcebbebceeadeebbcaecedbdbecceedccadacedaeeccbbbeeddeccedebeeebacecbaaceacbcbdbbebaa",
+   "b": "eeecceccbdaadccccbabccabdadbacebeacacbeabeecacaeacabaedabbcacbcddabcebcbbebbbeaadbdbccebdbdecebbddcceecdaaeeeaebbcccededecaeeabbacaabeebdcbbdeebbedadebbeaadaeceebcbddeccbdcdbecebbbabadbddecabbabbdbabecdedeebedd",
+   "ratio": 0.0
+  },
+  {
+   "a": "ceedeeabaebaeeaaebbcbadadedbeadcddbedddbcbbbebcbadbecccaeeebbecbabbcdbcdeebcbabbccedeedbbdebcdbcbaedaabbadeecdcccadaeadeebdcbdcacaebabdbddacecedeebdddaabbadeaeadaccdeeabbcceabadcbebcbeeaebcedabecbccdaaebaddeebeacddeddcacadeaadbdbaeaaeaeecdbacabcbdeadd",
+   "b": "dbecabddbbeccddddbbcedcbbeacdeeecaaaacbbcaaadadceabeceebceecbaeabbabaacccdbaebdabdcbeebaaddeeedbabbddebeebaabcdabdadcedbaabbabbabacaeadbdbdacbccdebccabdcbcaaadcadabcabaeabbbcaeedebbeacadccbdcddcabcbabdaacedabaecacdedccdeedeaebaeeeacbdeeaedadcccbaebbccdcdcbacd",
+   "ratio": 0.0
+  },
+  {
+   "a": "adaebeceeadedaecbaebdeabcdeaeaccabdbaabbeecdaddabeedccecedbdebcbddedeadbdcdadebcacacdbbeabbeaaeeeaaadcadddeddacbccbaabaeaaabcdaacdcecdbacddcccbeeebaaedcedcddddcbdaaccacdadadaacaaebaedddaaddeaacddeaabcbabbcbeaecbcbccdadceedaacaeecaedcbcacebedcbdcbeaecadadaaacbebccdccd",
+   "b": "aeacbeabeadeecadbcacdabbebcceeddbabddaadeebbedcaeacdeddedccabaaaabaeeeebdcbbcecceabbebeabccabebaacacecbccdeeaabaeaaabcbcedcebddbcadadeccddbadedccadccdcaecaceecddddabedecebedeadcaedbeadbeaddabcbabeebaeeabddbcbacbcaeecacdeddaadabdcabeecbbaeeeebcbedecbceeacaaccbebecdecadabbccdcbcaebccedbbedcebb",
+   "ratio": 0.0035778175313059034
+  },
+  {
+   "a": "daacdaeccacadacebdbeacbebddccbdbeebbbecdbbccaebecbabdabcccdaedbdeceddcacbabebddbdedbeedacaccbbdacdcdbcaceeeacacdacadcecdceceeaeebddcacdbeabccabbdeeddebdedbbbbeadcbbeaceaddebccadcedccacbecaadaedbbdbcceccebedbabdcaeaaacabbbbbcceddbbcddecbabaeaccbdcecadceccbaecdebabcebdaddcccbddeeaaccedddbddaaccabaeacbdbbaaeeeb",
+   "b": "beaeaceadebedbbcecccadbecbcbccecceddcaccbcdadadeedaebbbcbebdebedaeceadadddaecdbbaaacdedcbbadaebaeccdaacddecbaebabcdabaccaabdacadbdbdbcecdbadeeacaebcaebabcbceccacbdbbaecaaaceaeaadacadacaecabdeceeccbdbeadcbdecbbbacaedbbacdeedcaadebdbbdaeeceeaaeaadcdddeceaaacbeaabebaaaedcdbbdacabccadaaceabaebbccadddbebdabaecadad",
+   "ratio": 0.0
+  },
+  {
+   "a": "aaeeeedbddbbdbeaaabbaebbddbccdbeeddbbccebbbeadeeecdaabecaabddaedbaaeabbbcbcadbaaecccbddccadcaadebcaabbdbbebbcadedbadddeccdaacebbaddcaacabeeaddedccecbdcbbccbeedbaecdabceecebbeabedaecdcdaebbdeeabcebdabbecbbaeddeadcacddabeaaeeabdeeebdadbeaeacacedbbcbdabdddbbdabcade",
+   "b": "addecaeedabcedcbcebbaabdeadccaeddbcaeabacddabcaeabcceddcbbbbcdcacbacebbbcacedcdbadaeaabcdeacababcedebeeeaadccccedeeadcbbabceceedabebbeeaeaacbbcededbbcabedbaebabeccedeaeeeeeaddbccbcadecdebbcdaacddaaebccecddcbbddcabdbeebeaecdaccbadededebccbe",
+   "ratio": 0.003992015968063872
+  },
+  {
+   "a": "eabdaadebbddbdababccccabdddabaadcdceacdcbdbbdaebbaebdcaaeaaaaeaedbebceaacbdaeeccadaddacbcddcaadcacdceadcceaacedebaacaeebbadcddcecceeeedbbebacadccecdcddeeeeabcdcbabdaacdbaadbeaadbdabdddacbcaeebbcabecdc",
+   "b": "bdedccaeaaedcbdabcbcdcecddabcdbbddecaebeacbaebbcbdeabebeedceeedacbbbdddcacbccccdadbcbbeebcebdeeababadbaabaecdacedeedebabcceedcbbaccceeebebabadacabbadacaaeddecbcbcacccbacadeadcebdeedddedadccaceddccbccaeacddcdadeddebbdaddcecdadadcccbebebbaabeeabaadaececeadece",
+   "ratio": 0.0
+  },
+  {
+   "a": "cbbeebceeacaabecaddcadacedbebceacbdaeebaddddecbeddccdecebccebcdaeabcbadccdebadbdecaaabbcdaabccecabdcbbadccddbccaeeeddebccebedaccbaeedeeaeeedadaebedeabdcebcbdacdbeaebceceedbbaebbbdaecdbaedacccedbecbeeaddadbbcadcaccebbdbeceeebccdeccddaaabbedadbdbcdeadcdaadbeaceaeeaaeecbcdadbeddaaeadbbdbaedebbdabdddecae",
+   "b": "ddbddcbbaaecceadedeeaababcebdacccdaacceaacceaabaeebdbdabecebdccbaecbccceecbdbeeacdaacabcebbbaaadbacdbadedeaabaececeeacddeaacaaceceaddaaaeccecebebbdebeebbccdaaddcdceeabbdeaeddecbcdbedeadcadaecdaadceaadaaccaaaddbedaeaeeaebcabcecceacbbeaddccceebec",
+   "ratio": 0.0
+  },
+  {
+   "a": "ecaabcaadcdcdeecddddceadcbeadeebdabdccdeeabadadbdaaacbdcceadaaccacbebdedbbbdddacdccabcaaeabdcdddbbadacddbbadddedcdcbebdeadcbaceecbddbdbeceacedacbeadbecccebdcdadcedcdcebaecdcedaeaebaceadddddbebdbbdadccebaebdbeedebcbdaeddedeadbcacdeeaaebaeeecbcddbaac",
+   "b": "debadadacecadacecbdcabbdcebeebbdaacebbdeaddeedacdbdacdbbcddbdbecccaebbbcadceaecaeeacdaebccaeacbdaebddcdacbaccdbceaabcbcdacdaeecaedcdbbceebadaccceaeececaeaccdcbebccbbbbbdbbbdccaebebebaabcdbebaaccebbdaac",
+   "ratio": 0.0
+  },
+  {
+   "a": "abcbeaccacecaecbcbadeeebdddbcaacadcbebeacaabbcedddddbedcdecaadccceccdadaeeaddddabbbbeaabaaabcbabebbabaccadceedbddbeaddbbbebceacbbcecebbbdebbdbdacecccbacbcccdbcccdeeacdcadbcababacceabbbbbcdeadabdaedeaeaebacabccdebaebebebeebcbcdcedeaacecaeceeddecdecadcebededdbabeaddcebeddccd",
+   "b": "bbaebcddabeecaddbbbdacacccccbadbadcaababbacccbbaebcbbbdadeacebacdbdbcecebcdedeceedbcaebebbcbeacdacecdcbbcabaddaecaddddcccecceecdadcdeeaceaecaecdceaddaaadbdacceecdeccdddcaedaaceebcbaeecdcdaeedceabbcbbcadbaedecbaeeadaaeadebdcaecaeeaedaeccaaceeacabbaeaacdbbeaeabbaeeaea",
+   "ratio": 0.0
+  },
+  {
+   "a": "abebbabbbadacecbeaddebdeceabdebabadbbdedacdbceacaedddecbdabecccdabbdbbeeeccbbbaddcdeabbbcdbcbdabeddadacddaaddacacddaadeaaccdacbcdbabbeedabeaabedbacbbdaddcbdeaeddabbeeebdbcccadadbeedccbaaeebcadebaecabaeececbebabbdbcccdebaadadbedbacaeacbbcd",
+   "b": "bdccebcaebeeadddcedaeaaebdaddcdebdcbeabdaeebeadaaddcdadcadcddeaaccdbcecbdaedebdaccaceacaabdcdaacebdcbdaadbabbeacccbeabccdacbedbedaccdaaceaceedaedabbdedecdadcedcbeebebadebedceecabdbbecbdedceacedbedabbacdebccdcccedbacbbbeaeaadececdddddebaaabcddcebdbacbeecbdcabaabbbbcebeecdbbdbddeabb",
+   "ratio": 0.0
+  },
+  {
+   "a": "aaeccaababdaccecdaacbcacbceccedcbaecabedbcebecaddddeeacdaaaeeccbacabacaaacbdebeaacecaebccbbdcebcbdadcecbbcdbbcbdbcddcecddaceaacebcacbbecacaadaecccbdecbabeaecabbcddaeaacedecbecbbacebedacabcbcacacdadaedbbedeeeeaacddcaeceaabeeaaaccbacaddbbbcaaeddaededcaebbdeddcebabcbcaccaccdceaccadebdccaeceaeaccdbdabeedddbdaa",
+   "b": "bccabedabeaddaebaeccbaebedabedebcadcbdeaaebdcecdecebedaebdcebaececbcadcadcccadceccebcdebebcabebedbcbedaedbbbcdacdeeeebbbebdeaaeacacdeccdddeaeaadbaeeaddedceddcdcebdeceebaedcceaeadcdbeeaeadeeeecbbdacdacaaacecbbbabdeaabbbbeaacbddabbecdbeeeabaaedcdcdbbcddeedcedebd",
+   "ratio": 0.0
+  },
+  {
+   "a": "dddbdcedaceaacaddcbdeceecdccbcdeadbbbdeedeabcbddeeeeaadadbecbdbceeebaddbcdbebbcbaddcabadbadceddccaeecbbaaedacbeeaedaebdbeaccbeabcaecedeabbdadedceccdebabddbeacccddaececbcebaaeadacecadcbdbebbcebeebacabaaacdcecbdeecbdbcbecceababdddbdebdbbcdeddeeeecdbeabeeaeabaebbbdbdcdeeddcbdbbbeebeacdeceeaaecadbcaecaccaeabbcedcbdcddad",
+   "b": "bbacabaacdaabdcabeaaeeccbebdbdedcaebeeaeadabcdbbceeedaebaeebbacdbdbbdedddabeabadabecbeabbeadbabedeeacaabedccabcaeebcdcaebccddaedbbedabdcacdcaadeedcabbeebabdcebbedaadaaaeeeecebdeeaeaabecddcbbdbdddcbcdeacbcbbceeeccaddbeccebeadddeccacbdcaebbcaebdddcbeacbbadaaabaebdceddccccbebccdbbcacabbacaddbbedbbaddddd",
+   "ratio": 0.0
+  },
+  {
+   "a": "dadedbdddbaaebaddadadccdacababbcbaeccbdcdeeadbccdddbcbaddaddaeadbcdabeabdeccdebdcadadcdddddcadceeccbacaedcbacbbcabbdadcaacabcadbdbeaddebebeeecdcaccecdccdeedaebdeeeebbeddacabebadedbaabeeecdeaaedecaaeedadaaebcabdaebdeeaccaaccdaebabaeadbebccbcaabadcbeaebcebcaababbbeaacbdbcbaddeaacdecebdeaeabaddbababbaeadcceceeccedbdcdb",
+   "b": "ebddbdebaceeeaeaeacedaaeecedacbeeacbaacbaedbacbbebcdcaaeecbeabcdceaddebbacdcddaacccdccaaccaaebdbecccbcaebadcebaadcacebebcbcedbedaeecaeadabcbeecdebaeedddcacaaddddeaebcabbdebdddcbbddbaedbdeedbcbbebdddceeceeacabcbaeedddcadcedeadcbddadabdedaabcddd",
+   "ratio": 0.0
+  },
+  {
+   "a": "beebeeedaadeaeacecededeabcdbdeceaabcaaeadebddebcbeaeddddccecbeeccccddeeabbecceebdeabebccebaedbedccacbabddebdabcacbeedbbdcacedcaaaddddadbebebcecaddebcddedaaccdebaddaeeaccbaccbeaeaaaabebbceedccdbcdedddebcdecacbbcbcedbbedcedceaeeaadbcdcbdadebacddeebddbdbaecedbabcbaaaeccaccdbdcaebeacdeaceceebcdaeeaedabdaedeed",
+   "b": "dcdbddaeeaacbbacbaedeedebdddceecbbbadabbeedccbdeabccbcdceadccbdccbbeeeeeabccdbebbcabaaeeeaadceebddbaddbdccadadebccadceabbcbcbcbabeedaedadcaaebbeaadbebadbeabaebebdbdcadedbbbdceeccdccaaaaebabbedaebdeebcebceaecdacbebbbbaeceeedddeedc",
+   "ratio": 0.0
+  }
+ ],
+ "coverage": [
+  {
+   "text": "When the long day was finally over they asked me to come home.",
+   "heard": "the long day was finally over they asked me to come home.",
+   "covered": [
+    false,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "final_missing": false,
+   "first_missing": true
+  },
+  {
+   "text": "When the long day was finally over they asked me to come home.",
+   "heard": "When the long day was finally over they asked me to come home.",
+   "covered": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "When the long day was finally over they asked me to come home.",
+   "heard": "When the long day was finally over they asked me to come.",
+   "covered": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    false
+   ],
+   "final_missing": true,
+   "first_missing": false
+  },
+  {
+   "text": "Scadutree stood tall.",
+   "heard": "Skadu tree stood tall.",
+   "covered": [
+    true,
+    true,
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "Beneath the Scadutree.",
+   "heard": "Beneath the Skadu tree.",
+   "covered": [
+    true,
+    true,
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "nestled in the shadow of the Scadutree.",
+   "heard": "nestled in the shadow of the Skadu tree.",
+   "covered": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "two twin demigods: Miquella and Malenia.",
+   "heard": "two twin demigods, Mykela and Melania.",
+   "covered": [
+    true,
+    true,
+    true,
+    false,
+    true,
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "We walked before returning home.",
+   "heard": "We walked before returning.",
+   "covered": [
+    true,
+    true,
+    true,
+    true,
+    false
+   ],
+   "final_missing": true,
+   "first_missing": false
+  },
+  {
+   "text": "",
+   "heard": "",
+   "covered": [],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "",
+   "heard": "something heard",
+   "covered": [],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "Hello there.",
+   "heard": "",
+   "covered": [
+    false,
+    false
+   ],
+   "final_missing": true,
+   "first_missing": true
+  },
+  {
+   "text": "Hello.",
+   "heard": "Hello.",
+   "covered": [
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "Hello.",
+   "heard": "Goodbye.",
+   "covered": [
+    false
+   ],
+   "final_missing": true,
+   "first_missing": true
+  },
+  {
+   "text": "I have 20 apples.",
+   "heard": "I have twenty apples.",
+   "covered": [
+    true,
+    true,
+    true,
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "It costs $5.",
+   "heard": "It costs five dollars.",
+   "covered": [
+    true,
+    true,
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "Mr. Smith arrived.",
+   "heard": "Mister Smith arrived.",
+   "covered": [
+    true,
+    true,
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "The colour is grey.",
+   "heard": "The color is gray.",
+   "covered": [
+    true,
+    true,
+    true,
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "She won't stay.",
+   "heard": "She will not stay.",
+   "covered": [
+    true,
+    true,
+    true,
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "one two three four",
+   "heard": "one three four",
+   "covered": [
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "one two three four",
+   "heard": "one two three",
+   "covered": [
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "one two three four",
+   "heard": "two three four",
+   "covered": [
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "a b c",
+   "heard": "c b a",
+   "covered": [
+    false,
+    true,
+    false
+   ],
+   "final_missing": true,
+   "first_missing": true
+  },
+  {
+   "text": "The quick brown fox jumps.",
+   "heard": "The quick brown fox jumps over the lazy dog.",
+   "covered": [
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "The quick brown fox jumps over the lazy dog.",
+   "heard": "quick fox lazy",
+   "covered": [
+    false,
+    true,
+    false,
+    true,
+    false,
+    false,
+    false,
+    true,
+    false
+   ],
+   "final_missing": true,
+   "first_missing": true
+  },
+  {
+   "text": "Hideworking is hard.",
+   "heard": "Hide working is hard.",
+   "covered": [
+    true,
+    true,
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "Tolkien wrote it.",
+   "heard": "Tolkein wrote it.",
+   "covered": [
+    true,
+    true,
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "Ender's Game",
+   "heard": "Enders Game",
+   "covered": [
+    true,
+    false,
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "come home",
+   "heard": "come come",
+   "covered": [
+    true,
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "home",
+   "heard": "come home",
+   "covered": [
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "Malenia, Blade of Miquella.",
+   "heard": "Melania blade of Mikayla.",
+   "covered": [
+    true,
+    true,
+    true,
+    false
+   ],
+   "final_missing": true,
+   "first_missing": false
+  },
+  {
+   "text": "Rennala, Queen of the Full Moon.",
+   "heard": "Renala queen of the full moon",
+   "covered": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "They asked me to come home",
+   "heard": "They asked me to come home home",
+   "covered": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "(aside) the end.",
+   "heard": "the end.",
+   "covered": [
+    true,
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "Caf\u00e9 au lait.",
+   "heard": "Cafe au lait.",
+   "covered": [
+    true,
+    true,
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "Double five, then point two.",
+   "heard": "55 then .2",
+   "covered": [
+    true,
+    true,
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "tall me tree me day 20 won't asked come.",
+   "heard": "tall me tree me day 20 won't asked come",
+   "covered": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "stood tall asked twenty.",
+   "heard": "stood ll asked twenty",
+   "covered": [
+    true,
+    true,
+    true,
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "long 20 20 won't.",
+   "heard": "lon 20 20 won't",
+   "covered": [
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "me tall.",
+   "heard": "me tall",
+   "covered": [
+    true,
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "scadu one $5 long won't tall twenty to the.",
+   "heard": "sca one $5 long won't ta ll twenty to the",
+   "covered": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "stood.",
+   "heard": "",
+   "covered": [
+    false
+   ],
+   "final_missing": true,
+   "first_missing": true
+  },
+  {
+   "text": "twenty tree a asked.",
+   "heard": "twenty tree a asked",
+   "covered": [
+    true,
+    true,
+    true,
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "over $5 20 20 20.",
+   "heard": "over $5 2 20 20",
+   "covered": [
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "to day to come five five.",
+   "heard": "t day come five five",
+   "covered": [
+    true,
+    true,
+    false,
+    true,
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "skadu.",
+   "heard": "sk asked adu",
+   "covered": [
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "scadu the.",
+   "heard": "scadu t he",
+   "covered": [
+    true,
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "day over asked long won't come over.",
+   "heard": "day over asked long won't come over",
+   "covered": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "me to to a day tall home me asked.",
+   "heard": "me t o 20 to a day tall home asked",
+   "covered": [
+    true,
+    false,
+    true,
+    true,
+    true,
+    true,
+    true,
+    false,
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "five day me a scadu.",
+   "heard": "fi ve d ay me a scadu",
+   "covered": [
+    false,
+    true,
+    true,
+    true,
+    true
+   ],
+   "final_missing": false,
+   "first_missing": true
+  },
+  {
+   "text": "over they scadu to over tree $5 the.",
+   "heard": "over they scadu $5 to ove $5 the",
+   "covered": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    false,
+    true,
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "over me tall.",
+   "heard": "me ta ll",
+   "covered": [
+    false,
+    true,
+    true
+   ],
+   "final_missing": false,
+   "first_missing": true
+  },
+  {
+   "text": "the over five 20 day skadu skadu skadu twenty.",
+   "heard": "the over five 20 day skadu skadu sk adu twenty",
+   "covered": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "me.",
+   "heard": "skadu m",
+   "covered": [
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "a asked come twenty.",
+   "heard": "a asked come twenty",
+   "covered": [
+    true,
+    true,
+    true,
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "come.",
+   "heard": "",
+   "covered": [
+    false
+   ],
+   "final_missing": true,
+   "first_missing": true
+  },
+  {
+   "text": "they one the stood come tall a 20 a.",
+   "heard": "they one the stood com tall a 20 a",
+   "covered": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "tree 20 five tall stood the.",
+   "heard": "tree 20 tall stood",
+   "covered": [
+    true,
+    false,
+    true,
+    true,
+    false
+   ],
+   "final_missing": true,
+   "first_missing": false
+  },
+  {
+   "text": "to come to long 20 they.",
+   "heard": "won't to come lon 20 they",
+   "covered": [
+    false,
+    true,
+    false,
+    true,
+    true,
+    true
+   ],
+   "final_missing": false,
+   "first_missing": true
+  },
+  {
+   "text": "me won't over scadu tree long over.",
+   "heard": "m won't over scadu tree long over",
+   "covered": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "skadu twenty stood twenty $5 long won't.",
+   "heard": "skadu twenty stood twenty $5 scadu long won't",
+   "covered": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "tall home $5 they day.",
+   "heard": "tall home $5 20 they day",
+   "covered": [
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "20 skadu twenty long me they.",
+   "heard": "20 skadu twenty long m they",
+   "covered": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "home tall home twenty stood they day home.",
+   "heard": "home tall home twenty they day hom",
+   "covered": [
+    true,
+    true,
+    true,
+    true,
+    false,
+    true,
+    true,
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "to long long asked me stood to five.",
+   "heard": "to lo ng long asked me stood to five",
+   "covered": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "they over over 20 tree.",
+   "heard": "they ov er er 20 tree",
+   "covered": [
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "the a five five a tree.",
+   "heard": "the a five f ve x tree",
+   "covered": [
+    true,
+    true,
+    true,
+    false,
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "tall over over.",
+   "heard": "tall over ove",
+   "covered": [
+    true,
+    true,
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "they one stood home.",
+   "heard": "they one twenty stood scadu ho me",
+   "covered": [
+    true,
+    false,
+    true,
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "long they.",
+   "heard": "lo n g they",
+   "covered": [
+    true,
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "to stood over day.",
+   "heard": "t o over",
+   "covered": [
+    true,
+    false,
+    true,
+    false
+   ],
+   "final_missing": true,
+   "first_missing": false
+  },
+  {
+   "text": "scadu the asked.",
+   "heard": "da the asked",
+   "covered": [
+    false,
+    true,
+    true
+   ],
+   "final_missing": false,
+   "first_missing": true
+  },
+  {
+   "text": "skadu a home me $5.",
+   "heard": "skadu a home m $",
+   "covered": [
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "one.",
+   "heard": "one",
+   "covered": [
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "me 20 $5 home a asked me $5 tree.",
+   "heard": "me 20 $5 home a me $5 com tree",
+   "covered": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    false,
+    true,
+    true,
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "to scadu tree they the $5 come tree.",
+   "heard": "to sc adu tree they the $5 come tree",
+   "covered": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "home a stood come won't skadu long one over.",
+   "heard": "home come skadu long one over",
+   "covered": [
+    true,
+    false,
+    false,
+    true,
+    false,
+    false,
+    true,
+    true,
+    true,
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "they me one me me $5 to 20.",
+   "heard": "they me one me me $5 to 20",
+   "covered": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "home stood the one skadu come to.",
+   "heard": "home stood the one skadu come t",
+   "covered": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "20 one.",
+   "heard": "won't 2 on",
+   "covered": [
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "long.",
+   "heard": "lon",
+   "covered": [
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "come stood.",
+   "heard": "come stood",
+   "covered": [
+    true,
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "twenty tall tall won't asked five they five.",
+   "heard": "twenty tall tall t won't scadu asked five they five",
+   "covered": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "over twenty.",
+   "heard": "tal twenty",
+   "covered": [
+    false,
+    true
+   ],
+   "final_missing": false,
+   "first_missing": true
+  },
+  {
+   "text": "they the.",
+   "heard": "the",
+   "covered": [
+    false,
+    true
+   ],
+   "final_missing": false,
+   "first_missing": true
+  },
+  {
+   "text": "a 20 20 twenty the the one.",
+   "heard": "a 20 20 twenty the five the on",
+   "covered": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "$5 they asked five skadu skadu.",
+   "heard": "$5 they asked five skadu skadu",
+   "covered": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "the long skadu.",
+   "heard": "the long sk adu",
+   "covered": [
+    true,
+    true,
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "the.",
+   "heard": "t he",
+   "covered": [
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "come asked over over long the $5.",
+   "heard": "come as ke over over lo ng the $5",
+   "covered": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "skadu scadu home day come.",
+   "heard": "skadu sc adu home day come",
+   "covered": [
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "come asked twenty five asked.",
+   "heard": "co me asked twe nty five asked",
+   "covered": [
+    true,
+    true,
+    true,
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "asked day twenty over over come a tree.",
+   "heard": "asked day twenty over over come a tree",
+   "covered": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "over.",
+   "heard": "day ove",
+   "covered": [
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "scadu.",
+   "heard": "scadu",
+   "covered": [
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "tall tall to twenty 20 skadu five a.",
+   "heard": "tall tall to twenty 20 skadu five a",
+   "covered": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "home $5.",
+   "heard": "home $",
+   "covered": [
+    true,
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "long.",
+   "heard": "long da",
+   "covered": [
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "they five skadu me one one tall over.",
+   "heard": "they five skadu me o ne one tall over",
+   "covered": [
+    true,
+    true,
+    true,
+    true,
+    false,
+    true,
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "20 me one a twenty to long to.",
+   "heard": "20 me one a twenty to long to",
+   "covered": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "me.",
+   "heard": "me",
+   "covered": [
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "tree five.",
+   "heard": "tree five",
+   "covered": [
+    true,
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "over home tree day scadu $5 scadu to long.",
+   "heard": "over home tree d ay scadu the $5 over scadu to long",
+   "covered": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "one home tall five they scadu asked five me.",
+   "heard": "one home tall five they scadu asked fiv me",
+   "covered": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    false,
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "won't to asked.",
+   "heard": "won't t o",
+   "covered": [
+    true,
+    true,
+    true,
+    false
+   ],
+   "final_missing": true,
+   "first_missing": false
+  },
+  {
+   "text": "stood won't the twenty day tall won't to.",
+   "heard": "stood won't the twenty day tall won't to",
+   "covered": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "one a scadu me.",
+   "heard": "one a scadu me",
+   "covered": [
+    true,
+    true,
+    true,
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "asked twenty tree me they a.",
+   "heard": "asked twenty tree they a",
+   "covered": [
+    true,
+    true,
+    true,
+    false,
+    true,
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "tall a.",
+   "heard": "ta x",
+   "covered": [
+    true,
+    false
+   ],
+   "final_missing": true,
+   "first_missing": false
+  },
+  {
+   "text": "asked.",
+   "heard": "a",
+   "covered": [
+    false
+   ],
+   "final_missing": true,
+   "first_missing": true
+  },
+  {
+   "text": "home $5 $5 tree a over.",
+   "heard": "home $5 $5 tree the x over",
+   "covered": [
+    true,
+    true,
+    true,
+    true,
+    false,
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "tall come asked won't five asked.",
+   "heard": "tal come asked won't long five asked $5",
+   "covered": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "come day home a over.",
+   "heard": "come day twenty home a over",
+   "covered": [
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "scadu the home tall 20.",
+   "heard": "one scadu the hom tall 2 0",
+   "covered": [
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "the twenty tall skadu over $5 the come the.",
+   "heard": "the twenty tall skad over $5 the come the $5",
+   "covered": [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "stood come asked won't.",
+   "heard": "stood come long asked won't",
+   "covered": [
+    true,
+    true,
+    true,
+    true,
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  }
+ ],
+ "clean_text": [
+  {
+   "text": "\u6211\u4eec\u4eca\u5929\u8ba8\u8bba\u6cb3\u6d41\u3002\u201c\u57ce\u5e02\u201d\u5728\u6cb3\u8fb9\uff01",
+   "output": "\u6211\u4eec\u4eca\u5929\u8ba8\u8bba\u6cb3\u6d41\u3002\"\u57ce\u5e02\"\u5728\u6cb3\u8fb9\uff01"
+  },
+  {
+   "text": "\u2018Single\u2019 and \u201cdouble\u201d curly quotes\u2026 with an ellipsis",
+   "output": "'Single' and \"double\" curly quotes... with an ellipsis"
+  },
+  {
+   "text": "No\u00a0break\u00a0spaces here.",
+   "output": "No break spaces here."
+  },
+  {
+   "text": "Marika&39;s book &amp; Radagon&39;s &quot;notes&quot;",
+   "output": "Marika's book & Radagon's \"notes\""
+  },
+  {
+   "text": "Bare &9; &31; &32; &8191; &8192; &99999; numerics",
+   "output": "Bare &9; &31; \u1fff &8192; &99999; numerics"
+  },
+  {
+   "text": "Hex &#x27;quote&#X27; and &#39; decimal, &#128; cp1252, &#0; zero, &#13; cr",
+   "output": "Hex 'quote' and ' decimal, \u20ac cp1252, \ufffd zero, cr"
+  },
+  {
+   "text": "Bad &#xD800; surrogate, &#99999999999; huge, &#1; control, &#65535; noncharacter",
+   "output": "Bad \ufffd surrogate, \ufffd huge, control, noncharacter"
+  },
+  {
+   "text": "Legacy &copy 2024 &amp &lt;tag&gt; &notit; &notin; &AMP; &bogus; & alone &#; &#x;",
+   "output": "Legacy \u00a9 2024 & <tag \u00acit; \u2209 & &bogus; & alone &; &x;"
+  },
+  {
+   "text": "Long &abcdefghijklmnopqrstuvwxyzabcdefghij; name and &;",
+   "output": "Long &abcdefghijklmnopqrstuvwxyzabcdefghij; name and &;"
+  },
+  {
+   "text": "Rivers \u2014 towns \u2013 and more\u2014less",
+   "output": "Rivers, towns, and more, less"
+  },
+  {
+   "text": "Cited fact [1]. Another [2,3] and [4-6] and [7\u20139] and [10, 11].",
+   "output": "Cited fact. Another and and and."
+  },
+  {
+   "text": "Keep [1] these [2,3]",
+   "strip_citations": false,
+   "output": "Keep [1] these [2,3]"
+  },
+  {
+   "text": "**Bold** _under_ #head `code` > quote | pipe ~ tilde",
+   "output": "Bold under head code quote pipe tilde"
+  },
+  {
+   "text": "See https://example.com/page?x=1 and http://a.b now.",
+   "output": "See and now."
+  },
+  {
+   "text": "The SQL server and sql tools",
+   "pronunciations": [
+    {
+     "from": "SQL",
+     "to": "sequel"
+    }
+   ],
+   "output": "The sequel server and sequel tools"
+  },
+  {
+   "text": "C++ and C# are languages",
+   "pronunciations": [
+    {
+     "from": "C++",
+     "to": "C plus plus"
+    }
+   ],
+   "output": "C plus plus and C are languages"
+  },
+  {
+   "text": "It costs five",
+   "pronunciations": [
+    {
+     "from": "five",
+     "to": "$5 or $1"
+    }
+   ],
+   "output": "It costs $5 or $1"
+  },
+  {
+   "text": "Caf\u00e9 culture at the cafe",
+   "pronunciations": [
+    {
+     "from": "caf\u00e9",
+     "to": "ka-fay"
+    }
+   ],
+   "output": "ka-fay culture at the cafe"
+  },
+  {
+   "text": "Ignore blanks",
+   "pronunciations": [
+    {
+     "from": " ",
+     "to": "x"
+    },
+    {
+     "from": "a",
+     "to": ""
+    },
+    {
+     "to": "y"
+    }
+   ],
+   "output": "Ignore blanks"
+  },
+  {
+   "text": "Wordy words wordy",
+   "pronunciations": [
+    {
+     "from": "word",
+     "to": "WORD"
+    },
+    {
+     "from": "wordy",
+     "to": "verbose"
+    }
+   ],
+   "output": "verbose words verbose"
+  },
+  {
+   "text": "A line that was hard\nwrapped in the middle of\na sentence and goes on.",
+   "output": "A line that was hard wrapped in the middle of a sentence and goes on."
+  },
+  {
+   "text": "Heading\nBody text starts here.\nIt continues.",
+   "output": "Heading\nBody text starts here.\nIt continues."
+  },
+  {
+   "text": "A long-\nhouse and a well-\nKnown name, then a comma,\nNext line.",
+   "output": "A longhouse and a well-Known name, then a comma, Next line."
+  },
+  {
+   "text": "Para one.\n\n\n\nPara two.\r\nWindows line.\rOld Mac line.",
+   "output": "Para one.\n\nPara two.\nWindows line.\nOld Mac line."
+  },
+  {
+   "text": "  spaced   out\t\ttabs  \n  and lines  ",
+   "output": "spaced out tabs and lines"
+  },
+  {
+   "text": ", leading comma\n, another\nand ,, doubled , , commas",
+   "output": "leading comma , another and , doubled , commas"
+  },
+  {
+   "text": "Decomposed cafe\u0301 and nai\u0308ve text.",
+   "output": "Decomposed cafe\u0301 and nai\u0308ve text."
+  },
+  {
+   "text": "\ud55c\uad6d\uc5b4 \ubb38\uc7a5\uc785\ub2c8\ub2e4. \u65e5\u672c\u8a9e\u306e\u6587\u3067\u3059\u3002",
+   "output": "\ud55c\uad6d\uc5b4 \ubb38\uc7a5\uc785\ub2c8\ub2e4. \u65e5\u672c\u8a9e\u306e\u6587\u3067\u3059\u3002"
+  },
+  {
+   "text": "",
+   "output": ""
+  }
+ ],
+ "chunk_text": [
+  {
+   "text": "\u6211\u4eec\u4eca\u5929\u8ba8\u8bba\u6cb3\u6d41\u548c\u57ce\u5e02\u7684\u5386\u53f2\uff0c\u4ee5\u53ca\u5b83\u4eec\u5982\u4f55\u968f\u7740\u65f6\u95f4\u6539\u53d8\u3002\u6211\u4eec\u4eca\u5929\u8ba8\u8bba\u6cb3\u6d41\u548c\u57ce\u5e02\u7684\u5386\u53f2\uff0c\u4ee5\u53ca\u5b83\u4eec\u5982\u4f55\u968f\u7740\u65f6\u95f4\u6539\u53d8\u3002\u6211\u4eec\u4eca\u5929\u8ba8\u8bba\u6cb3\u6d41\u548c\u57ce\u5e02\u7684\u5386\u53f2\uff0c\u4ee5\u53ca\u5b83\u4eec\u5982\u4f55\u968f\u7740\u65f6\u95f4\u6539\u53d8\u3002\u6211\u4eec\u4eca\u5929\u8ba8\u8bba\u6cb3\u6d41\u548c\u57ce\u5e02\u7684\u5386\u53f2\uff0c\u4ee5\u53ca\u5b83\u4eec\u5982\u4f55\u968f\u7740\u65f6\u95f4\u6539\u53d8\u3002\u6211\u4eec\u4eca\u5929\u8ba8\u8bba\u6cb3\u6d41\u548c\u57ce\u5e02\u7684\u5386\u53f2\uff0c\u4ee5\u53ca\u5b83\u4eec\u5982\u4f55\u968f\u7740\u65f6\u95f4\u6539\u53d8\u3002\u6211\u4eec\u4eca\u5929\u8ba8\u8bba\u6cb3\u6d41\u548c\u57ce\u5e02\u7684\u5386\u53f2\uff0c\u4ee5\u53ca\u5b83\u4eec\u5982\u4f55\u968f\u7740\u65f6\u95f4\u6539\u53d8\u3002",
+   "max_chars": 50,
+   "chunks": [
+    {
+     "text": "\u6211\u4eec\u4eca\u5929\u8ba8\u8bba\u6cb3\u6d41\u548c\u57ce\u5e02\u7684\u5386\u53f2\uff0c\u4ee5\u53ca\u5b83\u4eec\u5982\u4f55\u968f\u7740\u65f6\u95f4\u6539\u53d8\u3002\u6211\u4eec\u4eca\u5929\u8ba8\u8bba\u6cb3\u6d41\u548c\u57ce\u5e02\u7684\u5386\u53f2\uff0c",
+     "pause_after": "sentence"
+    },
+    {
+     "text": "\u4ee5\u53ca\u5b83\u4eec\u5982\u4f55\u968f\u7740\u65f6\u95f4\u6539\u53d8\u3002\u6211\u4eec\u4eca\u5929\u8ba8\u8bba\u6cb3\u6d41\u548c\u57ce\u5e02\u7684\u5386\u53f2\uff0c\u4ee5\u53ca\u5b83\u4eec\u5982\u4f55\u968f\u7740\u65f6\u95f4\u6539\u53d8\u3002",
+     "pause_after": "sentence"
+    },
+    {
+     "text": "\u6211\u4eec\u4eca\u5929\u8ba8\u8bba\u6cb3\u6d41\u548c\u57ce\u5e02\u7684\u5386\u53f2\uff0c\u4ee5\u53ca\u5b83\u4eec\u5982\u4f55\u968f\u7740\u65f6\u95f4\u6539\u53d8\u3002\u6211\u4eec\u4eca\u5929\u8ba8\u8bba\u6cb3\u6d41\u548c\u57ce\u5e02\u7684\u5386\u53f2\uff0c",
+     "pause_after": "sentence"
+    },
+    {
+     "text": "\u4ee5\u53ca\u5b83\u4eec\u5982\u4f55\u968f\u7740\u65f6\u95f4\u6539\u53d8\u3002\u6211\u4eec\u4eca\u5929\u8ba8\u8bba\u6cb3\u6d41\u548c\u57ce\u5e02\u7684\u5386\u53f2\uff0c\u4ee5\u53ca\u5b83\u4eec\u5982\u4f55\u968f\u7740\u65f6\u95f4\u6539\u53d8\u3002",
+     "pause_after": "end"
+    }
+   ]
+  },
+  {
+   "text": "\u8fd9\u662f\u4e00\u4e2a\u6ca1\u6709\u4efb\u4f55\u6807\u70b9\u7b26\u53f7\u7684\u5f88\u957f\u7684\u53e5\u5b50\u5b83\u4f1a\u4e00\u76f4\u7ee7\u7eed\u4e0b\u53bb\u76f4\u5230\u8d85\u8fc7\u6700\u5927\u957f\u5ea6\u4e3a\u6b62\u8fd9\u662f\u4e00\u4e2a\u6ca1\u6709\u4efb\u4f55\u6807\u70b9\u7b26\u53f7\u7684\u5f88\u957f\u7684\u53e5\u5b50\u5b83\u4f1a\u4e00\u76f4\u7ee7\u7eed\u4e0b\u53bb\u76f4\u5230\u8d85\u8fc7\u6700\u5927\u957f\u5ea6\u4e3a\u6b62\u8fd9\u662f\u4e00\u4e2a\u6ca1\u6709\u4efb\u4f55\u6807\u70b9\u7b26\u53f7\u7684\u5f88\u957f\u7684\u53e5\u5b50\u5b83\u4f1a\u4e00\u76f4\u7ee7\u7eed\u4e0b\u53bb\u76f4\u5230\u8d85\u8fc7\u6700\u5927\u957f\u5ea6\u4e3a\u6b62\u8fd9\u662f\u4e00\u4e2a\u6ca1\u6709\u4efb\u4f55\u6807\u70b9\u7b26\u53f7\u7684\u5f88\u957f\u7684\u53e5\u5b50\u5b83\u4f1a\u4e00\u76f4\u7ee7\u7eed\u4e0b\u53bb\u76f4\u5230\u8d85\u8fc7\u6700\u5927\u957f\u5ea6\u4e3a\u6b62",
+   "max_chars": 40,
+   "chunks": [
+    {
+     "text": "\u8fd9\u662f\u4e00\u4e2a\u6ca1\u6709\u4efb\u4f55\u6807\u70b9\u7b26\u53f7\u7684\u5f88\u957f\u7684\u53e5\u5b50\u5b83\u4f1a\u4e00\u76f4\u7ee7\u7eed\u4e0b\u53bb\u76f4\u5230\u8d85\u8fc7\u6700\u5927\u957f\u5ea6\u4e3a\u6b62\u8fd9\u662f\u4e00\u4e2a",
+     "pause_after": "sentence"
+    },
+    {
+     "text": "\u6ca1\u6709\u4efb\u4f55\u6807\u70b9\u7b26\u53f7\u7684\u5f88\u957f\u7684\u53e5\u5b50\u5b83\u4f1a\u4e00\u76f4\u7ee7\u7eed\u4e0b\u53bb\u76f4\u5230\u8d85\u8fc7\u6700\u5927\u957f\u5ea6\u4e3a\u6b62\u8fd9\u662f\u4e00\u4e2a\u6ca1\u6709\u4efb\u4f55",
+     "pause_after": "sentence"
+    },
+    {
+     "text": "\u6807\u70b9\u7b26\u53f7\u7684\u5f88\u957f\u7684\u53e5\u5b50\u5b83\u4f1a\u4e00\u76f4\u7ee7\u7eed\u4e0b\u53bb\u76f4\u5230\u8d85\u8fc7\u6700\u5927\u957f\u5ea6\u4e3a\u6b62\u8fd9\u662f\u4e00\u4e2a\u6ca1\u6709\u4efb\u4f55\u6807\u70b9\u7b26\u53f7",
+     "pause_after": "sentence"
+    },
+    {
+     "text": "\u7684\u5f88\u957f\u7684\u53e5\u5b50\u5b83\u4f1a\u4e00\u76f4\u7ee7\u7eed\u4e0b\u53bb\u76f4\u5230\u8d85\u8fc7\u6700\u5927\u957f\u5ea6\u4e3a\u6b62",
+     "pause_after": "end"
+    }
+   ]
+  },
+  {
+   "text": "\u00dcn\u00efc\u00f6d\u00e9 w\u00f6rds \u00e4r\u00eb h\u00ebr\u00eb and they go on, \u00fcn\u00efc\u00f6d\u00e9 w\u00f6rds \u00e4r\u00eb h\u00ebr\u00eb and they go on, \u00dcn\u00efc\u00f6d\u00e9 w\u00f6rds \u00e4r\u00eb h\u00ebr\u00eb and they go on, \u00fcn\u00efc\u00f6d\u00e9 w\u00f6rds \u00e4r\u00eb h\u00ebr\u00eb and they go on, \u00dcn\u00efc\u00f6d\u00e9 w\u00f6rds \u00e4r\u00eb h\u00ebr\u00eb and they go on, \u00fcn\u00efc\u00f6d\u00e9 w\u00f6rds \u00e4r\u00eb h\u00ebr\u00eb and they go on, \u00dcn\u00efc\u00f6d\u00e9 w\u00f6rds \u00e4r\u00eb h\u00ebr\u00eb and they go on, \u00fcn\u00efc\u00f6d\u00e9 w\u00f6rds \u00e4r\u00eb h\u00ebr\u00eb and they go on, ",
+   "max_chars": 60,
+   "chunks": [
+    {
+     "text": "\u00dcn\u00efc\u00f6d\u00e9 w\u00f6rds \u00e4r\u00eb h\u00ebr\u00eb and they go on,",
+     "pause_after": "sentence"
+    },
+    {
+     "text": "\u00fcn\u00efc\u00f6d\u00e9 w\u00f6rds \u00e4r\u00eb h\u00ebr\u00eb and they go on,",
+     "pause_after": "sentence"
+    },
+    {
+     "text": "\u00dcn\u00efc\u00f6d\u00e9 w\u00f6rds \u00e4r\u00eb h\u00ebr\u00eb and they go on,",
+     "pause_after": "sentence"
+    },
+    {
+     "text": "\u00fcn\u00efc\u00f6d\u00e9 w\u00f6rds \u00e4r\u00eb h\u00ebr\u00eb and they go on,",
+     "pause_after": "sentence"
+    },
+    {
+     "text": "\u00dcn\u00efc\u00f6d\u00e9 w\u00f6rds \u00e4r\u00eb h\u00ebr\u00eb and they go on,",
+     "pause_after": "sentence"
+    },
+    {
+     "text": "\u00fcn\u00efc\u00f6d\u00e9 w\u00f6rds \u00e4r\u00eb h\u00ebr\u00eb and they go on,",
+     "pause_after": "sentence"
+    },
+    {
+     "text": "\u00dcn\u00efc\u00f6d\u00e9 w\u00f6rds \u00e4r\u00eb h\u00ebr\u00eb and they go on,",
+     "pause_after": "sentence"
+    },
+    {
+     "text": "\u00fcn\u00efc\u00f6d\u00e9 w\u00f6rds \u00e4r\u00eb h\u00ebr\u00eb and they go on,",
+     "pause_after": "end"
+    }
+   ]
+  },
+  {
+   "text": "Visit averyveryverylongtokenwithoutanyspacesaveryveryverylongtokenwithoutanyspacesaveryveryverylongtokenwithoutanyspacesaveryveryverylongtokenwithoutanyspacesaveryveryverylongtokenwithoutanyspaces today.",
+   "max_chars": 50,
+   "chunks": [
+    {
+     "text": "Visit",
+     "pause_after": "sentence"
+    },
+    {
+     "text": "averyveryverylongtokenwithoutanyspacesaveryveryver",
+     "pause_after": "sentence"
+    },
+    {
+     "text": "ylongtokenwithoutanyspacesaveryveryverylongtokenwi",
+     "pause_after": "sentence"
+    },
+    {
+     "text": "thoutanyspacesaveryveryverylongtokenwithoutanyspac",
+     "pause_after": "sentence"
+    },
+    {
+     "text": "esaveryveryverylongtokenwithoutanyspaces today.",
+     "pause_after": "end"
+    }
+   ]
+  },
+  {
+   "text": "Short. xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "max_chars": 40,
+   "chunks": [
+    {
+     "text": "Short.",
+     "pause_after": "sentence"
+    },
+    {
+     "text": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+     "pause_after": "sentence"
+    },
+    {
+     "text": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+     "pause_after": "sentence"
+    },
+    {
+     "text": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+     "pause_after": "end"
+    }
+   ]
+  },
+  {
+   "text": "First sentence is here. Then a tiny one. Ok.",
+   "max_chars": 30,
+   "chunks": [
+    {
+     "text": "First sentence is here.",
+     "pause_after": "sentence"
+    },
+    {
+     "text": "Then a tiny one. Ok.",
+     "pause_after": "end"
+    }
+   ]
+  },
+  {
+   "text": "It said \"Stop.\" Then it went on. (A note.) [Ref.] 3 apples.",
+   "max_chars": 220,
+   "chunks": [
+    {
+     "text": "It said \"Stop. Then it went on. (A note. [Ref. 3 apples.",
+     "pause_after": "end"
+    }
+   ]
+  },
+  {
+   "text": "We met Prof. Plum, Dr. Who and Mrs. Peacock etc. They left. The U.S. team won.",
+   "max_chars": 220,
+   "chunks": [
+    {
+     "text": "We met Prof. Plum, Dr. Who and Mrs. Peacock etc. They left. The U.S. team won.",
+     "pause_after": "end"
+    }
+   ]
+  },
+  {
+   "text": "J. R. R. Tolkien wrote it. A. B. went home. I. Am. Here.",
+   "max_chars": 220,
+   "chunks": [
+    {
+     "text": "J. R. R. Tolkien wrote it. A. B. went home. I. Am. Here.",
+     "pause_after": "end"
+    }
+   ]
+  },
+  {
+   "text": "Line one\nLine two\n\n\nLine three  \n   \nLine four",
+   "max_chars": 220,
+   "chunks": [
+    {
+     "text": "Line one",
+     "pause_after": "paragraph"
+    },
+    {
+     "text": "Line two",
+     "pause_after": "paragraph"
+    },
+    {
+     "text": "Line three",
+     "pause_after": "paragraph"
+    },
+    {
+     "text": "Line four",
+     "pause_after": "end"
+    }
+   ]
+  },
+  {
+   "text": "Clause one is here, clause two is here; clause three is here: and clause four is here.",
+   "max_chars": 30,
+   "chunks": [
+    {
+     "text": "Clause one is here,",
+     "pause_after": "sentence"
+    },
+    {
+     "text": "clause two is here;",
+     "pause_after": "sentence"
+    },
+    {
+     "text": "clause three is here:",
+     "pause_after": "sentence"
+    },
+    {
+     "text": "and clause four is here.",
+     "pause_after": "end"
+    }
+   ]
+  },
+  {
+   "text": "Words\u00a0with\u00a0nbsp go here and keep going. Another sentence.",
+   "max_chars": 25,
+   "chunks": [
+    {
+     "text": "Words with nbsp go here",
+     "pause_after": "sentence"
+    },
+    {
+     "text": "and keep going. Another sentence.",
+     "pause_after": "end"
+    }
+   ]
+  },
+  {
+   "text": "\u00bfQu\u00e9 tal? \u00a1Muy bien! \u00c9l dijo: \u00abs\u00ed\u00bb. \u00c7a va? Oui.",
+   "max_chars": 20,
+   "chunks": [
+    {
+     "text": "\u00bfQu\u00e9 tal? \u00a1Muy bien!",
+     "pause_after": "sentence"
+    },
+    {
+     "text": "\u00c9l dijo: \u00abs\u00ed\u00bb. \u00c7a va? Oui.",
+     "pause_after": "end"
+    }
+   ]
+  },
+  {
+   "text": "Ends with question? yes lower case. 99 bottles. 'Quoted' start.",
+   "max_chars": 220,
+   "chunks": [
+    {
+     "text": "Ends with question? yes lower case. 99 bottles. 'Quoted' start.",
+     "pause_after": "end"
+    }
+   ]
+  },
+  {
+   "text": "",
+   "max_chars": 220,
+   "chunks": []
+  },
+  {
+   "text": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+   "max_chars": 220,
+   "chunks": [
+    {
+     "text": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+     "pause_after": "sentence"
+    },
+    {
+     "text": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+     "pause_after": "sentence"
+    },
+    {
+     "text": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+     "pause_after": "end"
+    }
+   ]
+  },
+  {
+   "text": "word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word ",
+   "max_chars": 220,
+   "chunks": [
+    {
+     "text": "word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word",
+     "pause_after": "sentence"
+    },
+    {
+     "text": "word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word",
+     "pause_after": "sentence"
+    },
+    {
+     "text": "word word word word word word word word word word word word",
+     "pause_after": "end"
+    }
+   ]
+  }
+ ],
+ "word_count": [
+  {
+   "text": "",
+   "count": 0
+  },
+  {
+   "text": "Hello world",
+   "count": 2
+  },
+  {
+   "text": "It's Ender's game",
+   "count": 3
+  },
+  {
+   "text": "\u6211\u4eec\u4eca\u5929\u8ba8\u8bba\u6cb3\u6d41",
+   "count": 8
+  },
+  {
+   "text": "\u65e5\u672c\u8a9e\u306e\u30c6\u30ad\u30b9\u30c8",
+   "count": 8
+  },
+  {
+   "text": "\ud55c\uad6d\uc5b4 \ubb38\uc7a5",
+   "count": 5
+  },
+  {
+   "text": "mixed \u4e2d\u6587 and English",
+   "count": 5
+  },
+  {
+   "text": "under_score words",
+   "count": 2
+  },
+  {
+   "text": "nai\u0308ve cafe\u0301",
+   "count": 3
+  },
+  {
+   "text": "x\u00b2 and \u00bd and \u2460",
+   "count": 5
+  },
+  {
+   "text": "1,000 people at 3.5 pm",
+   "count": 7
+  },
+  {
+   "text": "don't-stop",
+   "count": 2
+  },
+  {
+   "text": "   ",
+   "count": 0
+  },
+  {
+   "text": "\u2019curly\u2019 apostrophes",
+   "count": 2
+  },
+  {
+   "text": "\u00dcn\u00efc\u00f6d\u00e9 w\u00f6rds",
+   "count": 2
+  },
+  {
+   "text": "emoji \ud83d\ude00 here",
+   "count": 2
+  },
+  {
+   "text": "a\u001cb",
+   "count": 2
+  },
+  {
+   "text": "\uff8a\uff9d\uff76\uff78 half-width",
+   "count": 3
+  },
+  {
+   "text": "abc123 _ __ '",
+   "count": 4
+  }
+ ]
+}
