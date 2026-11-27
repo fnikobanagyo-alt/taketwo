@@ -191,10 +191,10 @@ Needs: S01. Gate: G5 (part).
 - One model test, ignored by default (`cargo test -p taketwo-voice --features metal -- --ignored qwen_smoke`): checks 8766 is idle, renders one short line from a reference made with macOS `say` in a temp folder, asserts the sample count is a multiple of 1920 before trimming, records seconds and peak memory. At most 3 takes. No claim about sound.
 - Done when: the unit tests pass and the ignored smoke test has run once with its numbers in PROGRESS.md.
 
-### S13 Whisper with word timings
-Needs: S02 (binding chosen and linking). Gate: G5 (part).
+### S13 Whisper with word timings (push)
+Needs: S02 (binding chosen and linking). Gate: G5 (part), G1 (word grouping). Push at the end (the native build changes). Binding details: lead decision 12 in PROGRESS.md.
 - `prototypes/scripts/convert_whisper_ggml.py`: converts the local MLX Whisper large-v3-turbo weights plus the local OpenAI tokenizer files to a ggml file in `rust/.models/` (Python from `backend/.venv`, read-only use). No download.
-- `taketwo-voice::whisper`: whisper.cpp through the thin binding, DTW token timings with the large-v3-turbo alignment preset, flash attention off; mlx-audio's word grouping ported; the same result shape as `ml.transcribe` (`text`, `segments`, `words` with start and end).
+- `taketwo-voice::whisper`: whisper.cpp through the thin binding, DTW token timings with the heads the Python app uses (all heads of the top 2 decoder layers, mlx-audio's default; the large-v3-turbo preset is measured beside it and the lead picks), flash attention off; mlx-audio's word grouping ported; the same result shape as `ml.transcribe` (`text`, `language`, `segments` with `start`, `end`, `text`, `avg_logprob`, `no_speech_prob`, and `words` with `word`, `start`, `end`, `p`: `reference.py` reads all of them).
 - Check (ignored test, one model at a time, 8766 idle): on three `say`-made clips, the Rust transcript's words equal Python's `ml.transcribe` words after `normalize_for_wer`, and word start/end differ by a stated tolerance; record the differences. This is map ticket #11's question, answered with numbers only.
 - If the conversion is not faithful after one session: stop, write what was tried, and the lead asks Franz about downloading `ggml-large-v3-turbo.bin`.
 - Done when: `cargo test -p taketwo-voice --features metal -- --ignored whisper_parity` has run and its numbers are in PROGRESS.md.
@@ -235,6 +235,7 @@ Needs: S17. Gate: G5 (the smoke reports whether studio ran); it completes decisi
 
 ### S19 Real synthesis smoke
 Needs: S17 (S18 optional). Gate: G5.
+- Also in this step (lead decision 12): `rust/ab/ab.py render` renders with the Rust engine first, so a 501 or a failed voice copy shows before any Python take is spent; `selftest` still passes.
 - `rust/scripts/synth_smoke.sh`: check 8766 is idle (else exit 75, "busy, try later"); pick one voice and copy one reference clip through `GET http://127.0.0.1:8766/api/profiles` and `GET /api/profiles/<id>/audio/<file>` into a temp folder; start `taketwo-engine` (release, `metal`) in isolated mode on a dev port with `TAKETWO_MAX_TAKES=20` under `/usr/bin/time -l`; create the voice from that clip; create one narration of 2-3 fixed sentences; wait; fetch the WAV, SRT and timings into `rust/out/smoke/`; stop the engine; delete the temp library.
 - It writes `rust/out/smoke/report.json`: takes used, seconds per phase, audio seconds, peak memory, the checks' result for each part (issues, outcome), which options ran (studio on or off). It prints "no quality claim; Franz listens".
 - Done when: the script exits 0, `report.json` shows `takes <= 20`, the WAV and SRT exist, and the numbers are in PROGRESS.md.
