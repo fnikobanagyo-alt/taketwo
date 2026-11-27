@@ -19,7 +19,7 @@ The loop appends one entry per session at the bottom: date, step id, what was bu
 | S10 Audio DSP with Python parity vectors | done (`taketwo_core::audio`, 12 golden tests; first pushed with S11a) |
 | S11a Take checks, ending guard, pitch measures | done, parts A to D (pushed; `taketwo_core::checks`, `ending_guard`, `delivery`; 9 golden, 23 ported, 1 unit test) |
 | S11b Mic match, master chain, final-mix edge check | todo (before S16; sentence pauses moved to S15) |
-| S12 Qwen voice (real model, Metal) | todo |
+| S12 Qwen voice (real model, Metal) | done, needs lead review (pushed `ae905d1`, Windows `check` green, run 45993201520; acceptance 2 fails on the empty `incremental` folder cargo always makes; smoke 2 takes after 1 refused) |
 | S13 Whisper with word timings | done, accepted (lead decision 13: heads = all heads of the top two decoder layers; pushed `c123c7b`, Windows `check` green, run 45968817348) |
 | S14 Speaker encoder | todo |
 | S15 Render pipeline A | done (no push; `taketwo_core::render`, 47 golden render cases + 6 widen vectors bit-equal, 27 ported tests; `5dc3606`) |
@@ -1835,3 +1835,65 @@ Acceptance commands (the lead runs them; `WT` is the worktree; none starts a mod
 - `lsof -nP -iTCP -sTCP:LISTEN | grep -E ':(879[0-589])' ; pgrep -fl 'rust-taketwo/rust/target/'` shows nothing of ours
 
 After S12: S14, S11b, S16 (push), S17, S19, S21.
+
+### 2026-11-27, builder (Opus), S12 Qwen voice (real model, Metal) (push)
+Commits: `731b658` (item 0), `0f36cb5` (QwenVoice and vendor edits), `856d5e9` (smoke test), `ae905d1` (decoder trim fix, smoke take knob). Pushed `ae905d1` to `rust/taketwo` (`840e41f..ae905d1`; S15 went up with it). `main` untouched (`4448aaa`).
+
+**Item 0.** Disk at start 11 GB free. Deleted hash folders under `target/debug/build/{candle-transformers,tokenizers,ort-sys,taketwo-core,taketwo-engine}/`, all older than the session start, keeping the two newest per crate: 19 GB free after. `build.rs` points `CMAKE` at `rust/.tools/bin/cmake` when `CMAKE` is unset and the file exists; `.cargo/config.toml` has `[build] incremental = false` (no `CMAKE` there). Plain shell (`command -v cmake` empty, no `env.sh`): `cargo test --workspace` exit 0, twice (before and after the qwen code).
+- **Acceptance command 2 cannot pass as written.** Cargo 1.100 creates an empty `target/debug/incremental` folder on every build even with `incremental = false` (checked: `rmdir` it, `cargo build -p taketwo-core`, the empty folder is back, 0 B). No incremental cache is written. I did not hide it; the lead can change the check to "empty" (`test -z "$(ls -A target/debug/incremental 2>/dev/null)"`).
+
+**What was built.**
+- `taketwo-voice::qwen`: `QwenVoice` implements `taketwo_core::render::Voice` unchanged. Loads once from `$TAKETWO_MODELS/qwen3-tts-1.7b-base` (lazily or by `load()`), keeps the model, `unload()`. Metal + bf16 under `metal`, CUDA + bf16 under `cuda` (dtype on CUDA is my choice: the lead named none), else CPU f32. Compiles with no feature (plain workspace run) and the Windows `check` job builds it.
+- Settings: `DEFAULTS` (0.7 / 0.9 / 40 / 1.05) then the caller's non-null params; `top_k` through Python `int()`. `max_tokens(e) = (12.5 * (e * 1.8 + 3.0)) as i64 + 8`; tested against 18 values printed by python3, including 8.2 (221.99999999999997, gives 229) and 16.2 (409) where float error and truncation matter. `LANG_NAMES`, unknown code gives `auto`. Seed: `mt_rng::set_seed(seed)` per take; the only non-test random draw in the crate is `sampling.rs` `global_uniform` (talker and code predictor), so the seed covers every draw of the take. **No take-level parity with Python** (MLX draws differ).
+- Report keys in Python's order: `tokens`, `token_limit`, `raw_samples`, `sample_rate`, `stop_reason`, `sampler` (top_k int, the rest float), `generation_route` (`icl_explicit_penalty`), `decoder` (`frames`, `samples`, `zero_codes` of the decoded reference-plus-generated codes, as `decode_unpadded` reports; `{}` when nothing was decoded).
+- Refuses the take when the crate cannot encode the reference (the crate silently fell back to x-vector only; VoiceForge always takes the ICL route). Refuses engines other than `qwen3-tts-1.7b`.
+- Cancel: read once per frame in both frame loops of `nn/generation.rs` (`generate_cancellable`, `generate_batch_cancellable`), at their start, and before the decode; a cancelled take returns the error `"cancelled"` (`qwen::CANCELLED`, the whisper binding's word); a failure returns anything else.
+- Vendor edits are listed in `rust/vendor/README.md` (6 items).
+
+**The three listening rules, what the crate does.**
+1. **Sub-talker.** The voice-clone path merges options with `generate_defaults` (`GenerateConfig::merge`, now wrapped as `merge_voice_clone`), and `ConditionalGeneration::generate` hands `sampling_config.for_subtalker()` to the code predictor, which copies `subtalker_temperature/top_k/top_p` and sets the repetition penalty to 1.0; the code predictor also calls `sample_token(.., &[])` (no history). So the two routes are one chain: `opts.subtalker_*` -> `SamplingConfig.subtalker_*` -> `for_subtalker()`. `QwenVoice` sets all three sub-talker values to the caller's every call. Side finding: `GenerateConfig::from_model_dir` reads `generate_config.json`, but the model folder has `generation_config.json`, so the crate's built-in defaults (0.9 / 50 / 1.0, same numbers) are what it falls back to. Tests: `qwen_subtalker_takes_the_callers_settings` (defaults and the model file's values both overridden, for the default and a non-default sampler), `qwen_repetition_penalty_on_codebook_0_only` (greedy: the 1.05 penalty moves the talker's pick, the sub-talker's config does not).
+2. **Exact cut.** `generate.rs` cut at `int(ref_len / decoded_len * audio_samples)` in f64. Replaced by `icl_trim`: `decode_unpadded` (refuse fewer than `frames x upsample` samples, cut to exactly that, count `zero_codes` in codebook 0) then drop `ref_len x upsample`, `upsample` read from the tokenizer config (`decode_upsample_rate`, 1920). The EOS step is no longer decoded with the take.
+3. **Trim and last frame.** Two causes found, both measured or tested:
+   - **Dropped reference frame** (169 against MLX's 170): the Candle encoder padded its strided convs on the left only, so N samples gave floor(N / 1920) frames. mimi's `StreamableConv1d` adds right-side extra padding (`get_extra_padding_for_conv1d`), giving ceil, and its final downsample pads with `edge`. Ported both. Test `encoder_convs_keep_a_partial_last_frame` (zero weights, lengths only): 5759 / 5760 / 5761 / 1 / 14400 samples give 3 / 3 / 4 / 1 / 8 frames.
+   - **Output not a multiple of 1920**: the first smoke run refused its take: "Qwen decoded only 131925 samples; expected 132480". Cause: `CausalConvTranspose1d` trimmed `kernel - stride` from **both** sides; mlx-audio trims the right only. In the 12 Hz decoder that loses 8 x 60 + 5 x 12 + 4 x 3 + 3 = 555 samples per decode (exactly the measured shortfall) and starts the audio 555 samples late. Fixed to right-only; test `transposed_conv_gives_exact_stride_multiples`; the smoke now measures the real decoder at 19200 samples for 10 frames. The proportional cut's f64 floor could also miss by a sample (the defect control in the ported test finds such lengths).
+   - `raw_samples % 1920 == 0` is checked in `QwenVoice` (an error otherwise) and asserted by the smoke; there is no trim after it.
+
+**Carried tests** (backend/tests/test_regressions.py, in `vendor/qwen_tts/src/model/generate.rs`):
+- `test_zero_codes_preserve_length_and_exact_reference_boundary`: ported (fake decoder = sample index; 7 + 13 frames with a zero code in each; 13 x 1920 samples from 7 x 1920 to 20 x 1920 - 1, `zero_codes` 2; the positive control shows the old proportional cut misses the boundary for some lengths).
+- `test_all_zero_codes_are_data_and_install_is_idempotent`: ported as `test_all_zero_codes_are_data`; "install is idempotent" does not apply (the vendored code is compiled in, there is no install step).
+- `test_short_decoder_output_is_rejected`: ported, same message.
+- `test_upstream_reference_change_fails_before_install`: no AST patch seam in Rust. Nearest guard: `the_proportional_reference_cut_is_gone` reads `generate.rs` and fails if a re-vendored file brings the proportional cut back or drops the `icl_trim` call. Plus `longer_decoder_output_is_cut_to_exact_frames`.
+
+**Smoke** (`source rust/scripts/env.sh && cargo test --release -p taketwo-voice --features metal -- --ignored qwen_smoke --nocapture`). Before each model run: 8766 `"loaded_engine":null,"running":null,"queued":0`, `memory_pressure` 50% then 63% free.
+- Run 1 (commit `856d5e9`): load fine, take 1 (seed 1) generated and then was refused by `decode_unpadded` (the 555-sample finding above). It counts as a take.
+- Run 2 (commit `ae905d1`), `QWEN_SMOKE_TAKES=2` so the step stays at 3 takes in all (seed 1, seed 1; seed 2 not run): written to `rust/out/qwen_smoke.json`.
+
+| | take 1 (seed 1) | take 2 (seed 1) |
+|---|---|---|
+| tokens / limit | 25 / 101 | 25 / 101 |
+| raw_samples, % 1920 | 48000, 0 | 48000, 0 |
+| stop_reason | ended_before_limit | ended_before_limit |
+| decoder frames / samples / zero_codes | 69 / 132480 / 0 | 69 / 132480 / 0 |
+| seconds / audio seconds | 3.34 / 2.0 | 3.07 / 2.0 |
+
+`same_seed_equal`: true (a measurement). Load 8.1 s. Peak `ru_maxrss` 4.76 GB (Metal buffers are not in RSS; the footprint was not measured). Reference: `say`, 24 kHz PCM16, 44 frames. No claim about sound; no WAV kept.
+
+**Disk.** 11 GB free at start, 19 GB after the cleanup, 13 GB before the second release smoke, 12 GB at the end.
+
+**Windows.** Run **45993201520** on `ae905d1`: job `check` **success** (the `temperature_floor` / `all_flagged_one_clip` vectors passed on Windows; no tolerance added). The two CUDA jobs were still running when this entry was written (not waited for, as instructed). Run **45981183667** (`840e41f`) finished: `build (cuda)` success, `build (cuda,flash-attn)` success, `check` success, so CUDA is confirmed on `840e41f`.
+
+**Acceptance commands.** 1 plain-shell workspace: exit 0. 2: **fails** (empty `incremental` folder, above). 3 `cargo test -p taketwo-voice qwen`: 7 passed. 4 `cargo test -p qwen_tts --lib`: 123 passed. 5 smoke JSON check: pass. 6 no diff since `1a3b802` in engine, mcp, shell, core/src, .github: pass. 7 backend/app and mcp equal to main: pass. 8 main unmoved and code pushed: pass. 9 Windows `check`: pass (run 45993201520). 10 `g8.sh`: G8 PASS. 11 no listener on 8790-8795/8798/8799, no process of ours: pass.
+
+**Rule slips (guidance, not real risks).**
+- The task's defaults rule ("take them from `taketwo_core::delivery`") could not be followed: core defines no Qwen defaults; only `taketwo-engine/src/api.rs` lists them (for `/api/engines`). `qwen::DEFAULTS` is now a second copy; I could not edit core or the engine in this step.
+- The smoke ran with 2 takes instead of 3 so the step stayed within 3 takes (run 1's refused take counts).
+- `taketwo-voice` moved `serde_json` from dev-dependencies to dependencies (already in `Cargo.lock`; no lock change).
+- The first plain-shell workspace run overlapped my first vendor edits (it compiled `qwen_tts` once mid-edit); the second run after all edits is the evidence.
+- No wiki receipt (outside the worktree).
+
+**Questions for the lead.**
+1. Acceptance 2: accept "the folder is empty" instead of "the folder does not exist"?
+2. Where should the Qwen defaults live (one copy for the engine and the voice), in a step allowed to edit `taketwo-core`?
+3. `render/mod.rs` lines 356, 598, 671 map a synthesize error straight to `RenderError::Other` before `check()`, so a cancel during a Qwen take ends as a failure, not `Cancelled`. S16 should map `Err(qwen::CANCELLED)` (or a set flag) to `Cancelled`.
+4. CUDA dtype: bf16 chosen (needs compute capability 8.0 or later for speed); say if f32 is wanted.
+5. The first-frame-EOS case returns empty audio with `decoder: {}`; Python would report the previous call's `decoder` (a stale attribute). Kept the honest `{}`.
