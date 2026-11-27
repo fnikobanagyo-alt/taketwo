@@ -97,7 +97,8 @@ Needs: S01. Gate: G6 (early).
 Needs: S01. Gate: G1.
 - Port `textproc.py` (entities, `clean_text`, `unwrap_lines`, `split_sentences`, `_split_long`, `chunk_text`, `word_count`) and `ml.normalize_for_wer`, `ml.wer` (jiwer behaviour), `pipeline._word_coverage`, `_final_word_missing`, `_first_word_missing`.
 - Tests read `contract/golden/clean_text.json` (18 cases) and `chunk_text.json` (8 cases) directly. For wer and word coverage, record vectors with `rust/golden/record.py` (runs the Python functions, `TAKETWO_DATA` temp, no model) into `rust/golden/text.json`.
-- Done when: `cargo test -p taketwo-core text` passes with every golden case.
+- `normalize_for_wer` is the transformers Whisper `EnglishTextNormalizer` (numbers, spellings from `normalizer.json`, symbols and diacritics), not a small helper: port it in full. `rust/golden/record.py` gets it from the tokenizer files only (`WhisperTokenizer.from_pretrained(..., local_files_only=True).normalize`, offline) and sets `ml._normalizer`; it never calls `stt_model()`. See lead decision 3 in PROGRESS.md.
+- Done when: `cargo test -p taketwo-core text` passes with every golden case and a passed count above zero.
 
 ### S04 Library store, seeder, one-time copy
 Needs: S01. Gate: G1, G2 (seeder).

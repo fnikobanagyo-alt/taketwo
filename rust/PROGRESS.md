@@ -306,3 +306,25 @@ Questions for the lead:
 - flash-attn when last read: run 45917033507 `failure` (00:29 to 01:38; log not read, the commit had the known ORT `/MD` clash); run 45921171833 still `in_progress`.
 - Hindsight was unreachable, so no `retain` was made. `env.sh` has left 8 empty `$TMPDIR/taketwo-data.*` folders in all.
 - Suggestions for the lead, not done so that G6 keeps its commit: `cargo build --locked` in CI, and a `dumpbin /dependents` line in the CUDA job to name the missing DLL.
+
+### 2026-11-27, lead, iteration 3 decision
+State checked by command: branch at `d2ebf73`, tree clean; `origin/rust/taketwo` at `e28e7ba`; `main` and `origin/main` still `4448aaa`; `git diff --stat rust/taketwo main -- backend/app mcp` empty; `g8.sh` exit 0; 8766 idle (`"running":null`, `"queued":0`); 35 GB disk free. Gates G2 to G5 and G7 have no evidence. Not done, not blocked on Franz.
+
+G8 attribution (checked with `g8.sh --names`, output not pasted): the 2 changed files under data/ are both Finder `.DS_Store` files (top level and `generations/`). No voice, audio or database file changed. App Support/VoiceForge differences are again browser cache and storage files from Franz's running app.
+
+Windows: run 45921171833 on `e28e7ba` still shows `build (cuda)` success and `check` success; `build (cuda,flash-attn)` is still in progress. flash-attn stays reported, not judged, and nobody waits on it.
+
+Answers to the S02 questions:
+1. A CUDA build that answers on a PC with no NVIDIA driver: no gate needs it. Open product question for Franz, logged here; no work now.
+2. NuGet as the source of the Windows ONNX Runtime DLL: accepted. It is a build-tool download with a pinned SHA-512.
+3. Keep relying on `g6.sh`'s ".md-only descendant" rule. It is still unproven against a real run; S07's push will show it. Also take the two builder suggestions at the next push step (S07): `cargo build --locked` in CI and a `dumpbin /dependents` line in the CUDA job.
+
+Expected and fine: once S03 commits code without a push, `g6.sh` returns 75 or 1 for the new commit. No builder pushes to "fix" that; the next push is S07.
+
+Found while preparing S03 (changes its size):
+- `ml.normalize_for_wer` is `stt_model()._processor.tokenizer.normalize`, which is the transformers Whisper `EnglishTextNormalizer` with the spelling map from the tokenizer's `normalizer.json`. In the Python app, calling it loads the Whisper model. The Rust port needs the whole normalizer (number words, currency, contractions, British to American spellings, symbol and diacritic removal with NFKD).
+- `ml.wer` is `min(jiwer.wer, 2 x jiwer.cer without spaces)` after removing brackets.
+- `_word_coverage` uses `difflib.SequenceMatcher.ratio()`, which must be ported exactly (matching blocks, autojunk rule), because the 0.6 limit decides.
+- The Python data folder variable is `TAKETWO_DATA` (then `VOICEFORGE_DATA`); importing `app.config` creates folders and importing `app.db` opens the database. `record.py` must set both variables to a temp folder and assert `config.DATA_DIR` is inside it before any other app import, as `contract/seed_python.py` does.
+
+Next step: **S03 Text logic**, alone. With the full normalizer it is a session of its own; S04 follows it. PLAN.md S03 now says so.
