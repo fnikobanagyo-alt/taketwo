@@ -20,6 +20,14 @@ fn main() {
         .unwrap_or_else(|| "unknown".into());
     println!("cargo:rustc-env=TAKETWO_WHISPER_COMMIT={commit}");
 
+    // A plain shell has no cmake on PATH; the cmake crate reads CMAKE, so point it at the dev copy
+    // in rust/.tools when that exists. Not set in .cargo/config.toml: the Windows runner has its own cmake.
+    println!("cargo:rerun-if-env-changed=CMAKE");
+    let dev_cmake = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../.tools/bin/cmake");
+    if std::env::var_os("CMAKE").is_none() && dev_cmake.exists() {
+        unsafe { std::env::set_var("CMAKE", &dev_cmake) };
+    }
+
     let cuda = std::env::var_os("CARGO_FEATURE_CUDA").is_some();
     // Metal only with the `metal` feature (Mac); the shader source is embedded, so no metal compiler runs.
     let metal = std::env::var_os("CARGO_FEATURE_METAL").is_some();
