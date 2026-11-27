@@ -16,8 +16,8 @@ The loop appends one entry per session at the bottom: date, step id, what was bu
 | S07b Engine: worker, stub renderer, lifecycle | done (pushed `2e4d02a`, Windows `check` green) |
 | S08 MCP server | done (G4 evidence, judged again after S16 for mp3) |
 | S09 Tauri shell | done (G3 pass, pushed `e9ee6a4`, Windows `check` green) |
-| S10 Audio DSP with Python parity vectors | done (not pushed; `taketwo_core::audio`, 12 golden tests) |
-| S11a Take checks, ending guard, pitch measures | todo (next; split from S11 by lead decision 14) |
+| S10 Audio DSP with Python parity vectors | done (`taketwo_core::audio`, 12 golden tests; first pushed with S11a) |
+| S11a Take checks, ending guard, pitch measures | done, parts A to D (pushed; `taketwo_core::checks`, `ending_guard`, `delivery`; 9 golden, 23 ported, 1 unit test) |
 | S11b Mic match, master chain, sentence pauses, final-mix edge check | todo (before S16) |
 | S12 Qwen voice (real model, Metal) | todo |
 | S13 Whisper with word timings | done, accepted (lead decision 13: heads = all heads of the top two decoder layers; pushed `c123c7b`, Windows `check` green, run 45968817348) |
@@ -1396,3 +1396,274 @@ Report only: the timing sensitivity table; the tolerance table with measured max
 Safety for this step (Franz's standing policy, PLAN.md): real risks are touching `data/`, App Support/VoiceForge or saved voices or narrations; anything but a GET to ports 8765-8785; pushing anything other than `rust/taketwo`; a model run; editing outside the worktree. Set `safety_ok=false` only for one of those. `backend/.venv` is read-only (run its Python with `-B`). Every signal is synthetic. Never write that audio is good or matching: report the numbers. Commit on `rust/taketwo` after each green part, message ending `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`.
 
 After S11a: S11b, then S15; S12 and S14 when swap allows; S16 (push), S17, S19, S21.
+
+### 2026-11-27, builder (Opus), S11a Take checks, ending guard, pitch measures (push)
+All four parts are done; nothing is handed to S11b. No model, no synthesis (0 takes), no engine, MCP or shell change, no `.github` change, no `cargo update`. Every signal is synthetic. Franz's app on 8766 was asked only `GET /api/status` (`"running":null`, `"queued":0`).
+
+Commits: `52215b1` (A), `228b34b` (B), `bc5618d` (C), `e1c4a44` (D), then a recorder fix and this entry.
+
+**A. One transcript type.** `Transcript`, `Segment` and `Word` moved unchanged to `taketwo_core::transcript`. `taketwo-voice::whisper` re-exports them with `pub use`. `taketwo-core`'s `serde` gained the `derive` feature; the lock gained no package.
+
+**B. The recorder.** `rust/golden/record_checks.py` is a sibling of `record_audio.py` and has the same guards:
+- the temporary data folder is asserted before any app import;
+- `HF_HUB_OFFLINE=1`;
+- `ml.stt_model` and `ml.transcribe` raise;
+- the Whisper normalizer comes from tokenizer files, as `record.py` loads it;
+- `audio.subprocess` is replaced;
+- numba's cache goes to the temporary folder. A listing of librosa's `__pycache__` in the venv was the same before and after.
+
+What it writes:
+- `checks.json` (0.73 MB) and 5.8 MB of float32 arrays under `rust/golden/checks/`: `du -sk` gives 6068.
+- `speech_f45` is reused from `rust/golden/audio/`.
+- Arrays are stored once per content.
+- Outputs of the shifted-timing runs are stored as a SHA-256, which Rust must match bit for bit, to stay inside 6 MB.
+- Most takes are 16 kHz for the same reason. One clean take and `speech_f45` are 24 kHz.
+
+The cases:
+- **`evaluate`:** 39 cases.
+  - Every issue fires: `empty`, `cut_off` from the ending, `cut_off` from inside, `cut_off` twice in one list, `lead_burst`, `junk_tail`, `odd_pause`, `end_word_missing`, `start_word_missing`, `long_silence`, `too_long` (one word, the 0.8 s floor), `too_short`, `voice_drift`, `noise`, `clipping`, `mispronounced`, `wrong_words`.
+  - Also: 18 clean takes (issues `[]`), the no-words branch, a 0.75 s take (similarity not called), and the `self_sim` floor under 1e-3.
+  - Each of the 9 accepted punctuation marks after a 0.62 s pause.
+  - Both sides of the 0.5 s gap, `max_internal_silence`, the 0.3 s length, `noise_max` 0.09 and 0.5, and `min_speaker_similarity` (0.851 and 0.849).
+  - Each run stores every key, the dtype of each number, whether similarity was called, the length it was handed, and that it was handed the returned audio.
+- **`_internal_sentence_cut`:** 6 cases: a loud stop, a decaying stop, `Mr.`, a gap under 0.15 s, a segment under 0.2 s, and a late next word.
+- **`ending_guard`:**
+  - `synthesis_text`: 10 cases, covering every branch and end mark.
+  - `_tokens`: 13 cases, including ß, ſ, final Σ, İ, CJK, underscores and fullwidth letters.
+  - `remove_context`: 9 cases, covering two successes and each of the six messages.
+- **`noise_limit`:** 13 cases: the arithmetic, plus `round(max(vals), 3)` over synthetic WAVs in the temporary profile folder, with `put_profile` replaced.
+- **`resolve`:** 560 cases: 7 built-in specs, 10 settings, 4 base parameter sets, 2 QC dicts. The Qwen keys are checked against `engines.QWEN_PARAMS`.
+- **`pick_variant`:** 64 cases: 8 profiles at 8 styles, including ties, no variants, and untagged variants.
+- **`expressiveness`:** 4 cases.
+- **`prosody`:** 12 cases: tones of 100, 220 and 400 Hz; a glide up (24 kHz input) and a glide down; vibrato; speech-like harmonics over -40 dB noise at 16 and 24 kHz; under 0.8 s; under 10 voiced frames; and octave jumps (19 of 60 voiced frames dropped). librosa is 0.11.0.
+
+Knife edges:
+- `builtins.round` is wrapped in `pipeline`, `delivery` and `ending_guard`, and fails on a value within 1e-9 of a half (1e-3 for the pitch decisions).
+- An exact binary half is kept as a ties-to-even case: `guidance_scale` 2.625 at the default similarity.
+- Five pitch cases were moved off an edge by a seeded nudge (`redesigns` per case: tone_220 1, tone_400 14, glide_down 2, vibrato 3, speech_noise 2).
+- A second run is byte-identical, and so is `record_audio.py`'s output.
+
+**C. Checks and ending guard** (`taketwo_core::checks`, `taketwo_core::ending_guard`):
+- `evaluate(a, sr, text, self_sim, wps, &Limits, noise_max, &Transcript, similarity)` returns an `Evaluation`. Its `details` is `None` on the `empty` early return, which has 8 keys. `Ending` has `trim_start` and `head_pad_s` as `Option`s (words branch only).
+- `internal_sentence_cut`, `HARD_ISSUES`, `noise_limit(baseline)` and `noise_baseline(vals)`.
+- `py_round` is Python `round(x, n)` (`{:.n}`, ties to even on the exact value). A unit test checks it on halves.
+- `remove_context` takes `&[Word]` and returns a `Removed` struct (cut audio, kept text and words, info) or `UnsafeBoundary` with Python's message.
+- `tokens` hand-folds ß, ſ, final sigma, ligatures and Greek symbol forms before `to_lowercase` (code comment `shortcut:`).
+- float32 against a Python float compares in float32, as numpy 2 does: the `percentile - 40` line, the `threshold_db` test and the trough threshold.
+
+**D. Pitch measures** (`taketwo_core::delivery`):
+- `yin` is ported from librosa 0.11.0's source. It covers centre padding, framing, the difference function (with librosa's row-0 zeroing, so `d(1)` subtracts 0), the cumulative mean normalised difference plus float32 `tiny`, the numba parabolic stencil (float64, stored float32, 0 at both edges), `localmin`, the 0.1 float32 trough threshold, the first-argmin fallback, and `sr / (min_period + period + shift)`.
+- Python's autocorrelation runs in float32 through scipy's FFT. The port sums directly in float64.
+- `prosody` follows numpy's precision: `np.std` of the float32 levels stays float32, `np.median` is the mean of the two middle values, and `np.percentile` is linear.
+- `expressiveness`, `resolve` (`keys` = the spec's parameter keys; key order and int/float compared) and `pick_variant` (first of equal values, as Python's `max` and `min` with a key).
+- `default_voice_settings` stays defined once, in `pipeline.rs`, and `delivery` re-exports it.
+
+Measured maxima against the lead's tolerances (from `cargo test -p taketwo-core --test checks_golden --test delivery_golden -- --nocapture`):
+
+| Check | Tolerance | Measured |
+|---|---|---|
+| `evaluate`: issues and order, cut and trim in samples, lengths, similarity calls; rounded `score`, `wer`, `sim`, `max_gap`, `dur` | exact / equal | exact on 115 runs (39 cases, three timings) |
+| `evaluate` audio (given timing) / shifted timings | 1e-6 / bit-equal | 0 / bit-equal |
+| `evaluate` seconds (gaps, ending, trim) / `last_level` | 1e-9 / 1e-3 dB | 0 / 0 |
+| `_internal_sentence_cut` | exact | exact on 18 runs |
+| `remove_context`: raised or not, message, cut in samples, words / seconds / `threshold_db` | exact / 1e-9 / 1e-3 dB | exact on 27 runs / 0 / 0 |
+| `synthesis_text`, `_tokens`, `noise_limit`, `HARD_ISSUES` | exact | exact |
+| `resolve` (560), `pick_variant` (64), `expressiveness` (4) | exact | exact |
+| `prosody` voiced mask, frames kept after the octave filter | exact | exact (12 cases, 506 voiced frames) |
+| `yin` f0 on voiced frames, run on Python's own 16 kHz input | 1e-3 Hz | 8.9e-5 Hz (Python's float32 FFT autocorrelation against float64 sums here) |
+| `pitch_st`, `pitch_range`, `dyn_db`, `pitch_hz` end to end | 1e-4 | 3.8e-5 |
+| `round(pitch_hz, 1)`, `round(pitch_st / r, 2)` for r = 0.5, 1, 2 | exact | exact |
+| resample to 16 kHz (S10's tolerance 1e-4) | 1e-4 | 1.2e-7 |
+
+Smallest margins, each the case closest to its limit:
+- duration ratio: 0.0625;
+- expected floor: 0.031 s;
+- clipping: 0.003;
+- `noise_max`: 0.06 s;
+- `max_wer` 0.08 and the 0.35 line 0.05;
+- relative similarity: 0.0014;
+- `self_sim` floor: 0.0005;
+- `max_internal_silence`: 0.1 s;
+- odd-pause gap and word boundary: 0.06 s;
+- the 0.3 s length: 160 samples;
+- internal cut level: 0.032 dB;
+- `threshold_db` window: 0.073 dB;
+- pitch: level 0.26 dB, f0 against 62/410 Hz 0.23 Hz, yin trough 7.3e-5, octave line 0.005 st.
+
+Timing sensitivity: every word time was shifted by -0.16 s (floored at 0) and by +0.16 s. Rust equals Python on all three timings.
+
+| Function | Cases with words | Changed by a shift | Which |
+|---|---|---|---|
+| `evaluate` | 38 | 2 of 76 runs | `clean_24k` -0.16: trim start only (issues unchanged); `junk_tail` +0.16: issues `["junk_tail"]` become `["too_long"]` and the cut moves (the take keeps the stray sound: 1.59 s against 1.1 s) |
+| `_internal_sentence_cut` | 6 | 2 of 12 | `short_segment` +0.16 and `late_next_word` +0.16: the decision becomes a cut |
+| `remove_context` | 9 | 2 of 18 | `ok` and `ok_unpunctuated` -0.16: rejected instead of cut |
+
+Tests in the five backend files: 153 in all. 22 are ported to `tests/checks_ported.rs`, with their own fixtures and the real normalizer. One more test there checks `HARD_ISSUES`. One is covered by a golden case. The rest are covered by earlier steps or left out with the step that owns them:
+
+`test_narration_quality.py`:
+- `test_take_far_from_the_voice_median_is_retaken`: left out: S15 (pitch gate in render_chunk; the prosody numbers it reads are ported here)
+- `test_take_far_from_its_neighbour_part_is_retaken`: left out: S15 (pitch gate in render_chunk; the prosody numbers it reads are ported here)
+- `test_closest_pitch_is_kept_when_every_take_is_off`: left out: S15 (pitch gate in render_chunk; the prosody numbers it reads are ported here)
+- `test_voice_without_a_stored_median_is_not_gated`: left out: S15 (pitch gate in render_chunk; the prosody numbers it reads are ported here)
+- `test_short_full_stop_is_widened_to_the_target_without_touching_speech`: left out: S11b (sentence pauses, mastering)
+- `test_full_stop_misheard_as_a_comma_is_still_widened`: left out: S11b (sentence pauses, mastering)
+- `test_pause_goes_after_the_word_not_into_a_dip_inside_it`: left out: S11b (sentence pauses, mastering)
+- `test_long_enough_pause_and_comma_are_left_alone`: left out: S11b (sentence pauses, mastering)
+- `test_full_stop_inside_a_part_gets_the_setting_when_turned_on`: left out: S11b (sentence pauses)
+- `test_kept_word_times_follow_the_widened_audio`: left out: S16 (word timings of the finished file)
+- `test_off_by_default_until_a_length_is_chosen_by_ear`: left out: S11b (sentence pauses, mastering)
+- `test_sentence_and_word_times_are_in_the_final_file_after_speed`: left out: S16 (word timings of the finished file)
+- `test_misheard_word_takes_the_time_between_its_neighbours`: left out: S16 (word timings of the finished file)
+- `test_older_narration_without_word_times_gets_estimated_times`: left out: S16 (word timings of the finished file)
+- `test_style_and_stability_reach_the_narration_request`: left out: S15 (the render request; resolve and pick_variant themselves are golden cases here)
+- `test_default_request_keeps_the_voice_settings_untouched`: left out: S15 (the render request; resolve and pick_variant themselves are golden cases here)
+- `test_timings_come_from_the_narration`: left out: S16 (word timings of the finished file)
+- `test_voice_gains_its_median_pitch_without_touching_its_clips`: left out: S17 (backfill)
+`test_ending_guard.py`:
+- `test_english_qwen_only_gets_continuation_when_explicitly_enabled`: ported (`checks_ported.rs`)
+- `test_unsupported_engines_and_languages_are_unchanged`: ported (`checks_ported.rs`)
+- `test_default_qwen_text_is_unchanged`: ported (`checks_ported.rs`)
+- `test_unpunctuated_chunk_has_sentence_separator`: ported (`checks_ported.rs`)
+- `test_quiet_release_preserved_and_context_not_exported`: ported (`checks_ported.rs`)
+- `test_whisper_end_time_alone_does_not_cut_the_audio`: ported (`checks_ported.rs`)
+- `test_closure_inside_last_word_is_not_selected`: ported (`checks_ported.rs`)
+- `test_no_pause_is_rejected_without_saving_dummy_words`: ported (`checks_ported.rs`)
+- `test_missing_context_word_is_rejected`: ported (`checks_ported.rs`)
+- `test_missing_target_word_is_rejected`: ported (`checks_ported.rs`)
+- `test_identical_context_in_script_uses_final_occurrence`: ported (`checks_ported.rs`)
+- `test_default_render_does_not_synthesize_or_remove_dummy_context`: left out: S15 (render_chunk, _guarded_take, pitch gate)
+- `test_false_string_cannot_accidentally_enable_experimental_context`: left out: render, queue, library or HTTP behaviour (S15 to S17 or earlier steps); no function of this step
+- `test_real_render_path_saves_separate_context_evidence`: left out: S15 (render_chunk, _guarded_take, pitch gate)
+- `test_all_unsafe_takes_leave_old_audio_untouched`: left out: render, queue, library or HTTP behaviour (S15 to S17 or earlier steps); no function of this step
+- `test_each_sentence_inside_one_part_is_guarded`: left out: S15 (render_chunk, _guarded_take, pitch gate)
+- `test_new_narration_can_continue_with_flagged_plain_fallback`: left out: render, queue, library or HTTP behaviour (S15 to S17 or earlier steps); no function of this step
+- `test_bad_second_boundary_does_not_regenerate_first_sentence`: left out: S15 (render_chunk, _guarded_take, pitch gate)
+`test_repeat_cutoff.py`:
+- `test_when_every_take_fails_the_last_one_uses_another_clip`: left out: S15 (render_chunk, _guarded_take, pitch gate)
+- `test_a_passing_take_keeps_the_chosen_clip`: left out: render, queue, library or HTTP behaviour (S15 to S17 or earlier steps); no function of this step
+- `test_two_generations_do_not_repeat_the_same_take_seed`: left out: S15 (render_chunk, _guarded_take, pitch gate)
+- `test_repeated_render_even_without_regen_counter_has_new_seed`: left out: S15 (render_chunk, _guarded_take, pitch gate)
+- `test_render_avoids_previous_seed_even_if_random_nonce_repeats`: left out: S15 (render_chunk, _guarded_take, pitch gate)
+- `test_learned_duration_budget_survives_a_later_render`: left out: S15 (render_chunk, _guarded_take, pitch gate)
+- `test_quiet_first_sound_is_not_trimmed_or_faded`: ported (`checks_ported.rs`)
+- `test_quiet_tail_is_kept_past_old_scan_limit`: covered by S10 (`audio_golden.rs`) or later audio steps; no check function
+- `test_one_quiet_frame_does_not_hide_an_abrupt_model_stop`: covered by S10 (`audio_golden.rs`) or later audio steps; no check function
+- `test_evaluate_keeps_a_short_release_after_a_long_closure`: ported (`checks_ported.rs`)
+- `test_final_check_rejects_a_tail_lost_before_assembly`: left out: S15/S16 (render pipeline)
+- `test_joining_legacy_unpadded_chunks_does_not_fade_spoken_samples`: covered by S10 (`audio_golden.rs`) or later audio steps; no check function
+- `test_raw_clip_partial_final_frame_is_preserved`: covered by S10 (`audio_golden.rs`) or later audio steps; no check function
+- `test_missing_first_word_is_a_hard_issue_in_real_evaluate`: ported (`checks_ported.rs`)
+- `test_missing_first_word_cannot_pass_low_overall_wer`: covered by S03 (`text_golden.rs`, word coverage and WER)
+- `test_previous_come_does_not_cover_missing_home`: covered by S03 (`text_golden.rs`, word coverage and WER)
+- `test_split_names_still_match_at_both_edges`: covered by S03 (`text_golden.rs`, word coverage and WER)
+- `test_short_expander_keeps_shape_without_crashing`: left out: S11b (sentence pauses, mastering)
+- `test_final_check_rejects_a_silent_processed_export`: left out: S15/S16 (render pipeline)
+- `test_final_check_accepts_undamaged_processed_export`: left out: S15/S16 (render pipeline)
+- `test_final_check_rejects_a_processed_tail_removed_after_good_raw`: left out: S15/S16 (render pipeline)
+- `test_final_check_accepts_real_atempo_speed_changes`: left out: S15/S16 (render pipeline)
+`test_regressions.py`:
+- `test_zero_codes_preserve_length_and_exact_reference_boundary`: left out: needs the model code (S12)
+- `test_all_zero_codes_are_data_and_install_is_idempotent`: left out: needs the model code (S12)
+- `test_short_decoder_output_is_rejected`: left out: needs the model code (S12)
+- `test_upstream_reference_change_fails_before_install`: left out: needs the model code (S12)
+- `test_padding_never_repairs_a_hard_stop`: covered by S10 (`audio_golden.rs`) or later audio steps; no check function
+- `test_natural_decay_is_a_positive_pass_control`: covered by S10 (`audio_golden.rs`) or later audio steps; no check function
+- `test_evaluate_keeps_untouched_evidence_and_does_not_fade_speech_tail`: ported (`checks_ported.rs`)
+- `test_oversized_clause_preserves_prior_clauses_and_order`: covered by S03/S05 (text, captions)
+- `test_sentence_and_paragraph_grouping_preserves_all_words`: covered by S03/S05 (text, captions)
+- `test_final_scan_checks_raw_cutoff_despite_fade_and_padding`: left out: S15/S16 (render pipeline)
+- `test_final_scan_preserves_legacy_known_failures`: left out: S15/S16 (render pipeline)
+- `test_render_saves_raw_float_and_keeps_cutoff_flagged`: left out: S15 (render_chunk, _guarded_take, pitch gate)
+- `test_clean_take_outranks_lower_scoring_failed_take`: left out: S15 (render_chunk, _guarded_take, pitch gate)
+- `test_token_cap_is_never_a_clean_take`: left out: S15 (render_chunk, _guarded_take, pitch gate)
+- `test_assembly_preserves_part_duration_and_wav_export`: left out: S15/S16 (render pipeline)
+- `test_single_part_replacement_and_final_mix_are_rechecked`: left out: render, queue, library or HTTP behaviour (S15 to S17 or earlier steps); no function of this step
+- `test_failed_replacement_remains_flagged_and_is_not_reported_fixed`: left out: render, queue, library or HTTP behaviour (S15 to S17 or earlier steps); no function of this step
+`test_audit_fixes.py`:
+- `test_short_terminal_sound_after_a_pause_is_kept`: covered by S10 (`audio_golden.rs`) or later audio steps; no check function
+- `test_next_phrase_after_a_long_silence_is_not_kept`: covered by S10 (`audio_golden.rs`) or later audio steps; no check function
+- `test_a_faint_tail_does_not_hide_a_hard_stop`: covered by S10 (`audio_golden.rs`) or later audio steps; no check function
+- `test_a_short_last_word_alone_is_not_a_cut`: ported (`checks_ported.rs`)
+- `test_a_title_like_mr_is_not_a_sentence_end_inside_a_take`: ported (`checks_ported.rs`)
+- `test_the_next_sentence_starting_early_is_not_a_cut`: ported (`checks_ported.rs`)
+- `test_valid_short_final_word_is_not_junk`: covered by S10 (`audio_golden.rs`) or later audio steps; no check function
+- `test_expander_keeps_quiet_word_tails`: left out: S11b (sentence pauses, mastering)
+- `test_de_esser_keeps_soft_fricative_endings`: left out: S11b (sentence pauses, mastering)
+- `test_valid_short_final_word_passes_the_final_check`: left out: S15/S16 (render pipeline)
+- `test_dropped_last_word_is_rejected`: ported (`checks_ported.rs`)
+- `test_complete_last_word_is_accepted`: ported (`checks_ported.rs`)
+- `test_hard_stop_after_first_sentence_is_rejected`: ported (`checks_ported.rs`)
+- `test_natural_sentence_ends_pass`: ported (`checks_ported.rs`)
+- `test_overlong_unspaced_run_is_split`: covered by S03/S05 (text, captions)
+- `test_cjk_counts_as_words`: covered by S03/S05 (text, captions)
+- `test_unspaced_caption_does_not_crash`: covered by S03/S05 (text, captions)
+- `test_non_latin_download_header_encodes`: covered by S03/S05 (text, captions)
+- `test_invalid_setting_is_rejected`: left out: render, queue, library or HTTP behaviour (S15 to S17 or earlier steps); no function of this step
+- `test_custom_model_gets_its_family_parameters`: left out: render, queue, library or HTTP behaviour (S15 to S17 or earlier steps); no function of this step
+- `test_same_basename_models_get_distinct_ids`: left out: render, queue, library or HTTP behaviour (S15 to S17 or earlier steps); no function of this step
+- `test_frontend_route_cannot_leave_the_build_folder`: left out: render, queue, library or HTTP behaviour (S15 to S17 or earlier steps); no function of this step
+- `test_deleted_narration_is_not_recreated_by_a_running_worker`: left out: render, queue, library or HTTP behaviour (S15 to S17 or earlier steps); no function of this step
+- `test_title_edit_during_render_is_kept`: left out: S15 (render_chunk, _guarded_take, pitch gate)
+- `test_failed_speed_export_keeps_wav_and_mp3_together`: left out: S15/S16 (render pipeline)
+- `test_failed_respeak_restores_text_and_audio`: left out: S15/S16 (render pipeline)
+- `test_stopped_respeak_restores_text_and_audio`: left out: S15/S16 (render pipeline)
+- `test_respeak_rejects_text_that_is_too_long`: left out: render, queue, library or HTTP behaviour (S15 to S17 or earlier steps); no function of this step
+- `test_fix_remaining_targets_every_part_needing_attention`: left out: S15/S16 (render pipeline)
+- `test_stale_worker_does_not_publish_into_a_deleted_narration`: left out: render, queue, library or HTTP behaviour (S15 to S17 or earlier steps); no function of this step
+- `test_length_capped_preview_is_retried_and_never_published`: left out: S15/S16 (render pipeline)
+- `test_clean_take_beats_a_failed_take_with_a_better_score`: left out: S15/S16 (render pipeline)
+- `test_preview_made_from_an_old_voice_setting_is_not_published`: left out: S15/S16 (render pipeline)
+- `test_stop_during_the_final_take_is_not_marked_done`: left out: S15/S16 (render pipeline)
+- `test_status_lists_the_queue_with_real_progress`: left out: render, queue, library or HTTP behaviour (S15 to S17 or earlier steps); no function of this step
+- `test_queued_narration_says_what_it_waits_for`: left out: render, queue, library or HTTP behaviour (S15 to S17 or earlier steps); no function of this step
+- `test_stop_on_a_queued_narration_takes_effect_immediately`: left out: render, queue, library or HTTP behaviour (S15 to S17 or earlier steps); no function of this step
+- `test_identical_script_for_the_same_voice_is_refused_while_queued`: left out: render, queue, library or HTTP behaviour (S15 to S17 or earlier steps); no function of this step
+- `test_same_script_with_different_spacing_is_still_a_duplicate`: left out: render, queue, library or HTTP behaviour (S15 to S17 or earlier steps); no function of this step
+- `test_a_paragraph_break_is_a_different_narration`: left out: render, queue, library or HTTP behaviour (S15 to S17 or earlier steps); no function of this step
+- `test_a_running_narration_is_refused_too`: left out: render, queue, library or HTTP behaviour (S15 to S17 or earlier steps); no function of this step
+- `test_same_script_for_another_voice_is_allowed`: left out: render, queue, library or HTTP behaviour (S15 to S17 or earlier steps); no function of this step
+- `test_a_finished_narration_does_not_block_a_new_one`: left out: render, queue, library or HTTP behaviour (S15 to S17 or earlier steps); no function of this step
+- `test_the_queue_and_the_narration_show_the_refused_copy`: left out: render, queue, library or HTTP behaviour (S15 to S17 or earlier steps); no function of this step
+- `test_retry_requeues_an_interrupted_transcript_with_its_language`: left out: render, queue, library or HTTP behaviour (S15 to S17 or earlier steps); no function of this step
+- `test_retry_refuses_when_the_file_is_gone`: left out: render, queue, library or HTTP behaviour (S15 to S17 or earlier steps); no function of this step
+- `test_web_entities_are_not_read_aloud`: left out: render, queue, library or HTTP behaviour (S15 to S17 or earlier steps); no function of this step
+- `test_names_split_across_words_are_not_a_missing_word`: covered by S03 (`text_golden.rs`, word coverage and WER)
+- `test_a_natural_take_passes_the_final_check`: left out: S15/S16 (render pipeline)
+- `test_an_abrupt_take_still_fails_the_final_check`: left out: S15/S16 (render pipeline)
+- `test_fix_targets_include_web_artifacts_and_flagged_parts_only`: left out: S15/S16 (render pipeline)
+- `test_fix_remaining_corrects_the_stored_script`: left out: S15/S16 (render pipeline)
+- `test_models_are_released_after_idle_and_only_once`: left out: render, queue, library or HTTP behaviour (S15 to S17 or earlier steps); no function of this step
+- `test_reports_each_app_from_its_own_config`: left out: render, queue, library or HTTP behaviour (S15 to S17 or earlier steps); no function of this step
+- `test_respeak_records_only_the_chosen_part_and_flags_others`: left out: S15/S16 (render pipeline)
+- `test_stopped_respeak_leaves_other_parts_untouched`: left out: S15/S16 (render pipeline)
+- `test_fix_remaining_records_only_the_parts_it_counted`: left out: S15/S16 (render pipeline)
+- `test_a_chosen_part_failing_the_final_check_gets_one_more_recording`: left out: S15/S16 (render pipeline)
+- `test_first_render_still_repairs_parts_the_final_check_finds`: left out: S15/S16 (render pipeline)
+- `test_hiss_then_a_pause_before_the_first_word_is_a_burst`: covered by S10 (`audio_golden.rs`) or later audio steps; no check function
+- `test_a_take_starting_with_speech_is_clean`: covered by S10 (`audio_golden.rs`) or later audio steps; no check function
+- `test_a_real_s_sound_running_into_its_word_is_clean`: covered by S10 (`audio_golden.rs`) or later audio steps; no check function
+- `test_a_short_voiced_first_word_before_a_pause_is_clean`: covered by S10 (`audio_golden.rs`) or later audio steps; no check function
+- `test_a_burst_fails_the_take`: golden `lead_burst` evaluate case (Python's test draws random hiss); HARD_ISSUES in `checks_lead_burst_is_a_hard_issue`
+- `test_only_a_burst_of_40_to_300_ms_counts`: covered by S10 (`audio_golden.rs`) or later audio steps; no check function
+- `test_final_scan_reports_a_burst_in_the_saved_take`: left out: S15/S16 (render pipeline)
+- `test_clean_narration`: covered by S05 (`captions_review_golden.rs`)
+- `test_doubtful_parts_carry_part_text_and_reason`: left out: S15/S16 (render pipeline)
+- `test_unfinished_narration_has_no_outcome`: covered by S05 (`captions_review_golden.rs`)
+- `test_reason_labels_match_the_app`: covered by S05 (`captions_review_golden.rs`)
+- `test_links_the_clip_ends_after_the_final_sound`: covered by S10 (`audio_golden.rs`) or later audio steps; no check function
+- `test_a_short_gap_before_the_next_word_is_still_a_clean_end`: covered by S10 (`audio_golden.rs`) or later audio steps; no check function
+- `test_a_short_next_word_after_a_short_gap_is_not_a_final_sound`: covered by S10 (`audio_golden.rs`) or later audio steps; no check function
+- `test_no_clean_pause_after_the_final_sound_means_the_window_is_unused`: covered by S10 (`audio_golden.rs`) or later audio steps; no check function
+- `test_a_short_pause_at_the_end_of_the_recording_is_a_clean_end`: covered by S10 (`audio_golden.rs`) or later audio steps; no check function
+- `test_a_faint_breath_after_the_dip_is_not_a_final_sound`: covered by S10 (`audio_golden.rs`) or later audio steps; no check function
+- `test_a_long_gap_then_a_short_sound_is_a_real_pause`: covered by S10 (`audio_golden.rs`) or later audio steps; no check function
+- `test_pitch_is_remeasured_after_the_reference_is_replaced`: left out: S15 (render_chunk, _guarded_take, pitch gate)
+
+Disk (`df -g .`): 11 GB free before, 10 GB after. No cleanup was needed. `cargo test --workspace` ran once at `e1c4a44` plus the recorder fix: exit 0, 284 tests passed.
+
+Windows `check`: WINDOWS
+
+Notes for the lead:
+- **`tokens` casefold:** it is a hand list, not the full CaseFolding table. Cherokee and some Armenian ligatures would differ; the golden tokens cover the cases the guard meets in English.
+- **The `empty` and `no_words` paths:** they keep `audio` as the input (empty) or as the trimmed input plus 0.12 s (no words), as Python does.
+- **This push:** it is the first to put S10's `sci-rs` on the Windows `check` job.
