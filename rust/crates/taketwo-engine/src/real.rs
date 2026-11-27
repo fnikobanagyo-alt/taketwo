@@ -1,7 +1,8 @@
 //! The real renderer (step S16): a thin wrapper that gives taketwo-core's narration steps the three real models
 //! (Qwen voice, whisper.cpp, the speaker encoder) behind one mutex, the wall clock, a random nonce and the job's
 //! phase hook. Models load on the first job (never at start), each from `TAKETWO_MODELS`; a missing file is a job
-//! error naming it. They are released after `IDLE_UNLOAD_SECONDS` without a job, as main.py `_release_models`.
+//! error naming it. Studio restoration (Sidon, S18) is optional: its sessions open on the first studio analysis
+//! and close when that job ends; without its files a studio request runs the plain path. They are released after `IDLE_UNLOAD_SECONDS` without a job, as main.py `_release_models`.
 //! `TAKETWO_MAX_TAKES` caps the synthesis calls of one engine run.
 
 use crate::render::{bridged, job_error, preview_with, Cancel, Renderer};
@@ -20,6 +21,7 @@ use taketwo_core::render::RenderError;
 use taketwo_core::transcript::{Transcriber, Transcript};
 use taketwo_voice::encoder::VoiceEncoder;
 use taketwo_voice::qwen::{self, QwenVoice};
+use taketwo_voice::sidon::{self, Sidon};
 use taketwo_voice::whisper::{Heads, WhisperCpp};
 
 /// The Whisper model file under `TAKETWO_MODELS` (step S13's conversion).
@@ -86,6 +88,8 @@ impl Loaded {
 
 pub struct RealRenderer {
     files: [PathBuf; 3],
+    /// The Sidon folder: never one of `files` (a narration does not need it).
+    sidon_dir: PathBuf,
     models: Mutex<Loaded>,
     /// The engine's worker, for the phase hook (set once the app state exists).
     pub worker: OnceLock<Worker>,
@@ -122,6 +126,7 @@ impl RealRenderer {
                 pitch_cache: HashMap::new(),
             }),
             files,
+            sidon_dir: models.join(sidon::DIR),
             worker: OnceLock::new(),
             used: AtomicU32::new(0),
             cap,
@@ -219,7 +224,12 @@ impl Renderer for RealRenderer {
         if let Some(f) = self.files[1..].iter().find(|f| !f.exists()) {
             return Err(JobError::new("RuntimeError", format!("A model file TakeTwo needs is missing: {}. Put it in the models folder (TAKETWO_MODELS) and try again.", f.display())));
         }
-        let out = bridged(cancel, |flag| f(&mut reference::Models { transcriber: &mut m.whisper, encoder: &mut m.encoder, cancel: flag }));
+        // memory is tight: the Sidon sessions live for this job only
+        let mut studio = Sidon::new(&self.sidon_dir);
+        let out = bridged(cancel, |flag| {
+            f(&mut reference::Models { transcriber: &mut m.whisper, encoder: &mut m.encoder, restorer: Some(&mut studio), cancel: flag })
+        });
+        drop(studio);
         *self.last_job.lock().unwrap_or_else(|p| p.into_inner()) = Instant::now();
         out.or_else(job_error)
     }

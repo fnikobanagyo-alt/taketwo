@@ -3,6 +3,7 @@
 
 pub mod encoder;
 pub mod qwen;
+pub mod sidon;
 pub mod whisper;
 
 use std::ffi::{CStr, c_char};
