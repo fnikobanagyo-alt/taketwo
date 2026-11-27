@@ -93,6 +93,7 @@ fn a_second_engine_on_the_same_library_is_refused() {
     let err = String::from_utf8_lossy(&out.stderr);
     assert!(err.contains("another TakeTwo engine is running for this library"), "{err}");
     assert!(!String::from_utf8_lossy(&out.stdout).contains("ready"), "it bound nothing");
+    assert!(data.join("engine.json").exists(), "the refused engine left the first one's address file alone");
     drop(first);
 }
 
@@ -101,9 +102,12 @@ fn idle_exit_stops_by_itself_and_frees_port_and_lock() {
     let (tmp, data) = temp();
     let mut e = start(command(tmp.path(), &data, &["--idle-exit", "2"]));
     let t0 = Instant::now();
+    let address = std::fs::read_to_string(data.join("engine.json")).expect("isolated address file while running");
+    assert!(address.starts_with(&format!("{{\"url\": \"http://127.0.0.1:{}\", \"pid\": {}, ", e.port, e.child.id())), "{address}");
     let status = e.exits_within(Duration::from_secs(15)).unwrap_or_else(|| panic!("still running; stderr: {}", e.stderr_text()));
     assert!(status.success(), "{status:?}");
     assert!(t0.elapsed() >= Duration::from_millis(1500), "not before the idle time");
+    assert!(!data.join("engine.json").exists(), "a clean exit removes the address file");
     drop(TcpListener::bind(("127.0.0.1", e.port)).expect("the port is free again"));
     drop(EngineLock::acquire(&data.join("engine.lock")).expect("the lock is free again"));
 }

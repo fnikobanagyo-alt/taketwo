@@ -95,8 +95,8 @@ async fn stop_signal() {
     ctrl_c.await;
 }
 
-/// The address file, written the way `_publish_address` does (live mode and ports 8766-8785 only; an
-/// isolated engine writes none). Returns how many files were written.
+/// The address file, written the way `_publish_address` does (live mode: ports 8766-8785 under both app-data
+/// names; isolated: `<TAKETWO_DATA>/engine.json` for a dev port, lead decision 9). Returns how many were written.
 pub fn publish(mode: &Mode, app_data_root: &Path, port: u16, started: f64) -> usize {
     paths::publish_address(mode, &mode.address_files(app_data_root), "127.0.0.1", port, std::process::id(), started)
 }
@@ -159,6 +159,8 @@ pub fn run(args: &[String]) -> Result<(), String> {
     if !state.worker.stop(STOP_WAIT) {
         eprintln!("taketwo-engine: the running job did not stop within {} s", STOP_WAIT.as_secs());
     }
+    // The isolated address file goes before the lock, so a second engine never sees our stale address.
+    let _ = std::fs::remove_file(a.data.join(paths::ADDRESS_FILE));
     drop(lock);
     served
 }
@@ -197,9 +199,10 @@ mod tests {
         }
     }
 
-    /// The address file through `publish`, on a temporary app-data folder: both names when live, none when isolated.
+    /// The address file through `publish`, on a temporary app-data folder: both names when live, only
+    /// `<TAKETWO_DATA>/engine.json` for a dev port when isolated (lead decision 9).
     #[test]
-    fn address_file_is_written_only_in_live_mode() {
+    fn address_file_live_under_both_names_isolated_under_the_data_folder() {
         let tmp = tempfile::tempdir().unwrap();
         assert_eq!(publish(&Mode::Live, tmp.path(), 8766, 1.5), 2);
         for name in ["TakeTwo", "VoiceForge"] {
@@ -208,8 +211,12 @@ mod tests {
         }
         assert_eq!(publish(&Mode::Live, tmp.path(), 8790, 1.5), 0, "a dev port is never published");
         let data = tmp.path().join("iso");
-        assert_eq!(publish(&Mode::Isolated { data: data.clone() }, tmp.path(), 8790, 1.5), 0);
+        let iso = Mode::Isolated { data: data.clone() };
+        assert_eq!(publish(&iso, tmp.path(), 8766, 1.5), 0, "never a live port");
         assert!(!data.exists());
+        assert_eq!(publish(&iso, tmp.path(), 8790, 1.5), 1);
+        let text = std::fs::read_to_string(data.join("engine.json")).unwrap();
+        assert_eq!(text, format!("{{\"url\": \"http://127.0.0.1:8790\", \"pid\": {}, \"started\": 1.5}}", std::process::id()));
     }
 
     #[test]

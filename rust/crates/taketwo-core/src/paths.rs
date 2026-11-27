@@ -77,7 +77,7 @@ impl Mode {
     }
 
     /// Where the address file lives: under the data folder when isolated, under both app-data names when live.
-    /// `publish_address` only ever writes in live mode.
+    /// `publish_address` writes them (isolated: dev ports only).
     pub fn address_files(&self, app_data_root: &Path) -> Vec<PathBuf> {
         match self {
             Mode::Isolated { data } => vec![data.join(ADDRESS_FILE)],
@@ -121,15 +121,22 @@ pub fn address_json(host: &str, port: u16, pid: u32, started: f64) -> String {
     format!("{{\"url\": \"http://{host}:{port}\", \"pid\": {pid}, \"started\": {started:?}}}")
 }
 
-/// Write the address file the way `_publish_address` does: live mode only, port 8766-8785 only,
-/// write errors ignored (discovery falls back to scanning). Returns how many files were written.
+/// Write the address file the way `_publish_address` does, write errors ignored (discovery falls back).
+/// Live mode: ports 8766-8785 only, every file given. Isolated mode (lead decision 9): dev ports only, and only
+/// `<TAKETWO_DATA>/engine.json`, whatever else is handed in. Returns how many files were written.
 pub fn publish_address(mode: &Mode, files: &[PathBuf], host: &str, port: u16, pid: u32, started: f64) -> usize {
-    if !mode.is_live() || !LIVE_PUBLISH_PORTS.contains(&port) {
+    let own = match mode {
+        Mode::Live => None,
+        Mode::Isolated { data } => Some(data.join(ADDRESS_FILE)),
+    };
+    let port_ok = if own.is_none() { LIVE_PUBLISH_PORTS.contains(&port) } else { DEV_PORTS.contains(&port) };
+    if !port_ok {
         return 0;
     }
     let info = address_json(host, port, pid, started);
     files
         .iter()
+        .filter(|f| own.as_ref().is_none_or(|o| *f == o))
         .filter(|f| {
             f.parent().is_some_and(|p| std::fs::create_dir_all(p).is_ok()) && std::fs::write(f, &info).is_ok()
         })
@@ -257,16 +264,26 @@ mod tests {
     }
 
     #[test]
-    fn address_file_is_written_only_in_live_mode() {
+    fn isolated_address_file_only_under_the_data_folder_and_for_dev_ports() {
+        // Lead decision 9: an isolated engine writes <TAKETWO_DATA>/engine.json (dev ports only), nothing else.
         let tmp = tempfile::tempdir().unwrap();
         let root = tmp.path().join("app-data");
         let mode = isolated(&tmp.path().join("data"));
         let files = mode.address_files(&root);
-        assert_eq!(publish_address(&mode, &files, "127.0.0.1", 8766, 42, 1.5), 0);
+        for port in [8765, 8766, 8785, 8789, 8800] {
+            assert_eq!(publish_address(&mode, &files, "127.0.0.1", port, 42, 1.5), 0, "port {port}");
+        }
         assert!(!files[0].exists());
-        // Even handed live paths, isolated mode writes nothing.
+        // Even handed live paths, isolated mode never writes them.
         let live_files = Mode::Live.address_files(&root);
+        assert_eq!(publish_address(&mode, &live_files, "127.0.0.1", 8790, 42, 1.5), 0);
         assert_eq!(publish_address(&mode, &live_files, "127.0.0.1", 8766, 42, 1.5), 0);
+        assert!(!root.exists());
+        assert_eq!(publish_address(&mode, &files, "127.0.0.1", 8791, 42, 1.5), 1);
+        assert_eq!(
+            std::fs::read_to_string(&files[0]).unwrap(),
+            r#"{"url": "http://127.0.0.1:8791", "pid": 42, "started": 1.5}"#
+        );
         assert!(!root.exists());
     }
 
