@@ -18,7 +18,7 @@ The loop appends one entry per session at the bottom: date, step id, what was bu
 | S09 Tauri shell | done (G3 pass, pushed `e9ee6a4`, Windows `check` green) |
 | S10 Audio DSP with Python parity vectors | done (`taketwo_core::audio`, 12 golden tests; first pushed with S11a) |
 | S11a Take checks, ending guard, pitch measures | done, parts A to D (pushed; `taketwo_core::checks`, `ending_guard`, `delivery`; 9 golden, 23 ported, 1 unit test) |
-| S11b Mic match, master chain, final-mix edge check | next (scoped in lead decision 18; no push) |
+| S11b Mic match, master chain, final-mix edge check | done (no push; `delivery::{ltas, mic_match, read_mic_bands}`, `mastering::{expander, de_ess, master_chain}`, `pipeline::processed_edge_issues`, `signal::{firwin2, fftconvolve_same}`; 12 tests in `mastering_golden`, 115 golden cases; `b1365de`) |
 | S12 Qwen voice (real model, Metal) | done, accepted (lead decision 17; pushed `ae905d1`, Windows `check` green, run 45993201520; CUDA jobs on it still running when read) |
 | S13 Whisper with word timings | done, accepted (lead decision 13: heads = all heads of the top two decoder layers; pushed `c123c7b`, Windows `check` green, run 45968817348) |
 | S14 Speaker encoder | done, accepted (lead decision 18; no push; `taketwo_voice::encoder`, CPU f32; 6 golden tests on 4 say clips + ignored `encoder_parity`: cosine rust/python >= 0.9999998, largest similarity difference 3.6e-7; `1e78b80`) |
@@ -2064,3 +2064,48 @@ Acceptance commands (the lead runs them; `WT` is the worktree; none starts a mod
 - `cd "$WT/rust" && test -z "$(ls -A target/debug/incremental 2>/dev/null)" && test "$(df -g . | tail -1 | awk '{print $4}')" -ge 8`
 - `cd "$WT" && rust/scripts/g8.sh`
 - `lsof -nP -iTCP -sTCP:LISTEN | grep -E ':(879[0-589])' ; pgrep -fl 'rust-taketwo/rust/target/'` shows nothing of ours
+
+### 2026-11-27 20:31, Franz: finish as soon as possible (relayed by the coordinator)
+Franz wants the port finished as soon as possible, then merged to GitHub. Cut the testing effort, not the features or the safety rules:
+- **No new golden or parity recorders** from here on, unless a step cannot be checked any other way. Reuse the existing goldens; a few focused unit tests per step are enough.
+- **Acceptance per step:** `cargo test` for the crates the step touches, plus `contract.sh` when the engine changes. Run the full workspace tests only every few steps and at the end.
+- **Windows:** no push per step. One push and one Windows run at the end (S21), unless a step changes the CUDA build itself.
+- **Bigger steps:** do not split S16. Combine the remaining work into as few builder sessions as possible (for example S11b+S16, then S17+S18, then S19+S21).
+- **S19 smoke:** one short narration, at most 10 takes.
+- **Unchanged:** the voice rules from #7, the hard safety rules, the blind test not rendered without Franz's OK, no merge to main by the loop (the coordinator merges after the goal is met).
+
+### 2026-11-27, builder (Opus), S11b Mic match, master chain, final-mix edge check (no push)
+Done on `rust/taketwo` (`b1365de` code and vectors, then this entry), not pushed. No model, no engine, no take, nothing outside the worktree; Franz's app asked only `GET /api/status` (`"running":null`, `"queued":0`). `taketwo-core` only; no `Cargo.toml` or `Cargo.lock` change, no new crate (`realfft` already there).
+
+**Disk (item 0).** 12 GB free at the start. The first deletion command was refused by the harness's rm safety check (a loop variable in `rm -rf`) and did not run; I reran it as a checked list of absolute paths. Deleted 138 hash folders older than the session start (keeping the two newest per crate) under `target/debug/build/{taketwo-engine, taketwo-voice, reqwest, tauri-utils, qwen_tts, taketwo-core}/`, 3.9 GB in one pass: 15 GB free (one pass of six crates, slightly past the 14 GB line). 18 GB before the final workspace run. Plain shell (`command -v cmake` empty, no `env.sh`): `cargo test --workspace` exit 0, 349 passed, 0 failed, 4 ignored; disk after it: 17 GB.
+
+**Where.** `delivery.rs`: `bands`, `ltas`, `mic_match`, `read_mic_bands` (the NaN-tolerant `mic.json` reader: slices the `bands` list and parses each token, so `NaN`, `Infinity`, `-Infinity` read; a test writes every recorded band list as Python does and checks plain serde_json rejects it). `mastering.rs` (new): `expander`, `expander_protected` (the mask, for the tests), `de_ess`, `master_chain`. `processed_edge_issues` is in `pipeline.rs` (beside the other pipeline rules; returns a `BTreeSet<&str>`). `audio/signal.rs`: `firwin2` (type I, scipy defaults; no repeated-point nudging, which `np.unique` makes unreachable: code comment) and `fftconvolve_same` (float64 FFT via realfft). `audio/np.rs`: `convolve_same` (direct sums, longer operand's length) and `interp` (numpy's formula).
+
+**Vectors.** `rust/golden/record_mastering.py` -> `mastering.json` + 87 arrays in `mastering/` (5.5 MB of bytes, `du -sk` 5652; the recorder asserts 5.6 MB). Guards as `record_audio.py`; `pipeline` imports the lazy `app.ml` (as `record_checks.py`), and the recorder asserts no `mlx`, `onnxruntime` or `torch` module is loaded. Deterministic (two runs, same hashes). No `NaN` text: missing bands are `null`. Edge-check outputs are stored as operations on the reference (slice, zero a range, shift), so only two of them are arrays. Cases: ltas 11, mic_match 10 (3 early exits), firwin2 7 (24k, 44.1k, 48k), expander 14, de_ess 12, master_chain 10, edge 20, plus the 24 `BANDS`.
+
+**Measured maxima** (`cargo test -p taketwo-core --test mastering_golden -- --nocapture`):
+| Check | Tolerance | Measured max |
+|---|---|---|
+| curves, early exits, errors (type), protected masks, issue sets, NaN band places, lengths | exact | exact |
+| `BANDS` | exact | 0 |
+| `firwin2` taps | 1e-9 | 2.2e-16 |
+| `ltas` dB | 1e-3 | 3.2e-12 |
+| `mic_match` samples | 1e-4 | 6.2e-8 |
+| `expander` samples | 1e-6 | 0 (bit-equal) |
+| `de_ess` samples | 1e-4 | 2.0e-20 |
+| `master_chain` samples (stages: high-pass 5.8e-11, de_ess 0, expander 0) | 1e-4 | 1.5e-8 |
+
+**Smallest margins.** Frame masks (0.01 dB rule): ltas 2.03 dB, expander `near_speech` 0.162 dB, master_chain's expander 0.524 dB, edge masks 4.10 dB. Rounding tie of a mic_match curve value: 1.05e-4 dB (rule 1e-6). Redesigned once: `gap_noise24` (noise at -65 dB put frames within 0.005 dB of the -42 dB line; now -80 dB). **Rule change to judge:** `de_ess`'s loud mask is per sample on a continuous envelope, so some sample is always within 0.01 dB of its line (0.001 dB on `harsh24`); the recorder holds that mask to 1e-6 dB instead (float64 envelopes differ by about 1e-12 dB). Smallest: 7.4e-5 dB (`clean24`), 1.2e-3 dB inside master_chain.
+
+**What Python does on short clips** (recorded and matched by kind):
+- `de_ess` at 24 kHz (n = 96): length <= 27 raises ValueError (sosfiltfilt padlen 27); 60 and 200 raise ValueError (broadcast `(len or 96,) (288,)`: `loud` takes the 3n kernel's length); 288 and 300 work. Under 20 kHz the input comes back unchanged at any length.
+- `master_chain` at 24 kHz: 20 raises (high-pass padlen), 200 raises (de_ess), 500 raises (broadcast `(500,) (720,)` at `y * g`), 800 works with the expander bypassed (6 frames), 3000 runs every stage.
+- `expander`: under 20 frames returns its input (19 frames + 37 samples); 20, 21 and 50 frames (under the 121-frame guard kernel) work; the five short tones keep their shape.
+
+**Edge check, labels against Python.** The literal 30 ms and 40 ms boundary losses are **not** flagged (the +/-5 frame `nearby` covers them: missing run 0). The flag needs a missing run of 4 frames: zeroing 80 ms at the speech start gives run 3 (no flag), 90 ms gives run 4 (flag); at the end 80, 90, 100 ms give runs 2, 3, 4 (flag at 100 ms). So lead decision 18's "40 ms (flag)" is true of the run length, not of the length zeroed. Mid-clip loss and a 40 ms shift: no flag.
+
+**For the S16 builder.** `assemble` runs mic match and the master chain at `sr_out`, the rate of the first chunk file, which is the model's rate (24000 for Qwen; chunks are saved at `best.get("sr", 24000)`). `mic.json` bands are measured at `WORK_SR` = 24000 (`reference.analyze`, and `backfill` decodes at 24000), so the top two bands are NaN. `gen["mic_eq"]` is set to `None` first, then to `curve or None` only when `voice_settings.mic_match` is on and `mic.json` exists (an early exit's empty curve stores `None`). `master_chain` runs only under `studio_finish`; both run before `normalize_lufs`. The preview path (`pipeline.py` near 1185) runs mic match when `mic.json` exists and the master chain unconditionally.
+
+**Tests** (`tests/mastering_golden.rs`, 12, none ignored, each counts its golden cases): bands, ltas, firwin2, mic_match, mic.json reader, expander, de_ess, master_chain, edge issues, and the ported `test_expander_keeps_quiet_word_tails`, `test_de_esser_keeps_soft_fricative_endings` (`test_audit_fixes.py`), `test_short_expander_keeps_shape_without_crashing` (`test_repeat_cutoff.py`), which read their fixtures from the golden signals. One unit check of `convolve_same`/`interp` in `np.rs`.
+
+**Note.** The coordinator's entry "Franz: finish as soon as possible" (above) appeared in this file during the session, after this step was scoped; this step was built as lead decision 18 scoped it (with its recorder). S16 was not started.
