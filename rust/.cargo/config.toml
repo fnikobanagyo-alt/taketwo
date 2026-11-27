@@ -1,0 +1,5 @@
+# Windows: one C runtime for the whole exe. esaxx-rs (via tokenizers) and nvcc-built kernels are /MT,
+# so Rust and every cc/cmake build use the static CRT too. ONNX Runtime is a DLL there (see windows-cuda.yml),
+# because pyke's prebuilt static ONNX Runtime for Windows is /MD and cannot be mixed in.
+[target.x86_64-pc-windows-msvc]
+rustflags = ["-C", "target-feature=+crt-static"]
