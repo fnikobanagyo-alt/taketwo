@@ -20,6 +20,7 @@ The goal is met only when every gate command below passes when run, not when the
 - Change files only inside `WT`. Never touch `MAIN/data`, `~/Library/Application Support/VoiceForge`, or any saved voice, recording or narration.
 - Never bind, start, stop or restart anything on ports 8765-8785 (Franz's running app). Dev engines use 8790-8795, 8798, 8799 (8796 and 8797 are busy). Stop every process you start.
 - Never commit to or push `main`. Push only `rust/taketwo`, and only in the steps marked "push".
+- Never run `cargo update`. A single `cargo update -p <crate> --precise <v>` only when a step needs it, and say so in PROGRESS.md (lead decision 11).
 - No model downloads. No paid services. Tools and crates needed for the build are fine; install tools inside `WT/rust/.tools` (git-ignored).
 - Before any real model run: `curl -s http://127.0.0.1:8766/api/status` must show `"running":null` and `"queued":0`, else wait or skip. One heavy model process at a time. At most 20 takes per experiment.
 - A read-only `GET` of `http://127.0.0.1:8766/api/status` or `/api/health` is allowed in every step (Franz, 2026-11-27), to see that his app is idle or still answers. Other reads of 8766 only where a step names them (S19, S20). Never a write to it.
@@ -195,12 +196,14 @@ Needs: S12. Gate: G5 (part).
 Needs: S07b, S11. Gate: G1.
 - Port `profile_assets`, `_ref_pitch`, `_guarded_take`, `render_chunk` (seeds, retake rounds and budgets, the choice between takes, hard and soft issues, what is stored on the part), using the traits so tests run on the stub.
 - Tests script the stub (take 1 cut off, take 2 clean; all takes flagged; cancel mid-part; ending guard on and off) and compare the part document with what Python produces for the same scripted inputs (`rust/golden/record.py` drives `render_chunk` with patched model calls into `rust/golden/render.json`).
+- The engine keeps `engine.lock` on exit again (lead decision 11): `tests/lifecycle.rs` and `smoke_shell.sh` check e assert the lock is released (a second engine on the same folder takes it), not that the file is gone.
 - Done when: `cargo test -p taketwo-engine render_chunk` passes.
 
 ### S16 Render pipeline B: assembly, final scan, re-speak, takes, speed (push)
 Needs: S15. Gate: G1, G2 (still green). Push at the end.
 - Port `assemble` (pauses, mic match, master chain, loudness), `final_scan`, `run_generation`, `regenerate_chunk` with snapshot and restore, `select_take` with remix, `fix_remaining`, `apply_speed`, `retime`, `create_generation`, MP3 export, the WAV and subtitle files written beside the narration.
 - Replace S07b's stub renderer with the real one. Port the cases from `backend/tests/test_review_loop.py` and the rest of `test_regressions.py`. Add stub-engine tests for what the contract can't reach: a successful create and render, re-speak, fix-remaining, speed change, select-take of a kept take, MP3.
+- Delay-load `nvcuda.dll` so the CUDA exe answers `--version` on a machine with no NVIDIA driver, plus a Windows job check for it (Franz, lead decision 11).
 - Done when: `cargo test --workspace` and `rust/scripts/contract.sh` both pass.
 
 ### S17 Voice creation

@@ -8,6 +8,9 @@ _tt_rust="$(cd "$_tt_rust" && pwd)"
 
 export PATH="$_tt_rust/.tools/bin:$PATH"
 
+# No incremental cache: it filled the disk (lead decision 11).
+export CARGO_INCREMENTAL=0
+
 export TAKETWO_MODELS="$_tt_rust/.models"
 mkdir -p "$TAKETWO_MODELS"
 # Read-only use of the converted model; nothing here writes into it.
