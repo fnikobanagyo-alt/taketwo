@@ -3976,6 +3976,63 @@
    "first_missing": false
   },
   {
+   "text": "abcde went",
+   "heard": "abcxy went",
+   "covered": [
+    true,
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "went abcde",
+   "heard": "went abcxy",
+   "covered": [
+    true,
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "abcdefg went",
+   "heard": "abcdxyz went",
+   "covered": [
+    false,
+    true
+   ],
+   "final_missing": false,
+   "first_missing": true
+  },
+  {
+   "text": "abcdef",
+   "heard": "abc xyz",
+   "covered": [
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "abcdefghij",
+   "heard": "abcdefxyzw",
+   "covered": [
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
+   "text": "abcdefghij",
+   "heard": "abcde fxyzw",
+   "covered": [
+    true
+   ],
+   "final_missing": false,
+   "first_missing": false
+  },
+  {
    "text": "tall me tree me day 20 won't asked come.",
    "heard": "tall me tree me day 20 won't asked come",
    "covered": [

@@ -136,6 +136,9 @@ COVERAGE = [
     ("They asked me to come home", "They asked me to come home home"),
     ("(aside) the end.", "the end."), ("Café au lait.", "Cafe au lait."),
     ("Double five, then point two.", "55 then .2"),
+    # right on the 0.6 limit (ratio 0.6 exactly, and just under)
+    ("abcde went", "abcxy went"), ("went abcde", "went abcxy"), ("abcdefg went", "abcdxyz went"),
+    ("abcdef", "abc xyz"), ("abcdefghij", "abcdefxyzw"), ("abcdefghij", "abcde fxyzw"),
 ]
 
 CLEAN = [

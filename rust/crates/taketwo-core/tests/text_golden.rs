@@ -134,3 +134,14 @@ fn text_word_coverage() {
         assert_eq!(text::first_word_missing(t, h), c["first_missing"].as_bool().unwrap(), "{t:?} / {h:?}");
     }
 }
+
+#[test]
+fn text_long_input_does_not_panic() {
+    // The look-around regexes (fancy-regex) must not hit a backtrack limit on a long script.
+    let para = "word ".repeat(500_000);
+    let rule = [Pronunciation { from: "never".into(), to: "x".into() }];
+    assert!(!text::clean_text(&para, &rule, true).is_empty());
+    assert!(!text::split_sentences(&para).is_empty());
+    let prose = "One sentence here. ".repeat(100_000);
+    assert_eq!(text::split_sentences(&prose).len(), 100_000);
+}

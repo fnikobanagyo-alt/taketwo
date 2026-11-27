@@ -39,9 +39,14 @@ re!(PARAGRAPH, r"\n[{SPACE}]*\n|\n");
 re!(CJK, r"[\x{3040}-\x{30ff}\x{3400}-\x{4dbf}\x{4e00}-\x{9fff}\x{ac00}-\x{d7af}\x{f900}-\x{faff}]");
 re!(WORDS, r"[{WORD}']+");
 
-static SENTENCE_END: LazyLock<fancy_regex::Regex> = LazyLock::new(|| {
-    fancy_regex::Regex::new(&format!(r#"(?<=[.!?])["')\]]?[{}]+(?=["'(\[]?[A-Za-z0-9])"#, py::SPACE)).unwrap()
-});
+/// A look-around regex with no backtrack limit: Python's `re` has none, and a long script
+/// would otherwise make fancy-regex stop with an error.
+fn fancy(pattern: &str) -> fancy_regex::Regex {
+    fancy_regex::RegexBuilder::new(pattern).backtrack_limit(usize::MAX).build().expect("valid regex")
+}
+
+static SENTENCE_END: LazyLock<fancy_regex::Regex> =
+    LazyLock::new(|| fancy(&format!(r#"(?<=[.!?])["')\]]?[{}]+(?=["'(\[]?[A-Za-z0-9])"#, py::SPACE)));
 
 /// Undo web/HTML artifacts in a pasted script: &39; &amp; &quot; &nbsp; ...
 /// Left in place, the voice reads them aloud ("Marika and 39's").
@@ -80,7 +85,7 @@ pub fn clean_text(text: &str, pronunciations: &[Pronunciation], strip_citations:
             // (backslash escapes, and `\1` raises). Upgrade if a rule ever holds a backslash.
             let w = py::WORD;
             let pat = format!(r"(?i)(?<![{w}]){}(?![{w}])", fancy_regex::escape(src));
-            let re = fancy_regex::Regex::new(&pat).expect("escaped pattern");
+            let re = fancy(&pat);
             t = re.replace_all(&t, |_: &fancy_regex::Captures| dst.to_string()).into_owned();
         }
     }
