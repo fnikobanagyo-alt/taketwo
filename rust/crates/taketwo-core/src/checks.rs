@@ -78,7 +78,8 @@ pub fn noise_limit(baseline: f64) -> f64 {
 
 /// `noise_baseline` from the noise_bursts of the voice's files: round(max(vals, default=0.0), 3).
 pub fn noise_baseline(vals: &[f64]) -> f64 {
-    py_round(vals.iter().copied().fold(None, |m: Option<f64>, v| Some(match m { Some(b) if !(v > b) => b, _ => v })).unwrap_or(0.0), 3)
+    // Python's max keeps the first of equal values; for numbers that is the same value
+    py_round(vals.iter().copied().reduce(f64::max).unwrap_or(0.0), 3)
 }
 
 fn ends_with_any(s: &str, marks: &[char]) -> bool {
@@ -186,12 +187,10 @@ pub fn evaluate(
                 continue;
             }
             let t0 = gs + start - head_pad;
-            let before = words.iter().filter(|w| w.start <= t0 + 0.05).last();
-            if let Some(b) = before {
-                if !ends_with_any(py::strip(&b.word), &[',', '.', '?', '!', ';', ':', '—', '-', '…']) {
-                    issues.push("odd_pause");
-                    break;
-                }
+            let before = words.iter().rfind(|w| w.start <= t0 + 0.05);
+            if before.is_some_and(|b| !ends_with_any(py::strip(&b.word), &[',', '.', '?', '!', ';', ':', '—', '-', '…'])) {
+                issues.push("odd_pause");
+                break;
             }
         }
         if internal_sentence_cut(a, sr, &words) {

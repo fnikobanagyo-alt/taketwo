@@ -698,7 +698,7 @@ def prosody_cases(st, delivery, au, librosa):
             c["signal"] = st.put(f"in_pitch_{name}", c["signal"])
             c["x"] = st.put(f"x_pitch_{name}", c["x"])
             if "f0" in c:
-                c["f0"] = st.put(f"f0_pitch_{name}", c["f0"])
+                c["f0"] = [float(v) for v in c["f0"]]  # float64 values in the JSON (a float32 file would round them)
             cases.append(c)
             return
         raise AssertionError(f"{name}: knife edges after 40 redesigns")
