@@ -21,12 +21,12 @@ candle-core = "0.9"
 # statically on macOS arm64 and Windows x64, so no DLL ships beside the exe for the CPU provider.
 serde = { version = "1", features = ["derive"] }
 taketwo-core = { path = "../taketwo-core" }
+serde_json = { version = "1", features = ["preserve_order", "float_roundtrip"] }
 ort = { version = "=2.0.0-rc.15", default-features = false, features = ["std", "download-binaries", "copy-dylibs", "tls-native", "api-31"] }
 
 [dev-dependencies]
 hound = "3"
 libc = "0.2"
-serde_json = { version = "1", features = ["preserve_order", "float_roundtrip"] }
 
 [build-dependencies]
 cc = "1"

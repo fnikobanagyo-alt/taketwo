@@ -151,6 +151,22 @@ impl GenerateConfig {
         }
     }
 
+    /// TakeTwo: the merge `generate_voice_clone_full` uses, as one function so a test without a model can show
+    /// which settings reach the talker and, through `for_subtalker()`, the code predictor.
+    pub fn merge_voice_clone(&self, o: &crate::model::options::VoiceCloneOptions) -> SamplingConfig {
+        self.merge(
+            o.do_sample,
+            o.top_k,
+            o.top_p,
+            o.temperature,
+            o.repetition_penalty,
+            o.subtalker_do_sample,
+            o.subtalker_top_k,
+            o.subtalker_top_p,
+            o.subtalker_temperature,
+        )
+    }
+
     /// Get the effective max_new_tokens value.
     pub fn effective_max_tokens(&self, user_max: Option<usize>) -> usize {
         user_max.unwrap_or(self.max_new_tokens)

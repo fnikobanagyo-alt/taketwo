@@ -337,3 +337,25 @@ The codes JSON format:
   "codes": [[1995, 1642, ...], ...]
 }
 ```
+## TakeTwo edits to this vendored copy
+
+Upstream: danielclough/qwen3-tts-rs at 4fc1a5da. Every change TakeTwo made (step S12, 2026-11-27), each marked `TakeTwo` in the source:
+
+1. `src/audio/encoder/seanet.rs`: the strided encoder convs (the four SEANet downsample convs and the final
+   `Downsample`) add mimi's right-side extra padding (`get_extra_padding_for_conv1d`), and `Downsample` pads with
+   the edge value (mimi `ConvDownsample1d`, `pad_mode="edge"`) instead of zeros. N reference samples now give
+   ceil(N / 1920) frames as in mlx-audio, so the reference keeps its last frame (the prototype had 169 frames
+   against MLX's 170). Test: `encoder_convs_keep_a_partial_last_frame`.
+2. `src/model/generate.rs`: `generate_voice_clone_full_cancellable` (the old `generate_voice_clone_full` calls it
+   with a flag that is never set). The proportional reference cut is replaced by VoiceForge's exact cut
+   (`ref_len x decode_upsample_rate`, read from the tokenizer config) and `decode_unpadded` (output shorter than
+   frames x 1920 is refused, longer is cut to exactly that; code 0 is data). The EOS frame is not decoded. A take
+   with no generated frame returns empty audio (mlx-audio yields nothing then). New: `decode_unpadded`,
+   `icl_trim`, `Model::decode_upsample_rate`, tests ported from backend/tests/test_regressions.py.
+3. `src/model/types.rs`: `GenerationResult.decoder` (`DecodeLengths`: frames, samples, zero_codes);
+   `SUPPORTED_LANGUAGES` gains italian, portuguese, russian (in the 1.7B Base `codec_language_id`).
+4. `src/model/config.rs`: `GenerateConfig::merge_voice_clone`, the voice-clone merge as one function (tested in
+   taketwo-voice: the caller's settings reach the code predictor).
+5. `src/nn/generation.rs`: `generate_cancellable` and `generate_batch_cancellable` read a cancel flag once per
+   frame in both frame loops and return the error `CANCELLED` ("cancelled"); `generate` and `generate_batch`
+   keep their signatures.

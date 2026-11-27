@@ -165,7 +165,9 @@ impl SeaNetEncoder {
             let ratio = self.ratios[i];
             let kernel_size = ratio * 2;
             let padding = kernel_size - ratio; // causal padding
-            let padded = h.pad_with_zeros(2, padding, 0)?;
+            // TakeTwo: mimi's StreamableConv1d also pads the right so a partial last frame is kept (ceil, not floor).
+            let extra = extra_padding_for_conv1d(h.dim(2)?, kernel_size, ratio, padding);
+            let padded = h.pad_with_zeros(2, padding, extra)?;
             h = downsample.forward(&padded)?;
         }
 
@@ -244,7 +246,38 @@ impl Downsample {
         // Causal padding
         let kernel_size = self.stride * 2;
         let padding = kernel_size - self.stride;
-        let padded = xs.pad_with_zeros(2, padding, 0)?;
+        // TakeTwo: as mimi's ConvDownsample1d: edge padding (pad_mode="edge") and the right-side extra padding.
+        let extra = extra_padding_for_conv1d(xs.dim(2)?, kernel_size, self.stride, padding);
+        let padded = xs.pad_with_same(2, padding, extra)?;
         self.conv.forward(&padded)
+    }
+}
+
+/// mimi `get_extra_padding_for_conv1d`: right padding so the last, partial window still makes a frame.
+pub(crate) fn extra_padding_for_conv1d(len: usize, ksize: usize, stride: usize, padding_total: usize) -> usize {
+    let nframes = (len + padding_total).saturating_sub(ksize) as f64 / stride as f64 + 1.0;
+    let ideal_len = (nframes.ceil() as usize - 1) * stride + ksize - padding_total;
+    ideal_len.saturating_sub(len)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use candle_core::Device;
+
+    /// The reference keeps its last frame: N samples give ceil(N / 1920) frames, as MLX's encoder does
+    /// (169 against 170 frames in the prototype). Zero weights: only the lengths are under test.
+    #[test]
+    fn encoder_convs_keep_a_partial_last_frame() {
+        let vb = VarBuilder::zeros(DType::F32, &Device::Cpu);
+        let seanet = SeaNetEncoder::new(vb.pp("encoder")).unwrap();
+        let down = Downsample::new(512, 2, vb.pp("downsample")).unwrap();
+        for (n, frames) in [(3 * 1920 - 1, 3), (3 * 1920, 3), (3 * 1920 + 1, 4), (1, 1), (7 * 1920 + 960, 8)] {
+            let x = Tensor::zeros((1, 1, n), DType::F32, &Device::Cpu).unwrap();
+            let h = down.forward(&seanet.forward(&x).unwrap()).unwrap();
+            assert_eq!(h.dim(2).unwrap(), frames, "{n} samples");
+        }
+        assert_eq!(extra_padding_for_conv1d(10, 8, 4, 4), 2);
+        assert_eq!(extra_padding_for_conv1d(12, 8, 4, 4), 0);
     }
 }

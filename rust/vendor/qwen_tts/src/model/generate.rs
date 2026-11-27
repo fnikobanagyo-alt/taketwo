@@ -1,14 +1,18 @@
-use candle_core::{IndexOp, Result, Tensor};
+use candle_core::{DType, IndexOp, Result, Tensor};
+use std::sync::atomic::{AtomicBool, Ordering};
 
 use crate::{
     model::{
         Model,
         config::GenerateConfig,
         options::{CustomVoiceOptions, VoiceCloneOptions, VoiceDesignOptions},
-        types::GenerationResult,
+        types::{DecodeLengths, GenerationResult},
         voice_clone::VoiceClonePromptItem,
     },
-    nn::{generation::Output, generation_options::GenerationOptions},
+    nn::{
+        generation::{CANCELLED, Output},
+        generation_options::GenerationOptions,
+    },
 };
 
 impl Model {
@@ -317,6 +321,7 @@ impl Model {
             sample_rate: self.sample_rate(),
             codes: Some(output.codes),
             effective_lengths: output.effective_lengths,
+            decoder: None,
         })
     }
 
@@ -425,6 +430,7 @@ impl Model {
             sample_rate: self.sample_rate(),
             codes: Some(output.codes),
             effective_lengths: output.effective_lengths,
+            decoder: None,
         })
     }
 
@@ -456,6 +462,21 @@ impl Model {
         language: &str,
         options: Option<VoiceCloneOptions>,
     ) -> Result<GenerationResult> {
+        static NEVER: AtomicBool = AtomicBool::new(false);
+        self.generate_voice_clone_full_cancellable(text_ids, prompt, language, options, &NEVER)
+    }
+
+    /// TakeTwo: `generate_voice_clone_full` with a cancel flag (read once per frame and before the decode), the
+    /// exact reference cut and the exact-length decode of VoiceForge's `qwen_compat.py` (see `icl_trim`).
+    /// No generated frame (EOS first) gives empty audio, as mlx-audio yields nothing then.
+    pub fn generate_voice_clone_full_cancellable(
+        &self,
+        text_ids: &Tensor,
+        prompt: &VoiceClonePromptItem,
+        language: &str,
+        options: Option<VoiceCloneOptions>,
+        cancel: &AtomicBool,
+    ) -> Result<GenerationResult> {
         // Validate model type
         self.require_base_model()?;
 
@@ -468,17 +489,7 @@ impl Model {
         let opts = options.unwrap_or_default();
 
         // Merge sampling config with defaults
-        let sampling_config = self.generate_defaults.merge(
-            opts.do_sample,
-            opts.top_k,
-            opts.top_p,
-            opts.temperature,
-            opts.repetition_penalty,
-            opts.subtalker_do_sample,
-            opts.subtalker_top_k,
-            opts.subtalker_top_p,
-            opts.subtalker_temperature,
-        );
+        let sampling_config = self.generate_defaults.merge_voice_clone(&opts);
 
         let max_tokens = self
             .generate_defaults
@@ -525,122 +536,77 @@ impl Model {
         };
 
         // Generate using the full prompt construction pipeline
-        let output = self
-            .model
-            .generate(text_ids, &gen_options, max_tokens, &sampling_config)?;
-
-        // Check if any audio was generated
-        let num_steps = output.codes.dim(1)?;
-        if num_steps == 0 {
-            return Err(candle_core::Error::Msg(
-                "Generation produced no audio. The model generated 0 steps. \
-                 This may indicate: (1) the input text is too short, \
-                 (2) the model weights are not loaded correctly, \
-                 (3) the voice clone prompt is invalid, or \
-                 (4) there's a configuration mismatch."
-                    .to_string(),
-            ));
+        let output = self.model.generate_cancellable(
+            text_ids,
+            &gen_options,
+            max_tokens,
+            &sampling_config,
+            cancel,
+        )?;
+        if cancel.load(Ordering::Relaxed) {
+            return Err(candle_core::Error::Msg(CANCELLED.to_string()));
         }
 
-        // ICL mode: prepend ref_codes to generated codes before decoding,
-        // then cut off the reference audio portion from the output.
-        // This matches the Python implementation (qwen3_tts_model.py:614-629).
-        let (audio, ref_audio_cut_samples) = if let Some(ref ref_codes) = prompt.ref_code {
-            if !prompt.x_vector_only_mode {
-                // ref_codes shape: (seq_len, num_quantizers)
-                // output.codes shape: (batch, seq_len, num_quantizers)
-                let ref_codes_len = ref_codes.dim(0)?;
-                let output_codes_len = output.codes.dim(1)?;
+        let generated = output
+            .effective_lengths
+            .as_ref()
+            .and_then(|l| l.first().copied())
+            .unwrap_or(output.codes.dim(1)?);
+        if generated == 0 {
+            return Ok(GenerationResult {
+                audio: Tensor::zeros((0,), DType::F32, &self.device)?,
+                sample_rate: self.sample_rate(),
+                codes: Some(output.codes),
+                effective_lengths: output.effective_lengths,
+                decoder: None,
+            });
+        }
 
-                tracing::info!(
-                    ref_codes_shape = ?ref_codes.dims(),
-                    output_codes_shape = ?output.codes.dims(),
-                    ref_codes_len = ref_codes_len,
-                    output_codes_len = output_codes_len,
-                    "ICL prepend: before combining"
-                );
-
-                // Ensure ref_codes has batch dimension
-                let ref_codes_batched = ref_codes.unsqueeze(0)?; // (1, ref_len, num_quantizers)
-
-                // Concatenate: [ref_codes, generated_codes]
-                let combined_codes = Tensor::cat(&[&ref_codes_batched, &output.codes], 1)?;
-
-                // Decode the combined codes
-                let combined_output = crate::nn::generation::Output {
-                    codes: combined_codes,
-                    effective_lengths: output
-                        .effective_lengths
-                        .as_ref()
-                        .map(|lens| lens.iter().map(|&l| l + ref_codes_len).collect()),
-                    num_steps: output.num_steps + ref_codes_len,
-                };
-
-                tracing::info!(
-                    combined_codes_shape = ?combined_output.codes.dims(),
-                    combined_effective_lengths = ?combined_output.effective_lengths,
-                    "ICL prepend: after combining"
-                );
-
-                let full_audio = self.decode_output(&combined_output)?;
-
-                // Calculate how many audio samples to cut off
-                // cut = ref_len / decoded_len * wav_len (proportional approach, matches Python)
-                let decoded_codes_len = combined_output
-                    .effective_lengths
-                    .as_ref()
-                    .and_then(|l| l.first().copied())
-                    .unwrap_or(combined_output.codes.dim(1)?);
-                let audio_samples = full_audio.dim(full_audio.dims().len() - 1)?;
-                let cut_ratio = ref_codes_len as f64 / decoded_codes_len as f64;
-                let cut_samples = (cut_ratio * audio_samples as f64) as usize;
-
-                // Compute actual samples per code for reference
-                let samples_per_code = audio_samples as f64 / decoded_codes_len as f64;
-
-                tracing::info!(
-                    ref_codes_len = ref_codes_len,
-                    decoded_codes_len = decoded_codes_len,
-                    audio_samples = audio_samples,
-                    cut_ratio = format!("{:.4}", cut_ratio),
-                    cut_samples = cut_samples,
-                    samples_per_code = format!("{:.2}", samples_per_code),
-                    "ICL prepend: cut calculation"
-                );
-
-                // Cut off the reference audio portion
-                let audio = if full_audio.dims().len() == 2 {
-                    // Shape: (batch, samples)
-                    full_audio.i((.., cut_samples..))?
-                } else {
-                    // Shape: (samples,)
-                    full_audio.i(cut_samples..)?
-                };
-
-                tracing::info!(
-                    full_audio_samples = audio_samples,
-                    output_audio_samples = audio.dim(audio.dims().len() - 1)?,
-                    "ICL prepend: after cutting"
-                );
-
-                (audio, cut_samples)
-            } else {
-                // X-vector only mode: no prepending/cutting needed
-                (self.decode_output(&output)?, 0)
-            }
+        // ICL mode: prepend ref_codes to generated codes before decoding, then cut off the reference audio
+        // portion at exactly ref_len x the decoder's upsample rate (TakeTwo; the proportional cut is gone).
+        let (audio, decoder) = if let Some(ref ref_codes) = prompt.ref_code
+            && !prompt.x_vector_only_mode
+        {
+            // ref_codes shape: (seq_len, num_quantizers); output.codes shape: (batch, seq_len, num_quantizers)
+            let ref_codes_len = ref_codes.dim(0)?;
+            let ref_codes_batched = ref_codes.unsqueeze(0)?.to_dtype(output.codes.dtype())?;
+            // [ref_codes, generated codes without the EOS step]
+            let gen_codes = output.codes.i((.., 0..generated, ..))?;
+            let combined_codes = Tensor::cat(&[&ref_codes_batched, &gen_codes], 1)?;
+            let combined_output = crate::nn::generation::Output {
+                effective_lengths: Some(vec![combined_codes.dim(1)?]),
+                num_steps: output.num_steps + ref_codes_len,
+                codes: combined_codes,
+            };
+            let full_audio = self.decode_output(&combined_output)?;
+            let upsample = self.decode_upsample_rate()?;
+            let (audio, lengths) = icl_trim(&full_audio, &combined_output.codes, ref_codes_len, upsample)?;
+            tracing::debug!(
+                decoded_samples = full_audio.dim(full_audio.dims().len() - 1)?,
+                ?lengths,
+                "ICL exact cut"
+            );
+            (audio, Some(lengths))
         } else {
-            // No ref_codes: standard decoding
-            (self.decode_output(&output)?, 0)
+            // X-vector only mode or no ref_codes: standard decoding
+            (self.decode_output(&output)?, None)
         };
-
-        let _ = ref_audio_cut_samples; // Used for debugging, silence unused warning
 
         Ok(GenerationResult {
             audio,
             sample_rate: self.sample_rate(),
             codes: Some(output.codes),
             effective_lengths: output.effective_lengths,
+            decoder,
         })
+    }
+
+    /// TakeTwo: the audio tokenizer's decoder upsample rate (1920 for the 12 Hz tokenizer), read from its config.
+    pub fn decode_upsample_rate(&self) -> Result<usize> {
+        self.audio_tokenizer
+            .as_ref()
+            .map(|t| t.decode_upsample_rate())
+            .ok_or_else(|| candle_core::Error::Msg("Audio tokenizer not available".to_string()))
     }
 
     // =========================================================================
@@ -844,5 +810,116 @@ impl Model {
         }
 
         Ok(results)
+    }
+}
+
+/// TakeTwo: `qwen_compat.decode_unpadded`: the decoder must give at least `frames x upsample` samples for the
+/// (batch, frames, codebooks) `codes`; the output is cut to exactly that. Code 0 is data, never padding: `frames`
+/// counts every frame and `zero_codes` reports how many frames have code 0 in codebook 0.
+pub fn decode_unpadded(wav: &Tensor, codes: &Tensor, upsample: usize) -> Result<(Tensor, DecodeLengths)> {
+    let frames = codes.dim(1)?;
+    let expected = frames * upsample;
+    let last = wav.dims().len() - 1;
+    let got = wav.dim(last)?;
+    if got < expected {
+        return Err(candle_core::Error::Msg(format!(
+            "Qwen decoded only {got} samples; expected {expected}. Refusing truncated audio."
+        )));
+    }
+    let zero_codes = codes
+        .i((.., .., 0))?
+        .to_dtype(DType::U32)?
+        .flatten_all()?
+        .to_vec1::<u32>()?
+        .iter()
+        .filter(|&&c| c == 0)
+        .count();
+    Ok((wav.narrow(last, 0, expected)?, DecodeLengths { frames, samples: expected, zero_codes }))
+}
+
+/// TakeTwo: `decode_unpadded` on the decoded reference-plus-generated codes, then the exact reference cut:
+/// drop `ref_len x upsample` samples (qwen_compat.py), so the take is exactly `generated frames x upsample`.
+pub fn icl_trim(full_audio: &Tensor, combined_codes: &Tensor, ref_len: usize, upsample: usize) -> Result<(Tensor, DecodeLengths)> {
+    let (wav, lengths) = decode_unpadded(full_audio, combined_codes, upsample)?;
+    let last = wav.dims().len() - 1;
+    let cut = ref_len * upsample;
+    let audio = wav.narrow(last, cut, lengths.samples - cut)?;
+    let audio = if audio.dims().len() == 2 { audio.squeeze(0)? } else { audio };
+    Ok((audio, lengths))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use candle_core::Device;
+
+    /// A fake decoder as in backend/tests/test_regressions.py: sample i has value i.
+    fn fake_decode(codes: &Tensor) -> Tensor {
+        let n = codes.dim(1).unwrap() * 1920;
+        Tensor::arange(0u32, n as u32, &Device::Cpu).unwrap().to_dtype(DType::F32).unwrap().unsqueeze(0).unwrap()
+    }
+
+    fn ones(frames: usize) -> Vec<u32> {
+        vec![1u32; frames * 16]
+    }
+
+    /// The crate's old cut: int(ref_len / total_len * samples), computed in f64 as the old code did.
+    fn proportional_cut(ref_len: usize, total_len: usize, samples: usize) -> usize {
+        (ref_len as f64 / total_len as f64 * samples as f64) as usize
+    }
+
+    #[test]
+    fn test_zero_codes_preserve_length_and_exact_reference_boundary() {
+        let (mut r, mut t) = (ones(7), ones(13));
+        r[2 * 16] = 0;
+        t[5 * 16] = 0;
+        let mut all = r.clone();
+        all.extend(&t);
+        let codes = Tensor::from_vec(all, (1, 20, 16), &Device::Cpu).unwrap();
+        let (audio, lengths) = icl_trim(&fake_decode(&codes), &codes, 7, 1920).unwrap();
+        let v = audio.to_vec1::<f32>().unwrap();
+        assert_eq!(v.len(), 13 * 1920);
+        assert_eq!(v[0], (7 * 1920) as f32);
+        assert_eq!(v[v.len() - 1], (20 * 1920 - 1) as f32);
+        assert_eq!(lengths, DecodeLengths { frames: 20, samples: 20 * 1920, zero_codes: 2 });
+        // positive defect control: the old proportional cut misses the boundary for some lengths (f64 rounding)
+        let missed: Vec<(usize, usize)> = (1..200)
+            .flat_map(|r| (1..200).map(move |g| (r, g)))
+            .filter(|&(r, g)| proportional_cut(r, r + g, (r + g) * 1920) != r * 1920)
+            .collect();
+        assert!(!missed.is_empty());
+    }
+
+    #[test]
+    fn test_all_zero_codes_are_data() {
+        let codes = Tensor::zeros((1, 4, 16), DType::U32, &Device::Cpu).unwrap();
+        let (wav, lengths) = decode_unpadded(&fake_decode(&codes), &codes, 1920).unwrap();
+        assert_eq!(lengths.samples, 4 * 1920);
+        assert_eq!(lengths.zero_codes, 4);
+        assert_eq!(wav.dim(1).unwrap(), 4 * 1920);
+    }
+
+    #[test]
+    fn test_short_decoder_output_is_rejected() {
+        let codes = Tensor::ones((1, 4, 16), DType::U32, &Device::Cpu).unwrap();
+        let short = Tensor::zeros((1, 3), DType::F32, &Device::Cpu).unwrap();
+        let e = decode_unpadded(&short, &codes, 1920).unwrap_err().to_string();
+        assert!(e.contains("Refusing truncated audio"), "{e}");
+    }
+
+    #[test]
+    fn longer_decoder_output_is_cut_to_exact_frames() {
+        let codes = Tensor::ones((1, 4, 16), DType::U32, &Device::Cpu).unwrap();
+        let long = Tensor::zeros((1, 4 * 1920 + 7), DType::F32, &Device::Cpu).unwrap();
+        assert_eq!(decode_unpadded(&long, &codes, 1920).unwrap().0.dim(1).unwrap(), 4 * 1920);
+    }
+
+    /// The seam test_upstream_reference_change_fails_before_install guarded: a re-vendored generate.rs that
+    /// brings back the proportional cut fails here.
+    #[test]
+    fn the_proportional_reference_cut_is_gone() {
+        let src = include_str!("generate.rs");
+        assert!(!src.contains(concat!("cut_", "ratio")));
+        assert!(src.contains(concat!("icl_trim(&full_audio", ", &combined_output.codes")));
     }
 }

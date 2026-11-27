@@ -11,6 +11,7 @@
 use candle_core::{DType, Device, IndexOp, Result, Tensor};
 use candle_nn::{Module, VarBuilder};
 use std::collections::HashMap;
+use std::sync::atomic::{AtomicBool, Ordering};
 
 use crate::{
     config::{talker_config::DialectValue, tts_config::Config},
@@ -26,6 +27,20 @@ use crate::{
         talker::TalkerForConditionalGeneration,
     },
 };
+
+/// TakeTwo: the error message of a generation stopped by its cancel flag (the same word the whisper binding uses).
+pub const CANCELLED: &str = "cancelled";
+
+/// TakeTwo: the flag the uncancellable entry points pass.
+static NEVER: AtomicBool = AtomicBool::new(false);
+
+/// TakeTwo: read once per frame by both frame loops.
+fn check_cancel(cancel: &AtomicBool) -> Result<()> {
+    if cancel.load(Ordering::Relaxed) {
+        return Err(candle_core::Error::Msg(CANCELLED.to_string()));
+    }
+    Ok(())
+}
 
 /// Output from the TTS model.
 pub struct Output {
@@ -819,6 +834,19 @@ impl ConditionalGeneration {
         max_new_tokens: usize,
         sampling_config: &SamplingConfig,
     ) -> Result<Output> {
+        self.generate_cancellable(text_ids, options, max_new_tokens, sampling_config, &NEVER)
+    }
+
+    /// TakeTwo: `generate` that stops with [`CANCELLED`] when `cancel` is set (read once per frame).
+    pub fn generate_cancellable(
+        &self,
+        text_ids: &Tensor,
+        options: &GenerationOptions,
+        max_new_tokens: usize,
+        sampling_config: &SamplingConfig,
+        cancel: &AtomicBool,
+    ) -> Result<Output> {
+        check_cancel(cancel)?;
         let (batch_size, _) = text_ids.dims2()?;
         let (eos_id, _bos_id, _pad_id) = self.talker.get_special_tokens();
 
@@ -985,6 +1013,7 @@ impl ConditionalGeneration {
                 if sample_eos_step.iter().all(|s| s.is_some()) {
                     break;
                 }
+                check_cancel(cancel)?;
 
                 let cache_len = cache.seq_len();
 
@@ -1193,6 +1222,19 @@ impl ConditionalGeneration {
         max_new_tokens: usize,
         sampling_config: &SamplingConfig,
     ) -> Result<Output> {
+        self.generate_batch_cancellable(text_ids_list, options_list, max_new_tokens, sampling_config, &NEVER)
+    }
+
+    /// TakeTwo: `generate_batch` that stops with [`CANCELLED`] when `cancel` is set (read once per frame).
+    pub fn generate_batch_cancellable(
+        &self,
+        text_ids_list: &[Tensor],
+        options_list: &[GenerationOptions],
+        max_new_tokens: usize,
+        sampling_config: &SamplingConfig,
+        cancel: &AtomicBool,
+    ) -> Result<Output> {
+        check_cancel(cancel)?;
         let batch_size = text_ids_list.len();
         if batch_size == 0 {
             return Err(candle_core::Error::Msg("Empty batch".to_string()));
@@ -1205,11 +1247,12 @@ impl ConditionalGeneration {
 
         // Single sample - use regular method
         if batch_size == 1 {
-            return self.generate(
+            return self.generate_cancellable(
                 &text_ids_list[0],
                 &options_list[0],
                 max_new_tokens,
                 sampling_config,
+                cancel,
             );
         }
 
@@ -1330,6 +1373,7 @@ impl ConditionalGeneration {
                 if sample_eos_step.iter().all(|s| s.is_some()) {
                     break;
                 }
+                check_cancel(cancel)?;
 
                 let cache_len = cache.seq_len();
 

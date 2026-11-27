@@ -66,6 +66,18 @@ pub struct GenerationResult {
 
     /// Effective lengths for each batch item (for variable-length outputs).
     pub effective_lengths: Option<Vec<usize>>,
+
+    /// TakeTwo: the exact-length decode of the voice-clone path (VoiceForge's `_voiceforge_decode_lengths`).
+    pub decoder: Option<DecodeLengths>,
+}
+
+/// TakeTwo: what `decode_unpadded` decoded. `frames` is the decoded code frames (reference plus generated),
+/// `samples` = frames x the decoder's upsample rate, `zero_codes` = frames whose codebook-0 code is 0 (data, not padding).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct DecodeLengths {
+    pub frames: usize,
+    pub samples: usize,
+    pub zero_codes: usize,
 }
 
 impl GenerationResult {
@@ -76,6 +88,7 @@ impl GenerationResult {
             sample_rate,
             codes: None,
             effective_lengths: None,
+            decoder: None,
         }
     }
 
@@ -86,6 +99,7 @@ impl GenerationResult {
             sample_rate,
             codes: Some(codes),
             effective_lengths: None,
+            decoder: None,
         }
     }
 
@@ -100,13 +114,17 @@ impl GenerationResult {
             sample_rate,
             codes: None,
             effective_lengths: Some(effective_lengths),
+            decoder: None,
         }
     }
 }
 
 /// Supported languages for TTS.
+/// TakeTwo: italian, portuguese and russian added; the 1.7B Base config's `codec_language_id` has all ten,
+/// and VoiceForge's LANG_NAMES sends them.
 pub const SUPPORTED_LANGUAGES: &[&str] = &[
-    "auto", "chinese", "english", "japanese", "korean", "french", "german", "spanish",
+    "auto", "chinese", "english", "japanese", "korean", "french", "german", "spanish", "italian", "portuguese",
+    "russian",
 ];
 
 #[cfg(test)]
@@ -181,7 +199,10 @@ mod tests {
         assert!(SUPPORTED_LANGUAGES.contains(&"french"));
         assert!(SUPPORTED_LANGUAGES.contains(&"german"));
         assert!(SUPPORTED_LANGUAGES.contains(&"spanish"));
-        assert_eq!(SUPPORTED_LANGUAGES.len(), 8);
+        assert!(SUPPORTED_LANGUAGES.contains(&"italian"));
+        assert!(SUPPORTED_LANGUAGES.contains(&"portuguese"));
+        assert!(SUPPORTED_LANGUAGES.contains(&"russian"));
+        assert_eq!(SUPPORTED_LANGUAGES.len(), 11);
     }
 
     #[test]
