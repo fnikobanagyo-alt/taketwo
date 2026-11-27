@@ -1661,7 +1661,7 @@ Tests in the five backend files: 153 in all. 22 are ported to `tests/checks_port
 
 Disk (`df -g .`): 11 GB free before, 10 GB after. No cleanup was needed. `cargo test --workspace` ran once at `e1c4a44` plus the recorder fix: exit 0, 284 tests passed.
 
-Windows `check`: WINDOWS
+Windows `check`: success on `840e41f` (run 45981183667, 10:19:57 to 10:30:17 UTC; `rust/scripts/g6.sh check` prints `G6 PASS`). `sci-rs` built on Windows, so no change back to the hand port. The two CUDA jobs were still running and were not awaited.
 
 Notes for the lead:
 - **`tokens` casefold:** it is a hand list, not the full CaseFolding table. Cherokee and some Armenian ligatures would differ; the golden tokens cover the cases the guard meets in English.
