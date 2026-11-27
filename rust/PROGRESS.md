@@ -26,7 +26,7 @@ The loop appends one entry per session at the bottom: date, step id, what was bu
 | S17 Voice creation | todo |
 | S18 Studio restoration (Sidon) | todo |
 | S19 Real synthesis smoke | todo |
-| S20 Blind A/B harness | todo |
+| S20 Blind A/B harness | done (not rendered: waits for Franz's OK) |
 | S21 Final gate run | todo |
 
 ## Gate status
@@ -39,7 +39,7 @@ The loop appends one entry per session at the bottom: date, step id, what was bu
 | G4 | pass for wav, mp3 waits for S16 | S08 entry below: `cargo test -p taketwo-mcp` from no prebuilt engine, exit 0 (27 tests) |
 | G5 | not run | |
 | G6 | `check` success on `e9ee6a4` (run 45957448669, S09 entry); the two CUDA jobs of that run were still in progress when recorded; earlier all three success on `2e4d02a`; judge again on the final commit | Lead decision 10 below: run 45945950326, all three jobs `success` |
-| G7 | not run | |
+| G7 | pass at `8b6eed6` (judge again after S16/S17 if the voice-copy route changes) | S20 entry below: `plan` 10 scripts and `takes, most: 480`; `selftest` `AB SELFTEST PASS`; `render` exit 3 |
 | G8 | pass so far (re-run at the end) | Lead decision 9 below: `g8.sh` `G8 PASS`, exit 0 at `1f5b85b`. Data differences are Franz's own app use, information only |
 
 ## Baseline for G8 (recorded 2026-11-27, before any Rust was written)
@@ -972,3 +972,60 @@ Report only: `df -g .` before and after; the `plan` output; whether the take bou
 Safety for this step: to 8766 only read-only `GET`s of `/api/status`, `/api/health`, `/api/generations`, `/api/generations/<id>` and `/api/profiles` (no profile audio is fetched in this step: that happens only in a real `render`); never bind, start, stop or write to 8765-8785; dev ports 8790-8795, 8798, 8799 only; stop only your own pids, never `pkill`/`killall` by name. No model run, no model download, no `--live`, no real `render`. Never open the main checkout's `data/`, App Support/VoiceForge or App Support/TakeTwo; the main checkout is read-only (the three `eval/rust-prototype` pages may be read for structure). `backend/.venv` and `frontend/node_modules` are symlinks into the main checkout: use, never change. Franz's titles, scripts and voice names stay in `rust/ab/private/` and off standard output, PROGRESS.md and commits. No push. Commit on `rust/taketwo` after each green part, message ending `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`.
 
 Left outside this loop until the end: the wiki receipt, the HANDOFFS note, `scripts/check.py` on the main app. Hindsight is unreachable: no recall, no retain.
+
+### 2026-11-27, builder, S20 Blind A/B harness (not rendered)
+Built:
+- Step 0 (`e7d93bf`): deleted `rust/target/debug/incremental` (4.6 GB). `export CARGO_INCREMENTAL=0` is now in `rust/scripts/env.sh`. PLAN.md has three new lines: the no-`cargo update` safety rule, the S15 lock-file revert and the S16 `nvcuda.dll` delay-load. No `cargo clean`.
+- `rust/ab/ab.py`, `rust/ab/check_private.py` and `rust/ab/README.md` (`8b6eed6`). They are standard library only. The default source is written in one line, and `source_get` is the only code that talks to it (GET only, and its errors never print a URL).
+
+Plan output, real, from Franz's app (GETs of `/api/status`, `/api/generations`, `/api/generations/<id>` and `/api/profiles` only; no profile audio was fetched):
+```
+scripts: 10
+script 1: bucket 2 parts, 2 parts, 434 characters, voice 1
+script 2: bucket 2 parts, 2 parts, 280 characters, voice 2
+script 3: bucket 2 parts, 2 parts, 378 characters, voice 3
+script 4: bucket 3 parts, 3 parts, 452 characters, voice 4
+script 5: bucket 3 parts, 3 parts, 399 characters, voice 3
+script 6: bucket 3 parts, 3 parts, 398 characters, voice 5
+script 7: bucket 3 parts, 3 parts, 490 characters, voice 1
+script 8: bucket 4-5 parts, 4 parts, 582 characters, voice 1
+script 9: bucket 4-5 parts, 4 parts, 500 characters, voice 3
+script 10: bucket 4-5 parts, 4 parts, 573 characters, voice 2
+voices: 5
+reference clip files to copy: 38
+parts: 30
+takes, least: 60
+takes, most: 480
+take bound: no unbounded term while the ending guard is off (render checks it); per part 2 x (max_attempts + compare_takes - 1), plus 3 per voice without a preview, times 2 engines
+This is more than the 20-take limit; rendering needs Franz's OK for 480 takes.
+```
+- **Take bound.** It has no unbounded term while `experimental_qwen_ending_guard` is off. Per part it is 2 x (`max_attempts` + `compare_takes` - 1): `render_chunk` plus one final-check re-record. Each voice without a preview file adds 3 (the startup `make_preview`). The sum is doubled for two engines.
+  - If the guard were on, `_guarded_take` would allow up to 4 takes per sentence per take.
+  - The guard comes from the temp library (default False), not from the script. `render` checks it on each engine before each script and stops if it is on.
+  - The Python engine has no take cap. `render` therefore cancels and stops when a script is split into more parts than planned; fewer parts stay inside the bound.
+- **Voice files: this departs from the lead's wording.** `render` copies the files the profile document names (variant clips, preview, original recording) and also three fixed-name files the render path reads: `fingerprint.npy` (`profile_assets`), `mic.json` (`assemble`, `backfill`) and `clean.wav` (`noise_limit`, `backfill`). If the source answers 404 for one of the three, it is skipped. The printed "38" counts all of them, so it is an upper bound.
+- **Stored settings.** `POST /api/generations` takes no settings, so `render` sends the script's stored `settings` keys with `PUT /api/settings` on the temp engine before each create. When a stored value is missing, the bound uses the config.py defaults (4 and 1).
+- **"Takes used"** is the sum of `used_seeds` per part. Render, retakes and the final check all add to it. The stub records none, so it shows 0.
+- **The Python engine starts with `HF_HUB_OFFLINE=1`**, so it can only use the local model cache and never download.
+
+Selftest: it seeds the fixture with `taketwo-engine seed` and serves it with `serve --stub-renderer` as the source.
+- `--selftest-rule` drops the outcome filter, allows 1 part and accepts fewer than 10 scripts. The fixture has 4 finished narrations and 1 voice, so the plan has 4 scripts and `takes, most: 134`.
+- `render` ran with both engines as stub Rust engines. The temp library was written by the Python app's `db` module, and the Rust engine read it.
+- Then `page`. All asserts passed: 2 WAVs per script, 2 players per script, the key file exists, no engine word is in the page, the source library is unchanged (names, sizes, mtimes), every pid is gone and no port is listening.
+- First runs failed twice, and both were fixed in the harness, not the engine:
+  - The fixture's `ctaccept01` has 2 hand-made parts, but the cleaned text chunks to 1, which tripped the parts check. The check now fires only on more parts than planned.
+  - A closed engine leaves its port in TIME_WAIT, so a bind test fails. The port check now asks whether anything is listening.
+
+Acceptance commands, run from WT:
+- `plan` gives `scripts: 10` and `takes, most: 480`: exit 0. A second `plan` leaves `scripts.json` byte-identical: exit 0.
+- `render` and `render --franz-ok 1` both exit 3 ("Rendering waits for Franz's OK (480 takes at most, 38 reference clips copied from 5 voices).").
+- `cargo build -p taketwo-engine` then `selftest`: `AB SELFTEST PASS`, exit 0.
+- `git ls-files rust/ab/private` is empty, `check-ignore` passes, and `8766` occurs on 1 line of `ab.py`: exit 0.
+- `check_private.py`: 0 matches, exit 0.
+- `cargo test --workspace`: exit 0, 25 result lines all ok.
+- `contract.sh`: `Ran 33 tests`, `OK`, exit 0.
+- The clean-tree check, `g8.sh` and the port/process check were run after this entry was committed (results are in the final report to the lead).
+
+Disk free: 11 GB before, 13 GB after removing incremental, 12 GB at the end.
+
+Not done: no real render, no model run, no push. Rendering needs Franz's OK for 480 takes and for copying the files of 5 voices (at most 38) into temp folders.
