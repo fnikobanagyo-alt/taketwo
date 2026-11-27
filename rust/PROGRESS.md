@@ -10,7 +10,7 @@ The loop appends one entry per session at the bottom: date, step id, what was bu
 | S02 Windows CUDA link proof | done (G6 early evidence) |
 | S03 Text logic | done |
 | S04 Library store, seeder, one-time copy | done |
-| S05 Captions, timings, subtitles, review rules | todo |
+| S05 Captions, timings, subtitles, review rules | done |
 | S06 Engine: read side, guards, UI, contract runner | todo |
 | S07 Engine: write side, worker, stub voice, lifecycle | todo |
 | S08 MCP server | todo |
@@ -454,3 +454,30 @@ Next step: **S05 Captions, timings, subtitles, review rules**, alone (S06 is the
    - `rust/scripts/g8.sh` ends with `G8 PASS`; `lsof -nP -iTCP -sTCP:LISTEN | grep -E ':(879[0-589])'` and `pgrep -fl 'rust-taketwo/rust/target/'` print nothing.
 9. Safety for this step: no port bound, no engine started, no model, no push. Only temp folders. Nothing under the main checkout's `data/` or App Support/VoiceForge is opened, not even read-only. Python runs only as `backend/.venv/bin/python -B rust/golden/record.py` with both data variables on a temp folder and `config.DATA_DIR` asserted before any other app import. Add files to git by name, never `git add -A`. Do not weaken a test or widen a tolerance to get to green; a case that can't match goes to the lead with the evidence.
 
+
+### 2026-11-27, builder (Opus), S05 Captions, timings, subtitles, review rules
+Built (commit `d044e1a`), all pure logic in `taketwo-core`, no server, no model:
+- `captions.rs` (`tools.py` lines 18-153): `MAX_CAPTION_CHARS`, `caption_pieces`, `generation_captions`, `generation_timings`, `ts`, `wrap`, `attachment_header`, `to_srt`, `to_vtt`, `to_txt`. `round3` is Python `round(x, 3)` (exact value, ties to even, via `{:.3}` then parse); `ts` uses `(t * 1000.0).round_ties_even()` and floor divmod. Arithmetic in Python's order, so caption and word times are bit-equal. Where Python passes a number through, the JSON number keeps its kind: an integer timeline `start` stays an int in the first caption and, on the estimated path, in the first word (`round(int, 3)` is an int).
+- `review.rs` (`pipeline.py` lines 955-1066): `summarize`, `fix_targets`, `ISSUE_LABEL` (25, in order), `review` (11 keys, positional `chunks[i]` with Python negative indexing), `outcome`, `set_accepted` (clock is a parameter), `TAKE_FIELDS`, `MAX_OLD_TAKES`, `take_dir`, `archive_take` (copy2: contents, permissions, times), `trim_takes`, `take_audio`. The take functions take the generations folder. Where Python raises (missing key, index out of range, null timeline in captions) the Rust returns `Err`; nothing panics.
+- `text::SequenceMatcher::get_matching_blocks` (difflib's LIFO queue, sort, adjacent merge, final `(len(a), len(b), 0)`); `matches()` now sums it. `text::py` gained `truthy`, `num`, `int`, `display` (Python value semantics on JSON).
+- `rust/golden/record.py` section S05 writes `rust/golden/review.json` (same temp-folder safety; `pipeline.time` pinned and restored; take files in the temporary generations folder, paths recorded relative). Counts: round 280 (incl. 0.0005, 0.0015, 0.0025, 2.5005, 3599.9995, dyadic ties 0.0625/0.1875/0.3125, above one hour, 1e16, 1.5e300, 250 seeded), wrap 17, pieces 18, header 14, timings 26 (9 estimated, 2 where Python raises), rules 26 (19 `needs_listen`, 1 where `review` raises IndexError), accept 10 (incl. negative and out-of-range part), takes 9 (7 archived), issue_label 25, take_fields 15.
+- Tests `tests/captions_review_golden.rs`, 9 tests, every name contains `captions` or `review`, each asserts its case counts: contract narrations (5 read, 4 with a timeline; outcome, the 7 review keys, timings, captions, srt, vtt, txt), round and ts, wrap/pieces/header, timings and subtitles, ISSUE_LABEL and constants, rules (fix_targets, outcome, review with and without `voice_pitch_hz`, summarize), set_accepted, takes against Python (archive document, trimmed part, file tree with contents, `take_audio` for k 0-7), and a temp-folder takes test (C). Comparison: floats bit-equal, int and float kept apart, key order compared.
+
+Commands, from `$WT` (real results):
+- `cd rust && source scripts/env.sh && cargo test -p taketwo-core -- review captions`: `test result: ok. 9 passed; 0 failed` (other binaries 0 passed, filtered); grep check exit 0.
+- `cd rust && cargo test --workspace`: exit 0 (171 passed, 0 failed, 1 ignored as before).
+- `backend/.venv/bin/python -B rust/golden/record.py && git diff --exit-code -- rust/golden`: exit 0; two runs give identical shasums of every golden file.
+- Clean checkout (`git archive HEAD rust contract`, fresh target dir, `cargo test -p taketwo-core -- review captions`): `ok. 9 passed`.
+- Mutation check: `ts` with `.round()` and `round3` as `(x * 1000).round() / 1000` (ties away) made `captions_round_and_ts` (100 mismatches) and `captions_timings_and_subtitles` (9 mismatches) fail. Undone (file restored from a copy), tests green again.
+- Clippy: no warnings in the new files (older warnings in text and library tests unchanged).
+- Acceptance 5 and 6 (clean tree, no home path, `backend/app` and `mcp` unchanged, main at `4448aaa`; `g8.sh`, no dev port, no `rust/target` process): run after this entry is committed; results in the builder's report.
+- No port bound, no engine, no model, no push. Only temp folders.
+
+Left out or limited:
+- `select_take` and anything that renders: S16, as planned.
+- Python dict keys treat `1` and `1.0` as the same part number; the port keys parts by their JSON text, so a float part number would not find an int timeline entry. Python never writes float part numbers.
+- `py::display` prints a bool as `true` where an f-string prints `True` (only reachable with a bool take number).
+- A recorded error case checks only that Rust returns `Err`, not the exception type.
+
+Questions for the lead:
+1. Rust returns `Err(String)` where Python raises (for example a timeline entry for a missing part). The engine step (S06) decides the HTTP status for those; Python answers 500. Keep that?
