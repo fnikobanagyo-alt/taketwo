@@ -14,6 +14,8 @@ export TAKETWO_DATA="$DATA/library"
 source "$WT/rust/scripts/env.sh" >/dev/null   # keeps this TAKETWO_DATA
 LIB="$TAKETWO_DATA"
 PIDS=()
+BUILT_UI=""
+UI="$WT/frontend/dist"
 
 cleanup() {
     for p in ${PIDS[@]+"${PIDS[@]}"}; do
@@ -23,6 +25,8 @@ cleanup() {
         wait "$p" 2>/dev/null
     done
     rm -rf "$DATA"
+    # A UI built here goes again: record_http.py's Python engine serves frontend/dist when it exists.
+    [ -n "$BUILT_UI" ] && rm -rf "$UI"
 }
 trap cleanup EXIT INT TERM
 
@@ -54,10 +58,10 @@ start_shell() {
 (cd "$WT/rust" && cargo build -q -p taketwo -p taketwo-engine) || fail "build"
 SHELL_BIN="$WT/rust/target/debug/taketwo"
 ENGINE_BIN="$WT/rust/target/debug/taketwo-engine"
-UI="$WT/frontend/dist"
 if [ ! -f "$UI/index.html" ]; then
     # --configLoader runner: vite reads its config without writing a temp file into the symlinked node_modules.
     (cd "$WT/frontend" && npm run build -- --configLoader runner >/dev/null) || fail "npm run build"
+    BUILT_UI=1
 fi
 "$ENGINE_BIN" seed --fixture "$WT/contract/fixture.json" >/dev/null || fail "seed"
 
