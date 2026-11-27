@@ -11,7 +11,7 @@ default = []
 # One switch for every GPU piece: Candle (qwen_tts) and whisper.cpp both build for CUDA.
 cuda = ["qwen_tts/cuda"]
 flash-attn = ["cuda", "qwen_tts/flash-attn"]
-# Metal for Candle only; whisper.cpp stays on CPU on the Mac until S13 decides.
+# Metal for Candle and whisper.cpp (S13); whisper.cpp still runs on the CPU unless the caller asks for the GPU.
 metal = ["qwen_tts/metal"]
 
 [dependencies]

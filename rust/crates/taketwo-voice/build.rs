@@ -21,6 +21,8 @@ fn main() {
     println!("cargo:rustc-env=TAKETWO_WHISPER_COMMIT={commit}");
 
     let cuda = std::env::var_os("CARGO_FEATURE_CUDA").is_some();
+    // Metal only with the `metal` feature (Mac); the shader source is embedded, so no metal compiler runs.
+    let metal = std::env::var_os("CARGO_FEATURE_METAL").is_some();
     let mut cfg = cmake::Config::new(&src);
     // Release always: a Debug build on MSVC uses the /MDd runtime, which Rust does not link.
     cfg.profile("Release")
@@ -30,7 +32,8 @@ fn main() {
         .define("WHISPER_BUILD_SERVER", "OFF")
         .define("GGML_NATIVE", "OFF") // the exe must run on other CPUs than the build machine's
         .define("GGML_OPENMP", "OFF")
-        .define("GGML_METAL", "OFF")
+        .define("GGML_METAL", if metal { "ON" } else { "OFF" })
+        .define("GGML_METAL_EMBED_LIBRARY", if metal { "ON" } else { "OFF" })
         .define("GGML_BLAS", "OFF")
         .define("GGML_CUDA", if cuda { "ON" } else { "OFF" });
     if std::env::var("CARGO_CFG_TARGET_ENV").as_deref() == Ok("msvc") {
@@ -62,6 +65,9 @@ fn main() {
     if cuda {
         libs.push("ggml-cuda");
     }
+    if metal {
+        libs.push("ggml-metal");
+    }
     libs.push("ggml-base");
     for lib in libs {
         println!("cargo:rustc-link-lib=static={lib}");
@@ -71,6 +77,11 @@ fn main() {
     if target == "macos" {
         println!("cargo:rustc-link-lib=c++");
         println!("cargo:rustc-link-lib=framework=Accelerate"); // ggml-cpu uses vDSP on Apple
+        if metal {
+            for fw in ["Foundation", "Metal", "MetalKit"] {
+                println!("cargo:rustc-link-lib=framework={fw}");
+            }
+        }
     } else if target == "linux" {
         println!("cargo:rustc-link-lib=stdc++");
     }
