@@ -1,6 +1,6 @@
 //! audio.decode_to_wav and audio.export_mp3: ffmpeg run as a separate program with Python's exact
 //! arguments. The program is `TAKETWO_FFMPEG` when set, else `ffmpeg` on PATH. A missing or failing
-//! program is an error value. (The speed change, atempo, is step S16.)
+//! program is an error value. `atempo` is pipeline.apply_speed's tempo change.
 
 use std::ffi::OsString;
 use std::path::Path;
@@ -56,6 +56,19 @@ pub fn decode_to_wav(src: &Path, dst: &Path, sr: u32, max_seconds: Option<f64>) 
 
 pub fn export_mp3(wav: &Path, mp3: &Path) -> Result<(), String> {
     run(export_args(wav, mp3))
+}
+
+/// pipeline.apply_speed's arguments: a pitch-preserving tempo change to 16-bit PCM (`atempo={speed:.3f}`).
+pub fn atempo_args(src: &Path, dst: &Path, speed: f64) -> Vec<OsString> {
+    let mut cmd = os(&["-y", "-hide_banner", "-loglevel", "error", "-i"]);
+    cmd.push(src.into());
+    cmd.extend(os(&["-af", &format!("atempo={speed:.3}"), "-c:a", "pcm_s16le"]));
+    cmd.push(dst.into());
+    cmd
+}
+
+pub fn atempo(src: &Path, dst: &Path, speed: f64) -> Result<(), String> {
+    run(atempo_args(src, dst, speed))
 }
 
 #[cfg(test)]

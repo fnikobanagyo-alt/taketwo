@@ -7,6 +7,7 @@
 
 pub mod files;
 pub mod models;
+pub mod narration;
 
 use crate::audio;
 use crate::checks::{self, py_round, Evaluation, Limits, HARD_ISSUES};
@@ -22,6 +23,29 @@ use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicBool, Ordering};
 
 const QWEN_KEYS: [&str; 4] = ["temperature", "top_p", "top_k", "repetition_penalty"];
+
+/// The `qwen3` family's sampler defaults (engines.py `_QWEN_PARAMS`): the one copy, read by taketwo-voice::qwen
+/// and the engine's `/api/engines` (lead decision 17).
+pub const QWEN_SAMPLER_DEFAULTS: [(&str, f64); 4] = [("temperature", 0.7), ("top_p", 0.9), ("top_k", 40.0), ("repetition_penalty", 1.05)];
+
+/// The error text a model returns when its cancel flag stopped it (qwen_tts and the whisper binding use it).
+pub const CANCELLED: &str = "cancelled";
+
+/// worker.py's `phase` decorator as a hook: runs the step inside a named phase of the running job.
+pub type Phase<'a> = &'a dyn Fn(&str, &mut dyn FnMut());
+
+/// No job to annotate (tests, a speed change made outside a job).
+pub fn no_phase(_: &str, f: &mut dyn FnMut()) {
+    f()
+}
+
+/// Run `f` inside phase `name`.
+pub fn phased<T>(phase: Phase, name: &str, f: impl FnOnce() -> T) -> T {
+    let mut f = Some(f);
+    let mut out = None;
+    phase(name, &mut || out = Some((f.take().expect("a phase runs its step once"))()));
+    out.expect("the phase hook ran its step")
+}
 const TWO32: u128 = 1 << 32;
 
 /// What render_chunk raises: `Cancelled`, a `ValueError` with Python's message, or any other failure.
@@ -74,6 +98,7 @@ pub struct Render<'a> {
     pub clock: &'a mut dyn FnMut() -> f64,
     pub cancel: &'a AtomicBool,
     pub pitch_cache: &'a mut HashMap<String, f64>,
+    pub phase: Phase<'a>,
 }
 
 impl Render<'_> {
@@ -81,16 +106,39 @@ impl Render<'_> {
         if self.cancel.load(Ordering::SeqCst) { Err(RenderError::Cancelled) } else { Ok(()) }
     }
 
+    /// A model error while the cancel flag is set (or the model's own cancelled word) is a stop, not a failure.
+    fn model_error(&self, e: String) -> RenderError {
+        if e == CANCELLED || self.cancel.load(Ordering::SeqCst) { RenderError::Cancelled } else { RenderError::Other(e) }
+    }
+
+    /// `engines.synthesize(...)` in the `synthesis` phase.
+    #[allow(clippy::too_many_arguments)]
+    fn synth(&mut self, engine: &str, text: &str, assets: &Assets, language: &str, params: &Doc, seed: u32, expected: f64) -> Result<models::Take, RenderError> {
+        let (ph, cancel) = (self.phase, self.cancel);
+        let voice = &mut *self.voice;
+        let r = phased(ph, "synthesis", || voice.synthesize(engine, text, &assets.ref_wav, &assets.ref_text, language, params, seed, expected, cancel));
+        r.map_err(|e| self.model_error(e))
+    }
+
     /// `ml.transcribe(a, sr, language=language, words=True)`: resampled to 16 kHz first, as ml.py does.
     fn transcribe(&mut self, a: &[f32], sr: u32, language: &str) -> Result<Transcript, RenderError> {
         let x = audio::resample(a, sr, 16000);
         let lang = if language.is_empty() { None } else { Some(language) };
-        Ok(self.transcriber.transcribe(&x, lang, true, self.cancel)?)
+        let (ph, cancel) = (self.phase, self.cancel);
+        let tr = &mut *self.transcriber;
+        let r = phased(ph, "transcription", || tr.transcribe(&x, lang, true, cancel));
+        r.map_err(|e| self.model_error(e))
     }
 
     /// `evaluate(a, sr, text, fp, self_sim, wps, s, language, noise_max, transcript)`.
     #[allow(clippy::too_many_arguments)]
     fn evaluate(&mut self, a: &[f32], sr: u32, text: &str, assets: &Assets, s: &Doc, language: &str, noise_max: f64, transcript: Option<Transcript>) -> Result<Evaluation, RenderError> {
+        let ph = self.phase;
+        phased(ph, "quality_check", || self.evaluate_now(a, sr, text, assets, s, language, noise_max, transcript))
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    fn evaluate_now(&mut self, a: &[f32], sr: u32, text: &str, assets: &Assets, s: &Doc, language: &str, noise_max: f64, transcript: Option<Transcript>) -> Result<Evaluation, RenderError> {
         let limits = Limits {
             max_wer: py::num(get(s, "max_wer")?)?,
             min_speaker_similarity: py::num(get(s, "min_speaker_similarity")?)?,
@@ -353,7 +401,7 @@ fn guarded_take(r: &mut Render, text: &str, engine: &str, assets: &Assets, langu
         for retry in 0..local_limit {
             r.check()?;
             let sentence_seed = ((seed as u128 + si as u128 * 2654435761 + retry as u128 * 2246822519) % TWO32) as u32;
-            let take = r.voice.synthesize(engine, &speak, &assets.ref_wav, &assets.ref_text, language, params, sentence_seed, expected, r.cancel).map_err(RenderError::Other)?;
+            let take = r.synth(engine, &speak, assets, language, params, sentence_seed, expected)?;
             r.check()?;
             let tr = r.transcribe(&take.audio, take.sr, language)?;
             let all: Vec<Word> = tr.segments.iter().flat_map(|s| s.words.iter().cloned()).collect();
@@ -595,7 +643,7 @@ pub fn render_chunk(r: &mut Render, narration: &mut Doc, ci: usize, profile: &mu
                 }
             }
         } else {
-            let take = r.voice.synthesize(&engine, &speak, &assets.ref_wav, &assets.ref_text, &language, &p, seed, expected_seconds, r.cancel)?;
+            let take = r.synth(&engine, &speak, &assets, &language, &p, seed, expected_seconds)?;
             (take.audio, take.sr, None, None, None, take.report)
         };
         r.check()?;
@@ -668,7 +716,7 @@ pub fn render_chunk(r: &mut Render, narration: &mut Doc, ci: usize, profile: &mu
             let per = text::word_count(&ch_text) as f64 / assets.wps;
             let expected_seconds = (if 1.0 >= per { 1.0 } else { per }) * budget;
             let t0 = (r.clock)();
-            let take = r.voice.synthesize(&engine, &ch_text, &assets.ref_wav, &assets.ref_text, &language, &p, seed, expected_seconds, r.cancel)?;
+            let take = r.synth(&engine, &ch_text, &assets, &language, &p, seed, expected_seconds)?;
             r.check()?;
             let mut ev = r.evaluate(&take.audio, take.sr, &ch_text, &assets, &s, &language, nmax, None)?;
             ev.issues.push("ending_unverified");

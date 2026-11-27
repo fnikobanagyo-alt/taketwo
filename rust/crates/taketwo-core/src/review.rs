@@ -245,7 +245,7 @@ fn file_name<'a>(ch: &'a Doc, name: &str) -> Result<Option<&'a str>, String> {
 }
 
 /// `shutil.copy2`: contents, permissions and times.
-fn copy2(src: &Path, dst: &Path) -> Result<(), String> {
+pub fn copy2(src: &Path, dst: &Path) -> Result<(), String> {
     std::fs::copy(src, dst).map_err(|e| format!("{}: {e}", dst.display()))?;
     let m = std::fs::metadata(src).map_err(|e| e.to_string())?;
     let times = std::fs::FileTimes::new()

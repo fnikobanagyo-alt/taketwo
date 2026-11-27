@@ -142,6 +142,7 @@ pub fn replay_with(case: &Value, pitch_cache: &mut HashMap<String, f64>, again: 
             clock: &mut clock,
             cancel: &flag,
             pitch_cache,
+            phase: &render::no_phase,
         };
         render::render_chunk(&mut r, &mut narration, inp["ci"].as_u64().unwrap() as usize, &mut profile, &obj(&inp["settings"]), inp["regen_round"].as_i64().unwrap(), inp["nonce"].as_u64().unwrap() as u32)
     };
