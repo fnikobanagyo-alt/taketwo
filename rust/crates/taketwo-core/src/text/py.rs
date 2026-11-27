@@ -79,6 +79,49 @@ pub fn digit_value(c: char) -> u32 {
     (cp - zero).min(9)
 }
 
+/// Python truthiness of a JSON value (`None`, `False`, `0`, `""`, `[]`, `{}` are false).
+pub fn truthy(v: &serde_json::Value) -> bool {
+    use serde_json::Value::*;
+    match v {
+        Null => false,
+        Bool(b) => *b,
+        Number(n) => n.as_f64() != Some(0.0),
+        String(s) => !s.is_empty(),
+        Array(a) => !a.is_empty(),
+        Object(o) => !o.is_empty(),
+    }
+}
+
+/// A JSON number (or bool) as Python arithmetic sees it; anything else would raise TypeError.
+pub fn num(v: &serde_json::Value) -> Result<f64, String> {
+    match v {
+        serde_json::Value::Bool(b) => Ok(*b as u8 as f64),
+        serde_json::Value::Number(n) => n.as_f64().ok_or_else(|| format!("not a number: {n}")),
+        other => Err(format!("TypeError: not a number: {other}")),
+    }
+}
+
+/// Python `int(v)` for a JSON value: ints as they are, floats truncated, bools 0/1, numeric strings parsed.
+pub fn int(v: &serde_json::Value) -> Result<i64, String> {
+    match v {
+        serde_json::Value::Number(n) => match n.as_i64() {
+            Some(i) => Ok(i),
+            None => n.as_f64().filter(|f| f.is_finite()).map(|f| f.trunc() as i64).ok_or_else(|| format!("int({n})")),
+        },
+        serde_json::Value::Bool(b) => Ok(*b as i64),
+        serde_json::Value::String(s) => strip(s).parse().map_err(|_| format!("ValueError: int({s:?})")),
+        other => Err(format!("TypeError: int({other})")),
+    }
+}
+
+/// Python `str(v)` as an f-string prints it: strings bare, numbers and the rest as JSON.
+pub fn display(v: &serde_json::Value) -> String {
+    match v {
+        serde_json::Value::String(s) => s.clone(),
+        other => other.to_string(),
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

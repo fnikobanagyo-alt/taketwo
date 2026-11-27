@@ -1,4 +1,4 @@
-"""Record Python parity vectors for the Rust `text` module (step S03) and `library` module (step S04).
+"""Record Python parity vectors for the Rust `text` (S03), `library` (S04), `captions` and `review` (S05) modules.
 
     backend/.venv/bin/python -B rust/golden/record.py
 
@@ -8,12 +8,16 @@ Writes rust/golden/library.sqlite3 (a database written by db.py, synthetic docum
 rust/golden/library.json (a JSON copy of its documents, settings vectors, and what
 contract/seed_python.py seed() writes into a temporary folder, recorded in a child process).
 db.py's clock is pinned, so both files come out byte-identical on every run.
+Writes rust/golden/review.json (step S05): tools.py captions, timings, subtitles and download header,
+and pipeline.py review rules, "Sounds fine" and take bookkeeping, on synthetic documents
+(pipeline's clock pinned; take files live in the temporary generations folder, paths recorded relative).
 Safety: the data folder is a fresh temporary folder (checked before any other app import),
 Hugging Face is offline, and the Whisper normalizer comes from tokenizer files only.
 No model is loaded or downloaded: ml.stt_model is replaced by a function that raises.
 """
 from __future__ import annotations
 
+import copy
 import difflib
 import json
 import os
@@ -472,6 +476,283 @@ def seed_child() -> None:
     print(json.dumps({"files": files, "profiles": db.list_profiles(), "generations": db.list_generations()}, allow_nan=False))
 
 
+# ---- step S05: captions, timings, subtitles, review rules ---------------------------------------
+
+REVIEW_OUT = HERE / "review.json"
+NOW0 = 1800001234.5
+
+
+def _w(word, start, end):
+    return {"word": word, "start": start, "end": end}
+
+
+def _heard(text, start=0.0, step=0.25):
+    """Heard words for a script, one per step."""
+    return [_w(x, round(start + n * step, 6), round(start + (n + 1) * step, 6)) for n, x in enumerate(text.split())]
+
+
+def _gen(chunks, timeline, **extra):
+    return {"id": "s05gen", "status": "done", **extra, "timeline": timeline,
+            "chunks": [{"i": n, **c} for n, c in enumerate(chunks)]}
+
+
+def _run(fn, *args):
+    try:
+        return {"result": fn(*args)}
+    except Exception as e:  # noqa: BLE001 - the Rust port must fail the same cases
+        return {"error": type(e).__name__}
+
+
+LONG_EN = ("This sentence is deliberately long, with several clauses; it keeps going: on and on, until it is far "
+           "longer than the caption limit allows. Short one. And a final question that is also rather long for one "
+           "caption, wouldn't you say, my friend?")
+
+
+def timing_cases() -> list[dict]:
+    t1 = "Hello there, my friend. How are you?"
+    cases = [
+        _gen([{"text": t1, "words": _heard(t1)}], [{"i": 0, "start": 0.0, "end": 2.0}], speed=1.0, duration=2.0),
+        _gen([{"text": "The cat sat down.", "words": _heard("The dog sat down.")}], [{"i": 0, "start": 0.5, "end": 1.6}]),
+        _gen([{"text": "Well I think so.", "words": _heard("I think so.", 0.3)}], [{"i": 0, "start": 1.0, "end": 2.2}], speed=0.8),
+        _gen([{"text": "We go home now.", "words": _heard("We go home")}], [{"i": 0, "start": 0.0, "end": 1.0}], speed=1.5),
+        _gen([{"text": "We go to the store.", "words": _heard("Um we go to the the store")}], [{"i": 0, "start": 0.0, "end": 2.0}], speed=0),
+        _gen([{"text": "One two three four five.", "words": _heard("one three five")}], [{"i": 0, "start": 0.2, "end": 1.4}], speed=None),
+        _gen([{"text": "Don't STOP, it's Franz's turn!", "words": _heard("dont stop its franz's TURN")}], [{"i": 0, "start": 0.0, "end": 1.5}]),
+        _gen([{"text": "Café crème, naïve Æsop.", "words": _heard("cafe creme naive æsop")}], [{"i": 0, "start": 0.0, "end": 1.2}]),
+        # a part with words beside one without (estimated)
+        _gen([{"text": "First part here.", "words": _heard("First part here.")},
+              {"text": "Second part has no word times at all."}],
+             [{"i": 0, "start": 0.0, "end": 0.75}, {"i": 1, "start": 1.1, "end": 3.3}], speed=1.25, duration=3.3),
+        # empty part text, and sentences with no words
+        _gen([{"text": ""}, {"text": "   "}, {"text": "?! Hello. . World."}],
+             [{"i": 0, "start": 0.0, "end": 0.5}, {"i": 1, "start": 0.5, "end": 1.0}, {"i": 2, "start": 1.0, "end": 2.0}]),
+        _gen([{"text": "", "words": [_w("ghost", 0.0, 0.2)]}], [{"i": 0, "start": 0.0, "end": 0.5}]),
+        # integer times stay integers where Python keeps them
+        _gen([{"text": "Integer start and end times."}], [{"i": 0, "start": 0, "end": 3}], duration=3),
+        _gen([{"text": "Integer word times.", "words": [_w("Integer", 0, 1), _w("word", 1, 2), _w("times.", 2, 3)]}],
+             [{"i": 0, "start": 1, "end": 4}]),
+        # half milliseconds and times above one hour
+        _gen([{"text": "Half a milli.", "words": [_w("Half", 0.0005, 0.0015), _w("a", 0.0015, 0.0025), _w("milli.", 0.0025, 0.0045)]}],
+             [{"i": 0, "start": 0.0, "end": 0.01}]),
+        _gen([{"text": "Later on.", "words": [_w("Later", 0.0005, 0.5), _w("on.", 0.5, 0.9995)]}],
+             [{"i": 0, "start": 2.5, "end": 3.5}]),
+        _gen([{"text": "Almost an hour.", "words": [_w("Almost", 0.0, 0.0005), _w("an", 0.0005, 0.0015), _w("hour.", 0.0015, 0.0025)]}],
+             [{"i": 0, "start": 3599.999, "end": 3600.001}]),
+        _gen([{"text": "Well past one hour now."}], [{"i": 0, "start": 3725.2505, "end": 3731.0015}]),
+        _gen([{"text": "Two hours in."}], [{"i": 0, "start": 7200.0005, "end": 7201.9995}]),
+        # long text: caption pieces inside a timeline
+        _gen([{"text": LONG_EN}], [{"i": 0, "start": 0.0, "end": 14.3}]),
+        _gen([{"text": "这是一个很长的中文句子，没有空格，所以必须按字符切分。" * 4}], [{"i": 0, "start": 0.0, "end": 9.0}]),
+        # duplicate chunk ids: the last one wins in the {i: chunk} map
+        {"id": "s05dup", "status": "done", "timeline": [{"i": 0, "start": 0.0, "end": 1.0}],
+         "chunks": [{"i": 0, "text": "First copy."}, {"i": 0, "text": "Second copy wins."}]},
+        # timeline order is the order of the output, whatever the part numbers
+        _gen([{"text": "Part zero."}, {"text": "Part one."}], [{"i": 1, "start": 0.0, "end": 0.8}, {"i": 0, "start": 1.0, "end": 1.7}]),
+        {"id": "s05none", "status": "done", "chunks": [{"i": 0, "text": "No timeline."}]},
+        _gen([{"text": "Speed as text.", "words": _heard("Speed as text.")}], [{"i": 0, "start": 0.0, "end": 1.0}], speed="1.5"),
+        # Python raises: a timeline entry for a part that does not exist, a null timeline
+        _gen([{"text": "Only part."}], [{"i": 3, "start": 0.0, "end": 1.0}]),
+        {"id": "s05null", "status": "done", "timeline": None, "chunks": [{"i": 0, "text": "Null timeline."}]},
+    ]
+    return cases
+
+
+ROUND = [0.0, -0.0, 0.0005, 0.0015, 0.0025, 0.0035, 0.0045, 0.1235, 1.0005, 2.5005, 2.675, 3599.9995, 3600.0005,
+         7200.0015, 86399.9995, 0.0625, 0.1875, 0.3125, 0.4375, 1.0625, 1e16, 1.5e300, 123456.7895, -0.0005,
+         -2.5005, 5e-324, 0.000499999, 0.00050001, 1 / 3, 2 / 3]
+
+
+def round_cases() -> list[float]:
+    rnd = random.Random(23)
+    extra = [rnd.randrange(0, 8_000_000) / 2000 for _ in range(150)] + [rnd.random() * 10_000 for _ in range(100)]
+    return ROUND + extra
+
+
+WRAP = [
+    "x" * 41, "x" * 42, "x" * 43,
+    "This line has exactly forty-one chars ok.", "This line has exactly forty-two chars, ok.",
+    "This line has exactly forty-three chars, ok.",
+    "averyveryverylongtokenwithoutanyspacesatallthatkeepsgoingandgoing",
+    "这是一个很长的中文句子没有空格所以必须按字符切分这是一个很长的中文句子没有空格",
+    "这是一个很长的中文句子没有空格所以必须按字符切分这是一个很长的中文句子没有空格好",
+    "这是一个很长的中文句子没有空格所以必须按字符切分" * 2 + "好", "这是一个很长的中文句子没有空格所以必须按字符切分" * 2 + "好的",
+    "Supercalifragilisticexpialidocious-and-even-longer-word a b",
+    "aaaaaaaaaaaaaaaaaaaaaaaaaa bbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "Welcome to the show & thanks for listening, today we talk about rivers.",
+    "many   spaces    between   these words    and more words here",
+    "Ça va très bien, merci beaucoup, et vous, mon ami très cher?",
+    "a b c d e f g h i j k l m n o p q r s t u v w x y z a b c",
+]
+
+PIECES = [
+    "", "   \n\t ", "One. Two! Three? Four", "Hi. There.\x1cNext. Done",
+    "a" * 84, "a" * 85, ("word " * 17).strip()[:84], ("word " * 17).strip()[:85] + "x",
+    ("abcd " * 17).strip(), ("abcd " * 17).strip() + "e",
+    "The first clause of this sentence is long enough to pass the limit, then a second clause follows here and ends.",
+    "Short clause, then a much much longer clause that goes well past the flush limit of the captions here; end: x y.",
+    "Wörter mit Umlauten über Äpfel, Öl und Übermut sind länger in Bytes als in Zeichen, aber nicht zu lang.",
+    "Wörter mit Umlauten über Äpfel, Öl und Übermut sind länger in Bytes als in Zeichen, aber gar nicht zu lang hier.",
+    "这是一个很长的中文句子，没有空格，所以必须按字符切分。" * 4,
+    "x" * 100 + " tail words after a huge one.",
+    LONG_EN,
+    "Line one.\n\nLine two?  Line three!   ",
+]
+
+HEADERS = [
+    ("Rivers and towns", "wav"), ("Café olé", "mp3"), ("日本語のタイトル", "srt"), ('He said "hi"', "vtt"),
+    ("back\\slash", "txt"), ("line\r\nbreak", "wav"), ("  spaced  out  ", "mp3"), ("100% / done", "wav"),
+    ("", "wav"), ("~tilde_under-score.dot", "srt"), ("🎙 Mic check", "mp3"), ("tab\there", "wav"),
+    ("a+b=c&d?e#f", "txt"), ("  日本  ", "vtt"),
+]
+
+
+def _chunk(text="A part.", **kw):
+    return {"text": text, "status": "ok", "issues": [], "file": "x.wav", "heard": text, "pitch_hz": 180.0, **kw}
+
+
+def review_cases() -> list[dict]:
+    tl3 = [{"i": 0, "start": 0.0, "end": 1.0}, {"i": 1, "start": 1.2, "end": 2.0}, {"i": 2, "start": 2.4, "end": 3.0}]
+    g = lambda chunks, **kw: {"id": "s05rev", "status": "done", "flagged": [], "message": "old", **kw,
+                              "chunks": [{"i": n, **c} for n, c in enumerate(chunks)]}
+    flagged = lambda text="Flagged part.", codes=("cut_off",), **kw: _chunk(text, status="flagged", issues=list(codes), **kw)
+    return [
+        g([_chunk(), _chunk(), _chunk()], timeline=tl3),
+        g([_chunk(), flagged(), _chunk()], timeline=tl3),
+        g([_chunk(), _chunk(), _chunk(final_issues=["processed_audio_missing"])], timeline=tl3, final_scan={"remaining": [2]}),
+        g([_chunk(), _chunk("It&39;s web code."), _chunk()], timeline=tl3),
+        g([_chunk(), flagged(accepted={"by": "person", "at": 1.5}), _chunk()], timeline=tl3),
+        g([flagged(accepted={"by": "person", "at": 1.5}), flagged(accepted=True), _chunk()], timeline=tl3),
+        g([flagged(), _chunk(), flagged("Third &amp; last."), _chunk(), flagged(codes=("too_long",))], timeline=tl3),
+        g([flagged(codes=("cut_off", "leak"), final_issues=["leak", "noise", "cut_off"])], timeline=tl3),
+        g([flagged(codes=())], timeline=tl3),
+        g([flagged(codes=("weird_new_thing", "x"))], timeline=tl3),
+        g([flagged()]),
+        g([flagged(take=3), flagged(take=None), flagged()], timeline=tl3),
+        g([flagged(), _chunk()], timeline=tl3, status="rendering"),
+        g([flagged(heard=None, pitch_hz=None)], timeline=tl3),
+        {"id": "s05bare", "status": "done", "chunks": [{"i": 0, "text": "Bare.", "status": "flagged"}]},
+        g([flagged(codes=("web_artifact",), text="It&#39;s here.")], timeline=tl3),
+        g([_chunk(accepted={"by": "person", "at": 2.0}), _chunk()], timeline=tl3, final_scan={"remaining": [0, 1]}),
+        g([_chunk(), _chunk()], timeline=tl3, final_scan=None),
+        g([_chunk(), _chunk()], timeline=tl3, final_scan={"remaining": None}),
+        g([flagged(text=None), _chunk()], timeline=tl3),
+        g([flagged(accepted={}), _chunk()], timeline=tl3),
+        g([flagged(), flagged()], timeline=[{"i": 1, "start": 0.0, "end": 1.0}, {"i": 1, "start": 5.0, "end": 6.0}, {"i": 0, "start": 7, "end": 8}]),
+        g([_chunk(), _chunk()], timeline=tl3, final_scan={"remaining": [1, 1, 0]}),
+        {"id": "s05nokeys", "status": "done", "chunks": [{"i": 0, "text": "A.", "status": "ok"}, {"i": 1, "text": "B.", "status": "flagged"}]},
+        g([_chunk(), _chunk()], timeline=tl3, final_scan={"remaining": [5]}),  # Python raises IndexError in review()
+        g([_chunk(), flagged()], timeline=tl3, status="cancelled"),
+    ]
+
+
+def record_review_rules(pipeline) -> list[dict]:
+    out = []
+    for gen in review_cases():
+        case = {"gen": copy.deepcopy(gen), "fix_targets": _run(pipeline.fix_targets, copy.deepcopy(gen)),
+                "outcome": _run(pipeline.outcome, copy.deepcopy(gen))}
+        for name, pitch in (("review", None), ("review_pitch", 181.25)):
+            case[name] = _run(pipeline.review, copy.deepcopy(gen), pitch)
+        summarized = copy.deepcopy(gen)
+        case["summarize"] = _run(lambda d: (pipeline.summarize(d), d)[1], summarized)
+        out.append(case)
+    return out
+
+
+def record_accept(pipeline) -> list[dict]:
+    base = review_cases()
+    picks = [(base[1], 1, True), (base[1], 1, False), (base[4], 1, False), (base[5], 2, True), (base[2], 2, True),
+             (base[12], 0, True), (base[12], 0, False), (base[0], 0, True), (base[1], -1, True), (base[1], 7, True)]
+    out = []
+    for n, (gen, ci, on) in enumerate(picks):
+        now = NOW0 + n * 0.125
+        pipeline.time = types.SimpleNamespace(time=lambda now=now: now)
+        out.append({"gen": copy.deepcopy(gen), "ci": ci, "on": on, "now": now,
+                    "after": _run(pipeline.set_accepted, copy.deepcopy(gen), ci, on)})
+    return out
+
+
+def _tree(root: Path) -> dict:
+    return {f.relative_to(root).as_posix() + ("/" if f.is_dir() else ""): (f.read_text() if f.is_file() else None)
+            for f in sorted(root.rglob("*"))}
+
+
+def record_takes(pipeline, gens: Path) -> list[dict]:
+    full = {"i": 1, "text": "Take me.", "file": "chunk_001.wav", "raw_file": "chunk_001.raw.wav",
+            "context_file": "chunk_001.ctx.wav", "wer": 0.0, "sim": 0.91, "dur": 1.2, "issues": ["cut_off"],
+            "final_issues": [], "heard": "Take me.", "pitch_hz": 180.0, "words": [_w("Take", 0.0, 0.3)],
+            "ending": {"ok": True}, "status": "flagged", "chosen_seed": 7, "accepted": {"by": "person", "at": 1.0},
+            "take": 2, "pause_after": "end"}
+    three = {"chunk_001.wav": "a1", "chunk_001.raw.wav": "r1", "chunk_001.ctx.wav": "c1"}
+    old = lambda *ks: [{"take": k, "text": f"take {k}"} for k in ks]
+    takes_files = lambda gid, *ks: {f"takes/001-{k}/chunk_001.wav": f"old {k}" for k in ks}
+    specs = [
+        ("all three files", full, three),
+        ("context file missing on disk", full, {"chunk_001.wav": "a1", "chunk_001.raw.wav": "r1"}),
+        ("audio file missing", full, {"chunk_001.raw.wav": "r1"}),
+        ("no file key", {k: v for k, v in full.items() if k != "file"}, three),
+        ("take missing, minimal part", {"i": 1, "file": "chunk_001.wav"}, {"chunk_001.wav": "a1"}),
+        ("take as float", {**full, "take": 2.0, "raw_file": None, "context_file": ""}, three),
+        ("five old takes", {**full, "take": 6, "takes": old(1, 2, 3, 4, 5)}, {**three, **takes_files("g", 1, 2, 3, 4, 5)}),
+        ("two old takes", {**full, "take": 3, "takes": old(1, 2)}, {**three, **takes_files("g", 1, 2)}),
+        ("four old takes, part 0", {**full, "i": 0, "file": "chunk_000.wav", "take": 5, "takes": old(1, 2, 3, 4)},
+         {"chunk_000.wav": "z", "takes/000-1/chunk_000.wav": "o1", "takes/000-2/chunk_000.wav": "o2", "takes/000-4/chunk_000.wav": "o4"}),
+    ]
+    out = []
+    for n, (name, ch, files) in enumerate(specs):
+        gid = f"s05take{n}"
+        gdir = gens / gid
+        for rel, content in files.items():
+            (gdir / rel).parent.mkdir(parents=True, exist_ok=True)
+            (gdir / rel).write_text(content)
+        now = NOW0 + 100 + n
+        pipeline.time = types.SimpleNamespace(time=lambda now=now: now)
+        before = copy.deepcopy(ch)
+        archived = pipeline._archive_take(gid, ch)
+        trimmed = copy.deepcopy(ch)
+        pipeline._trim_takes(gid, trimmed)
+        gen = {"id": gid, "chunks": [{"i": 0, "take": 1}, trimmed] if trimmed["i"] == 1 else [trimmed]}
+        ci = trimmed["i"]
+        audio = {str(k): (lambda p: p.relative_to(gens).as_posix() if p else None)(pipeline.take_audio(gen, ci, k)) for k in range(0, 8)}
+        out.append({"name": name, "gen_id": gid, "chunk": before, "files": files, "now": now, "archived": archived,
+                    "trimmed": trimmed, "tree": _tree(gdir), "take_audio_ci": ci, "take_audio": audio})
+        shutil.rmtree(gdir)
+    return out
+
+
+def record_review(config) -> dict:
+    """tools.py captions and timings, pipeline.py review rules and take bookkeeping, on synthetic documents."""
+    from app import pipeline, tools
+
+    saved_time = pipeline.time
+    try:
+        data = {
+            "issue_label": [[k, v] for k, v in pipeline.ISSUE_LABEL.items()],
+            "take_fields": list(pipeline.TAKE_FIELDS),
+            "max_old_takes": pipeline.MAX_OLD_TAKES,
+            "max_caption_chars": tools.MAX_CAPTION_CHARS,
+            "round": [{"x": x, "round3": round(x, 3), "ts": tools._ts(x, ",") if abs(x) < 1e15 else None} for x in round_cases()],
+            "wrap": [{"text": t, "out": tools._wrap(t)} for t in WRAP],
+            "pieces": [{"text": t, "pieces": tools._caption_pieces(t)} for t in PIECES],
+            "header": [{"name": n, "ext": e, "out": tools.attachment_header(n, e)} for n, e in HEADERS],
+            "timings": [],
+            "rules": record_review_rules(pipeline),
+            "accept": record_accept(pipeline),
+            "takes": record_takes(pipeline, config.GENERATIONS_DIR),
+        }
+        for gen in timing_cases():
+            case = {"gen": copy.deepcopy(gen), "timings": _run(tools.generation_timings, copy.deepcopy(gen))}
+            caps = _run(tools.generation_captions, copy.deepcopy(gen))
+            case["captions"] = caps
+            if "result" in caps:
+                c = caps["result"]
+                case.update(srt=tools.to_srt(c), vtt=tools.to_vtt(c), txt=tools.to_txt(c))
+            data["timings"].append(case)
+    finally:
+        pipeline.time = saved_time
+    assert len(data["issue_label"]) == 25, len(data["issue_label"])
+    return data
+
+
 def main() -> None:
     tmp = Path(tempfile.mkdtemp(prefix="taketwo-golden."))
     try:
@@ -526,6 +807,10 @@ def main() -> None:
         lib = {"database": record_database(db), **record_settings(db, config), "seed": seed_golden()}
         LIB_OUT.write_text(json.dumps(lib, ensure_ascii=True, indent=1, allow_nan=False) + "\n")
         print({k: len(v) for k, v in lib.items()})
+
+        rev = record_review(config)
+        REVIEW_OUT.write_text(json.dumps(rev, ensure_ascii=True, indent=1, allow_nan=False) + "\n")
+        print({k: (len(v) if isinstance(v, list) else v) for k, v in rev.items()})
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
 

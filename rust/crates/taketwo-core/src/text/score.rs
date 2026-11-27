@@ -64,14 +64,16 @@ impl<'a, T: Eq + Hash> SequenceMatcher<'a, T> {
         (besti, bestj, bestsize)
     }
 
-    /// The total size of `get_matching_blocks()` (merging adjacent blocks does not change it).
-    pub fn matches(&self) -> usize {
-        let mut queue = vec![(0, self.a.len(), 0, self.b.len())];
-        let mut total = 0;
+    /// `get_matching_blocks()`: difflib's exact algorithm (LIFO queue, sort, merge of adjacent
+    /// blocks), ending with the `(len(a), len(b), 0)` block.
+    pub fn get_matching_blocks(&self) -> Vec<(usize, usize, usize)> {
+        let (la, lb) = (self.a.len(), self.b.len());
+        let mut queue = vec![(0, la, 0, lb)];
+        let mut blocks = Vec::new();
         while let Some((alo, ahi, blo, bhi)) = queue.pop() {
             let (i, j, k) = self.find_longest_match(alo, ahi, blo, bhi);
             if k > 0 {
-                total += k;
+                blocks.push((i, j, k));
                 if alo < i && blo < j {
                     queue.push((alo, i, blo, j));
                 }
@@ -80,7 +82,29 @@ impl<'a, T: Eq + Hash> SequenceMatcher<'a, T> {
                 }
             }
         }
-        total
+        blocks.sort();
+        let (mut i1, mut j1, mut k1) = (0, 0, 0);
+        let mut out = Vec::new();
+        for (i2, j2, k2) in blocks {
+            if i1 + k1 == i2 && j1 + k1 == j2 {
+                k1 += k2;
+            } else {
+                if k1 > 0 {
+                    out.push((i1, j1, k1));
+                }
+                (i1, j1, k1) = (i2, j2, k2);
+            }
+        }
+        if k1 > 0 {
+            out.push((i1, j1, k1));
+        }
+        out.push((la, lb, 0));
+        out
+    }
+
+    /// The total size of the matching blocks.
+    pub fn matches(&self) -> usize {
+        self.get_matching_blocks().iter().map(|b| b.2).sum()
     }
 
     pub fn ratio(&self) -> f64 {

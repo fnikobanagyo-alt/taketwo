@@ -1,0 +1,10118 @@
+{
+ "issue_label": [
+  [
+   "cut_off",
+   "Cut-off ending"
+  ],
+  [
+   "lead_burst",
+   "Stray sound at the start"
+  ],
+  [
+   "end_word_missing",
+   "Last word missing"
+  ],
+  [
+   "start_word_missing",
+   "First word missing"
+  ],
+  [
+   "processed_audio_missing",
+   "Audio missing from final mix"
+  ],
+  [
+   "processed_audio_cut_off",
+   "Speech lost in final mix"
+  ],
+  [
+   "ending_unverified",
+   "Listen to sentence ending"
+  ],
+  [
+   "odd_pause",
+   "Odd pause"
+  ],
+  [
+   "leak",
+   "Stray next word"
+  ],
+  [
+   "junk_tail",
+   "Stray sound at the end"
+  ],
+  [
+   "flat",
+   "Too monotone"
+  ],
+  [
+   "off_pitch",
+   "Pitch off from the voice"
+  ],
+  [
+   "long_silence",
+   "Silence gap"
+  ],
+  [
+   "too_long",
+   "Too long / looping"
+  ],
+  [
+   "too_short",
+   "Cut short"
+  ],
+  [
+   "voice_drift",
+   "Voice drift"
+  ],
+  [
+   "noise",
+   "Noise burst"
+  ],
+  [
+   "wrong_words",
+   "Wrong words"
+  ],
+  [
+   "mispronounced",
+   "Mispronounced"
+  ],
+  [
+   "clipping",
+   "Clipping"
+  ],
+  [
+   "empty",
+   "No audio"
+  ],
+  [
+   "trimmed_tail",
+   "Tail trimmed"
+  ],
+  [
+   "trimmed_head",
+   "Head trimmed"
+  ],
+  [
+   "final_check",
+   "Failed the final check"
+  ],
+  [
+   "web_artifact",
+   "Web code in the script (such as &#39;)"
+  ]
+ ],
+ "take_fields": [
+  "text",
+  "file",
+  "raw_file",
+  "context_file",
+  "wer",
+  "sim",
+  "dur",
+  "issues",
+  "final_issues",
+  "heard",
+  "pitch_hz",
+  "words",
+  "ending",
+  "status",
+  "chosen_seed"
+ ],
+ "max_old_takes": 3,
+ "max_caption_chars": 84,
+ "round": [
+  {
+   "x": 0.0,
+   "round3": 0.0,
+   "ts": "00:00:00,000"
+  },
+  {
+   "x": -0.0,
+   "round3": -0.0,
+   "ts": "00:00:00,000"
+  },
+  {
+   "x": 0.0005,
+   "round3": 0.001,
+   "ts": "00:00:00,000"
+  },
+  {
+   "x": 0.0015,
+   "round3": 0.002,
+   "ts": "00:00:00,002"
+  },
+  {
+   "x": 0.0025,
+   "round3": 0.003,
+   "ts": "00:00:00,002"
+  },
+  {
+   "x": 0.0035,
+   "round3": 0.004,
+   "ts": "00:00:00,004"
+  },
+  {
+   "x": 0.0045,
+   "round3": 0.004,
+   "ts": "00:00:00,004"
+  },
+  {
+   "x": 0.1235,
+   "round3": 0.123,
+   "ts": "00:00:00,124"
+  },
+  {
+   "x": 1.0005,
+   "round3": 1.0,
+   "ts": "00:00:01,000"
+  },
+  {
+   "x": 2.5005,
+   "round3": 2.501,
+   "ts": "00:00:02,500"
+  },
+  {
+   "x": 2.675,
+   "round3": 2.675,
+   "ts": "00:00:02,675"
+  },
+  {
+   "x": 3599.9995,
+   "round3": 3599.999,
+   "ts": "01:00:00,000"
+  },
+  {
+   "x": 3600.0005,
+   "round3": 3600.001,
+   "ts": "01:00:00,000"
+  },
+  {
+   "x": 7200.0015,
+   "round3": 7200.002,
+   "ts": "02:00:00,002"
+  },
+  {
+   "x": 86399.9995,
+   "round3": 86400.0,
+   "ts": "24:00:00,000"
+  },
+  {
+   "x": 0.0625,
+   "round3": 0.062,
+   "ts": "00:00:00,062"
+  },
+  {
+   "x": 0.1875,
+   "round3": 0.188,
+   "ts": "00:00:00,188"
+  },
+  {
+   "x": 0.3125,
+   "round3": 0.312,
+   "ts": "00:00:00,312"
+  },
+  {
+   "x": 0.4375,
+   "round3": 0.438,
+   "ts": "00:00:00,438"
+  },
+  {
+   "x": 1.0625,
+   "round3": 1.062,
+   "ts": "00:00:01,062"
+  },
+  {
+   "x": 1e+16,
+   "round3": 1e+16,
+   "ts": null
+  },
+  {
+   "x": 1.5e+300,
+   "round3": 1.5e+300,
+   "ts": null
+  },
+  {
+   "x": 123456.7895,
+   "round3": 123456.789,
+   "ts": "34:17:36,790"
+  },
+  {
+   "x": -0.0005,
+   "round3": -0.001,
+   "ts": "00:00:00,000"
+  },
+  {
+   "x": -2.5005,
+   "round3": -2.501,
+   "ts": "-1:59:57,500"
+  },
+  {
+   "x": 5e-324,
+   "round3": 0.0,
+   "ts": "00:00:00,000"
+  },
+  {
+   "x": 0.000499999,
+   "round3": 0.0,
+   "ts": "00:00:00,000"
+  },
+  {
+   "x": 0.00050001,
+   "round3": 0.001,
+   "ts": "00:00:00,001"
+  },
+  {
+   "x": 0.3333333333333333,
+   "round3": 0.333,
+   "ts": "00:00:00,333"
+  },
+  {
+   "x": 0.6666666666666666,
+   "round3": 0.667,
+   "ts": "00:00:00,667"
+  },
+  {
+   "x": 3879.166,
+   "round3": 3879.166,
+   "ts": "01:04:39,166"
+  },
+  {
+   "x": 3268.9675,
+   "round3": 3268.968,
+   "ts": "00:54:28,968"
+  },
+  {
+   "x": 3978.741,
+   "round3": 3978.741,
+   "ts": "01:06:18,741"
+  },
+  {
+   "x": 1215.9985,
+   "round3": 1215.998,
+   "ts": "00:20:15,998"
+  },
+  {
+   "x": 3743.1365,
+   "round3": 3743.137,
+   "ts": "01:02:23,136"
+  },
+  {
+   "x": 3479.773,
+   "round3": 3479.773,
+   "ts": "00:57:59,773"
+  },
+  {
+   "x": 350.4365,
+   "round3": 350.437,
+   "ts": "00:05:50,436"
+  },
+  {
+   "x": 71.624,
+   "round3": 71.624,
+   "ts": "00:01:11,624"
+  },
+  {
+   "x": 2483.142,
+   "round3": 2483.142,
+   "ts": "00:41:23,142"
+  },
+  {
+   "x": 1286.577,
+   "round3": 1286.577,
+   "ts": "00:21:26,577"
+  },
+  {
+   "x": 1777.325,
+   "round3": 1777.325,
+   "ts": "00:29:37,325"
+  },
+  {
+   "x": 1590.417,
+   "round3": 1590.417,
+   "ts": "00:26:30,417"
+  },
+  {
+   "x": 2223.35,
+   "round3": 2223.35,
+   "ts": "00:37:03,350"
+  },
+  {
+   "x": 1501.8955,
+   "round3": 1501.896,
+   "ts": "00:25:01,896"
+  },
+  {
+   "x": 546.53,
+   "round3": 546.53,
+   "ts": "00:09:06,530"
+  },
+  {
+   "x": 3044.873,
+   "round3": 3044.873,
+   "ts": "00:50:44,873"
+  },
+  {
+   "x": 805.294,
+   "round3": 805.294,
+   "ts": "00:13:25,294"
+  },
+  {
+   "x": 1121.481,
+   "round3": 1121.481,
+   "ts": "00:18:41,481"
+  },
+  {
+   "x": 1864.6765,
+   "round3": 1864.677,
+   "ts": "00:31:04,676"
+  },
+  {
+   "x": 59.0385,
+   "round3": 59.038,
+   "ts": "00:00:59,038"
+  },
+  {
+   "x": 927.105,
+   "round3": 927.105,
+   "ts": "00:15:27,105"
+  },
+  {
+   "x": 2601.1415,
+   "round3": 2601.142,
+   "ts": "00:43:21,142"
+  },
+  {
+   "x": 1908.5465,
+   "round3": 1908.546,
+   "ts": "00:31:48,546"
+  },
+  {
+   "x": 3781.8275,
+   "round3": 3781.827,
+   "ts": "01:03:01,828"
+  },
+  {
+   "x": 103.88,
+   "round3": 103.88,
+   "ts": "00:01:43,880"
+  },
+  {
+   "x": 444.1755,
+   "round3": 444.175,
+   "ts": "00:07:24,176"
+  },
+  {
+   "x": 359.7625,
+   "round3": 359.762,
+   "ts": "00:05:59,762"
+  },
+  {
+   "x": 2977.99,
+   "round3": 2977.99,
+   "ts": "00:49:37,990"
+  },
+  {
+   "x": 2089.7735,
+   "round3": 2089.773,
+   "ts": "00:34:49,773"
+  },
+  {
+   "x": 1766.8435,
+   "round3": 1766.843,
+   "ts": "00:29:26,844"
+  },
+  {
+   "x": 82.1225,
+   "round3": 82.123,
+   "ts": "00:01:22,122"
+  },
+  {
+   "x": 2150.1425,
+   "round3": 2150.142,
+   "ts": "00:35:50,142"
+  },
+  {
+   "x": 2632.621,
+   "round3": 2632.621,
+   "ts": "00:43:52,621"
+  },
+  {
+   "x": 3079.496,
+   "round3": 3079.496,
+   "ts": "00:51:19,496"
+  },
+  {
+   "x": 1808.977,
+   "round3": 1808.977,
+   "ts": "00:30:08,977"
+  },
+  {
+   "x": 1505.7395,
+   "round3": 1505.739,
+   "ts": "00:25:05,740"
+  },
+  {
+   "x": 3232.8615,
+   "round3": 3232.861,
+   "ts": "00:53:52,862"
+  },
+  {
+   "x": 241.401,
+   "round3": 241.401,
+   "ts": "00:04:01,401"
+  },
+  {
+   "x": 862.461,
+   "round3": 862.461,
+   "ts": "00:14:22,461"
+  },
+  {
+   "x": 3284.569,
+   "round3": 3284.569,
+   "ts": "00:54:44,569"
+  },
+  {
+   "x": 148.0995,
+   "round3": 148.1,
+   "ts": "00:02:28,100"
+  },
+  {
+   "x": 2470.9625,
+   "round3": 2470.963,
+   "ts": "00:41:10,962"
+  },
+  {
+   "x": 1548.141,
+   "round3": 1548.141,
+   "ts": "00:25:48,141"
+  },
+  {
+   "x": 2759.4855,
+   "round3": 2759.485,
+   "ts": "00:45:59,486"
+  },
+  {
+   "x": 721.129,
+   "round3": 721.129,
+   "ts": "00:12:01,129"
+  },
+  {
+   "x": 2604.6265,
+   "round3": 2604.626,
+   "ts": "00:43:24,626"
+  },
+  {
+   "x": 906.1595,
+   "round3": 906.159,
+   "ts": "00:15:06,160"
+  },
+  {
+   "x": 3083.6965,
+   "round3": 3083.697,
+   "ts": "00:51:23,696"
+  },
+  {
+   "x": 1521.662,
+   "round3": 1521.662,
+   "ts": "00:25:21,662"
+  },
+  {
+   "x": 2372.0035,
+   "round3": 2372.003,
+   "ts": "00:39:32,004"
+  },
+  {
+   "x": 3186.776,
+   "round3": 3186.776,
+   "ts": "00:53:06,776"
+  },
+  {
+   "x": 3607.704,
+   "round3": 3607.704,
+   "ts": "01:00:07,704"
+  },
+  {
+   "x": 1546.3715,
+   "round3": 1546.371,
+   "ts": "00:25:46,372"
+  },
+  {
+   "x": 2399.338,
+   "round3": 2399.338,
+   "ts": "00:39:59,338"
+  },
+  {
+   "x": 1179.7485,
+   "round3": 1179.748,
+   "ts": "00:19:39,748"
+  },
+  {
+   "x": 2770.472,
+   "round3": 2770.472,
+   "ts": "00:46:10,472"
+  },
+  {
+   "x": 1318.6515,
+   "round3": 1318.651,
+   "ts": "00:21:58,652"
+  },
+  {
+   "x": 2403.2755,
+   "round3": 2403.276,
+   "ts": "00:40:03,276"
+  },
+  {
+   "x": 359.603,
+   "round3": 359.603,
+   "ts": "00:05:59,603"
+  },
+  {
+   "x": 3415.319,
+   "round3": 3415.319,
+   "ts": "00:56:55,319"
+  },
+  {
+   "x": 1988.3785,
+   "round3": 1988.379,
+   "ts": "00:33:08,378"
+  },
+  {
+   "x": 745.0415,
+   "round3": 745.042,
+   "ts": "00:12:25,042"
+  },
+  {
+   "x": 3011.1495,
+   "round3": 3011.149,
+   "ts": "00:50:11,150"
+  },
+  {
+   "x": 2026.2015,
+   "round3": 2026.201,
+   "ts": "00:33:46,202"
+  },
+  {
+   "x": 2477.1965,
+   "round3": 2477.197,
+   "ts": "00:41:17,196"
+  },
+  {
+   "x": 3319.752,
+   "round3": 3319.752,
+   "ts": "00:55:19,752"
+  },
+  {
+   "x": 1876.7475,
+   "round3": 1876.747,
+   "ts": "00:31:16,748"
+  },
+  {
+   "x": 2834.193,
+   "round3": 2834.193,
+   "ts": "00:47:14,193"
+  },
+  {
+   "x": 2694.3305,
+   "round3": 2694.331,
+   "ts": "00:44:54,330"
+  },
+  {
+   "x": 686.124,
+   "round3": 686.124,
+   "ts": "00:11:26,124"
+  },
+  {
+   "x": 763.4855,
+   "round3": 763.486,
+   "ts": "00:12:43,486"
+  },
+  {
+   "x": 3351.2725,
+   "round3": 3351.273,
+   "ts": "00:55:51,272"
+  },
+  {
+   "x": 748.8505,
+   "round3": 748.851,
+   "ts": "00:12:28,850"
+  },
+  {
+   "x": 2238.0245,
+   "round3": 2238.024,
+   "ts": "00:37:18,024"
+  },
+  {
+   "x": 1356.4895,
+   "round3": 1356.489,
+   "ts": "00:22:36,490"
+  },
+  {
+   "x": 2824.3125,
+   "round3": 2824.312,
+   "ts": "00:47:04,312"
+  },
+  {
+   "x": 3422.021,
+   "round3": 3422.021,
+   "ts": "00:57:02,021"
+  },
+  {
+   "x": 2181.321,
+   "round3": 2181.321,
+   "ts": "00:36:21,321"
+  },
+  {
+   "x": 820.4385,
+   "round3": 820.438,
+   "ts": "00:13:40,438"
+  },
+  {
+   "x": 2442.334,
+   "round3": 2442.334,
+   "ts": "00:40:42,334"
+  },
+  {
+   "x": 479.414,
+   "round3": 479.414,
+   "ts": "00:07:59,414"
+  },
+  {
+   "x": 345.305,
+   "round3": 345.305,
+   "ts": "00:05:45,305"
+  },
+  {
+   "x": 413.5755,
+   "round3": 413.575,
+   "ts": "00:06:53,576"
+  },
+  {
+   "x": 1787.3705,
+   "round3": 1787.37,
+   "ts": "00:29:47,370"
+  },
+  {
+   "x": 163.2975,
+   "round3": 163.298,
+   "ts": "00:02:43,298"
+  },
+  {
+   "x": 2382.407,
+   "round3": 2382.407,
+   "ts": "00:39:42,407"
+  },
+  {
+   "x": 1155.801,
+   "round3": 1155.801,
+   "ts": "00:19:15,801"
+  },
+  {
+   "x": 3943.0395,
+   "round3": 3943.039,
+   "ts": "01:05:43,040"
+  },
+  {
+   "x": 2402.589,
+   "round3": 2402.589,
+   "ts": "00:40:02,589"
+  },
+  {
+   "x": 1176.8415,
+   "round3": 1176.841,
+   "ts": "00:19:36,842"
+  },
+  {
+   "x": 3442.1105,
+   "round3": 3442.11,
+   "ts": "00:57:22,110"
+  },
+  {
+   "x": 2474.485,
+   "round3": 2474.485,
+   "ts": "00:41:14,485"
+  },
+  {
+   "x": 1387.496,
+   "round3": 1387.496,
+   "ts": "00:23:07,496"
+  },
+  {
+   "x": 457.3715,
+   "round3": 457.372,
+   "ts": "00:07:37,372"
+  },
+  {
+   "x": 1550.4405,
+   "round3": 1550.44,
+   "ts": "00:25:50,440"
+  },
+  {
+   "x": 3775.398,
+   "round3": 3775.398,
+   "ts": "01:02:55,398"
+  },
+  {
+   "x": 1209.9905,
+   "round3": 1209.991,
+   "ts": "00:20:09,990"
+  },
+  {
+   "x": 2273.968,
+   "round3": 2273.968,
+   "ts": "00:37:53,968"
+  },
+  {
+   "x": 1278.371,
+   "round3": 1278.371,
+   "ts": "00:21:18,371"
+  },
+  {
+   "x": 3751.9695,
+   "round3": 3751.97,
+   "ts": "01:02:31,970"
+  },
+  {
+   "x": 3261.417,
+   "round3": 3261.417,
+   "ts": "00:54:21,417"
+  },
+  {
+   "x": 1907.268,
+   "round3": 1907.268,
+   "ts": "00:31:47,268"
+  },
+  {
+   "x": 2302.6455,
+   "round3": 2302.646,
+   "ts": "00:38:22,646"
+  },
+  {
+   "x": 915.5965,
+   "round3": 915.596,
+   "ts": "00:15:15,596"
+  },
+  {
+   "x": 1083.8855,
+   "round3": 1083.886,
+   "ts": "00:18:03,886"
+  },
+  {
+   "x": 627.1875,
+   "round3": 627.188,
+   "ts": "00:10:27,188"
+  },
+  {
+   "x": 449.324,
+   "round3": 449.324,
+   "ts": "00:07:29,324"
+  },
+  {
+   "x": 2599.0095,
+   "round3": 2599.01,
+   "ts": "00:43:19,010"
+  },
+  {
+   "x": 3287.5335,
+   "round3": 3287.534,
+   "ts": "00:54:47,534"
+  },
+  {
+   "x": 500.774,
+   "round3": 500.774,
+   "ts": "00:08:20,774"
+  },
+  {
+   "x": 2965.9745,
+   "round3": 2965.974,
+   "ts": "00:49:25,974"
+  },
+  {
+   "x": 3334.8115,
+   "round3": 3334.811,
+   "ts": "00:55:34,812"
+  },
+  {
+   "x": 3475.2545,
+   "round3": 3475.255,
+   "ts": "00:57:55,254"
+  },
+  {
+   "x": 2067.8515,
+   "round3": 2067.852,
+   "ts": "00:34:27,852"
+  },
+  {
+   "x": 998.355,
+   "round3": 998.355,
+   "ts": "00:16:38,355"
+  },
+  {
+   "x": 1376.831,
+   "round3": 1376.831,
+   "ts": "00:22:56,831"
+  },
+  {
+   "x": 2287.9045,
+   "round3": 2287.905,
+   "ts": "00:38:07,904"
+  },
+  {
+   "x": 597.4785,
+   "round3": 597.479,
+   "ts": "00:09:57,478"
+  },
+  {
+   "x": 3853.488,
+   "round3": 3853.488,
+   "ts": "01:04:13,488"
+  },
+  {
+   "x": 3126.0735,
+   "round3": 3126.073,
+   "ts": "00:52:06,074"
+  },
+  {
+   "x": 2485.946,
+   "round3": 2485.946,
+   "ts": "00:41:25,946"
+  },
+  {
+   "x": 420.89,
+   "round3": 420.89,
+   "ts": "00:07:00,890"
+  },
+  {
+   "x": 3965.5735,
+   "round3": 3965.573,
+   "ts": "01:06:05,574"
+  },
+  {
+   "x": 1606.564,
+   "round3": 1606.564,
+   "ts": "00:26:46,564"
+  },
+  {
+   "x": 701.538,
+   "round3": 701.538,
+   "ts": "00:11:41,538"
+  },
+  {
+   "x": 1884.5565,
+   "round3": 1884.556,
+   "ts": "00:31:24,556"
+  },
+  {
+   "x": 141.68,
+   "round3": 141.68,
+   "ts": "00:02:21,680"
+  },
+  {
+   "x": 234.5445,
+   "round3": 234.544,
+   "ts": "00:03:54,544"
+  },
+  {
+   "x": 2645.981,
+   "round3": 2645.981,
+   "ts": "00:44:05,981"
+  },
+  {
+   "x": 1745.767,
+   "round3": 1745.767,
+   "ts": "00:29:05,767"
+  },
+  {
+   "x": 1649.963,
+   "round3": 1649.963,
+   "ts": "00:27:29,963"
+  },
+  {
+   "x": 97.9905,
+   "round3": 97.99,
+   "ts": "00:01:37,990"
+  },
+  {
+   "x": 681.8665,
+   "round3": 681.866,
+   "ts": "00:11:21,866"
+  },
+  {
+   "x": 3395.554,
+   "round3": 3395.554,
+   "ts": "00:56:35,554"
+  },
+  {
+   "x": 946.3735,
+   "round3": 946.374,
+   "ts": "00:15:46,374"
+  },
+  {
+   "x": 2882.348,
+   "round3": 2882.348,
+   "ts": "00:48:02,348"
+  },
+  {
+   "x": 53.418,
+   "round3": 53.418,
+   "ts": "00:00:53,418"
+  },
+  {
+   "x": 931.984,
+   "round3": 931.984,
+   "ts": "00:15:31,984"
+  },
+  {
+   "x": 3376.2625,
+   "round3": 3376.262,
+   "ts": "00:56:16,262"
+  },
+  {
+   "x": 3106.0745,
+   "round3": 3106.075,
+   "ts": "00:51:46,074"
+  },
+  {
+   "x": 3979.6735,
+   "round3": 3979.673,
+   "ts": "01:06:19,674"
+  },
+  {
+   "x": 238.544,
+   "round3": 238.544,
+   "ts": "00:03:58,544"
+  },
+  {
+   "x": 2259.0355,
+   "round3": 2259.035,
+   "ts": "00:37:39,036"
+  },
+  {
+   "x": 3962.104,
+   "round3": 3962.104,
+   "ts": "01:06:02,104"
+  },
+  {
+   "x": 1866.7935,
+   "round3": 1866.793,
+   "ts": "00:31:06,794"
+  },
+  {
+   "x": 3141.5935,
+   "round3": 3141.593,
+   "ts": "00:52:21,594"
+  },
+  {
+   "x": 389.2925,
+   "round3": 389.293,
+   "ts": "00:06:29,292"
+  },
+  {
+   "x": 1451.827,
+   "round3": 1451.827,
+   "ts": "00:24:11,827"
+  },
+  {
+   "x": 66.976,
+   "round3": 66.976,
+   "ts": "00:01:06,976"
+  },
+  {
+   "x": 3306.067,
+   "round3": 3306.067,
+   "ts": "00:55:06,067"
+  },
+  {
+   "x": 3769.9915834216135,
+   "round3": 3769.992,
+   "ts": "01:02:49,992"
+  },
+  {
+   "x": 1933.138894810783,
+   "round3": 1933.139,
+   "ts": "00:32:13,139"
+  },
+  {
+   "x": 758.7707239625474,
+   "round3": 758.771,
+   "ts": "00:12:38,771"
+  },
+  {
+   "x": 4659.578021487165,
+   "round3": 4659.578,
+   "ts": "01:17:39,578"
+  },
+  {
+   "x": 1966.449078541198,
+   "round3": 1966.449,
+   "ts": "00:32:46,449"
+  },
+  {
+   "x": 9335.781295521987,
+   "round3": 9335.781,
+   "ts": "02:35:35,781"
+  },
+  {
+   "x": 9504.53685936658,
+   "round3": 9504.537,
+   "ts": "02:38:24,537"
+  },
+  {
+   "x": 2159.511081252543,
+   "round3": 2159.511,
+   "ts": "00:35:59,511"
+  },
+  {
+   "x": 1035.0345489636059,
+   "round3": 1035.035,
+   "ts": "00:17:15,035"
+  },
+  {
+   "x": 5289.699856154854,
+   "round3": 5289.7,
+   "ts": "01:28:09,700"
+  },
+  {
+   "x": 1696.7994489229854,
+   "round3": 1696.799,
+   "ts": "00:28:16,799"
+  },
+  {
+   "x": 5436.483365147497,
+   "round3": 5436.483,
+   "ts": "01:30:36,483"
+  },
+  {
+   "x": 8128.427582877767,
+   "round3": 8128.428,
+   "ts": "02:15:28,428"
+  },
+  {
+   "x": 2530.6235328324965,
+   "round3": 2530.624,
+   "ts": "00:42:10,624"
+  },
+  {
+   "x": 4217.51604712983,
+   "round3": 4217.516,
+   "ts": "01:10:17,516"
+  },
+  {
+   "x": 9008.700103445277,
+   "round3": 9008.7,
+   "ts": "02:30:08,700"
+  },
+  {
+   "x": 4446.925279641446,
+   "round3": 4446.925,
+   "ts": "01:14:06,925"
+  },
+  {
+   "x": 3427.7622145855767,
+   "round3": 3427.762,
+   "ts": "00:57:07,762"
+  },
+  {
+   "x": 8923.288689140903,
+   "round3": 8923.289,
+   "ts": "02:28:43,289"
+  },
+  {
+   "x": 8137.559456012128,
+   "round3": 8137.559,
+   "ts": "02:15:37,559"
+  },
+  {
+   "x": 8951.81660480843,
+   "round3": 8951.817,
+   "ts": "02:29:11,817"
+  },
+  {
+   "x": 6877.443403786335,
+   "round3": 6877.443,
+   "ts": "01:54:37,443"
+  },
+  {
+   "x": 4126.22206431442,
+   "round3": 4126.222,
+   "ts": "01:08:46,222"
+  },
+  {
+   "x": 6930.229437396931,
+   "round3": 6930.229,
+   "ts": "01:55:30,229"
+  },
+  {
+   "x": 8298.19618892797,
+   "round3": 8298.196,
+   "ts": "02:18:18,196"
+  },
+  {
+   "x": 6395.121495853766,
+   "round3": 6395.121,
+   "ts": "01:46:35,121"
+  },
+  {
+   "x": 2384.2417855410526,
+   "round3": 2384.242,
+   "ts": "00:39:44,242"
+  },
+  {
+   "x": 2952.5317568412634,
+   "round3": 2952.532,
+   "ts": "00:49:12,532"
+  },
+  {
+   "x": 4096.16412958913,
+   "round3": 4096.164,
+   "ts": "01:08:16,164"
+  },
+  {
+   "x": 7716.656614873332,
+   "round3": 7716.657,
+   "ts": "02:08:36,657"
+  },
+  {
+   "x": 5570.906297102496,
+   "round3": 5570.906,
+   "ts": "01:32:50,906"
+  },
+  {
+   "x": 5499.374944829646,
+   "round3": 5499.375,
+   "ts": "01:31:39,375"
+  },
+  {
+   "x": 8265.409341816414,
+   "round3": 8265.409,
+   "ts": "02:17:45,409"
+  },
+  {
+   "x": 1084.4627041598342,
+   "round3": 1084.463,
+   "ts": "00:18:04,463"
+  },
+  {
+   "x": 6312.385435343704,
+   "round3": 6312.385,
+   "ts": "01:45:12,385"
+  },
+  {
+   "x": 3325.0230524638923,
+   "round3": 3325.023,
+   "ts": "00:55:25,023"
+  },
+  {
+   "x": 5593.552122171377,
+   "round3": 5593.552,
+   "ts": "01:33:13,552"
+  },
+  {
+   "x": 8353.494661335299,
+   "round3": 8353.495,
+   "ts": "02:19:13,495"
+  },
+  {
+   "x": 2483.5222337637906,
+   "round3": 2483.522,
+   "ts": "00:41:23,522"
+  },
+  {
+   "x": 9515.180338965394,
+   "round3": 9515.18,
+   "ts": "02:38:35,180"
+  },
+  {
+   "x": 785.7539756506449,
+   "round3": 785.754,
+   "ts": "00:13:05,754"
+  },
+  {
+   "x": 5620.212829749486,
+   "round3": 5620.213,
+   "ts": "01:33:40,213"
+  },
+  {
+   "x": 5418.14916682527,
+   "round3": 5418.149,
+   "ts": "01:30:18,149"
+  },
+  {
+   "x": 2350.8059149180017,
+   "round3": 2350.806,
+   "ts": "00:39:10,806"
+  },
+  {
+   "x": 5608.482134164793,
+   "round3": 5608.482,
+   "ts": "01:33:28,482"
+  },
+  {
+   "x": 4707.269728149112,
+   "round3": 4707.27,
+   "ts": "01:18:27,270"
+  },
+  {
+   "x": 4495.94952079013,
+   "round3": 4495.95,
+   "ts": "01:14:55,950"
+  },
+  {
+   "x": 7183.801924595119,
+   "round3": 7183.802,
+   "ts": "01:59:43,802"
+  },
+  {
+   "x": 39.419855041030736,
+   "round3": 39.42,
+   "ts": "00:00:39,420"
+  },
+  {
+   "x": 3771.7684375976623,
+   "round3": 3771.768,
+   "ts": "01:02:51,768"
+  },
+  {
+   "x": 7856.009524807854,
+   "round3": 7856.01,
+   "ts": "02:10:56,010"
+  },
+  {
+   "x": 1418.6334423108792,
+   "round3": 1418.633,
+   "ts": "00:23:38,633"
+  },
+  {
+   "x": 8673.907697331577,
+   "round3": 8673.908,
+   "ts": "02:24:33,908"
+  },
+  {
+   "x": 2035.9060014472252,
+   "round3": 2035.906,
+   "ts": "00:33:55,906"
+  },
+  {
+   "x": 6811.271535618647,
+   "round3": 6811.272,
+   "ts": "01:53:31,272"
+  },
+  {
+   "x": 1731.654305355036,
+   "round3": 1731.654,
+   "ts": "00:28:51,654"
+  },
+  {
+   "x": 4493.239950078585,
+   "round3": 4493.24,
+   "ts": "01:14:53,240"
+  },
+  {
+   "x": 4225.50238331346,
+   "round3": 4225.502,
+   "ts": "01:10:25,502"
+  },
+  {
+   "x": 817.9972633696209,
+   "round3": 817.997,
+   "ts": "00:13:37,997"
+  },
+  {
+   "x": 6996.066590939685,
+   "round3": 6996.067,
+   "ts": "01:56:36,067"
+  },
+  {
+   "x": 4801.749333540964,
+   "round3": 4801.749,
+   "ts": "01:20:01,749"
+  },
+  {
+   "x": 6890.096142291893,
+   "round3": 6890.096,
+   "ts": "01:54:50,096"
+  },
+  {
+   "x": 5391.333678397951,
+   "round3": 5391.334,
+   "ts": "01:29:51,334"
+  },
+  {
+   "x": 5558.708397868788,
+   "round3": 5558.708,
+   "ts": "01:32:38,708"
+  },
+  {
+   "x": 5261.266941758548,
+   "round3": 5261.267,
+   "ts": "01:27:41,267"
+  },
+  {
+   "x": 2977.945377336898,
+   "round3": 2977.945,
+   "ts": "00:49:37,945"
+  },
+  {
+   "x": 8987.534939785928,
+   "round3": 8987.535,
+   "ts": "02:29:47,535"
+  },
+  {
+   "x": 863.9060874653737,
+   "round3": 863.906,
+   "ts": "00:14:23,906"
+  },
+  {
+   "x": 8766.161133513528,
+   "round3": 8766.161,
+   "ts": "02:26:06,161"
+  },
+  {
+   "x": 8634.64071527533,
+   "round3": 8634.641,
+   "ts": "02:23:54,641"
+  },
+  {
+   "x": 4978.0648482847955,
+   "round3": 4978.065,
+   "ts": "01:22:58,065"
+  },
+  {
+   "x": 7769.482286114411,
+   "round3": 7769.482,
+   "ts": "02:09:29,482"
+  },
+  {
+   "x": 6733.666766944026,
+   "round3": 6733.667,
+   "ts": "01:52:13,667"
+  },
+  {
+   "x": 6050.73551922021,
+   "round3": 6050.736,
+   "ts": "01:40:50,736"
+  },
+  {
+   "x": 2916.2667454214666,
+   "round3": 2916.267,
+   "ts": "00:48:36,267"
+  },
+  {
+   "x": 3196.4886492016,
+   "round3": 3196.489,
+   "ts": "00:53:16,489"
+  },
+  {
+   "x": 3493.801713343241,
+   "round3": 3493.802,
+   "ts": "00:58:13,802"
+  },
+  {
+   "x": 3021.7175389594663,
+   "round3": 3021.718,
+   "ts": "00:50:21,718"
+  },
+  {
+   "x": 9597.026924056963,
+   "round3": 9597.027,
+   "ts": "02:39:57,027"
+  },
+  {
+   "x": 3412.7697468136544,
+   "round3": 3412.77,
+   "ts": "00:56:52,770"
+  },
+  {
+   "x": 3875.502202122807,
+   "round3": 3875.502,
+   "ts": "01:04:35,502"
+  },
+  {
+   "x": 4195.594555652403,
+   "round3": 4195.595,
+   "ts": "01:09:55,595"
+  },
+  {
+   "x": 8164.939259581363,
+   "round3": 8164.939,
+   "ts": "02:16:04,939"
+  },
+  {
+   "x": 4777.587932044156,
+   "round3": 4777.588,
+   "ts": "01:19:37,588"
+  },
+  {
+   "x": 5537.523320570012,
+   "round3": 5537.523,
+   "ts": "01:32:17,523"
+  },
+  {
+   "x": 2554.8197730480183,
+   "round3": 2554.82,
+   "ts": "00:42:34,820"
+  },
+  {
+   "x": 2780.6990363467753,
+   "round3": 2780.699,
+   "ts": "00:46:20,699"
+  },
+  {
+   "x": 890.8800321831878,
+   "round3": 890.88,
+   "ts": "00:14:50,880"
+  },
+  {
+   "x": 2172.5867609083384,
+   "round3": 2172.587,
+   "ts": "00:36:12,587"
+  },
+  {
+   "x": 2638.8815036446576,
+   "round3": 2638.882,
+   "ts": "00:43:58,882"
+  },
+  {
+   "x": 8522.706266214602,
+   "round3": 8522.706,
+   "ts": "02:22:02,706"
+  },
+  {
+   "x": 5024.699000347463,
+   "round3": 5024.699,
+   "ts": "01:23:44,699"
+  },
+  {
+   "x": 1103.891478513358,
+   "round3": 1103.891,
+   "ts": "00:18:23,891"
+  },
+  {
+   "x": 4627.228378487626,
+   "round3": 4627.228,
+   "ts": "01:17:07,228"
+  },
+  {
+   "x": 1209.2933265517947,
+   "round3": 1209.293,
+   "ts": "00:20:09,293"
+  },
+  {
+   "x": 5660.26894522284,
+   "round3": 5660.269,
+   "ts": "01:34:20,269"
+  },
+  {
+   "x": 4421.340451210041,
+   "round3": 4421.34,
+   "ts": "01:13:41,340"
+  },
+  {
+   "x": 8582.843842882123,
+   "round3": 8582.844,
+   "ts": "02:23:02,844"
+  },
+  {
+   "x": 2592.7307294912325,
+   "round3": 2592.731,
+   "ts": "00:43:12,731"
+  },
+  {
+   "x": 8508.620121427697,
+   "round3": 8508.62,
+   "ts": "02:21:48,620"
+  }
+ ],
+ "wrap": [
+  {
+   "text": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "out": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+  },
+  {
+   "text": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "out": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+  },
+  {
+   "text": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+   "out": "xxxxxxxxxxxxxxxxxxxxx\nxxxxxxxxxxxxxxxxxxxxxx"
+  },
+  {
+   "text": "This line has exactly forty-one chars ok.",
+   "out": "This line has exactly forty-one chars ok."
+  },
+  {
+   "text": "This line has exactly forty-two chars, ok.",
+   "out": "This line has exactly forty-two chars, ok."
+  },
+  {
+   "text": "This line has exactly forty-three chars, ok.",
+   "out": "This line has exactly\nforty-three chars, ok."
+  },
+  {
+   "text": "averyveryverylongtokenwithoutanyspacesatallthatkeepsgoingandgoing",
+   "out": "averyveryverylongtokenwithoutany\nspacesatallthatkeepsgoingandgoing"
+  },
+  {
+   "text": "\u8fd9\u662f\u4e00\u4e2a\u5f88\u957f\u7684\u4e2d\u6587\u53e5\u5b50\u6ca1\u6709\u7a7a\u683c\u6240\u4ee5\u5fc5\u987b\u6309\u5b57\u7b26\u5207\u5206\u8fd9\u662f\u4e00\u4e2a\u5f88\u957f\u7684\u4e2d\u6587\u53e5\u5b50\u6ca1\u6709\u7a7a\u683c",
+   "out": "\u8fd9\u662f\u4e00\u4e2a\u5f88\u957f\u7684\u4e2d\u6587\u53e5\u5b50\u6ca1\u6709\u7a7a\u683c\u6240\u4ee5\u5fc5\u987b\u6309\u5b57\u7b26\u5207\u5206\u8fd9\u662f\u4e00\u4e2a\u5f88\u957f\u7684\u4e2d\u6587\u53e5\u5b50\u6ca1\u6709\u7a7a\u683c"
+  },
+  {
+   "text": "\u8fd9\u662f\u4e00\u4e2a\u5f88\u957f\u7684\u4e2d\u6587\u53e5\u5b50\u6ca1\u6709\u7a7a\u683c\u6240\u4ee5\u5fc5\u987b\u6309\u5b57\u7b26\u5207\u5206\u8fd9\u662f\u4e00\u4e2a\u5f88\u957f\u7684\u4e2d\u6587\u53e5\u5b50\u6ca1\u6709\u7a7a\u683c\u597d",
+   "out": "\u8fd9\u662f\u4e00\u4e2a\u5f88\u957f\u7684\u4e2d\u6587\u53e5\u5b50\u6ca1\u6709\u7a7a\u683c\u6240\u4ee5\u5fc5\u987b\u6309\u5b57\u7b26\u5207\u5206\u8fd9\u662f\u4e00\u4e2a\u5f88\u957f\u7684\u4e2d\u6587\u53e5\u5b50\u6ca1\u6709\u7a7a\u683c\u597d"
+  },
+  {
+   "text": "\u8fd9\u662f\u4e00\u4e2a\u5f88\u957f\u7684\u4e2d\u6587\u53e5\u5b50\u6ca1\u6709\u7a7a\u683c\u6240\u4ee5\u5fc5\u987b\u6309\u5b57\u7b26\u5207\u5206\u8fd9\u662f\u4e00\u4e2a\u5f88\u957f\u7684\u4e2d\u6587\u53e5\u5b50\u6ca1\u6709\u7a7a\u683c\u6240\u4ee5\u5fc5\u987b\u6309\u5b57\u7b26\u5207\u5206\u597d",
+   "out": "\u8fd9\u662f\u4e00\u4e2a\u5f88\u957f\u7684\u4e2d\u6587\u53e5\u5b50\u6ca1\u6709\u7a7a\u683c\u6240\u4ee5\u5fc5\u987b\u6309\u5b57\u7b26\u5207\u5206\n\u8fd9\u662f\u4e00\u4e2a\u5f88\u957f\u7684\u4e2d\u6587\u53e5\u5b50\u6ca1\u6709\u7a7a\u683c\u6240\u4ee5\u5fc5\u987b\u6309\u5b57\u7b26\u5207\u5206\u597d"
+  },
+  {
+   "text": "\u8fd9\u662f\u4e00\u4e2a\u5f88\u957f\u7684\u4e2d\u6587\u53e5\u5b50\u6ca1\u6709\u7a7a\u683c\u6240\u4ee5\u5fc5\u987b\u6309\u5b57\u7b26\u5207\u5206\u8fd9\u662f\u4e00\u4e2a\u5f88\u957f\u7684\u4e2d\u6587\u53e5\u5b50\u6ca1\u6709\u7a7a\u683c\u6240\u4ee5\u5fc5\u987b\u6309\u5b57\u7b26\u5207\u5206\u597d\u7684",
+   "out": "\u8fd9\u662f\u4e00\u4e2a\u5f88\u957f\u7684\u4e2d\u6587\u53e5\u5b50\u6ca1\u6709\u7a7a\u683c\u6240\u4ee5\u5fc5\u987b\u6309\u5b57\u7b26\u5207\u5206\u8fd9\n\u662f\u4e00\u4e2a\u5f88\u957f\u7684\u4e2d\u6587\u53e5\u5b50\u6ca1\u6709\u7a7a\u683c\u6240\u4ee5\u5fc5\u987b\u6309\u5b57\u7b26\u5207\u5206\u597d\u7684"
+  },
+  {
+   "text": "Supercalifragilisticexpialidocious-and-even-longer-word a b",
+   "out": "Supercalifragilisticexpialidocious-and-even-longer-word\na b"
+  },
+  {
+   "text": "aaaaaaaaaaaaaaaaaaaaaaaaaa bbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+   "out": "aaaaaaaaaaaaaaaaaaaaaaaaaa\nbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+  },
+  {
+   "text": "Welcome to the show & thanks for listening, today we talk about rivers.",
+   "out": "Welcome to the show & thanks for\nlistening, today we talk about rivers."
+  },
+  {
+   "text": "many   spaces    between   these words    and more words here",
+   "out": "many spaces between these words\nand more words here"
+  },
+  {
+   "text": "\u00c7a va tr\u00e8s bien, merci beaucoup, et vous, mon ami tr\u00e8s cher?",
+   "out": "\u00c7a va tr\u00e8s bien, merci beaucoup,\net vous, mon ami tr\u00e8s cher?"
+  },
+  {
+   "text": "a b c d e f g h i j k l m n o p q r s t u v w x y z a b c",
+   "out": "a b c d e f g h i j k l m n\no p q r s t u v w x y z a b c"
+  }
+ ],
+ "pieces": [
+  {
+   "text": "",
+   "pieces": []
+  },
+  {
+   "text": "   \n\t ",
+   "pieces": []
+  },
+  {
+   "text": "One. Two! Three? Four",
+   "pieces": [
+    "One.",
+    "Two!",
+    "Three?",
+    "Four"
+   ]
+  },
+  {
+   "text": "Hi.\u00a0There.\u001cNext. Done",
+   "pieces": [
+    "Hi.",
+    "There.",
+    "Next.",
+    "Done"
+   ]
+  },
+  {
+   "text": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+   "pieces": [
+    "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+   ]
+  },
+  {
+   "text": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+   "pieces": [
+    "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+   ]
+  },
+  {
+   "text": "word word word word word word word word word word word word word word word word word",
+   "pieces": [
+    "word word word word word word word word word word word word word word word word word"
+   ]
+  },
+  {
+   "text": "word word word word word word word word word word word word word word word word wordx",
+   "pieces": [
+    "word word word word word word word word word word word word word word word word",
+    "wordx"
+   ]
+  },
+  {
+   "text": "abcd abcd abcd abcd abcd abcd abcd abcd abcd abcd abcd abcd abcd abcd abcd abcd abcd",
+   "pieces": [
+    "abcd abcd abcd abcd abcd abcd abcd abcd abcd abcd abcd abcd abcd abcd abcd abcd abcd"
+   ]
+  },
+  {
+   "text": "abcd abcd abcd abcd abcd abcd abcd abcd abcd abcd abcd abcd abcd abcd abcd abcd abcde",
+   "pieces": [
+    "abcd abcd abcd abcd abcd abcd abcd abcd abcd abcd abcd abcd abcd abcd abcd abcd",
+    "abcde"
+   ]
+  },
+  {
+   "text": "The first clause of this sentence is long enough to pass the limit, then a second clause follows here and ends.",
+   "pieces": [
+    "The first clause of this sentence is long enough to pass the limit,",
+    "then a second clause follows here and ends."
+   ]
+  },
+  {
+   "text": "Short clause, then a much much longer clause that goes well past the flush limit of the captions here; end: x y.",
+   "pieces": [
+    "Short clause, then a much much longer clause that goes well past the flush limit of",
+    "the captions here; end: x y."
+   ]
+  },
+  {
+   "text": "W\u00f6rter mit Umlauten \u00fcber \u00c4pfel, \u00d6l und \u00dcbermut sind l\u00e4nger in Bytes als in Zeichen, aber nicht zu lang.",
+   "pieces": [
+    "W\u00f6rter mit Umlauten \u00fcber \u00c4pfel, \u00d6l und \u00dcbermut sind l\u00e4nger in Bytes als in Zeichen,",
+    "aber nicht zu lang."
+   ]
+  },
+  {
+   "text": "W\u00f6rter mit Umlauten \u00fcber \u00c4pfel, \u00d6l und \u00dcbermut sind l\u00e4nger in Bytes als in Zeichen, aber gar nicht zu lang hier.",
+   "pieces": [
+    "W\u00f6rter mit Umlauten \u00fcber \u00c4pfel, \u00d6l und \u00dcbermut sind l\u00e4nger in Bytes als in Zeichen,",
+    "aber gar nicht zu lang hier."
+   ]
+  },
+  {
+   "text": "\u8fd9\u662f\u4e00\u4e2a\u5f88\u957f\u7684\u4e2d\u6587\u53e5\u5b50\uff0c\u6ca1\u6709\u7a7a\u683c\uff0c\u6240\u4ee5\u5fc5\u987b\u6309\u5b57\u7b26\u5207\u5206\u3002\u8fd9\u662f\u4e00\u4e2a\u5f88\u957f\u7684\u4e2d\u6587\u53e5\u5b50\uff0c\u6ca1\u6709\u7a7a\u683c\uff0c\u6240\u4ee5\u5fc5\u987b\u6309\u5b57\u7b26\u5207\u5206\u3002\u8fd9\u662f\u4e00\u4e2a\u5f88\u957f\u7684\u4e2d\u6587\u53e5\u5b50\uff0c\u6ca1\u6709\u7a7a\u683c\uff0c\u6240\u4ee5\u5fc5\u987b\u6309\u5b57\u7b26\u5207\u5206\u3002\u8fd9\u662f\u4e00\u4e2a\u5f88\u957f\u7684\u4e2d\u6587\u53e5\u5b50\uff0c\u6ca1\u6709\u7a7a\u683c\uff0c\u6240\u4ee5\u5fc5\u987b\u6309\u5b57\u7b26\u5207\u5206\u3002",
+   "pieces": [
+    "\u8fd9\u662f\u4e00\u4e2a\u5f88\u957f\u7684\u4e2d\u6587\u53e5\u5b50\uff0c\u6ca1\u6709\u7a7a\u683c\uff0c\u6240\u4ee5\u5fc5\u987b\u6309\u5b57\u7b26\u5207\u5206\u3002\u8fd9\u662f\u4e00\u4e2a\u5f88\u957f\u7684\u4e2d\u6587\u53e5\u5b50\uff0c\u6ca1\u6709\u7a7a\u683c\uff0c\u6240\u4ee5\u5fc5\u987b\u6309\u5b57\u7b26\u5207\u5206\u3002\u8fd9\u662f\u4e00\u4e2a\u5f88\u957f\u7684\u4e2d\u6587\u53e5\u5b50\uff0c\u6ca1\u6709\u7a7a\u683c\uff0c\u6240\u4ee5\u5fc5\u987b\u6309\u5b57\u7b26\u5207\u5206\u3002\u8fd9\u662f\u4e00\u4e2a\u5f88\u957f\u7684\u4e2d\u6587\u53e5\u5b50\uff0c\u6ca1\u6709\u7a7a\u683c\uff0c\u6240\u4ee5\u5fc5\u987b\u6309\u5b57\u7b26\u5207\u5206\u3002"
+   ]
+  },
+  {
+   "text": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx tail words after a huge one.",
+   "pieces": [
+    "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    "tail words after a huge one."
+   ]
+  },
+  {
+   "text": "This sentence is deliberately long, with several clauses; it keeps going: on and on, until it is far longer than the caption limit allows. Short one. And a final question that is also rather long for one caption, wouldn't you say, my friend?",
+   "pieces": [
+    "This sentence is deliberately long, with several clauses;",
+    "it keeps going: on and on, until it is far longer than the caption limit allows.",
+    "Short one.",
+    "And a final question that is also rather long for one caption,",
+    "wouldn't you say, my friend?"
+   ]
+  },
+  {
+   "text": "Line one.\n\nLine two?  Line three!   ",
+   "pieces": [
+    "Line one.",
+    "Line two?",
+    "Line three!"
+   ]
+  }
+ ],
+ "header": [
+  {
+   "name": "Rivers and towns",
+   "ext": "wav",
+   "out": "attachment; filename=\"Rivers and towns.wav\"; filename*=UTF-8''Rivers%20and%20towns.wav"
+  },
+  {
+   "name": "Caf\u00e9 ol\u00e9",
+   "ext": "mp3",
+   "out": "attachment; filename=\"Caf ol.mp3\"; filename*=UTF-8''Caf%C3%A9%20ol%C3%A9.mp3"
+  },
+  {
+   "name": "\u65e5\u672c\u8a9e\u306e\u30bf\u30a4\u30c8\u30eb",
+   "ext": "srt",
+   "out": "attachment; filename=\"download.srt\"; filename*=UTF-8''%E6%97%A5%E6%9C%AC%E8%AA%9E%E3%81%AE%E3%82%BF%E3%82%A4%E3%83%88%E3%83%AB.srt"
+  },
+  {
+   "name": "He said \"hi\"",
+   "ext": "vtt",
+   "out": "attachment; filename=\"He said _hi_.vtt\"; filename*=UTF-8''He%20said%20%22hi%22.vtt"
+  },
+  {
+   "name": "back\\slash",
+   "ext": "txt",
+   "out": "attachment; filename=\"back_slash.txt\"; filename*=UTF-8''back%5Cslash.txt"
+  },
+  {
+   "name": "line\r\nbreak",
+   "ext": "wav",
+   "out": "attachment; filename=\"line__break.wav\"; filename*=UTF-8''line%0D%0Abreak.wav"
+  },
+  {
+   "name": "  spaced  out  ",
+   "ext": "mp3",
+   "out": "attachment; filename=\"spaced  out.mp3\"; filename*=UTF-8''%20%20spaced%20%20out%20%20.mp3"
+  },
+  {
+   "name": "100% / done",
+   "ext": "wav",
+   "out": "attachment; filename=\"100% / done.wav\"; filename*=UTF-8''100%25%20%2F%20done.wav"
+  },
+  {
+   "name": "",
+   "ext": "wav",
+   "out": "attachment; filename=\"download.wav\"; filename*=UTF-8''.wav"
+  },
+  {
+   "name": "~tilde_under-score.dot",
+   "ext": "srt",
+   "out": "attachment; filename=\"~tilde_under-score.dot.srt\"; filename*=UTF-8''~tilde_under-score.dot.srt"
+  },
+  {
+   "name": "\ud83c\udf99 Mic check",
+   "ext": "mp3",
+   "out": "attachment; filename=\"Mic check.mp3\"; filename*=UTF-8''%F0%9F%8E%99%20Mic%20check.mp3"
+  },
+  {
+   "name": "tab\there",
+   "ext": "wav",
+   "out": "attachment; filename=\"tab\there.wav\"; filename*=UTF-8''tab%09here.wav"
+  },
+  {
+   "name": "a+b=c&d?e#f",
+   "ext": "txt",
+   "out": "attachment; filename=\"a+b=c&d?e#f.txt\"; filename*=UTF-8''a%2Bb%3Dc%26d%3Fe%23f.txt"
+  },
+  {
+   "name": "  \u65e5\u672c  ",
+   "ext": "vtt",
+   "out": "attachment; filename=\"download.vtt\"; filename*=UTF-8''%20%20%E6%97%A5%E6%9C%AC%20%20.vtt"
+  }
+ ],
+ "timings": [
+  {
+   "gen": {
+    "id": "s05gen",
+    "status": "done",
+    "speed": 1.0,
+    "duration": 2.0,
+    "timeline": [
+     {
+      "i": 0,
+      "start": 0.0,
+      "end": 2.0
+     }
+    ],
+    "chunks": [
+     {
+      "i": 0,
+      "text": "Hello there, my friend. How are you?",
+      "words": [
+       {
+        "word": "Hello",
+        "start": 0.0,
+        "end": 0.25
+       },
+       {
+        "word": "there,",
+        "start": 0.25,
+        "end": 0.5
+       },
+       {
+        "word": "my",
+        "start": 0.5,
+        "end": 0.75
+       },
+       {
+        "word": "friend.",
+        "start": 0.75,
+        "end": 1.0
+       },
+       {
+        "word": "How",
+        "start": 1.0,
+        "end": 1.25
+       },
+       {
+        "word": "are",
+        "start": 1.25,
+        "end": 1.5
+       },
+       {
+        "word": "you?",
+        "start": 1.5,
+        "end": 1.75
+       }
+      ]
+     }
+    ]
+   },
+   "timings": {
+    "result": {
+     "speed": 1.0,
+     "duration": 2.0,
+     "estimated": false,
+     "sentences": [
+      {
+       "text": "Hello there, my friend.",
+       "start": 0.0,
+       "end": 1.0
+      },
+      {
+       "text": "How are you?",
+       "start": 1.0,
+       "end": 1.75
+      }
+     ],
+     "words": [
+      {
+       "word": "Hello",
+       "start": 0.0,
+       "end": 0.25
+      },
+      {
+       "word": "there,",
+       "start": 0.25,
+       "end": 0.5
+      },
+      {
+       "word": "my",
+       "start": 0.5,
+       "end": 0.75
+      },
+      {
+       "word": "friend.",
+       "start": 0.75,
+       "end": 1.0
+      },
+      {
+       "word": "How",
+       "start": 1.0,
+       "end": 1.25
+      },
+      {
+       "word": "are",
+       "start": 1.25,
+       "end": 1.5
+      },
+      {
+       "word": "you?",
+       "start": 1.5,
+       "end": 1.75
+      }
+     ]
+    }
+   },
+   "captions": {
+    "result": [
+     {
+      "start": 0.0,
+      "end": 1.3142857142857143,
+      "text": "Hello there, my friend."
+     },
+     {
+      "start": 1.3142857142857143,
+      "end": 2.0,
+      "text": "How are you?"
+     }
+    ]
+   },
+   "srt": "1\n00:00:00,000 --> 00:00:01,314\nHello there, my friend.\n\n2\n00:00:01,314 --> 00:00:02,000\nHow are you?\n",
+   "vtt": "WEBVTT\n\n00:00:00.000 --> 00:00:01.314\nHello there, my friend.\n\n00:00:01.314 --> 00:00:02.000\nHow are you?\n",
+   "txt": "Hello there, my friend. How are you?"
+  },
+  {
+   "gen": {
+    "id": "s05gen",
+    "status": "done",
+    "timeline": [
+     {
+      "i": 0,
+      "start": 0.5,
+      "end": 1.6
+     }
+    ],
+    "chunks": [
+     {
+      "i": 0,
+      "text": "The cat sat down.",
+      "words": [
+       {
+        "word": "The",
+        "start": 0.0,
+        "end": 0.25
+       },
+       {
+        "word": "dog",
+        "start": 0.25,
+        "end": 0.5
+       },
+       {
+        "word": "sat",
+        "start": 0.5,
+        "end": 0.75
+       },
+       {
+        "word": "down.",
+        "start": 0.75,
+        "end": 1.0
+       }
+      ]
+     }
+    ]
+   },
+   "timings": {
+    "result": {
+     "speed": 1.0,
+     "duration": null,
+     "estimated": false,
+     "sentences": [
+      {
+       "text": "The cat sat down.",
+       "start": 0.5,
+       "end": 1.5
+      }
+     ],
+     "words": [
+      {
+       "word": "The",
+       "start": 0.5,
+       "end": 0.75
+      },
+      {
+       "word": "cat",
+       "start": 0.75,
+       "end": 1.0
+      },
+      {
+       "word": "sat",
+       "start": 1.0,
+       "end": 1.25
+      },
+      {
+       "word": "down.",
+       "start": 1.25,
+       "end": 1.5
+      }
+     ]
+    }
+   },
+   "captions": {
+    "result": [
+     {
+      "start": 0.5,
+      "end": 1.6,
+      "text": "The cat sat down."
+     }
+    ]
+   },
+   "srt": "1\n00:00:00,500 --> 00:00:01,600\nThe cat sat down.\n",
+   "vtt": "WEBVTT\n\n00:00:00.500 --> 00:00:01.600\nThe cat sat down.\n",
+   "txt": "The cat sat down."
+  },
+  {
+   "gen": {
+    "id": "s05gen",
+    "status": "done",
+    "speed": 0.8,
+    "timeline": [
+     {
+      "i": 0,
+      "start": 1.0,
+      "end": 2.2
+     }
+    ],
+    "chunks": [
+     {
+      "i": 0,
+      "text": "Well I think so.",
+      "words": [
+       {
+        "word": "I",
+        "start": 0.3,
+        "end": 0.55
+       },
+       {
+        "word": "think",
+        "start": 0.55,
+        "end": 0.8
+       },
+       {
+        "word": "so.",
+        "start": 0.8,
+        "end": 1.05
+       }
+      ]
+     }
+    ]
+   },
+   "timings": {
+    "result": {
+     "speed": 0.8,
+     "duration": null,
+     "estimated": false,
+     "sentences": [
+      {
+       "text": "Well I think so.",
+       "start": 1.0,
+       "end": 2.312
+      }
+     ],
+     "words": [
+      {
+       "word": "Well",
+       "start": 1.0,
+       "end": 1.375
+      },
+      {
+       "word": "I",
+       "start": 1.375,
+       "end": 1.688
+      },
+      {
+       "word": "think",
+       "start": 1.688,
+       "end": 2.0
+      },
+      {
+       "word": "so.",
+       "start": 2.0,
+       "end": 2.312
+      }
+     ]
+    }
+   },
+   "captions": {
+    "result": [
+     {
+      "start": 1.0,
+      "end": 2.2,
+      "text": "Well I think so."
+     }
+    ]
+   },
+   "srt": "1\n00:00:01,000 --> 00:00:02,200\nWell I think so.\n",
+   "vtt": "WEBVTT\n\n00:00:01.000 --> 00:00:02.200\nWell I think so.\n",
+   "txt": "Well I think so."
+  },
+  {
+   "gen": {
+    "id": "s05gen",
+    "status": "done",
+    "speed": 1.5,
+    "timeline": [
+     {
+      "i": 0,
+      "start": 0.0,
+      "end": 1.0
+     }
+    ],
+    "chunks": [
+     {
+      "i": 0,
+      "text": "We go home now.",
+      "words": [
+       {
+        "word": "We",
+        "start": 0.0,
+        "end": 0.25
+       },
+       {
+        "word": "go",
+        "start": 0.25,
+        "end": 0.5
+       },
+       {
+        "word": "home",
+        "start": 0.5,
+        "end": 0.75
+       }
+      ]
+     }
+    ]
+   },
+   "timings": {
+    "result": {
+     "speed": 1.5,
+     "duration": null,
+     "estimated": false,
+     "sentences": [
+      {
+       "text": "We go home now.",
+       "start": 0.0,
+       "end": 0.5
+      }
+     ],
+     "words": [
+      {
+       "word": "We",
+       "start": 0.0,
+       "end": 0.167
+      },
+      {
+       "word": "go",
+       "start": 0.167,
+       "end": 0.333
+      },
+      {
+       "word": "home",
+       "start": 0.333,
+       "end": 0.5
+      },
+      {
+       "word": "now.",
+       "start": 0.5,
+       "end": 0.5
+      }
+     ]
+    }
+   },
+   "captions": {
+    "result": [
+     {
+      "start": 0.0,
+      "end": 1.0,
+      "text": "We go home now."
+     }
+    ]
+   },
+   "srt": "1\n00:00:00,000 --> 00:00:01,000\nWe go home now.\n",
+   "vtt": "WEBVTT\n\n00:00:00.000 --> 00:00:01.000\nWe go home now.\n",
+   "txt": "We go home now."
+  },
+  {
+   "gen": {
+    "id": "s05gen",
+    "status": "done",
+    "speed": 0,
+    "timeline": [
+     {
+      "i": 0,
+      "start": 0.0,
+      "end": 2.0
+     }
+    ],
+    "chunks": [
+     {
+      "i": 0,
+      "text": "We go to the store.",
+      "words": [
+       {
+        "word": "Um",
+        "start": 0.0,
+        "end": 0.25
+       },
+       {
+        "word": "we",
+        "start": 0.25,
+        "end": 0.5
+       },
+       {
+        "word": "go",
+        "start": 0.5,
+        "end": 0.75
+       },
+       {
+        "word": "to",
+        "start": 0.75,
+        "end": 1.0
+       },
+       {
+        "word": "the",
+        "start": 1.0,
+        "end": 1.25
+       },
+       {
+        "word": "the",
+        "start": 1.25,
+        "end": 1.5
+       },
+       {
+        "word": "store",
+        "start": 1.5,
+        "end": 1.75
+       }
+      ]
+     }
+    ]
+   },
+   "timings": {
+    "result": {
+     "speed": 1.0,
+     "duration": null,
+     "estimated": false,
+     "sentences": [
+      {
+       "text": "We go to the store.",
+       "start": 0.25,
+       "end": 1.75
+      }
+     ],
+     "words": [
+      {
+       "word": "We",
+       "start": 0.25,
+       "end": 0.5
+      },
+      {
+       "word": "go",
+       "start": 0.5,
+       "end": 0.75
+      },
+      {
+       "word": "to",
+       "start": 0.75,
+       "end": 1.0
+      },
+      {
+       "word": "the",
+       "start": 1.0,
+       "end": 1.25
+      },
+      {
+       "word": "store.",
+       "start": 1.5,
+       "end": 1.75
+      }
+     ]
+    }
+   },
+   "captions": {
+    "result": [
+     {
+      "start": 0.0,
+      "end": 2.0,
+      "text": "We go to the store."
+     }
+    ]
+   },
+   "srt": "1\n00:00:00,000 --> 00:00:02,000\nWe go to the store.\n",
+   "vtt": "WEBVTT\n\n00:00:00.000 --> 00:00:02.000\nWe go to the store.\n",
+   "txt": "We go to the store."
+  },
+  {
+   "gen": {
+    "id": "s05gen",
+    "status": "done",
+    "speed": null,
+    "timeline": [
+     {
+      "i": 0,
+      "start": 0.2,
+      "end": 1.4
+     }
+    ],
+    "chunks": [
+     {
+      "i": 0,
+      "text": "One two three four five.",
+      "words": [
+       {
+        "word": "one",
+        "start": 0.0,
+        "end": 0.25
+       },
+       {
+        "word": "three",
+        "start": 0.25,
+        "end": 0.5
+       },
+       {
+        "word": "five",
+        "start": 0.5,
+        "end": 0.75
+       }
+      ]
+     }
+    ]
+   },
+   "timings": {
+    "result": {
+     "speed": 1.0,
+     "duration": null,
+     "estimated": false,
+     "sentences": [
+      {
+       "text": "One two three four five.",
+       "start": 0.2,
+       "end": 0.95
+      }
+     ],
+     "words": [
+      {
+       "word": "One",
+       "start": 0.2,
+       "end": 0.45
+      },
+      {
+       "word": "two",
+       "start": 0.45,
+       "end": 0.45
+      },
+      {
+       "word": "three",
+       "start": 0.45,
+       "end": 0.7
+      },
+      {
+       "word": "four",
+       "start": 0.7,
+       "end": 0.7
+      },
+      {
+       "word": "five.",
+       "start": 0.7,
+       "end": 0.95
+      }
+     ]
+    }
+   },
+   "captions": {
+    "result": [
+     {
+      "start": 0.2,
+      "end": 1.4,
+      "text": "One two three four five."
+     }
+    ]
+   },
+   "srt": "1\n00:00:00,200 --> 00:00:01,400\nOne two three four five.\n",
+   "vtt": "WEBVTT\n\n00:00:00.200 --> 00:00:01.400\nOne two three four five.\n",
+   "txt": "One two three four five."
+  },
+  {
+   "gen": {
+    "id": "s05gen",
+    "status": "done",
+    "timeline": [
+     {
+      "i": 0,
+      "start": 0.0,
+      "end": 1.5
+     }
+    ],
+    "chunks": [
+     {
+      "i": 0,
+      "text": "Don't STOP, it's Franz's turn!",
+      "words": [
+       {
+        "word": "dont",
+        "start": 0.0,
+        "end": 0.25
+       },
+       {
+        "word": "stop",
+        "start": 0.25,
+        "end": 0.5
+       },
+       {
+        "word": "its",
+        "start": 0.5,
+        "end": 0.75
+       },
+       {
+        "word": "franz's",
+        "start": 0.75,
+        "end": 1.0
+       },
+       {
+        "word": "TURN",
+        "start": 1.0,
+        "end": 1.25
+       }
+      ]
+     }
+    ]
+   },
+   "timings": {
+    "result": {
+     "speed": 1.0,
+     "duration": null,
+     "estimated": false,
+     "sentences": [
+      {
+       "text": "Don't STOP, it's Franz's turn!",
+       "start": 0.0,
+       "end": 1.25
+      }
+     ],
+     "words": [
+      {
+       "word": "Don't",
+       "start": 0.0,
+       "end": 0.25
+      },
+      {
+       "word": "STOP,",
+       "start": 0.25,
+       "end": 0.5
+      },
+      {
+       "word": "it's",
+       "start": 0.5,
+       "end": 0.75
+      },
+      {
+       "word": "Franz's",
+       "start": 0.75,
+       "end": 1.0
+      },
+      {
+       "word": "turn!",
+       "start": 1.0,
+       "end": 1.25
+      }
+     ]
+    }
+   },
+   "captions": {
+    "result": [
+     {
+      "start": 0.0,
+      "end": 1.5,
+      "text": "Don't STOP, it's Franz's turn!"
+     }
+    ]
+   },
+   "srt": "1\n00:00:00,000 --> 00:00:01,500\nDon't STOP, it's Franz's turn!\n",
+   "vtt": "WEBVTT\n\n00:00:00.000 --> 00:00:01.500\nDon't STOP, it's Franz's turn!\n",
+   "txt": "Don't STOP, it's Franz's turn!"
+  },
+  {
+   "gen": {
+    "id": "s05gen",
+    "status": "done",
+    "timeline": [
+     {
+      "i": 0,
+      "start": 0.0,
+      "end": 1.2
+     }
+    ],
+    "chunks": [
+     {
+      "i": 0,
+      "text": "Caf\u00e9 cr\u00e8me, na\u00efve \u00c6sop.",
+      "words": [
+       {
+        "word": "cafe",
+        "start": 0.0,
+        "end": 0.25
+       },
+       {
+        "word": "creme",
+        "start": 0.25,
+        "end": 0.5
+       },
+       {
+        "word": "naive",
+        "start": 0.5,
+        "end": 0.75
+       },
+       {
+        "word": "\u00e6sop",
+        "start": 0.75,
+        "end": 1.0
+       }
+      ]
+     }
+    ]
+   },
+   "timings": {
+    "result": {
+     "speed": 1.0,
+     "duration": null,
+     "estimated": false,
+     "sentences": [
+      {
+       "text": "Caf\u00e9 cr\u00e8me, na\u00efve \u00c6sop.",
+       "start": 0.0,
+       "end": 1.0
+      }
+     ],
+     "words": [
+      {
+       "word": "Caf\u00e9",
+       "start": 0.0,
+       "end": 0.75
+      },
+      {
+       "word": "cr\u00e8me,",
+       "start": 0.75,
+       "end": 0.75
+      },
+      {
+       "word": "na\u00efve",
+       "start": 0.75,
+       "end": 0.75
+      },
+      {
+       "word": "\u00c6sop.",
+       "start": 0.75,
+       "end": 1.0
+      }
+     ]
+    }
+   },
+   "captions": {
+    "result": [
+     {
+      "start": 0.0,
+      "end": 1.2,
+      "text": "Caf\u00e9 cr\u00e8me, na\u00efve \u00c6sop."
+     }
+    ]
+   },
+   "srt": "1\n00:00:00,000 --> 00:00:01,200\nCaf\u00e9 cr\u00e8me, na\u00efve \u00c6sop.\n",
+   "vtt": "WEBVTT\n\n00:00:00.000 --> 00:00:01.200\nCaf\u00e9 cr\u00e8me, na\u00efve \u00c6sop.\n",
+   "txt": "Caf\u00e9 cr\u00e8me, na\u00efve \u00c6sop."
+  },
+  {
+   "gen": {
+    "id": "s05gen",
+    "status": "done",
+    "speed": 1.25,
+    "duration": 3.3,
+    "timeline": [
+     {
+      "i": 0,
+      "start": 0.0,
+      "end": 0.75
+     },
+     {
+      "i": 1,
+      "start": 1.1,
+      "end": 3.3
+     }
+    ],
+    "chunks": [
+     {
+      "i": 0,
+      "text": "First part here.",
+      "words": [
+       {
+        "word": "First",
+        "start": 0.0,
+        "end": 0.25
+       },
+       {
+        "word": "part",
+        "start": 0.25,
+        "end": 0.5
+       },
+       {
+        "word": "here.",
+        "start": 0.5,
+        "end": 0.75
+       }
+      ]
+     },
+     {
+      "i": 1,
+      "text": "Second part has no word times at all."
+     }
+    ]
+   },
+   "timings": {
+    "result": {
+     "speed": 1.25,
+     "duration": 3.3,
+     "estimated": true,
+     "sentences": [
+      {
+       "text": "First part here.",
+       "start": 0.0,
+       "end": 0.6
+      },
+      {
+       "text": "Second part has no word times at all.",
+       "start": 1.1,
+       "end": 3.3
+      }
+     ],
+     "words": [
+      {
+       "word": "First",
+       "start": 0.0,
+       "end": 0.2
+      },
+      {
+       "word": "part",
+       "start": 0.2,
+       "end": 0.4
+      },
+      {
+       "word": "here.",
+       "start": 0.4,
+       "end": 0.6
+      },
+      {
+       "word": "Second",
+       "start": 1.1,
+       "end": 1.54
+      },
+      {
+       "word": "part",
+       "start": 1.54,
+       "end": 1.833
+      },
+      {
+       "word": "has",
+       "start": 1.833,
+       "end": 2.053
+      },
+      {
+       "word": "no",
+       "start": 2.053,
+       "end": 2.2
+      },
+      {
+       "word": "word",
+       "start": 2.2,
+       "end": 2.493
+      },
+      {
+       "word": "times",
+       "start": 2.493,
+       "end": 2.86
+      },
+      {
+       "word": "at",
+       "start": 2.86,
+       "end": 3.007
+      },
+      {
+       "word": "all.",
+       "start": 3.007,
+       "end": 3.3
+      }
+     ]
+    }
+   },
+   "captions": {
+    "result": [
+     {
+      "start": 0.0,
+      "end": 0.75,
+      "text": "First part here."
+     },
+     {
+      "start": 1.1,
+      "end": 3.3,
+      "text": "Second part has no word times at all."
+     }
+    ]
+   },
+   "srt": "1\n00:00:00,000 --> 00:00:00,750\nFirst part here.\n\n2\n00:00:01,100 --> 00:00:03,300\nSecond part has no word times at all.\n",
+   "vtt": "WEBVTT\n\n00:00:00.000 --> 00:00:00.750\nFirst part here.\n\n00:00:01.100 --> 00:00:03.300\nSecond part has no word times at all.\n",
+   "txt": "First part here. Second part has no word times at all."
+  },
+  {
+   "gen": {
+    "id": "s05gen",
+    "status": "done",
+    "timeline": [
+     {
+      "i": 0,
+      "start": 0.0,
+      "end": 0.5
+     },
+     {
+      "i": 1,
+      "start": 0.5,
+      "end": 1.0
+     },
+     {
+      "i": 2,
+      "start": 1.0,
+      "end": 2.0
+     }
+    ],
+    "chunks": [
+     {
+      "i": 0,
+      "text": ""
+     },
+     {
+      "i": 1,
+      "text": "   "
+     },
+     {
+      "i": 2,
+      "text": "?! Hello. . World."
+     }
+    ]
+   },
+   "timings": {
+    "result": {
+     "speed": 1.0,
+     "duration": null,
+     "estimated": true,
+     "sentences": [
+      {
+       "text": "?!",
+       "start": 1.0,
+       "end": 1.133
+      },
+      {
+       "text": "Hello. .",
+       "start": 1.133,
+       "end": 1.6
+      },
+      {
+       "text": "World.",
+       "start": 1.6,
+       "end": 2.0
+      }
+     ],
+     "words": [
+      {
+       "word": "?!",
+       "start": 1.0,
+       "end": 1.133
+      },
+      {
+       "word": "Hello.",
+       "start": 1.133,
+       "end": 1.533
+      },
+      {
+       "word": ".",
+       "start": 1.533,
+       "end": 1.6
+      },
+      {
+       "word": "World.",
+       "start": 1.6,
+       "end": 2.0
+      }
+     ]
+    }
+   },
+   "captions": {
+    "result": [
+     {
+      "start": 1.0,
+      "end": 1.1333333333333333,
+      "text": "?!"
+     },
+     {
+      "start": 1.1333333333333333,
+      "end": 1.5333333333333332,
+      "text": "Hello."
+     },
+     {
+      "start": 1.5333333333333332,
+      "end": 1.5999999999999999,
+      "text": "."
+     },
+     {
+      "start": 1.5999999999999999,
+      "end": 2.0,
+      "text": "World."
+     }
+    ]
+   },
+   "srt": "1\n00:00:01,000 --> 00:00:01,133\n?!\n\n2\n00:00:01,133 --> 00:00:01,533\nHello.\n\n3\n00:00:01,533 --> 00:00:01,600\n.\n\n4\n00:00:01,600 --> 00:00:02,000\nWorld.\n",
+   "vtt": "WEBVTT\n\n00:00:01.000 --> 00:00:01.133\n?!\n\n00:00:01.133 --> 00:00:01.533\nHello.\n\n00:00:01.533 --> 00:00:01.600\n.\n\n00:00:01.600 --> 00:00:02.000\nWorld.\n",
+   "txt": "?! Hello. . World."
+  },
+  {
+   "gen": {
+    "id": "s05gen",
+    "status": "done",
+    "timeline": [
+     {
+      "i": 0,
+      "start": 0.0,
+      "end": 0.5
+     }
+    ],
+    "chunks": [
+     {
+      "i": 0,
+      "text": "",
+      "words": [
+       {
+        "word": "ghost",
+        "start": 0.0,
+        "end": 0.2
+       }
+      ]
+     }
+    ]
+   },
+   "timings": {
+    "result": {
+     "speed": 1.0,
+     "duration": null,
+     "estimated": false,
+     "sentences": [],
+     "words": []
+    }
+   },
+   "captions": {
+    "result": []
+   },
+   "srt": "",
+   "vtt": "WEBVTT\n\n",
+   "txt": ""
+  },
+  {
+   "gen": {
+    "id": "s05gen",
+    "status": "done",
+    "duration": 3,
+    "timeline": [
+     {
+      "i": 0,
+      "start": 0,
+      "end": 3
+     }
+    ],
+    "chunks": [
+     {
+      "i": 0,
+      "text": "Integer start and end times."
+     }
+    ]
+   },
+   "timings": {
+    "result": {
+     "speed": 1.0,
+     "duration": 3,
+     "estimated": true,
+     "sentences": [
+      {
+       "text": "Integer start and end times.",
+       "start": 0,
+       "end": 3.0
+      }
+     ],
+     "words": [
+      {
+       "word": "Integer",
+       "start": 0,
+       "end": 0.875
+      },
+      {
+       "word": "start",
+       "start": 0.875,
+       "end": 1.5
+      },
+      {
+       "word": "and",
+       "start": 1.5,
+       "end": 1.875
+      },
+      {
+       "word": "end",
+       "start": 1.875,
+       "end": 2.25
+      },
+      {
+       "word": "times.",
+       "start": 2.25,
+       "end": 3.0
+      }
+     ]
+    }
+   },
+   "captions": {
+    "result": [
+     {
+      "start": 0,
+      "end": 3.0,
+      "text": "Integer start and end times."
+     }
+    ]
+   },
+   "srt": "1\n00:00:00,000 --> 00:00:03,000\nInteger start and end times.\n",
+   "vtt": "WEBVTT\n\n00:00:00.000 --> 00:00:03.000\nInteger start and end times.\n",
+   "txt": "Integer start and end times."
+  },
+  {
+   "gen": {
+    "id": "s05gen",
+    "status": "done",
+    "timeline": [
+     {
+      "i": 0,
+      "start": 1,
+      "end": 4
+     }
+    ],
+    "chunks": [
+     {
+      "i": 0,
+      "text": "Integer word times.",
+      "words": [
+       {
+        "word": "Integer",
+        "start": 0,
+        "end": 1
+       },
+       {
+        "word": "word",
+        "start": 1,
+        "end": 2
+       },
+       {
+        "word": "times.",
+        "start": 2,
+        "end": 3
+       }
+      ]
+     }
+    ]
+   },
+   "timings": {
+    "result": {
+     "speed": 1.0,
+     "duration": null,
+     "estimated": false,
+     "sentences": [
+      {
+       "text": "Integer word times.",
+       "start": 1.0,
+       "end": 4.0
+      }
+     ],
+     "words": [
+      {
+       "word": "Integer",
+       "start": 1.0,
+       "end": 2.0
+      },
+      {
+       "word": "word",
+       "start": 2.0,
+       "end": 3.0
+      },
+      {
+       "word": "times.",
+       "start": 3.0,
+       "end": 4.0
+      }
+     ]
+    }
+   },
+   "captions": {
+    "result": [
+     {
+      "start": 1,
+      "end": 4.0,
+      "text": "Integer word times."
+     }
+    ]
+   },
+   "srt": "1\n00:00:01,000 --> 00:00:04,000\nInteger word times.\n",
+   "vtt": "WEBVTT\n\n00:00:01.000 --> 00:00:04.000\nInteger word times.\n",
+   "txt": "Integer word times."
+  },
+  {
+   "gen": {
+    "id": "s05gen",
+    "status": "done",
+    "timeline": [
+     {
+      "i": 0,
+      "start": 0.0,
+      "end": 0.01
+     }
+    ],
+    "chunks": [
+     {
+      "i": 0,
+      "text": "Half a milli.",
+      "words": [
+       {
+        "word": "Half",
+        "start": 0.0005,
+        "end": 0.0015
+       },
+       {
+        "word": "a",
+        "start": 0.0015,
+        "end": 0.0025
+       },
+       {
+        "word": "milli.",
+        "start": 0.0025,
+        "end": 0.0045
+       }
+      ]
+     }
+    ]
+   },
+   "timings": {
+    "result": {
+     "speed": 1.0,
+     "duration": null,
+     "estimated": false,
+     "sentences": [
+      {
+       "text": "Half a milli.",
+       "start": 0.001,
+       "end": 0.004
+      }
+     ],
+     "words": [
+      {
+       "word": "Half",
+       "start": 0.001,
+       "end": 0.002
+      },
+      {
+       "word": "a",
+       "start": 0.002,
+       "end": 0.003
+      },
+      {
+       "word": "milli.",
+       "start": 0.003,
+       "end": 0.004
+      }
+     ]
+    }
+   },
+   "captions": {
+    "result": [
+     {
+      "start": 0.0,
+      "end": 0.01,
+      "text": "Half a milli."
+     }
+    ]
+   },
+   "srt": "1\n00:00:00,000 --> 00:00:00,010\nHalf a milli.\n",
+   "vtt": "WEBVTT\n\n00:00:00.000 --> 00:00:00.010\nHalf a milli.\n",
+   "txt": "Half a milli."
+  },
+  {
+   "gen": {
+    "id": "s05gen",
+    "status": "done",
+    "timeline": [
+     {
+      "i": 0,
+      "start": 2.5,
+      "end": 3.5
+     }
+    ],
+    "chunks": [
+     {
+      "i": 0,
+      "text": "Later on.",
+      "words": [
+       {
+        "word": "Later",
+        "start": 0.0005,
+        "end": 0.5
+       },
+       {
+        "word": "on.",
+        "start": 0.5,
+        "end": 0.9995
+       }
+      ]
+     }
+    ]
+   },
+   "timings": {
+    "result": {
+     "speed": 1.0,
+     "duration": null,
+     "estimated": false,
+     "sentences": [
+      {
+       "text": "Later on.",
+       "start": 2.501,
+       "end": 3.5
+      }
+     ],
+     "words": [
+      {
+       "word": "Later",
+       "start": 2.501,
+       "end": 3.0
+      },
+      {
+       "word": "on.",
+       "start": 3.0,
+       "end": 3.5
+      }
+     ]
+    }
+   },
+   "captions": {
+    "result": [
+     {
+      "start": 2.5,
+      "end": 3.5,
+      "text": "Later on."
+     }
+    ]
+   },
+   "srt": "1\n00:00:02,500 --> 00:00:03,500\nLater on.\n",
+   "vtt": "WEBVTT\n\n00:00:02.500 --> 00:00:03.500\nLater on.\n",
+   "txt": "Later on."
+  },
+  {
+   "gen": {
+    "id": "s05gen",
+    "status": "done",
+    "timeline": [
+     {
+      "i": 0,
+      "start": 3599.999,
+      "end": 3600.001
+     }
+    ],
+    "chunks": [
+     {
+      "i": 0,
+      "text": "Almost an hour.",
+      "words": [
+       {
+        "word": "Almost",
+        "start": 0.0,
+        "end": 0.0005
+       },
+       {
+        "word": "an",
+        "start": 0.0005,
+        "end": 0.0015
+       },
+       {
+        "word": "hour.",
+        "start": 0.0015,
+        "end": 0.0025
+       }
+      ]
+     }
+    ]
+   },
+   "timings": {
+    "result": {
+     "speed": 1.0,
+     "duration": null,
+     "estimated": false,
+     "sentences": [
+      {
+       "text": "Almost an hour.",
+       "start": 3599.999,
+       "end": 3600.001
+      }
+     ],
+     "words": [
+      {
+       "word": "Almost",
+       "start": 3599.999,
+       "end": 3599.999
+      },
+      {
+       "word": "an",
+       "start": 3599.999,
+       "end": 3600.0
+      },
+      {
+       "word": "hour.",
+       "start": 3600.0,
+       "end": 3600.001
+      }
+     ]
+    }
+   },
+   "captions": {
+    "result": [
+     {
+      "start": 3599.999,
+      "end": 3600.001,
+      "text": "Almost an hour."
+     }
+    ]
+   },
+   "srt": "1\n00:59:59,999 --> 01:00:00,001\nAlmost an hour.\n",
+   "vtt": "WEBVTT\n\n00:59:59.999 --> 01:00:00.001\nAlmost an hour.\n",
+   "txt": "Almost an hour."
+  },
+  {
+   "gen": {
+    "id": "s05gen",
+    "status": "done",
+    "timeline": [
+     {
+      "i": 0,
+      "start": 3725.2505,
+      "end": 3731.0015
+     }
+    ],
+    "chunks": [
+     {
+      "i": 0,
+      "text": "Well past one hour now."
+     }
+    ]
+   },
+   "timings": {
+    "result": {
+     "speed": 1.0,
+     "duration": null,
+     "estimated": true,
+     "sentences": [
+      {
+       "text": "Well past one hour now.",
+       "start": 3725.251,
+       "end": 3731.001
+      }
+     ],
+     "words": [
+      {
+       "word": "Well",
+       "start": 3725.251,
+       "end": 3726.461
+      },
+      {
+       "word": "past",
+       "start": 3726.461,
+       "end": 3727.672
+      },
+      {
+       "word": "one",
+       "start": 3727.672,
+       "end": 3728.58
+      },
+      {
+       "word": "hour",
+       "start": 3728.58,
+       "end": 3729.791
+      },
+      {
+       "word": "now.",
+       "start": 3729.791,
+       "end": 3731.001
+      }
+     ]
+    }
+   },
+   "captions": {
+    "result": [
+     {
+      "start": 3725.2505,
+      "end": 3731.0015,
+      "text": "Well past one hour now."
+     }
+    ]
+   },
+   "srt": "1\n01:02:05,250 --> 01:02:11,002\nWell past one hour now.\n",
+   "vtt": "WEBVTT\n\n01:02:05.250 --> 01:02:11.002\nWell past one hour now.\n",
+   "txt": "Well past one hour now."
+  },
+  {
+   "gen": {
+    "id": "s05gen",
+    "status": "done",
+    "timeline": [
+     {
+      "i": 0,
+      "start": 7200.0005,
+      "end": 7201.9995
+     }
+    ],
+    "chunks": [
+     {
+      "i": 0,
+      "text": "Two hours in."
+     }
+    ]
+   },
+   "timings": {
+    "result": {
+     "speed": 1.0,
+     "duration": null,
+     "estimated": true,
+     "sentences": [
+      {
+       "text": "Two hours in.",
+       "start": 7200.001,
+       "end": 7201.999
+      }
+     ],
+     "words": [
+      {
+       "word": "Two",
+       "start": 7200.001,
+       "end": 7200.546
+      },
+      {
+       "word": "hours",
+       "start": 7200.546,
+       "end": 7201.454
+      },
+      {
+       "word": "in.",
+       "start": 7201.454,
+       "end": 7201.999
+      }
+     ]
+    }
+   },
+   "captions": {
+    "result": [
+     {
+      "start": 7200.0005,
+      "end": 7201.9995,
+      "text": "Two hours in."
+     }
+    ]
+   },
+   "srt": "1\n02:00:00,000 --> 02:00:02,000\nTwo hours in.\n",
+   "vtt": "WEBVTT\n\n02:00:00.000 --> 02:00:02.000\nTwo hours in.\n",
+   "txt": "Two hours in."
+  },
+  {
+   "gen": {
+    "id": "s05gen",
+    "status": "done",
+    "timeline": [
+     {
+      "i": 0,
+      "start": 0.0,
+      "end": 14.3
+     }
+    ],
+    "chunks": [
+     {
+      "i": 0,
+      "text": "This sentence is deliberately long, with several clauses; it keeps going: on and on, until it is far longer than the caption limit allows. Short one. And a final question that is also rather long for one caption, wouldn't you say, my friend?"
+     }
+    ]
+   },
+   "timings": {
+    "result": {
+     "speed": 1.0,
+     "duration": null,
+     "estimated": true,
+     "sentences": [
+      {
+       "text": "This sentence is deliberately long, with several clauses; it keeps going: on and on, until it is far longer than the caption limit allows.",
+       "start": 0.0,
+       "end": 8.264
+      },
+      {
+       "text": "Short one.",
+       "start": 8.264,
+       "end": 8.911
+      },
+      {
+       "text": "And a final question that is also rather long for one caption, wouldn't you say, my friend?",
+       "start": 8.911,
+       "end": 14.3
+      }
+     ],
+     "words": [
+      {
+       "word": "This",
+       "start": 0.0,
+       "end": 0.287
+      },
+      {
+       "word": "sentence",
+       "start": 0.287,
+       "end": 0.862
+      },
+      {
+       "word": "is",
+       "start": 0.862,
+       "end": 1.006
+      },
+      {
+       "word": "deliberately",
+       "start": 1.006,
+       "end": 1.868
+      },
+      {
+       "word": "long,",
+       "start": 1.868,
+       "end": 2.228
+      },
+      {
+       "word": "with",
+       "start": 2.228,
+       "end": 2.515
+      },
+      {
+       "word": "several",
+       "start": 2.515,
+       "end": 3.018
+      },
+      {
+       "word": "clauses;",
+       "start": 3.018,
+       "end": 3.593
+      },
+      {
+       "word": "it",
+       "start": 3.593,
+       "end": 3.737
+      },
+      {
+       "word": "keeps",
+       "start": 3.737,
+       "end": 4.096
+      },
+      {
+       "word": "going:",
+       "start": 4.096,
+       "end": 4.527
+      },
+      {
+       "word": "on",
+       "start": 4.527,
+       "end": 4.671
+      },
+      {
+       "word": "and",
+       "start": 4.671,
+       "end": 4.886
+      },
+      {
+       "word": "on,",
+       "start": 4.886,
+       "end": 5.102
+      },
+      {
+       "word": "until",
+       "start": 5.102,
+       "end": 5.461
+      },
+      {
+       "word": "it",
+       "start": 5.461,
+       "end": 5.605
+      },
+      {
+       "word": "is",
+       "start": 5.605,
+       "end": 5.749
+      },
+      {
+       "word": "far",
+       "start": 5.749,
+       "end": 5.964
+      },
+      {
+       "word": "longer",
+       "start": 5.964,
+       "end": 6.395
+      },
+      {
+       "word": "than",
+       "start": 6.395,
+       "end": 6.683
+      },
+      {
+       "word": "the",
+       "start": 6.683,
+       "end": 6.898
+      },
+      {
+       "word": "caption",
+       "start": 6.898,
+       "end": 7.402
+      },
+      {
+       "word": "limit",
+       "start": 7.402,
+       "end": 7.761
+      },
+      {
+       "word": "allows.",
+       "start": 7.761,
+       "end": 8.264
+      },
+      {
+       "word": "Short",
+       "start": 8.264,
+       "end": 8.623
+      },
+      {
+       "word": "one.",
+       "start": 8.623,
+       "end": 8.911
+      },
+      {
+       "word": "And",
+       "start": 8.911,
+       "end": 9.126
+      },
+      {
+       "word": "a",
+       "start": 9.126,
+       "end": 9.198
+      },
+      {
+       "word": "final",
+       "start": 9.198,
+       "end": 9.557
+      },
+      {
+       "word": "question",
+       "start": 9.557,
+       "end": 10.132
+      },
+      {
+       "word": "that",
+       "start": 10.132,
+       "end": 10.42
+      },
+      {
+       "word": "is",
+       "start": 10.42,
+       "end": 10.563
+      },
+      {
+       "word": "also",
+       "start": 10.563,
+       "end": 10.851
+      },
+      {
+       "word": "rather",
+       "start": 10.851,
+       "end": 11.282
+      },
+      {
+       "word": "long",
+       "start": 11.282,
+       "end": 11.569
+      },
+      {
+       "word": "for",
+       "start": 11.569,
+       "end": 11.785
+      },
+      {
+       "word": "one",
+       "start": 11.785,
+       "end": 12.001
+      },
+      {
+       "word": "caption,",
+       "start": 12.001,
+       "end": 12.575
+      },
+      {
+       "word": "wouldn't",
+       "start": 12.575,
+       "end": 13.15
+      },
+      {
+       "word": "you",
+       "start": 13.15,
+       "end": 13.366
+      },
+      {
+       "word": "say,",
+       "start": 13.366,
+       "end": 13.653
+      },
+      {
+       "word": "my",
+       "start": 13.653,
+       "end": 13.797
+      },
+      {
+       "word": "friend?",
+       "start": 13.797,
+       "end": 14.3
+      }
+     ]
+    }
+   },
+   "captions": {
+    "result": [
+     {
+      "start": 0.0,
+      "end": 3.439240506329114,
+      "text": "This sentence is deliberately long, with several clauses;"
+     },
+     {
+      "start": 3.439240506329114,
+      "end": 8.266244725738396,
+      "text": "it keeps going: on and on, until it is far longer than the caption limit allows."
+     },
+     {
+      "start": 8.266244725738396,
+      "end": 8.869620253164555,
+      "text": "Short one."
+     },
+     {
+      "start": 8.869620253164555,
+      "end": 12.610548523206749,
+      "text": "And a final question that is also rather long for one caption,"
+     },
+     {
+      "start": 12.610548523206749,
+      "end": 14.299999999999997,
+      "text": "wouldn't you say, my friend?"
+     }
+    ]
+   },
+   "srt": "1\n00:00:00,000 --> 00:00:03,439\nThis sentence is deliberately\nlong, with several clauses;\n\n2\n00:00:03,439 --> 00:00:08,266\nit keeps going: on and on, until it is\nfar longer than the caption limit allows.\n\n3\n00:00:08,266 --> 00:00:08,870\nShort one.\n\n4\n00:00:08,870 --> 00:00:12,611\nAnd a final question that is\nalso rather long for one caption,\n\n5\n00:00:12,611 --> 00:00:14,300\nwouldn't you say, my friend?\n",
+   "vtt": "WEBVTT\n\n00:00:00.000 --> 00:00:03.439\nThis sentence is deliberately\nlong, with several clauses;\n\n00:00:03.439 --> 00:00:08.266\nit keeps going: on and on, until it is\nfar longer than the caption limit allows.\n\n00:00:08.266 --> 00:00:08.870\nShort one.\n\n00:00:08.870 --> 00:00:12.611\nAnd a final question that is\nalso rather long for one caption,\n\n00:00:12.611 --> 00:00:14.300\nwouldn't you say, my friend?\n",
+   "txt": "This sentence is deliberately long, with several clauses; it keeps going: on and on, until it is far longer than the caption limit allows. Short one. And a final question that is also rather long for one caption, wouldn't you say, my friend?"
+  },
+  {
+   "gen": {
+    "id": "s05gen",
+    "status": "done",
+    "timeline": [
+     {
+      "i": 0,
+      "start": 0.0,
+      "end": 9.0
+     }
+    ],
+    "chunks": [
+     {
+      "i": 0,
+      "text": "\u8fd9\u662f\u4e00\u4e2a\u5f88\u957f\u7684\u4e2d\u6587\u53e5\u5b50\uff0c\u6ca1\u6709\u7a7a\u683c\uff0c\u6240\u4ee5\u5fc5\u987b\u6309\u5b57\u7b26\u5207\u5206\u3002\u8fd9\u662f\u4e00\u4e2a\u5f88\u957f\u7684\u4e2d\u6587\u53e5\u5b50\uff0c\u6ca1\u6709\u7a7a\u683c\uff0c\u6240\u4ee5\u5fc5\u987b\u6309\u5b57\u7b26\u5207\u5206\u3002\u8fd9\u662f\u4e00\u4e2a\u5f88\u957f\u7684\u4e2d\u6587\u53e5\u5b50\uff0c\u6ca1\u6709\u7a7a\u683c\uff0c\u6240\u4ee5\u5fc5\u987b\u6309\u5b57\u7b26\u5207\u5206\u3002\u8fd9\u662f\u4e00\u4e2a\u5f88\u957f\u7684\u4e2d\u6587\u53e5\u5b50\uff0c\u6ca1\u6709\u7a7a\u683c\uff0c\u6240\u4ee5\u5fc5\u987b\u6309\u5b57\u7b26\u5207\u5206\u3002"
+     }
+    ]
+   },
+   "timings": {
+    "result": {
+     "speed": 1.0,
+     "duration": null,
+     "estimated": true,
+     "sentences": [
+      {
+       "text": "\u8fd9\u662f\u4e00\u4e2a\u5f88\u957f\u7684\u4e2d\u6587\u53e5\u5b50\uff0c\u6ca1\u6709\u7a7a\u683c\uff0c\u6240\u4ee5\u5fc5\u987b\u6309\u5b57\u7b26\u5207\u5206\u3002\u8fd9\u662f\u4e00\u4e2a\u5f88\u957f\u7684\u4e2d\u6587\u53e5\u5b50\uff0c\u6ca1\u6709\u7a7a\u683c\uff0c\u6240\u4ee5\u5fc5\u987b\u6309\u5b57\u7b26\u5207\u5206\u3002\u8fd9\u662f\u4e00\u4e2a\u5f88\u957f\u7684\u4e2d\u6587\u53e5\u5b50\uff0c\u6ca1\u6709\u7a7a\u683c\uff0c\u6240\u4ee5\u5fc5\u987b\u6309\u5b57\u7b26\u5207\u5206\u3002\u8fd9\u662f\u4e00\u4e2a\u5f88\u957f\u7684\u4e2d\u6587\u53e5\u5b50\uff0c\u6ca1\u6709\u7a7a\u683c\uff0c\u6240\u4ee5\u5fc5\u987b\u6309\u5b57\u7b26\u5207\u5206\u3002",
+       "start": 0.0,
+       "end": 9.0
+      }
+     ],
+     "words": [
+      {
+       "word": "\u8fd9\u662f\u4e00\u4e2a\u5f88\u957f\u7684\u4e2d\u6587\u53e5\u5b50\uff0c\u6ca1\u6709\u7a7a\u683c\uff0c\u6240\u4ee5\u5fc5\u987b\u6309\u5b57\u7b26\u5207\u5206\u3002\u8fd9\u662f\u4e00\u4e2a\u5f88\u957f\u7684\u4e2d\u6587\u53e5\u5b50\uff0c\u6ca1\u6709\u7a7a\u683c\uff0c\u6240\u4ee5\u5fc5\u987b\u6309\u5b57\u7b26\u5207\u5206\u3002\u8fd9\u662f\u4e00\u4e2a\u5f88\u957f\u7684\u4e2d\u6587\u53e5\u5b50\uff0c\u6ca1\u6709\u7a7a\u683c\uff0c\u6240\u4ee5\u5fc5\u987b\u6309\u5b57\u7b26\u5207\u5206\u3002\u8fd9\u662f\u4e00\u4e2a\u5f88\u957f\u7684\u4e2d\u6587\u53e5\u5b50\uff0c\u6ca1\u6709\u7a7a\u683c\uff0c\u6240\u4ee5\u5fc5\u987b\u6309\u5b57\u7b26\u5207\u5206\u3002",
+       "start": 0.0,
+       "end": 9.0
+      }
+     ]
+    }
+   },
+   "captions": {
+    "result": [
+     {
+      "start": 0.0,
+      "end": 9.0,
+      "text": "\u8fd9\u662f\u4e00\u4e2a\u5f88\u957f\u7684\u4e2d\u6587\u53e5\u5b50\uff0c\u6ca1\u6709\u7a7a\u683c\uff0c\u6240\u4ee5\u5fc5\u987b\u6309\u5b57\u7b26\u5207\u5206\u3002\u8fd9\u662f\u4e00\u4e2a\u5f88\u957f\u7684\u4e2d\u6587\u53e5\u5b50\uff0c\u6ca1\u6709\u7a7a\u683c\uff0c\u6240\u4ee5\u5fc5\u987b\u6309\u5b57\u7b26\u5207\u5206\u3002\u8fd9\u662f\u4e00\u4e2a\u5f88\u957f\u7684\u4e2d\u6587\u53e5\u5b50\uff0c\u6ca1\u6709\u7a7a\u683c\uff0c\u6240\u4ee5\u5fc5\u987b\u6309\u5b57\u7b26\u5207\u5206\u3002\u8fd9\u662f\u4e00\u4e2a\u5f88\u957f\u7684\u4e2d\u6587\u53e5\u5b50\uff0c\u6ca1\u6709\u7a7a\u683c\uff0c\u6240\u4ee5\u5fc5\u987b\u6309\u5b57\u7b26\u5207\u5206\u3002"
+     }
+    ]
+   },
+   "srt": "1\n00:00:00,000 --> 00:00:09,000\n\u8fd9\u662f\u4e00\u4e2a\u5f88\u957f\u7684\u4e2d\u6587\u53e5\u5b50\uff0c\u6ca1\u6709\u7a7a\u683c\uff0c\u6240\u4ee5\u5fc5\u987b\u6309\u5b57\u7b26\u5207\u5206\u3002\u8fd9\u662f\u4e00\u4e2a\u5f88\u957f\u7684\u4e2d\u6587\u53e5\u5b50\uff0c\u6ca1\u6709\u7a7a\u683c\uff0c\u6240\u4ee5\u5fc5\u987b\u6309\u5b57\u7b26\u5207\u5206\u3002\n\u8fd9\u662f\u4e00\u4e2a\u5f88\u957f\u7684\u4e2d\u6587\u53e5\u5b50\uff0c\u6ca1\u6709\u7a7a\u683c\uff0c\u6240\u4ee5\u5fc5\u987b\u6309\u5b57\u7b26\u5207\u5206\u3002\u8fd9\u662f\u4e00\u4e2a\u5f88\u957f\u7684\u4e2d\u6587\u53e5\u5b50\uff0c\u6ca1\u6709\u7a7a\u683c\uff0c\u6240\u4ee5\u5fc5\u987b\u6309\u5b57\u7b26\u5207\u5206\u3002\n",
+   "vtt": "WEBVTT\n\n00:00:00.000 --> 00:00:09.000\n\u8fd9\u662f\u4e00\u4e2a\u5f88\u957f\u7684\u4e2d\u6587\u53e5\u5b50\uff0c\u6ca1\u6709\u7a7a\u683c\uff0c\u6240\u4ee5\u5fc5\u987b\u6309\u5b57\u7b26\u5207\u5206\u3002\u8fd9\u662f\u4e00\u4e2a\u5f88\u957f\u7684\u4e2d\u6587\u53e5\u5b50\uff0c\u6ca1\u6709\u7a7a\u683c\uff0c\u6240\u4ee5\u5fc5\u987b\u6309\u5b57\u7b26\u5207\u5206\u3002\n\u8fd9\u662f\u4e00\u4e2a\u5f88\u957f\u7684\u4e2d\u6587\u53e5\u5b50\uff0c\u6ca1\u6709\u7a7a\u683c\uff0c\u6240\u4ee5\u5fc5\u987b\u6309\u5b57\u7b26\u5207\u5206\u3002\u8fd9\u662f\u4e00\u4e2a\u5f88\u957f\u7684\u4e2d\u6587\u53e5\u5b50\uff0c\u6ca1\u6709\u7a7a\u683c\uff0c\u6240\u4ee5\u5fc5\u987b\u6309\u5b57\u7b26\u5207\u5206\u3002\n",
+   "txt": "\u8fd9\u662f\u4e00\u4e2a\u5f88\u957f\u7684\u4e2d\u6587\u53e5\u5b50\uff0c\u6ca1\u6709\u7a7a\u683c\uff0c\u6240\u4ee5\u5fc5\u987b\u6309\u5b57\u7b26\u5207\u5206\u3002\u8fd9\u662f\u4e00\u4e2a\u5f88\u957f\u7684\u4e2d\u6587\u53e5\u5b50\uff0c\u6ca1\u6709\u7a7a\u683c\uff0c\u6240\u4ee5\u5fc5\u987b\u6309\u5b57\u7b26\u5207\u5206\u3002\u8fd9\u662f\u4e00\u4e2a\u5f88\u957f\u7684\u4e2d\u6587\u53e5\u5b50\uff0c\u6ca1\u6709\u7a7a\u683c\uff0c\u6240\u4ee5\u5fc5\u987b\u6309\u5b57\u7b26\u5207\u5206\u3002\u8fd9\u662f\u4e00\u4e2a\u5f88\u957f\u7684\u4e2d\u6587\u53e5\u5b50\uff0c\u6ca1\u6709\u7a7a\u683c\uff0c\u6240\u4ee5\u5fc5\u987b\u6309\u5b57\u7b26\u5207\u5206\u3002"
+  },
+  {
+   "gen": {
+    "id": "s05dup",
+    "status": "done",
+    "timeline": [
+     {
+      "i": 0,
+      "start": 0.0,
+      "end": 1.0
+     }
+    ],
+    "chunks": [
+     {
+      "i": 0,
+      "text": "First copy."
+     },
+     {
+      "i": 0,
+      "text": "Second copy wins."
+     }
+    ]
+   },
+   "timings": {
+    "result": {
+     "speed": 1.0,
+     "duration": null,
+     "estimated": true,
+     "sentences": [
+      {
+       "text": "Second copy wins.",
+       "start": 0.0,
+       "end": 1.0
+      }
+     ],
+     "words": [
+      {
+       "word": "Second",
+       "start": 0.0,
+       "end": 0.4
+      },
+      {
+       "word": "copy",
+       "start": 0.4,
+       "end": 0.667
+      },
+      {
+       "word": "wins.",
+       "start": 0.667,
+       "end": 1.0
+      }
+     ]
+    }
+   },
+   "captions": {
+    "result": [
+     {
+      "start": 0.0,
+      "end": 1.0,
+      "text": "Second copy wins."
+     }
+    ]
+   },
+   "srt": "1\n00:00:00,000 --> 00:00:01,000\nSecond copy wins.\n",
+   "vtt": "WEBVTT\n\n00:00:00.000 --> 00:00:01.000\nSecond copy wins.\n",
+   "txt": "Second copy wins."
+  },
+  {
+   "gen": {
+    "id": "s05gen",
+    "status": "done",
+    "timeline": [
+     {
+      "i": 1,
+      "start": 0.0,
+      "end": 0.8
+     },
+     {
+      "i": 0,
+      "start": 1.0,
+      "end": 1.7
+     }
+    ],
+    "chunks": [
+     {
+      "i": 0,
+      "text": "Part zero."
+     },
+     {
+      "i": 1,
+      "text": "Part one."
+     }
+    ]
+   },
+   "timings": {
+    "result": {
+     "speed": 1.0,
+     "duration": null,
+     "estimated": true,
+     "sentences": [
+      {
+       "text": "Part one.",
+       "start": 0.0,
+       "end": 0.8
+      },
+      {
+       "text": "Part zero.",
+       "start": 1.0,
+       "end": 1.7
+      }
+     ],
+     "words": [
+      {
+       "word": "Part",
+       "start": 0.0,
+       "end": 0.4
+      },
+      {
+       "word": "one.",
+       "start": 0.4,
+       "end": 0.8
+      },
+      {
+       "word": "Part",
+       "start": 1.0,
+       "end": 1.311
+      },
+      {
+       "word": "zero.",
+       "start": 1.311,
+       "end": 1.7
+      }
+     ]
+    }
+   },
+   "captions": {
+    "result": [
+     {
+      "start": 0.0,
+      "end": 0.8,
+      "text": "Part one."
+     },
+     {
+      "start": 1.0,
+      "end": 1.7,
+      "text": "Part zero."
+     }
+    ]
+   },
+   "srt": "1\n00:00:00,000 --> 00:00:00,800\nPart one.\n\n2\n00:00:01,000 --> 00:00:01,700\nPart zero.\n",
+   "vtt": "WEBVTT\n\n00:00:00.000 --> 00:00:00.800\nPart one.\n\n00:00:01.000 --> 00:00:01.700\nPart zero.\n",
+   "txt": "Part one. Part zero."
+  },
+  {
+   "gen": {
+    "id": "s05none",
+    "status": "done",
+    "chunks": [
+     {
+      "i": 0,
+      "text": "No timeline."
+     }
+    ]
+   },
+   "timings": {
+    "result": {
+     "speed": 1.0,
+     "duration": null,
+     "estimated": false,
+     "sentences": [],
+     "words": []
+    }
+   },
+   "captions": {
+    "result": []
+   },
+   "srt": "",
+   "vtt": "WEBVTT\n\n",
+   "txt": ""
+  },
+  {
+   "gen": {
+    "id": "s05gen",
+    "status": "done",
+    "speed": "1.5",
+    "timeline": [
+     {
+      "i": 0,
+      "start": 0.0,
+      "end": 1.0
+     }
+    ],
+    "chunks": [
+     {
+      "i": 0,
+      "text": "Speed as text.",
+      "words": [
+       {
+        "word": "Speed",
+        "start": 0.0,
+        "end": 0.25
+       },
+       {
+        "word": "as",
+        "start": 0.25,
+        "end": 0.5
+       },
+       {
+        "word": "text.",
+        "start": 0.5,
+        "end": 0.75
+       }
+      ]
+     }
+    ]
+   },
+   "timings": {
+    "result": {
+     "speed": 1.5,
+     "duration": null,
+     "estimated": false,
+     "sentences": [
+      {
+       "text": "Speed as text.",
+       "start": 0.0,
+       "end": 0.5
+      }
+     ],
+     "words": [
+      {
+       "word": "Speed",
+       "start": 0.0,
+       "end": 0.167
+      },
+      {
+       "word": "as",
+       "start": 0.167,
+       "end": 0.333
+      },
+      {
+       "word": "text.",
+       "start": 0.333,
+       "end": 0.5
+      }
+     ]
+    }
+   },
+   "captions": {
+    "result": [
+     {
+      "start": 0.0,
+      "end": 1.0,
+      "text": "Speed as text."
+     }
+    ]
+   },
+   "srt": "1\n00:00:00,000 --> 00:00:01,000\nSpeed as text.\n",
+   "vtt": "WEBVTT\n\n00:00:00.000 --> 00:00:01.000\nSpeed as text.\n",
+   "txt": "Speed as text."
+  },
+  {
+   "gen": {
+    "id": "s05gen",
+    "status": "done",
+    "timeline": [
+     {
+      "i": 3,
+      "start": 0.0,
+      "end": 1.0
+     }
+    ],
+    "chunks": [
+     {
+      "i": 0,
+      "text": "Only part."
+     }
+    ]
+   },
+   "timings": {
+    "error": "KeyError"
+   },
+   "captions": {
+    "error": "KeyError"
+   }
+  },
+  {
+   "gen": {
+    "id": "s05null",
+    "status": "done",
+    "timeline": null,
+    "chunks": [
+     {
+      "i": 0,
+      "text": "Null timeline."
+     }
+    ]
+   },
+   "timings": {
+    "error": "TypeError"
+   },
+   "captions": {
+    "error": "TypeError"
+   }
+  }
+ ],
+ "rules": [
+  {
+   "gen": {
+    "id": "s05rev",
+    "status": "done",
+    "flagged": [],
+    "message": "old",
+    "timeline": [
+     {
+      "i": 0,
+      "start": 0.0,
+      "end": 1.0
+     },
+     {
+      "i": 1,
+      "start": 1.2,
+      "end": 2.0
+     },
+     {
+      "i": 2,
+      "start": 2.4,
+      "end": 3.0
+     }
+    ],
+    "chunks": [
+     {
+      "i": 0,
+      "text": "A part.",
+      "status": "ok",
+      "issues": [],
+      "file": "x.wav",
+      "heard": "A part.",
+      "pitch_hz": 180.0
+     },
+     {
+      "i": 1,
+      "text": "A part.",
+      "status": "ok",
+      "issues": [],
+      "file": "x.wav",
+      "heard": "A part.",
+      "pitch_hz": 180.0
+     },
+     {
+      "i": 2,
+      "text": "A part.",
+      "status": "ok",
+      "issues": [],
+      "file": "x.wav",
+      "heard": "A part.",
+      "pitch_hz": 180.0
+     }
+    ]
+   },
+   "fix_targets": {
+    "result": []
+   },
+   "outcome": {
+    "result": "clean"
+   },
+   "review": {
+    "result": []
+   },
+   "review_pitch": {
+    "result": []
+   },
+   "summarize": {
+    "result": {
+     "id": "s05rev",
+     "status": "done",
+     "flagged": [],
+     "message": "Done. All parts passed the automated checks.",
+     "timeline": [
+      {
+       "i": 0,
+       "start": 0.0,
+       "end": 1.0
+      },
+      {
+       "i": 1,
+       "start": 1.2,
+       "end": 2.0
+      },
+      {
+       "i": 2,
+       "start": 2.4,
+       "end": 3.0
+      }
+     ],
+     "chunks": [
+      {
+       "i": 0,
+       "text": "A part.",
+       "status": "ok",
+       "issues": [],
+       "file": "x.wav",
+       "heard": "A part.",
+       "pitch_hz": 180.0
+      },
+      {
+       "i": 1,
+       "text": "A part.",
+       "status": "ok",
+       "issues": [],
+       "file": "x.wav",
+       "heard": "A part.",
+       "pitch_hz": 180.0
+      },
+      {
+       "i": 2,
+       "text": "A part.",
+       "status": "ok",
+       "issues": [],
+       "file": "x.wav",
+       "heard": "A part.",
+       "pitch_hz": 180.0
+      }
+     ]
+    }
+   }
+  },
+  {
+   "gen": {
+    "id": "s05rev",
+    "status": "done",
+    "flagged": [],
+    "message": "old",
+    "timeline": [
+     {
+      "i": 0,
+      "start": 0.0,
+      "end": 1.0
+     },
+     {
+      "i": 1,
+      "start": 1.2,
+      "end": 2.0
+     },
+     {
+      "i": 2,
+      "start": 2.4,
+      "end": 3.0
+     }
+    ],
+    "chunks": [
+     {
+      "i": 0,
+      "text": "A part.",
+      "status": "ok",
+      "issues": [],
+      "file": "x.wav",
+      "heard": "A part.",
+      "pitch_hz": 180.0
+     },
+     {
+      "i": 1,
+      "text": "Flagged part.",
+      "status": "flagged",
+      "issues": [
+       "cut_off"
+      ],
+      "file": "x.wav",
+      "heard": "Flagged part.",
+      "pitch_hz": 180.0
+     },
+     {
+      "i": 2,
+      "text": "A part.",
+      "status": "ok",
+      "issues": [],
+      "file": "x.wav",
+      "heard": "A part.",
+      "pitch_hz": 180.0
+     }
+    ]
+   },
+   "fix_targets": {
+    "result": [
+     1
+    ]
+   },
+   "outcome": {
+    "result": "needs_listen"
+   },
+   "review": {
+    "result": [
+     {
+      "part": 2,
+      "text": "Flagged part.",
+      "issues": [
+       "cut_off"
+      ],
+      "reasons": [
+       "Cut-off ending"
+      ],
+      "start": 1.2,
+      "end": 2.0,
+      "heard": "Flagged part.",
+      "pitch_hz": 180.0,
+      "voice_pitch_hz": null,
+      "checked_by": [
+       "take check"
+      ],
+      "take": 1
+     }
+    ]
+   },
+   "review_pitch": {
+    "result": [
+     {
+      "part": 2,
+      "text": "Flagged part.",
+      "issues": [
+       "cut_off"
+      ],
+      "reasons": [
+       "Cut-off ending"
+      ],
+      "start": 1.2,
+      "end": 2.0,
+      "heard": "Flagged part.",
+      "pitch_hz": 180.0,
+      "voice_pitch_hz": 181.25,
+      "checked_by": [
+       "take check"
+      ],
+      "take": 1
+     }
+    ]
+   },
+   "summarize": {
+    "result": {
+     "id": "s05rev",
+     "status": "done",
+     "flagged": [
+      1
+     ],
+     "message": "Done, needs review: part 2.",
+     "timeline": [
+      {
+       "i": 0,
+       "start": 0.0,
+       "end": 1.0
+      },
+      {
+       "i": 1,
+       "start": 1.2,
+       "end": 2.0
+      },
+      {
+       "i": 2,
+       "start": 2.4,
+       "end": 3.0
+      }
+     ],
+     "chunks": [
+      {
+       "i": 0,
+       "text": "A part.",
+       "status": "ok",
+       "issues": [],
+       "file": "x.wav",
+       "heard": "A part.",
+       "pitch_hz": 180.0
+      },
+      {
+       "i": 1,
+       "text": "Flagged part.",
+       "status": "flagged",
+       "issues": [
+        "cut_off"
+       ],
+       "file": "x.wav",
+       "heard": "Flagged part.",
+       "pitch_hz": 180.0
+      },
+      {
+       "i": 2,
+       "text": "A part.",
+       "status": "ok",
+       "issues": [],
+       "file": "x.wav",
+       "heard": "A part.",
+       "pitch_hz": 180.0
+      }
+     ]
+    }
+   }
+  },
+  {
+   "gen": {
+    "id": "s05rev",
+    "status": "done",
+    "flagged": [],
+    "message": "old",
+    "timeline": [
+     {
+      "i": 0,
+      "start": 0.0,
+      "end": 1.0
+     },
+     {
+      "i": 1,
+      "start": 1.2,
+      "end": 2.0
+     },
+     {
+      "i": 2,
+      "start": 2.4,
+      "end": 3.0
+     }
+    ],
+    "final_scan": {
+     "remaining": [
+      2
+     ]
+    },
+    "chunks": [
+     {
+      "i": 0,
+      "text": "A part.",
+      "status": "ok",
+      "issues": [],
+      "file": "x.wav",
+      "heard": "A part.",
+      "pitch_hz": 180.0
+     },
+     {
+      "i": 1,
+      "text": "A part.",
+      "status": "ok",
+      "issues": [],
+      "file": "x.wav",
+      "heard": "A part.",
+      "pitch_hz": 180.0
+     },
+     {
+      "i": 2,
+      "text": "A part.",
+      "status": "ok",
+      "issues": [],
+      "file": "x.wav",
+      "heard": "A part.",
+      "pitch_hz": 180.0,
+      "final_issues": [
+       "processed_audio_missing"
+      ]
+     }
+    ]
+   },
+   "fix_targets": {
+    "result": [
+     2
+    ]
+   },
+   "outcome": {
+    "result": "needs_listen"
+   },
+   "review": {
+    "result": [
+     {
+      "part": 3,
+      "text": "A part.",
+      "issues": [
+       "processed_audio_missing"
+      ],
+      "reasons": [
+       "Audio missing from final mix"
+      ],
+      "start": 2.4,
+      "end": 3.0,
+      "heard": "A part.",
+      "pitch_hz": 180.0,
+      "voice_pitch_hz": null,
+      "checked_by": [
+       "final check"
+      ],
+      "take": 1
+     }
+    ]
+   },
+   "review_pitch": {
+    "result": [
+     {
+      "part": 3,
+      "text": "A part.",
+      "issues": [
+       "processed_audio_missing"
+      ],
+      "reasons": [
+       "Audio missing from final mix"
+      ],
+      "start": 2.4,
+      "end": 3.0,
+      "heard": "A part.",
+      "pitch_hz": 180.0,
+      "voice_pitch_hz": 181.25,
+      "checked_by": [
+       "final check"
+      ],
+      "take": 1
+     }
+    ]
+   },
+   "summarize": {
+    "result": {
+     "id": "s05rev",
+     "status": "done",
+     "flagged": [],
+     "message": "Done, needs review: part 3.",
+     "timeline": [
+      {
+       "i": 0,
+       "start": 0.0,
+       "end": 1.0
+      },
+      {
+       "i": 1,
+       "start": 1.2,
+       "end": 2.0
+      },
+      {
+       "i": 2,
+       "start": 2.4,
+       "end": 3.0
+      }
+     ],
+     "final_scan": {
+      "remaining": [
+       2
+      ]
+     },
+     "chunks": [
+      {
+       "i": 0,
+       "text": "A part.",
+       "status": "ok",
+       "issues": [],
+       "file": "x.wav",
+       "heard": "A part.",
+       "pitch_hz": 180.0
+      },
+      {
+       "i": 1,
+       "text": "A part.",
+       "status": "ok",
+       "issues": [],
+       "file": "x.wav",
+       "heard": "A part.",
+       "pitch_hz": 180.0
+      },
+      {
+       "i": 2,
+       "text": "A part.",
+       "status": "ok",
+       "issues": [],
+       "file": "x.wav",
+       "heard": "A part.",
+       "pitch_hz": 180.0,
+       "final_issues": [
+        "processed_audio_missing"
+       ]
+      }
+     ]
+    }
+   }
+  },
+  {
+   "gen": {
+    "id": "s05rev",
+    "status": "done",
+    "flagged": [],
+    "message": "old",
+    "timeline": [
+     {
+      "i": 0,
+      "start": 0.0,
+      "end": 1.0
+     },
+     {
+      "i": 1,
+      "start": 1.2,
+      "end": 2.0
+     },
+     {
+      "i": 2,
+      "start": 2.4,
+      "end": 3.0
+     }
+    ],
+    "chunks": [
+     {
+      "i": 0,
+      "text": "A part.",
+      "status": "ok",
+      "issues": [],
+      "file": "x.wav",
+      "heard": "A part.",
+      "pitch_hz": 180.0
+     },
+     {
+      "i": 1,
+      "text": "It&39;s web code.",
+      "status": "ok",
+      "issues": [],
+      "file": "x.wav",
+      "heard": "It&39;s web code.",
+      "pitch_hz": 180.0
+     },
+     {
+      "i": 2,
+      "text": "A part.",
+      "status": "ok",
+      "issues": [],
+      "file": "x.wav",
+      "heard": "A part.",
+      "pitch_hz": 180.0
+     }
+    ]
+   },
+   "fix_targets": {
+    "result": [
+     1
+    ]
+   },
+   "outcome": {
+    "result": "needs_listen"
+   },
+   "review": {
+    "result": [
+     {
+      "part": 2,
+      "text": "It&39;s web code.",
+      "issues": [
+       "web_artifact"
+      ],
+      "reasons": [
+       "Web code in the script (such as &#39;)"
+      ],
+      "start": 1.2,
+      "end": 2.0,
+      "heard": "It&39;s web code.",
+      "pitch_hz": 180.0,
+      "voice_pitch_hz": null,
+      "checked_by": [
+       "script check"
+      ],
+      "take": 1
+     }
+    ]
+   },
+   "review_pitch": {
+    "result": [
+     {
+      "part": 2,
+      "text": "It&39;s web code.",
+      "issues": [
+       "web_artifact"
+      ],
+      "reasons": [
+       "Web code in the script (such as &#39;)"
+      ],
+      "start": 1.2,
+      "end": 2.0,
+      "heard": "It&39;s web code.",
+      "pitch_hz": 180.0,
+      "voice_pitch_hz": 181.25,
+      "checked_by": [
+       "script check"
+      ],
+      "take": 1
+     }
+    ]
+   },
+   "summarize": {
+    "result": {
+     "id": "s05rev",
+     "status": "done",
+     "flagged": [],
+     "message": "Done, needs review: part 2.",
+     "timeline": [
+      {
+       "i": 0,
+       "start": 0.0,
+       "end": 1.0
+      },
+      {
+       "i": 1,
+       "start": 1.2,
+       "end": 2.0
+      },
+      {
+       "i": 2,
+       "start": 2.4,
+       "end": 3.0
+      }
+     ],
+     "chunks": [
+      {
+       "i": 0,
+       "text": "A part.",
+       "status": "ok",
+       "issues": [],
+       "file": "x.wav",
+       "heard": "A part.",
+       "pitch_hz": 180.0
+      },
+      {
+       "i": 1,
+       "text": "It&39;s web code.",
+       "status": "ok",
+       "issues": [],
+       "file": "x.wav",
+       "heard": "It&39;s web code.",
+       "pitch_hz": 180.0
+      },
+      {
+       "i": 2,
+       "text": "A part.",
+       "status": "ok",
+       "issues": [],
+       "file": "x.wav",
+       "heard": "A part.",
+       "pitch_hz": 180.0
+      }
+     ]
+    }
+   }
+  },
+  {
+   "gen": {
+    "id": "s05rev",
+    "status": "done",
+    "flagged": [],
+    "message": "old",
+    "timeline": [
+     {
+      "i": 0,
+      "start": 0.0,
+      "end": 1.0
+     },
+     {
+      "i": 1,
+      "start": 1.2,
+      "end": 2.0
+     },
+     {
+      "i": 2,
+      "start": 2.4,
+      "end": 3.0
+     }
+    ],
+    "chunks": [
+     {
+      "i": 0,
+      "text": "A part.",
+      "status": "ok",
+      "issues": [],
+      "file": "x.wav",
+      "heard": "A part.",
+      "pitch_hz": 180.0
+     },
+     {
+      "i": 1,
+      "text": "Flagged part.",
+      "status": "flagged",
+      "issues": [
+       "cut_off"
+      ],
+      "file": "x.wav",
+      "heard": "Flagged part.",
+      "pitch_hz": 180.0,
+      "accepted": {
+       "by": "person",
+       "at": 1.5
+      }
+     },
+     {
+      "i": 2,
+      "text": "A part.",
+      "status": "ok",
+      "issues": [],
+      "file": "x.wav",
+      "heard": "A part.",
+      "pitch_hz": 180.0
+     }
+    ]
+   },
+   "fix_targets": {
+    "result": []
+   },
+   "outcome": {
+    "result": "clean"
+   },
+   "review": {
+    "result": []
+   },
+   "review_pitch": {
+    "result": []
+   },
+   "summarize": {
+    "result": {
+     "id": "s05rev",
+     "status": "done",
+     "flagged": [],
+     "message": "Done. You marked 1 part as sounding fine; every other part passed the checks.",
+     "timeline": [
+      {
+       "i": 0,
+       "start": 0.0,
+       "end": 1.0
+      },
+      {
+       "i": 1,
+       "start": 1.2,
+       "end": 2.0
+      },
+      {
+       "i": 2,
+       "start": 2.4,
+       "end": 3.0
+      }
+     ],
+     "chunks": [
+      {
+       "i": 0,
+       "text": "A part.",
+       "status": "ok",
+       "issues": [],
+       "file": "x.wav",
+       "heard": "A part.",
+       "pitch_hz": 180.0
+      },
+      {
+       "i": 1,
+       "text": "Flagged part.",
+       "status": "flagged",
+       "issues": [
+        "cut_off"
+       ],
+       "file": "x.wav",
+       "heard": "Flagged part.",
+       "pitch_hz": 180.0,
+       "accepted": {
+        "by": "person",
+        "at": 1.5
+       }
+      },
+      {
+       "i": 2,
+       "text": "A part.",
+       "status": "ok",
+       "issues": [],
+       "file": "x.wav",
+       "heard": "A part.",
+       "pitch_hz": 180.0
+      }
+     ]
+    }
+   }
+  },
+  {
+   "gen": {
+    "id": "s05rev",
+    "status": "done",
+    "flagged": [],
+    "message": "old",
+    "timeline": [
+     {
+      "i": 0,
+      "start": 0.0,
+      "end": 1.0
+     },
+     {
+      "i": 1,
+      "start": 1.2,
+      "end": 2.0
+     },
+     {
+      "i": 2,
+      "start": 2.4,
+      "end": 3.0
+     }
+    ],
+    "chunks": [
+     {
+      "i": 0,
+      "text": "Flagged part.",
+      "status": "flagged",
+      "issues": [
+       "cut_off"
+      ],
+      "file": "x.wav",
+      "heard": "Flagged part.",
+      "pitch_hz": 180.0,
+      "accepted": {
+       "by": "person",
+       "at": 1.5
+      }
+     },
+     {
+      "i": 1,
+      "text": "Flagged part.",
+      "status": "flagged",
+      "issues": [
+       "cut_off"
+      ],
+      "file": "x.wav",
+      "heard": "Flagged part.",
+      "pitch_hz": 180.0,
+      "accepted": true
+     },
+     {
+      "i": 2,
+      "text": "A part.",
+      "status": "ok",
+      "issues": [],
+      "file": "x.wav",
+      "heard": "A part.",
+      "pitch_hz": 180.0
+     }
+    ]
+   },
+   "fix_targets": {
+    "result": []
+   },
+   "outcome": {
+    "result": "clean"
+   },
+   "review": {
+    "result": []
+   },
+   "review_pitch": {
+    "result": []
+   },
+   "summarize": {
+    "result": {
+     "id": "s05rev",
+     "status": "done",
+     "flagged": [],
+     "message": "Done. You marked 2 parts as sounding fine; every other part passed the checks.",
+     "timeline": [
+      {
+       "i": 0,
+       "start": 0.0,
+       "end": 1.0
+      },
+      {
+       "i": 1,
+       "start": 1.2,
+       "end": 2.0
+      },
+      {
+       "i": 2,
+       "start": 2.4,
+       "end": 3.0
+      }
+     ],
+     "chunks": [
+      {
+       "i": 0,
+       "text": "Flagged part.",
+       "status": "flagged",
+       "issues": [
+        "cut_off"
+       ],
+       "file": "x.wav",
+       "heard": "Flagged part.",
+       "pitch_hz": 180.0,
+       "accepted": {
+        "by": "person",
+        "at": 1.5
+       }
+      },
+      {
+       "i": 1,
+       "text": "Flagged part.",
+       "status": "flagged",
+       "issues": [
+        "cut_off"
+       ],
+       "file": "x.wav",
+       "heard": "Flagged part.",
+       "pitch_hz": 180.0,
+       "accepted": true
+      },
+      {
+       "i": 2,
+       "text": "A part.",
+       "status": "ok",
+       "issues": [],
+       "file": "x.wav",
+       "heard": "A part.",
+       "pitch_hz": 180.0
+      }
+     ]
+    }
+   }
+  },
+  {
+   "gen": {
+    "id": "s05rev",
+    "status": "done",
+    "flagged": [],
+    "message": "old",
+    "timeline": [
+     {
+      "i": 0,
+      "start": 0.0,
+      "end": 1.0
+     },
+     {
+      "i": 1,
+      "start": 1.2,
+      "end": 2.0
+     },
+     {
+      "i": 2,
+      "start": 2.4,
+      "end": 3.0
+     }
+    ],
+    "chunks": [
+     {
+      "i": 0,
+      "text": "Flagged part.",
+      "status": "flagged",
+      "issues": [
+       "cut_off"
+      ],
+      "file": "x.wav",
+      "heard": "Flagged part.",
+      "pitch_hz": 180.0
+     },
+     {
+      "i": 1,
+      "text": "A part.",
+      "status": "ok",
+      "issues": [],
+      "file": "x.wav",
+      "heard": "A part.",
+      "pitch_hz": 180.0
+     },
+     {
+      "i": 2,
+      "text": "Third &amp; last.",
+      "status": "flagged",
+      "issues": [
+       "cut_off"
+      ],
+      "file": "x.wav",
+      "heard": "Third &amp; last.",
+      "pitch_hz": 180.0
+     },
+     {
+      "i": 3,
+      "text": "A part.",
+      "status": "ok",
+      "issues": [],
+      "file": "x.wav",
+      "heard": "A part.",
+      "pitch_hz": 180.0
+     },
+     {
+      "i": 4,
+      "text": "Flagged part.",
+      "status": "flagged",
+      "issues": [
+       "too_long"
+      ],
+      "file": "x.wav",
+      "heard": "Flagged part.",
+      "pitch_hz": 180.0
+     }
+    ]
+   },
+   "fix_targets": {
+    "result": [
+     0,
+     2,
+     4
+    ]
+   },
+   "outcome": {
+    "result": "needs_listen"
+   },
+   "review": {
+    "result": [
+     {
+      "part": 1,
+      "text": "Flagged part.",
+      "issues": [
+       "cut_off"
+      ],
+      "reasons": [
+       "Cut-off ending"
+      ],
+      "start": 0.0,
+      "end": 1.0,
+      "heard": "Flagged part.",
+      "pitch_hz": 180.0,
+      "voice_pitch_hz": null,
+      "checked_by": [
+       "take check"
+      ],
+      "take": 1
+     },
+     {
+      "part": 3,
+      "text": "Third &amp; last.",
+      "issues": [
+       "cut_off",
+       "web_artifact"
+      ],
+      "reasons": [
+       "Cut-off ending",
+       "Web code in the script (such as &#39;)"
+      ],
+      "start": 2.4,
+      "end": 3.0,
+      "heard": "Third &amp; last.",
+      "pitch_hz": 180.0,
+      "voice_pitch_hz": null,
+      "checked_by": [
+       "take check",
+       "script check"
+      ],
+      "take": 1
+     },
+     {
+      "part": 5,
+      "text": "Flagged part.",
+      "issues": [
+       "too_long"
+      ],
+      "reasons": [
+       "Too long / looping"
+      ],
+      "start": null,
+      "end": null,
+      "heard": "Flagged part.",
+      "pitch_hz": 180.0,
+      "voice_pitch_hz": null,
+      "checked_by": [
+       "take check"
+      ],
+      "take": 1
+     }
+    ]
+   },
+   "review_pitch": {
+    "result": [
+     {
+      "part": 1,
+      "text": "Flagged part.",
+      "issues": [
+       "cut_off"
+      ],
+      "reasons": [
+       "Cut-off ending"
+      ],
+      "start": 0.0,
+      "end": 1.0,
+      "heard": "Flagged part.",
+      "pitch_hz": 180.0,
+      "voice_pitch_hz": 181.25,
+      "checked_by": [
+       "take check"
+      ],
+      "take": 1
+     },
+     {
+      "part": 3,
+      "text": "Third &amp; last.",
+      "issues": [
+       "cut_off",
+       "web_artifact"
+      ],
+      "reasons": [
+       "Cut-off ending",
+       "Web code in the script (such as &#39;)"
+      ],
+      "start": 2.4,
+      "end": 3.0,
+      "heard": "Third &amp; last.",
+      "pitch_hz": 180.0,
+      "voice_pitch_hz": 181.25,
+      "checked_by": [
+       "take check",
+       "script check"
+      ],
+      "take": 1
+     },
+     {
+      "part": 5,
+      "text": "Flagged part.",
+      "issues": [
+       "too_long"
+      ],
+      "reasons": [
+       "Too long / looping"
+      ],
+      "start": null,
+      "end": null,
+      "heard": "Flagged part.",
+      "pitch_hz": 180.0,
+      "voice_pitch_hz": 181.25,
+      "checked_by": [
+       "take check"
+      ],
+      "take": 1
+     }
+    ]
+   },
+   "summarize": {
+    "result": {
+     "id": "s05rev",
+     "status": "done",
+     "flagged": [
+      0,
+      2,
+      4
+     ],
+     "message": "Done, needs review: part 1, 3, 5.",
+     "timeline": [
+      {
+       "i": 0,
+       "start": 0.0,
+       "end": 1.0
+      },
+      {
+       "i": 1,
+       "start": 1.2,
+       "end": 2.0
+      },
+      {
+       "i": 2,
+       "start": 2.4,
+       "end": 3.0
+      }
+     ],
+     "chunks": [
+      {
+       "i": 0,
+       "text": "Flagged part.",
+       "status": "flagged",
+       "issues": [
+        "cut_off"
+       ],
+       "file": "x.wav",
+       "heard": "Flagged part.",
+       "pitch_hz": 180.0
+      },
+      {
+       "i": 1,
+       "text": "A part.",
+       "status": "ok",
+       "issues": [],
+       "file": "x.wav",
+       "heard": "A part.",
+       "pitch_hz": 180.0
+      },
+      {
+       "i": 2,
+       "text": "Third &amp; last.",
+       "status": "flagged",
+       "issues": [
+        "cut_off"
+       ],
+       "file": "x.wav",
+       "heard": "Third &amp; last.",
+       "pitch_hz": 180.0
+      },
+      {
+       "i": 3,
+       "text": "A part.",
+       "status": "ok",
+       "issues": [],
+       "file": "x.wav",
+       "heard": "A part.",
+       "pitch_hz": 180.0
+      },
+      {
+       "i": 4,
+       "text": "Flagged part.",
+       "status": "flagged",
+       "issues": [
+        "too_long"
+       ],
+       "file": "x.wav",
+       "heard": "Flagged part.",
+       "pitch_hz": 180.0
+      }
+     ]
+    }
+   }
+  },
+  {
+   "gen": {
+    "id": "s05rev",
+    "status": "done",
+    "flagged": [],
+    "message": "old",
+    "timeline": [
+     {
+      "i": 0,
+      "start": 0.0,
+      "end": 1.0
+     },
+     {
+      "i": 1,
+      "start": 1.2,
+      "end": 2.0
+     },
+     {
+      "i": 2,
+      "start": 2.4,
+      "end": 3.0
+     }
+    ],
+    "chunks": [
+     {
+      "i": 0,
+      "text": "Flagged part.",
+      "status": "flagged",
+      "issues": [
+       "cut_off",
+       "leak"
+      ],
+      "file": "x.wav",
+      "heard": "Flagged part.",
+      "pitch_hz": 180.0,
+      "final_issues": [
+       "leak",
+       "noise",
+       "cut_off"
+      ]
+     }
+    ]
+   },
+   "fix_targets": {
+    "result": [
+     0
+    ]
+   },
+   "outcome": {
+    "result": "needs_listen"
+   },
+   "review": {
+    "result": [
+     {
+      "part": 1,
+      "text": "Flagged part.",
+      "issues": [
+       "cut_off",
+       "leak",
+       "noise"
+      ],
+      "reasons": [
+       "Cut-off ending",
+       "Stray next word",
+       "Noise burst"
+      ],
+      "start": 0.0,
+      "end": 1.0,
+      "heard": "Flagged part.",
+      "pitch_hz": 180.0,
+      "voice_pitch_hz": null,
+      "checked_by": [
+       "take check",
+       "final check"
+      ],
+      "take": 1
+     }
+    ]
+   },
+   "review_pitch": {
+    "result": [
+     {
+      "part": 1,
+      "text": "Flagged part.",
+      "issues": [
+       "cut_off",
+       "leak",
+       "noise"
+      ],
+      "reasons": [
+       "Cut-off ending",
+       "Stray next word",
+       "Noise burst"
+      ],
+      "start": 0.0,
+      "end": 1.0,
+      "heard": "Flagged part.",
+      "pitch_hz": 180.0,
+      "voice_pitch_hz": 181.25,
+      "checked_by": [
+       "take check",
+       "final check"
+      ],
+      "take": 1
+     }
+    ]
+   },
+   "summarize": {
+    "result": {
+     "id": "s05rev",
+     "status": "done",
+     "flagged": [
+      0
+     ],
+     "message": "Done, needs review: part 1.",
+     "timeline": [
+      {
+       "i": 0,
+       "start": 0.0,
+       "end": 1.0
+      },
+      {
+       "i": 1,
+       "start": 1.2,
+       "end": 2.0
+      },
+      {
+       "i": 2,
+       "start": 2.4,
+       "end": 3.0
+      }
+     ],
+     "chunks": [
+      {
+       "i": 0,
+       "text": "Flagged part.",
+       "status": "flagged",
+       "issues": [
+        "cut_off",
+        "leak"
+       ],
+       "file": "x.wav",
+       "heard": "Flagged part.",
+       "pitch_hz": 180.0,
+       "final_issues": [
+        "leak",
+        "noise",
+        "cut_off"
+       ]
+      }
+     ]
+    }
+   }
+  },
+  {
+   "gen": {
+    "id": "s05rev",
+    "status": "done",
+    "flagged": [],
+    "message": "old",
+    "timeline": [
+     {
+      "i": 0,
+      "start": 0.0,
+      "end": 1.0
+     },
+     {
+      "i": 1,
+      "start": 1.2,
+      "end": 2.0
+     },
+     {
+      "i": 2,
+      "start": 2.4,
+      "end": 3.0
+     }
+    ],
+    "chunks": [
+     {
+      "i": 0,
+      "text": "Flagged part.",
+      "status": "flagged",
+      "issues": [],
+      "file": "x.wav",
+      "heard": "Flagged part.",
+      "pitch_hz": 180.0
+     }
+    ]
+   },
+   "fix_targets": {
+    "result": [
+     0
+    ]
+   },
+   "outcome": {
+    "result": "needs_listen"
+   },
+   "review": {
+    "result": [
+     {
+      "part": 1,
+      "text": "Flagged part.",
+      "issues": [
+       "final_check"
+      ],
+      "reasons": [
+       "Failed the final check"
+      ],
+      "start": 0.0,
+      "end": 1.0,
+      "heard": "Flagged part.",
+      "pitch_hz": 180.0,
+      "voice_pitch_hz": null,
+      "checked_by": [
+       "final check"
+      ],
+      "take": 1
+     }
+    ]
+   },
+   "review_pitch": {
+    "result": [
+     {
+      "part": 1,
+      "text": "Flagged part.",
+      "issues": [
+       "final_check"
+      ],
+      "reasons": [
+       "Failed the final check"
+      ],
+      "start": 0.0,
+      "end": 1.0,
+      "heard": "Flagged part.",
+      "pitch_hz": 180.0,
+      "voice_pitch_hz": 181.25,
+      "checked_by": [
+       "final check"
+      ],
+      "take": 1
+     }
+    ]
+   },
+   "summarize": {
+    "result": {
+     "id": "s05rev",
+     "status": "done",
+     "flagged": [
+      0
+     ],
+     "message": "Done, needs review: part 1.",
+     "timeline": [
+      {
+       "i": 0,
+       "start": 0.0,
+       "end": 1.0
+      },
+      {
+       "i": 1,
+       "start": 1.2,
+       "end": 2.0
+      },
+      {
+       "i": 2,
+       "start": 2.4,
+       "end": 3.0
+      }
+     ],
+     "chunks": [
+      {
+       "i": 0,
+       "text": "Flagged part.",
+       "status": "flagged",
+       "issues": [],
+       "file": "x.wav",
+       "heard": "Flagged part.",
+       "pitch_hz": 180.0
+      }
+     ]
+    }
+   }
+  },
+  {
+   "gen": {
+    "id": "s05rev",
+    "status": "done",
+    "flagged": [],
+    "message": "old",
+    "timeline": [
+     {
+      "i": 0,
+      "start": 0.0,
+      "end": 1.0
+     },
+     {
+      "i": 1,
+      "start": 1.2,
+      "end": 2.0
+     },
+     {
+      "i": 2,
+      "start": 2.4,
+      "end": 3.0
+     }
+    ],
+    "chunks": [
+     {
+      "i": 0,
+      "text": "Flagged part.",
+      "status": "flagged",
+      "issues": [
+       "weird_new_thing",
+       "x"
+      ],
+      "file": "x.wav",
+      "heard": "Flagged part.",
+      "pitch_hz": 180.0
+     }
+    ]
+   },
+   "fix_targets": {
+    "result": [
+     0
+    ]
+   },
+   "outcome": {
+    "result": "needs_listen"
+   },
+   "review": {
+    "result": [
+     {
+      "part": 1,
+      "text": "Flagged part.",
+      "issues": [
+       "weird_new_thing",
+       "x"
+      ],
+      "reasons": [
+       "weird new thing",
+       "x"
+      ],
+      "start": 0.0,
+      "end": 1.0,
+      "heard": "Flagged part.",
+      "pitch_hz": 180.0,
+      "voice_pitch_hz": null,
+      "checked_by": [
+       "take check"
+      ],
+      "take": 1
+     }
+    ]
+   },
+   "review_pitch": {
+    "result": [
+     {
+      "part": 1,
+      "text": "Flagged part.",
+      "issues": [
+       "weird_new_thing",
+       "x"
+      ],
+      "reasons": [
+       "weird new thing",
+       "x"
+      ],
+      "start": 0.0,
+      "end": 1.0,
+      "heard": "Flagged part.",
+      "pitch_hz": 180.0,
+      "voice_pitch_hz": 181.25,
+      "checked_by": [
+       "take check"
+      ],
+      "take": 1
+     }
+    ]
+   },
+   "summarize": {
+    "result": {
+     "id": "s05rev",
+     "status": "done",
+     "flagged": [
+      0
+     ],
+     "message": "Done, needs review: part 1.",
+     "timeline": [
+      {
+       "i": 0,
+       "start": 0.0,
+       "end": 1.0
+      },
+      {
+       "i": 1,
+       "start": 1.2,
+       "end": 2.0
+      },
+      {
+       "i": 2,
+       "start": 2.4,
+       "end": 3.0
+      }
+     ],
+     "chunks": [
+      {
+       "i": 0,
+       "text": "Flagged part.",
+       "status": "flagged",
+       "issues": [
+        "weird_new_thing",
+        "x"
+       ],
+       "file": "x.wav",
+       "heard": "Flagged part.",
+       "pitch_hz": 180.0
+      }
+     ]
+    }
+   }
+  },
+  {
+   "gen": {
+    "id": "s05rev",
+    "status": "done",
+    "flagged": [],
+    "message": "old",
+    "chunks": [
+     {
+      "i": 0,
+      "text": "Flagged part.",
+      "status": "flagged",
+      "issues": [
+       "cut_off"
+      ],
+      "file": "x.wav",
+      "heard": "Flagged part.",
+      "pitch_hz": 180.0
+     }
+    ]
+   },
+   "fix_targets": {
+    "result": [
+     0
+    ]
+   },
+   "outcome": {
+    "result": "needs_listen"
+   },
+   "review": {
+    "result": [
+     {
+      "part": 1,
+      "text": "Flagged part.",
+      "issues": [
+       "cut_off"
+      ],
+      "reasons": [
+       "Cut-off ending"
+      ],
+      "start": null,
+      "end": null,
+      "heard": "Flagged part.",
+      "pitch_hz": 180.0,
+      "voice_pitch_hz": null,
+      "checked_by": [
+       "take check"
+      ],
+      "take": 1
+     }
+    ]
+   },
+   "review_pitch": {
+    "result": [
+     {
+      "part": 1,
+      "text": "Flagged part.",
+      "issues": [
+       "cut_off"
+      ],
+      "reasons": [
+       "Cut-off ending"
+      ],
+      "start": null,
+      "end": null,
+      "heard": "Flagged part.",
+      "pitch_hz": 180.0,
+      "voice_pitch_hz": 181.25,
+      "checked_by": [
+       "take check"
+      ],
+      "take": 1
+     }
+    ]
+   },
+   "summarize": {
+    "result": {
+     "id": "s05rev",
+     "status": "done",
+     "flagged": [
+      0
+     ],
+     "message": "Done, needs review: part 1.",
+     "chunks": [
+      {
+       "i": 0,
+       "text": "Flagged part.",
+       "status": "flagged",
+       "issues": [
+        "cut_off"
+       ],
+       "file": "x.wav",
+       "heard": "Flagged part.",
+       "pitch_hz": 180.0
+      }
+     ]
+    }
+   }
+  },
+  {
+   "gen": {
+    "id": "s05rev",
+    "status": "done",
+    "flagged": [],
+    "message": "old",
+    "timeline": [
+     {
+      "i": 0,
+      "start": 0.0,
+      "end": 1.0
+     },
+     {
+      "i": 1,
+      "start": 1.2,
+      "end": 2.0
+     },
+     {
+      "i": 2,
+      "start": 2.4,
+      "end": 3.0
+     }
+    ],
+    "chunks": [
+     {
+      "i": 0,
+      "text": "Flagged part.",
+      "status": "flagged",
+      "issues": [
+       "cut_off"
+      ],
+      "file": "x.wav",
+      "heard": "Flagged part.",
+      "pitch_hz": 180.0,
+      "take": 3
+     },
+     {
+      "i": 1,
+      "text": "Flagged part.",
+      "status": "flagged",
+      "issues": [
+       "cut_off"
+      ],
+      "file": "x.wav",
+      "heard": "Flagged part.",
+      "pitch_hz": 180.0,
+      "take": null
+     },
+     {
+      "i": 2,
+      "text": "Flagged part.",
+      "status": "flagged",
+      "issues": [
+       "cut_off"
+      ],
+      "file": "x.wav",
+      "heard": "Flagged part.",
+      "pitch_hz": 180.0
+     }
+    ]
+   },
+   "fix_targets": {
+    "result": [
+     0,
+     1,
+     2
+    ]
+   },
+   "outcome": {
+    "result": "needs_listen"
+   },
+   "review": {
+    "result": [
+     {
+      "part": 1,
+      "text": "Flagged part.",
+      "issues": [
+       "cut_off"
+      ],
+      "reasons": [
+       "Cut-off ending"
+      ],
+      "start": 0.0,
+      "end": 1.0,
+      "heard": "Flagged part.",
+      "pitch_hz": 180.0,
+      "voice_pitch_hz": null,
+      "checked_by": [
+       "take check"
+      ],
+      "take": 3
+     },
+     {
+      "part": 2,
+      "text": "Flagged part.",
+      "issues": [
+       "cut_off"
+      ],
+      "reasons": [
+       "Cut-off ending"
+      ],
+      "start": 1.2,
+      "end": 2.0,
+      "heard": "Flagged part.",
+      "pitch_hz": 180.0,
+      "voice_pitch_hz": null,
+      "checked_by": [
+       "take check"
+      ],
+      "take": null
+     },
+     {
+      "part": 3,
+      "text": "Flagged part.",
+      "issues": [
+       "cut_off"
+      ],
+      "reasons": [
+       "Cut-off ending"
+      ],
+      "start": 2.4,
+      "end": 3.0,
+      "heard": "Flagged part.",
+      "pitch_hz": 180.0,
+      "voice_pitch_hz": null,
+      "checked_by": [
+       "take check"
+      ],
+      "take": 1
+     }
+    ]
+   },
+   "review_pitch": {
+    "result": [
+     {
+      "part": 1,
+      "text": "Flagged part.",
+      "issues": [
+       "cut_off"
+      ],
+      "reasons": [
+       "Cut-off ending"
+      ],
+      "start": 0.0,
+      "end": 1.0,
+      "heard": "Flagged part.",
+      "pitch_hz": 180.0,
+      "voice_pitch_hz": 181.25,
+      "checked_by": [
+       "take check"
+      ],
+      "take": 3
+     },
+     {
+      "part": 2,
+      "text": "Flagged part.",
+      "issues": [
+       "cut_off"
+      ],
+      "reasons": [
+       "Cut-off ending"
+      ],
+      "start": 1.2,
+      "end": 2.0,
+      "heard": "Flagged part.",
+      "pitch_hz": 180.0,
+      "voice_pitch_hz": 181.25,
+      "checked_by": [
+       "take check"
+      ],
+      "take": null
+     },
+     {
+      "part": 3,
+      "text": "Flagged part.",
+      "issues": [
+       "cut_off"
+      ],
+      "reasons": [
+       "Cut-off ending"
+      ],
+      "start": 2.4,
+      "end": 3.0,
+      "heard": "Flagged part.",
+      "pitch_hz": 180.0,
+      "voice_pitch_hz": 181.25,
+      "checked_by": [
+       "take check"
+      ],
+      "take": 1
+     }
+    ]
+   },
+   "summarize": {
+    "result": {
+     "id": "s05rev",
+     "status": "done",
+     "flagged": [
+      0,
+      1,
+      2
+     ],
+     "message": "Done, needs review: part 1, 2, 3.",
+     "timeline": [
+      {
+       "i": 0,
+       "start": 0.0,
+       "end": 1.0
+      },
+      {
+       "i": 1,
+       "start": 1.2,
+       "end": 2.0
+      },
+      {
+       "i": 2,
+       "start": 2.4,
+       "end": 3.0
+      }
+     ],
+     "chunks": [
+      {
+       "i": 0,
+       "text": "Flagged part.",
+       "status": "flagged",
+       "issues": [
+        "cut_off"
+       ],
+       "file": "x.wav",
+       "heard": "Flagged part.",
+       "pitch_hz": 180.0,
+       "take": 3
+      },
+      {
+       "i": 1,
+       "text": "Flagged part.",
+       "status": "flagged",
+       "issues": [
+        "cut_off"
+       ],
+       "file": "x.wav",
+       "heard": "Flagged part.",
+       "pitch_hz": 180.0,
+       "take": null
+      },
+      {
+       "i": 2,
+       "text": "Flagged part.",
+       "status": "flagged",
+       "issues": [
+        "cut_off"
+       ],
+       "file": "x.wav",
+       "heard": "Flagged part.",
+       "pitch_hz": 180.0
+      }
+     ]
+    }
+   }
+  },
+  {
+   "gen": {
+    "id": "s05rev",
+    "status": "rendering",
+    "flagged": [],
+    "message": "old",
+    "timeline": [
+     {
+      "i": 0,
+      "start": 0.0,
+      "end": 1.0
+     },
+     {
+      "i": 1,
+      "start": 1.2,
+      "end": 2.0
+     },
+     {
+      "i": 2,
+      "start": 2.4,
+      "end": 3.0
+     }
+    ],
+    "chunks": [
+     {
+      "i": 0,
+      "text": "Flagged part.",
+      "status": "flagged",
+      "issues": [
+       "cut_off"
+      ],
+      "file": "x.wav",
+      "heard": "Flagged part.",
+      "pitch_hz": 180.0
+     },
+     {
+      "i": 1,
+      "text": "A part.",
+      "status": "ok",
+      "issues": [],
+      "file": "x.wav",
+      "heard": "A part.",
+      "pitch_hz": 180.0
+     }
+    ]
+   },
+   "fix_targets": {
+    "result": [
+     0
+    ]
+   },
+   "outcome": {
+    "result": null
+   },
+   "review": {
+    "result": [
+     {
+      "part": 1,
+      "text": "Flagged part.",
+      "issues": [
+       "cut_off"
+      ],
+      "reasons": [
+       "Cut-off ending"
+      ],
+      "start": 0.0,
+      "end": 1.0,
+      "heard": "Flagged part.",
+      "pitch_hz": 180.0,
+      "voice_pitch_hz": null,
+      "checked_by": [
+       "take check"
+      ],
+      "take": 1
+     }
+    ]
+   },
+   "review_pitch": {
+    "result": [
+     {
+      "part": 1,
+      "text": "Flagged part.",
+      "issues": [
+       "cut_off"
+      ],
+      "reasons": [
+       "Cut-off ending"
+      ],
+      "start": 0.0,
+      "end": 1.0,
+      "heard": "Flagged part.",
+      "pitch_hz": 180.0,
+      "voice_pitch_hz": 181.25,
+      "checked_by": [
+       "take check"
+      ],
+      "take": 1
+     }
+    ]
+   },
+   "summarize": {
+    "result": {
+     "id": "s05rev",
+     "status": "rendering",
+     "flagged": [
+      0
+     ],
+     "message": "Done, needs review: part 1.",
+     "timeline": [
+      {
+       "i": 0,
+       "start": 0.0,
+       "end": 1.0
+      },
+      {
+       "i": 1,
+       "start": 1.2,
+       "end": 2.0
+      },
+      {
+       "i": 2,
+       "start": 2.4,
+       "end": 3.0
+      }
+     ],
+     "chunks": [
+      {
+       "i": 0,
+       "text": "Flagged part.",
+       "status": "flagged",
+       "issues": [
+        "cut_off"
+       ],
+       "file": "x.wav",
+       "heard": "Flagged part.",
+       "pitch_hz": 180.0
+      },
+      {
+       "i": 1,
+       "text": "A part.",
+       "status": "ok",
+       "issues": [],
+       "file": "x.wav",
+       "heard": "A part.",
+       "pitch_hz": 180.0
+      }
+     ]
+    }
+   }
+  },
+  {
+   "gen": {
+    "id": "s05rev",
+    "status": "done",
+    "flagged": [],
+    "message": "old",
+    "timeline": [
+     {
+      "i": 0,
+      "start": 0.0,
+      "end": 1.0
+     },
+     {
+      "i": 1,
+      "start": 1.2,
+      "end": 2.0
+     },
+     {
+      "i": 2,
+      "start": 2.4,
+      "end": 3.0
+     }
+    ],
+    "chunks": [
+     {
+      "i": 0,
+      "text": "Flagged part.",
+      "status": "flagged",
+      "issues": [
+       "cut_off"
+      ],
+      "file": "x.wav",
+      "heard": null,
+      "pitch_hz": null
+     }
+    ]
+   },
+   "fix_targets": {
+    "result": [
+     0
+    ]
+   },
+   "outcome": {
+    "result": "needs_listen"
+   },
+   "review": {
+    "result": [
+     {
+      "part": 1,
+      "text": "Flagged part.",
+      "issues": [
+       "cut_off"
+      ],
+      "reasons": [
+       "Cut-off ending"
+      ],
+      "start": 0.0,
+      "end": 1.0,
+      "heard": "",
+      "pitch_hz": null,
+      "voice_pitch_hz": null,
+      "checked_by": [
+       "take check"
+      ],
+      "take": 1
+     }
+    ]
+   },
+   "review_pitch": {
+    "result": [
+     {
+      "part": 1,
+      "text": "Flagged part.",
+      "issues": [
+       "cut_off"
+      ],
+      "reasons": [
+       "Cut-off ending"
+      ],
+      "start": 0.0,
+      "end": 1.0,
+      "heard": "",
+      "pitch_hz": null,
+      "voice_pitch_hz": 181.25,
+      "checked_by": [
+       "take check"
+      ],
+      "take": 1
+     }
+    ]
+   },
+   "summarize": {
+    "result": {
+     "id": "s05rev",
+     "status": "done",
+     "flagged": [
+      0
+     ],
+     "message": "Done, needs review: part 1.",
+     "timeline": [
+      {
+       "i": 0,
+       "start": 0.0,
+       "end": 1.0
+      },
+      {
+       "i": 1,
+       "start": 1.2,
+       "end": 2.0
+      },
+      {
+       "i": 2,
+       "start": 2.4,
+       "end": 3.0
+      }
+     ],
+     "chunks": [
+      {
+       "i": 0,
+       "text": "Flagged part.",
+       "status": "flagged",
+       "issues": [
+        "cut_off"
+       ],
+       "file": "x.wav",
+       "heard": null,
+       "pitch_hz": null
+      }
+     ]
+    }
+   }
+  },
+  {
+   "gen": {
+    "id": "s05bare",
+    "status": "done",
+    "chunks": [
+     {
+      "i": 0,
+      "text": "Bare.",
+      "status": "flagged"
+     }
+    ]
+   },
+   "fix_targets": {
+    "result": [
+     0
+    ]
+   },
+   "outcome": {
+    "result": "needs_listen"
+   },
+   "review": {
+    "result": [
+     {
+      "part": 1,
+      "text": "Bare.",
+      "issues": [
+       "final_check"
+      ],
+      "reasons": [
+       "Failed the final check"
+      ],
+      "start": null,
+      "end": null,
+      "heard": "",
+      "pitch_hz": null,
+      "voice_pitch_hz": null,
+      "checked_by": [
+       "final check"
+      ],
+      "take": 1
+     }
+    ]
+   },
+   "review_pitch": {
+    "result": [
+     {
+      "part": 1,
+      "text": "Bare.",
+      "issues": [
+       "final_check"
+      ],
+      "reasons": [
+       "Failed the final check"
+      ],
+      "start": null,
+      "end": null,
+      "heard": "",
+      "pitch_hz": null,
+      "voice_pitch_hz": 181.25,
+      "checked_by": [
+       "final check"
+      ],
+      "take": 1
+     }
+    ]
+   },
+   "summarize": {
+    "result": {
+     "id": "s05bare",
+     "status": "done",
+     "chunks": [
+      {
+       "i": 0,
+       "text": "Bare.",
+       "status": "flagged"
+      }
+     ],
+     "flagged": [
+      0
+     ],
+     "message": "Done, needs review: part 1."
+    }
+   }
+  },
+  {
+   "gen": {
+    "id": "s05rev",
+    "status": "done",
+    "flagged": [],
+    "message": "old",
+    "timeline": [
+     {
+      "i": 0,
+      "start": 0.0,
+      "end": 1.0
+     },
+     {
+      "i": 1,
+      "start": 1.2,
+      "end": 2.0
+     },
+     {
+      "i": 2,
+      "start": 2.4,
+      "end": 3.0
+     }
+    ],
+    "chunks": [
+     {
+      "i": 0,
+      "text": "It&#39;s here.",
+      "status": "flagged",
+      "issues": [
+       "web_artifact"
+      ],
+      "file": "x.wav",
+      "heard": "It&#39;s here.",
+      "pitch_hz": 180.0
+     }
+    ]
+   },
+   "fix_targets": {
+    "result": [
+     0
+    ]
+   },
+   "outcome": {
+    "result": "needs_listen"
+   },
+   "review": {
+    "result": [
+     {
+      "part": 1,
+      "text": "It&#39;s here.",
+      "issues": [
+       "web_artifact",
+       "web_artifact"
+      ],
+      "reasons": [
+       "Web code in the script (such as &#39;)",
+       "Web code in the script (such as &#39;)"
+      ],
+      "start": 0.0,
+      "end": 1.0,
+      "heard": "It&#39;s here.",
+      "pitch_hz": 180.0,
+      "voice_pitch_hz": null,
+      "checked_by": [
+       "take check",
+       "script check"
+      ],
+      "take": 1
+     }
+    ]
+   },
+   "review_pitch": {
+    "result": [
+     {
+      "part": 1,
+      "text": "It&#39;s here.",
+      "issues": [
+       "web_artifact",
+       "web_artifact"
+      ],
+      "reasons": [
+       "Web code in the script (such as &#39;)",
+       "Web code in the script (such as &#39;)"
+      ],
+      "start": 0.0,
+      "end": 1.0,
+      "heard": "It&#39;s here.",
+      "pitch_hz": 180.0,
+      "voice_pitch_hz": 181.25,
+      "checked_by": [
+       "take check",
+       "script check"
+      ],
+      "take": 1
+     }
+    ]
+   },
+   "summarize": {
+    "result": {
+     "id": "s05rev",
+     "status": "done",
+     "flagged": [
+      0
+     ],
+     "message": "Done, needs review: part 1.",
+     "timeline": [
+      {
+       "i": 0,
+       "start": 0.0,
+       "end": 1.0
+      },
+      {
+       "i": 1,
+       "start": 1.2,
+       "end": 2.0
+      },
+      {
+       "i": 2,
+       "start": 2.4,
+       "end": 3.0
+      }
+     ],
+     "chunks": [
+      {
+       "i": 0,
+       "text": "It&#39;s here.",
+       "status": "flagged",
+       "issues": [
+        "web_artifact"
+       ],
+       "file": "x.wav",
+       "heard": "It&#39;s here.",
+       "pitch_hz": 180.0
+      }
+     ]
+    }
+   }
+  },
+  {
+   "gen": {
+    "id": "s05rev",
+    "status": "done",
+    "flagged": [],
+    "message": "old",
+    "timeline": [
+     {
+      "i": 0,
+      "start": 0.0,
+      "end": 1.0
+     },
+     {
+      "i": 1,
+      "start": 1.2,
+      "end": 2.0
+     },
+     {
+      "i": 2,
+      "start": 2.4,
+      "end": 3.0
+     }
+    ],
+    "final_scan": {
+     "remaining": [
+      0,
+      1
+     ]
+    },
+    "chunks": [
+     {
+      "i": 0,
+      "text": "A part.",
+      "status": "ok",
+      "issues": [],
+      "file": "x.wav",
+      "heard": "A part.",
+      "pitch_hz": 180.0,
+      "accepted": {
+       "by": "person",
+       "at": 2.0
+      }
+     },
+     {
+      "i": 1,
+      "text": "A part.",
+      "status": "ok",
+      "issues": [],
+      "file": "x.wav",
+      "heard": "A part.",
+      "pitch_hz": 180.0
+     }
+    ]
+   },
+   "fix_targets": {
+    "result": [
+     1
+    ]
+   },
+   "outcome": {
+    "result": "needs_listen"
+   },
+   "review": {
+    "result": [
+     {
+      "part": 2,
+      "text": "A part.",
+      "issues": [
+       "final_check"
+      ],
+      "reasons": [
+       "Failed the final check"
+      ],
+      "start": 1.2,
+      "end": 2.0,
+      "heard": "A part.",
+      "pitch_hz": 180.0,
+      "voice_pitch_hz": null,
+      "checked_by": [
+       "final check"
+      ],
+      "take": 1
+     }
+    ]
+   },
+   "review_pitch": {
+    "result": [
+     {
+      "part": 2,
+      "text": "A part.",
+      "issues": [
+       "final_check"
+      ],
+      "reasons": [
+       "Failed the final check"
+      ],
+      "start": 1.2,
+      "end": 2.0,
+      "heard": "A part.",
+      "pitch_hz": 180.0,
+      "voice_pitch_hz": 181.25,
+      "checked_by": [
+       "final check"
+      ],
+      "take": 1
+     }
+    ]
+   },
+   "summarize": {
+    "result": {
+     "id": "s05rev",
+     "status": "done",
+     "flagged": [],
+     "message": "Done, needs review: part 2.",
+     "timeline": [
+      {
+       "i": 0,
+       "start": 0.0,
+       "end": 1.0
+      },
+      {
+       "i": 1,
+       "start": 1.2,
+       "end": 2.0
+      },
+      {
+       "i": 2,
+       "start": 2.4,
+       "end": 3.0
+      }
+     ],
+     "final_scan": {
+      "remaining": [
+       0,
+       1
+      ]
+     },
+     "chunks": [
+      {
+       "i": 0,
+       "text": "A part.",
+       "status": "ok",
+       "issues": [],
+       "file": "x.wav",
+       "heard": "A part.",
+       "pitch_hz": 180.0,
+       "accepted": {
+        "by": "person",
+        "at": 2.0
+       }
+      },
+      {
+       "i": 1,
+       "text": "A part.",
+       "status": "ok",
+       "issues": [],
+       "file": "x.wav",
+       "heard": "A part.",
+       "pitch_hz": 180.0
+      }
+     ]
+    }
+   }
+  },
+  {
+   "gen": {
+    "id": "s05rev",
+    "status": "done",
+    "flagged": [],
+    "message": "old",
+    "timeline": [
+     {
+      "i": 0,
+      "start": 0.0,
+      "end": 1.0
+     },
+     {
+      "i": 1,
+      "start": 1.2,
+      "end": 2.0
+     },
+     {
+      "i": 2,
+      "start": 2.4,
+      "end": 3.0
+     }
+    ],
+    "final_scan": null,
+    "chunks": [
+     {
+      "i": 0,
+      "text": "A part.",
+      "status": "ok",
+      "issues": [],
+      "file": "x.wav",
+      "heard": "A part.",
+      "pitch_hz": 180.0
+     },
+     {
+      "i": 1,
+      "text": "A part.",
+      "status": "ok",
+      "issues": [],
+      "file": "x.wav",
+      "heard": "A part.",
+      "pitch_hz": 180.0
+     }
+    ]
+   },
+   "fix_targets": {
+    "result": []
+   },
+   "outcome": {
+    "result": "clean"
+   },
+   "review": {
+    "result": []
+   },
+   "review_pitch": {
+    "result": []
+   },
+   "summarize": {
+    "result": {
+     "id": "s05rev",
+     "status": "done",
+     "flagged": [],
+     "message": "Done. All parts passed the automated checks.",
+     "timeline": [
+      {
+       "i": 0,
+       "start": 0.0,
+       "end": 1.0
+      },
+      {
+       "i": 1,
+       "start": 1.2,
+       "end": 2.0
+      },
+      {
+       "i": 2,
+       "start": 2.4,
+       "end": 3.0
+      }
+     ],
+     "final_scan": null,
+     "chunks": [
+      {
+       "i": 0,
+       "text": "A part.",
+       "status": "ok",
+       "issues": [],
+       "file": "x.wav",
+       "heard": "A part.",
+       "pitch_hz": 180.0
+      },
+      {
+       "i": 1,
+       "text": "A part.",
+       "status": "ok",
+       "issues": [],
+       "file": "x.wav",
+       "heard": "A part.",
+       "pitch_hz": 180.0
+      }
+     ]
+    }
+   }
+  },
+  {
+   "gen": {
+    "id": "s05rev",
+    "status": "done",
+    "flagged": [],
+    "message": "old",
+    "timeline": [
+     {
+      "i": 0,
+      "start": 0.0,
+      "end": 1.0
+     },
+     {
+      "i": 1,
+      "start": 1.2,
+      "end": 2.0
+     },
+     {
+      "i": 2,
+      "start": 2.4,
+      "end": 3.0
+     }
+    ],
+    "final_scan": {
+     "remaining": null
+    },
+    "chunks": [
+     {
+      "i": 0,
+      "text": "A part.",
+      "status": "ok",
+      "issues": [],
+      "file": "x.wav",
+      "heard": "A part.",
+      "pitch_hz": 180.0
+     },
+     {
+      "i": 1,
+      "text": "A part.",
+      "status": "ok",
+      "issues": [],
+      "file": "x.wav",
+      "heard": "A part.",
+      "pitch_hz": 180.0
+     }
+    ]
+   },
+   "fix_targets": {
+    "result": []
+   },
+   "outcome": {
+    "result": "clean"
+   },
+   "review": {
+    "result": []
+   },
+   "review_pitch": {
+    "result": []
+   },
+   "summarize": {
+    "result": {
+     "id": "s05rev",
+     "status": "done",
+     "flagged": [],
+     "message": "Done. All parts passed the automated checks.",
+     "timeline": [
+      {
+       "i": 0,
+       "start": 0.0,
+       "end": 1.0
+      },
+      {
+       "i": 1,
+       "start": 1.2,
+       "end": 2.0
+      },
+      {
+       "i": 2,
+       "start": 2.4,
+       "end": 3.0
+      }
+     ],
+     "final_scan": {
+      "remaining": null
+     },
+     "chunks": [
+      {
+       "i": 0,
+       "text": "A part.",
+       "status": "ok",
+       "issues": [],
+       "file": "x.wav",
+       "heard": "A part.",
+       "pitch_hz": 180.0
+      },
+      {
+       "i": 1,
+       "text": "A part.",
+       "status": "ok",
+       "issues": [],
+       "file": "x.wav",
+       "heard": "A part.",
+       "pitch_hz": 180.0
+      }
+     ]
+    }
+   }
+  },
+  {
+   "gen": {
+    "id": "s05rev",
+    "status": "done",
+    "flagged": [],
+    "message": "old",
+    "timeline": [
+     {
+      "i": 0,
+      "start": 0.0,
+      "end": 1.0
+     },
+     {
+      "i": 1,
+      "start": 1.2,
+      "end": 2.0
+     },
+     {
+      "i": 2,
+      "start": 2.4,
+      "end": 3.0
+     }
+    ],
+    "chunks": [
+     {
+      "i": 0,
+      "text": null,
+      "status": "flagged",
+      "issues": [
+       "cut_off"
+      ],
+      "file": "x.wav",
+      "heard": null,
+      "pitch_hz": 180.0
+     },
+     {
+      "i": 1,
+      "text": "A part.",
+      "status": "ok",
+      "issues": [],
+      "file": "x.wav",
+      "heard": "A part.",
+      "pitch_hz": 180.0
+     }
+    ]
+   },
+   "fix_targets": {
+    "result": [
+     0
+    ]
+   },
+   "outcome": {
+    "result": "needs_listen"
+   },
+   "review": {
+    "result": [
+     {
+      "part": 1,
+      "text": "",
+      "issues": [
+       "cut_off"
+      ],
+      "reasons": [
+       "Cut-off ending"
+      ],
+      "start": 0.0,
+      "end": 1.0,
+      "heard": "",
+      "pitch_hz": 180.0,
+      "voice_pitch_hz": null,
+      "checked_by": [
+       "take check"
+      ],
+      "take": 1
+     }
+    ]
+   },
+   "review_pitch": {
+    "result": [
+     {
+      "part": 1,
+      "text": "",
+      "issues": [
+       "cut_off"
+      ],
+      "reasons": [
+       "Cut-off ending"
+      ],
+      "start": 0.0,
+      "end": 1.0,
+      "heard": "",
+      "pitch_hz": 180.0,
+      "voice_pitch_hz": 181.25,
+      "checked_by": [
+       "take check"
+      ],
+      "take": 1
+     }
+    ]
+   },
+   "summarize": {
+    "result": {
+     "id": "s05rev",
+     "status": "done",
+     "flagged": [
+      0
+     ],
+     "message": "Done, needs review: part 1.",
+     "timeline": [
+      {
+       "i": 0,
+       "start": 0.0,
+       "end": 1.0
+      },
+      {
+       "i": 1,
+       "start": 1.2,
+       "end": 2.0
+      },
+      {
+       "i": 2,
+       "start": 2.4,
+       "end": 3.0
+      }
+     ],
+     "chunks": [
+      {
+       "i": 0,
+       "text": null,
+       "status": "flagged",
+       "issues": [
+        "cut_off"
+       ],
+       "file": "x.wav",
+       "heard": null,
+       "pitch_hz": 180.0
+      },
+      {
+       "i": 1,
+       "text": "A part.",
+       "status": "ok",
+       "issues": [],
+       "file": "x.wav",
+       "heard": "A part.",
+       "pitch_hz": 180.0
+      }
+     ]
+    }
+   }
+  },
+  {
+   "gen": {
+    "id": "s05rev",
+    "status": "done",
+    "flagged": [],
+    "message": "old",
+    "timeline": [
+     {
+      "i": 0,
+      "start": 0.0,
+      "end": 1.0
+     },
+     {
+      "i": 1,
+      "start": 1.2,
+      "end": 2.0
+     },
+     {
+      "i": 2,
+      "start": 2.4,
+      "end": 3.0
+     }
+    ],
+    "chunks": [
+     {
+      "i": 0,
+      "text": "Flagged part.",
+      "status": "flagged",
+      "issues": [
+       "cut_off"
+      ],
+      "file": "x.wav",
+      "heard": "Flagged part.",
+      "pitch_hz": 180.0,
+      "accepted": {}
+     },
+     {
+      "i": 1,
+      "text": "A part.",
+      "status": "ok",
+      "issues": [],
+      "file": "x.wav",
+      "heard": "A part.",
+      "pitch_hz": 180.0
+     }
+    ]
+   },
+   "fix_targets": {
+    "result": [
+     0
+    ]
+   },
+   "outcome": {
+    "result": "needs_listen"
+   },
+   "review": {
+    "result": [
+     {
+      "part": 1,
+      "text": "Flagged part.",
+      "issues": [
+       "cut_off"
+      ],
+      "reasons": [
+       "Cut-off ending"
+      ],
+      "start": 0.0,
+      "end": 1.0,
+      "heard": "Flagged part.",
+      "pitch_hz": 180.0,
+      "voice_pitch_hz": null,
+      "checked_by": [
+       "take check"
+      ],
+      "take": 1
+     }
+    ]
+   },
+   "review_pitch": {
+    "result": [
+     {
+      "part": 1,
+      "text": "Flagged part.",
+      "issues": [
+       "cut_off"
+      ],
+      "reasons": [
+       "Cut-off ending"
+      ],
+      "start": 0.0,
+      "end": 1.0,
+      "heard": "Flagged part.",
+      "pitch_hz": 180.0,
+      "voice_pitch_hz": 181.25,
+      "checked_by": [
+       "take check"
+      ],
+      "take": 1
+     }
+    ]
+   },
+   "summarize": {
+    "result": {
+     "id": "s05rev",
+     "status": "done",
+     "flagged": [
+      0
+     ],
+     "message": "Done, needs review: part 1.",
+     "timeline": [
+      {
+       "i": 0,
+       "start": 0.0,
+       "end": 1.0
+      },
+      {
+       "i": 1,
+       "start": 1.2,
+       "end": 2.0
+      },
+      {
+       "i": 2,
+       "start": 2.4,
+       "end": 3.0
+      }
+     ],
+     "chunks": [
+      {
+       "i": 0,
+       "text": "Flagged part.",
+       "status": "flagged",
+       "issues": [
+        "cut_off"
+       ],
+       "file": "x.wav",
+       "heard": "Flagged part.",
+       "pitch_hz": 180.0,
+       "accepted": {}
+      },
+      {
+       "i": 1,
+       "text": "A part.",
+       "status": "ok",
+       "issues": [],
+       "file": "x.wav",
+       "heard": "A part.",
+       "pitch_hz": 180.0
+      }
+     ]
+    }
+   }
+  },
+  {
+   "gen": {
+    "id": "s05rev",
+    "status": "done",
+    "flagged": [],
+    "message": "old",
+    "timeline": [
+     {
+      "i": 1,
+      "start": 0.0,
+      "end": 1.0
+     },
+     {
+      "i": 1,
+      "start": 5.0,
+      "end": 6.0
+     },
+     {
+      "i": 0,
+      "start": 7,
+      "end": 8
+     }
+    ],
+    "chunks": [
+     {
+      "i": 0,
+      "text": "Flagged part.",
+      "status": "flagged",
+      "issues": [
+       "cut_off"
+      ],
+      "file": "x.wav",
+      "heard": "Flagged part.",
+      "pitch_hz": 180.0
+     },
+     {
+      "i": 1,
+      "text": "Flagged part.",
+      "status": "flagged",
+      "issues": [
+       "cut_off"
+      ],
+      "file": "x.wav",
+      "heard": "Flagged part.",
+      "pitch_hz": 180.0
+     }
+    ]
+   },
+   "fix_targets": {
+    "result": [
+     0,
+     1
+    ]
+   },
+   "outcome": {
+    "result": "needs_listen"
+   },
+   "review": {
+    "result": [
+     {
+      "part": 1,
+      "text": "Flagged part.",
+      "issues": [
+       "cut_off"
+      ],
+      "reasons": [
+       "Cut-off ending"
+      ],
+      "start": 7,
+      "end": 8,
+      "heard": "Flagged part.",
+      "pitch_hz": 180.0,
+      "voice_pitch_hz": null,
+      "checked_by": [
+       "take check"
+      ],
+      "take": 1
+     },
+     {
+      "part": 2,
+      "text": "Flagged part.",
+      "issues": [
+       "cut_off"
+      ],
+      "reasons": [
+       "Cut-off ending"
+      ],
+      "start": 5.0,
+      "end": 6.0,
+      "heard": "Flagged part.",
+      "pitch_hz": 180.0,
+      "voice_pitch_hz": null,
+      "checked_by": [
+       "take check"
+      ],
+      "take": 1
+     }
+    ]
+   },
+   "review_pitch": {
+    "result": [
+     {
+      "part": 1,
+      "text": "Flagged part.",
+      "issues": [
+       "cut_off"
+      ],
+      "reasons": [
+       "Cut-off ending"
+      ],
+      "start": 7,
+      "end": 8,
+      "heard": "Flagged part.",
+      "pitch_hz": 180.0,
+      "voice_pitch_hz": 181.25,
+      "checked_by": [
+       "take check"
+      ],
+      "take": 1
+     },
+     {
+      "part": 2,
+      "text": "Flagged part.",
+      "issues": [
+       "cut_off"
+      ],
+      "reasons": [
+       "Cut-off ending"
+      ],
+      "start": 5.0,
+      "end": 6.0,
+      "heard": "Flagged part.",
+      "pitch_hz": 180.0,
+      "voice_pitch_hz": 181.25,
+      "checked_by": [
+       "take check"
+      ],
+      "take": 1
+     }
+    ]
+   },
+   "summarize": {
+    "result": {
+     "id": "s05rev",
+     "status": "done",
+     "flagged": [
+      0,
+      1
+     ],
+     "message": "Done, needs review: part 1, 2.",
+     "timeline": [
+      {
+       "i": 1,
+       "start": 0.0,
+       "end": 1.0
+      },
+      {
+       "i": 1,
+       "start": 5.0,
+       "end": 6.0
+      },
+      {
+       "i": 0,
+       "start": 7,
+       "end": 8
+      }
+     ],
+     "chunks": [
+      {
+       "i": 0,
+       "text": "Flagged part.",
+       "status": "flagged",
+       "issues": [
+        "cut_off"
+       ],
+       "file": "x.wav",
+       "heard": "Flagged part.",
+       "pitch_hz": 180.0
+      },
+      {
+       "i": 1,
+       "text": "Flagged part.",
+       "status": "flagged",
+       "issues": [
+        "cut_off"
+       ],
+       "file": "x.wav",
+       "heard": "Flagged part.",
+       "pitch_hz": 180.0
+      }
+     ]
+    }
+   }
+  },
+  {
+   "gen": {
+    "id": "s05rev",
+    "status": "done",
+    "flagged": [],
+    "message": "old",
+    "timeline": [
+     {
+      "i": 0,
+      "start": 0.0,
+      "end": 1.0
+     },
+     {
+      "i": 1,
+      "start": 1.2,
+      "end": 2.0
+     },
+     {
+      "i": 2,
+      "start": 2.4,
+      "end": 3.0
+     }
+    ],
+    "final_scan": {
+     "remaining": [
+      1,
+      1,
+      0
+     ]
+    },
+    "chunks": [
+     {
+      "i": 0,
+      "text": "A part.",
+      "status": "ok",
+      "issues": [],
+      "file": "x.wav",
+      "heard": "A part.",
+      "pitch_hz": 180.0
+     },
+     {
+      "i": 1,
+      "text": "A part.",
+      "status": "ok",
+      "issues": [],
+      "file": "x.wav",
+      "heard": "A part.",
+      "pitch_hz": 180.0
+     }
+    ]
+   },
+   "fix_targets": {
+    "result": [
+     0,
+     1
+    ]
+   },
+   "outcome": {
+    "result": "needs_listen"
+   },
+   "review": {
+    "result": [
+     {
+      "part": 1,
+      "text": "A part.",
+      "issues": [
+       "final_check"
+      ],
+      "reasons": [
+       "Failed the final check"
+      ],
+      "start": 0.0,
+      "end": 1.0,
+      "heard": "A part.",
+      "pitch_hz": 180.0,
+      "voice_pitch_hz": null,
+      "checked_by": [
+       "final check"
+      ],
+      "take": 1
+     },
+     {
+      "part": 2,
+      "text": "A part.",
+      "issues": [
+       "final_check"
+      ],
+      "reasons": [
+       "Failed the final check"
+      ],
+      "start": 1.2,
+      "end": 2.0,
+      "heard": "A part.",
+      "pitch_hz": 180.0,
+      "voice_pitch_hz": null,
+      "checked_by": [
+       "final check"
+      ],
+      "take": 1
+     }
+    ]
+   },
+   "review_pitch": {
+    "result": [
+     {
+      "part": 1,
+      "text": "A part.",
+      "issues": [
+       "final_check"
+      ],
+      "reasons": [
+       "Failed the final check"
+      ],
+      "start": 0.0,
+      "end": 1.0,
+      "heard": "A part.",
+      "pitch_hz": 180.0,
+      "voice_pitch_hz": 181.25,
+      "checked_by": [
+       "final check"
+      ],
+      "take": 1
+     },
+     {
+      "part": 2,
+      "text": "A part.",
+      "issues": [
+       "final_check"
+      ],
+      "reasons": [
+       "Failed the final check"
+      ],
+      "start": 1.2,
+      "end": 2.0,
+      "heard": "A part.",
+      "pitch_hz": 180.0,
+      "voice_pitch_hz": 181.25,
+      "checked_by": [
+       "final check"
+      ],
+      "take": 1
+     }
+    ]
+   },
+   "summarize": {
+    "result": {
+     "id": "s05rev",
+     "status": "done",
+     "flagged": [],
+     "message": "Done, needs review: part 1, 2.",
+     "timeline": [
+      {
+       "i": 0,
+       "start": 0.0,
+       "end": 1.0
+      },
+      {
+       "i": 1,
+       "start": 1.2,
+       "end": 2.0
+      },
+      {
+       "i": 2,
+       "start": 2.4,
+       "end": 3.0
+      }
+     ],
+     "final_scan": {
+      "remaining": [
+       1,
+       1,
+       0
+      ]
+     },
+     "chunks": [
+      {
+       "i": 0,
+       "text": "A part.",
+       "status": "ok",
+       "issues": [],
+       "file": "x.wav",
+       "heard": "A part.",
+       "pitch_hz": 180.0
+      },
+      {
+       "i": 1,
+       "text": "A part.",
+       "status": "ok",
+       "issues": [],
+       "file": "x.wav",
+       "heard": "A part.",
+       "pitch_hz": 180.0
+      }
+     ]
+    }
+   }
+  },
+  {
+   "gen": {
+    "id": "s05nokeys",
+    "status": "done",
+    "chunks": [
+     {
+      "i": 0,
+      "text": "A.",
+      "status": "ok"
+     },
+     {
+      "i": 1,
+      "text": "B.",
+      "status": "flagged"
+     }
+    ]
+   },
+   "fix_targets": {
+    "result": [
+     1
+    ]
+   },
+   "outcome": {
+    "result": "needs_listen"
+   },
+   "review": {
+    "result": [
+     {
+      "part": 2,
+      "text": "B.",
+      "issues": [
+       "final_check"
+      ],
+      "reasons": [
+       "Failed the final check"
+      ],
+      "start": null,
+      "end": null,
+      "heard": "",
+      "pitch_hz": null,
+      "voice_pitch_hz": null,
+      "checked_by": [
+       "final check"
+      ],
+      "take": 1
+     }
+    ]
+   },
+   "review_pitch": {
+    "result": [
+     {
+      "part": 2,
+      "text": "B.",
+      "issues": [
+       "final_check"
+      ],
+      "reasons": [
+       "Failed the final check"
+      ],
+      "start": null,
+      "end": null,
+      "heard": "",
+      "pitch_hz": null,
+      "voice_pitch_hz": 181.25,
+      "checked_by": [
+       "final check"
+      ],
+      "take": 1
+     }
+    ]
+   },
+   "summarize": {
+    "result": {
+     "id": "s05nokeys",
+     "status": "done",
+     "chunks": [
+      {
+       "i": 0,
+       "text": "A.",
+       "status": "ok"
+      },
+      {
+       "i": 1,
+       "text": "B.",
+       "status": "flagged"
+      }
+     ],
+     "flagged": [
+      1
+     ],
+     "message": "Done, needs review: part 2."
+    }
+   }
+  },
+  {
+   "gen": {
+    "id": "s05rev",
+    "status": "done",
+    "flagged": [],
+    "message": "old",
+    "timeline": [
+     {
+      "i": 0,
+      "start": 0.0,
+      "end": 1.0
+     },
+     {
+      "i": 1,
+      "start": 1.2,
+      "end": 2.0
+     },
+     {
+      "i": 2,
+      "start": 2.4,
+      "end": 3.0
+     }
+    ],
+    "final_scan": {
+     "remaining": [
+      5
+     ]
+    },
+    "chunks": [
+     {
+      "i": 0,
+      "text": "A part.",
+      "status": "ok",
+      "issues": [],
+      "file": "x.wav",
+      "heard": "A part.",
+      "pitch_hz": 180.0
+     },
+     {
+      "i": 1,
+      "text": "A part.",
+      "status": "ok",
+      "issues": [],
+      "file": "x.wav",
+      "heard": "A part.",
+      "pitch_hz": 180.0
+     }
+    ]
+   },
+   "fix_targets": {
+    "result": [
+     5
+    ]
+   },
+   "outcome": {
+    "result": "needs_listen"
+   },
+   "review": {
+    "error": "IndexError"
+   },
+   "review_pitch": {
+    "error": "IndexError"
+   },
+   "summarize": {
+    "error": "IndexError"
+   }
+  },
+  {
+   "gen": {
+    "id": "s05rev",
+    "status": "cancelled",
+    "flagged": [],
+    "message": "old",
+    "timeline": [
+     {
+      "i": 0,
+      "start": 0.0,
+      "end": 1.0
+     },
+     {
+      "i": 1,
+      "start": 1.2,
+      "end": 2.0
+     },
+     {
+      "i": 2,
+      "start": 2.4,
+      "end": 3.0
+     }
+    ],
+    "chunks": [
+     {
+      "i": 0,
+      "text": "A part.",
+      "status": "ok",
+      "issues": [],
+      "file": "x.wav",
+      "heard": "A part.",
+      "pitch_hz": 180.0
+     },
+     {
+      "i": 1,
+      "text": "Flagged part.",
+      "status": "flagged",
+      "issues": [
+       "cut_off"
+      ],
+      "file": "x.wav",
+      "heard": "Flagged part.",
+      "pitch_hz": 180.0
+     }
+    ]
+   },
+   "fix_targets": {
+    "result": [
+     1
+    ]
+   },
+   "outcome": {
+    "result": null
+   },
+   "review": {
+    "result": [
+     {
+      "part": 2,
+      "text": "Flagged part.",
+      "issues": [
+       "cut_off"
+      ],
+      "reasons": [
+       "Cut-off ending"
+      ],
+      "start": 1.2,
+      "end": 2.0,
+      "heard": "Flagged part.",
+      "pitch_hz": 180.0,
+      "voice_pitch_hz": null,
+      "checked_by": [
+       "take check"
+      ],
+      "take": 1
+     }
+    ]
+   },
+   "review_pitch": {
+    "result": [
+     {
+      "part": 2,
+      "text": "Flagged part.",
+      "issues": [
+       "cut_off"
+      ],
+      "reasons": [
+       "Cut-off ending"
+      ],
+      "start": 1.2,
+      "end": 2.0,
+      "heard": "Flagged part.",
+      "pitch_hz": 180.0,
+      "voice_pitch_hz": 181.25,
+      "checked_by": [
+       "take check"
+      ],
+      "take": 1
+     }
+    ]
+   },
+   "summarize": {
+    "result": {
+     "id": "s05rev",
+     "status": "cancelled",
+     "flagged": [
+      1
+     ],
+     "message": "Done, needs review: part 2.",
+     "timeline": [
+      {
+       "i": 0,
+       "start": 0.0,
+       "end": 1.0
+      },
+      {
+       "i": 1,
+       "start": 1.2,
+       "end": 2.0
+      },
+      {
+       "i": 2,
+       "start": 2.4,
+       "end": 3.0
+      }
+     ],
+     "chunks": [
+      {
+       "i": 0,
+       "text": "A part.",
+       "status": "ok",
+       "issues": [],
+       "file": "x.wav",
+       "heard": "A part.",
+       "pitch_hz": 180.0
+      },
+      {
+       "i": 1,
+       "text": "Flagged part.",
+       "status": "flagged",
+       "issues": [
+        "cut_off"
+       ],
+       "file": "x.wav",
+       "heard": "Flagged part.",
+       "pitch_hz": 180.0
+      }
+     ]
+    }
+   }
+  }
+ ],
+ "accept": [
+  {
+   "gen": {
+    "id": "s05rev",
+    "status": "done",
+    "flagged": [],
+    "message": "old",
+    "timeline": [
+     {
+      "i": 0,
+      "start": 0.0,
+      "end": 1.0
+     },
+     {
+      "i": 1,
+      "start": 1.2,
+      "end": 2.0
+     },
+     {
+      "i": 2,
+      "start": 2.4,
+      "end": 3.0
+     }
+    ],
+    "chunks": [
+     {
+      "i": 0,
+      "text": "A part.",
+      "status": "ok",
+      "issues": [],
+      "file": "x.wav",
+      "heard": "A part.",
+      "pitch_hz": 180.0
+     },
+     {
+      "i": 1,
+      "text": "Flagged part.",
+      "status": "flagged",
+      "issues": [
+       "cut_off"
+      ],
+      "file": "x.wav",
+      "heard": "Flagged part.",
+      "pitch_hz": 180.0
+     },
+     {
+      "i": 2,
+      "text": "A part.",
+      "status": "ok",
+      "issues": [],
+      "file": "x.wav",
+      "heard": "A part.",
+      "pitch_hz": 180.0
+     }
+    ]
+   },
+   "ci": 1,
+   "on": true,
+   "now": 1800001234.5,
+   "after": {
+    "result": {
+     "id": "s05rev",
+     "status": "done",
+     "flagged": [],
+     "message": "Done. You marked 1 part as sounding fine; every other part passed the checks.",
+     "timeline": [
+      {
+       "i": 0,
+       "start": 0.0,
+       "end": 1.0
+      },
+      {
+       "i": 1,
+       "start": 1.2,
+       "end": 2.0
+      },
+      {
+       "i": 2,
+       "start": 2.4,
+       "end": 3.0
+      }
+     ],
+     "chunks": [
+      {
+       "i": 0,
+       "text": "A part.",
+       "status": "ok",
+       "issues": [],
+       "file": "x.wav",
+       "heard": "A part.",
+       "pitch_hz": 180.0
+      },
+      {
+       "i": 1,
+       "text": "Flagged part.",
+       "status": "flagged",
+       "issues": [
+        "cut_off"
+       ],
+       "file": "x.wav",
+       "heard": "Flagged part.",
+       "pitch_hz": 180.0,
+       "accepted": {
+        "by": "person",
+        "at": 1800001234.5
+       }
+      },
+      {
+       "i": 2,
+       "text": "A part.",
+       "status": "ok",
+       "issues": [],
+       "file": "x.wav",
+       "heard": "A part.",
+       "pitch_hz": 180.0
+      }
+     ]
+    }
+   }
+  },
+  {
+   "gen": {
+    "id": "s05rev",
+    "status": "done",
+    "flagged": [],
+    "message": "old",
+    "timeline": [
+     {
+      "i": 0,
+      "start": 0.0,
+      "end": 1.0
+     },
+     {
+      "i": 1,
+      "start": 1.2,
+      "end": 2.0
+     },
+     {
+      "i": 2,
+      "start": 2.4,
+      "end": 3.0
+     }
+    ],
+    "chunks": [
+     {
+      "i": 0,
+      "text": "A part.",
+      "status": "ok",
+      "issues": [],
+      "file": "x.wav",
+      "heard": "A part.",
+      "pitch_hz": 180.0
+     },
+     {
+      "i": 1,
+      "text": "Flagged part.",
+      "status": "flagged",
+      "issues": [
+       "cut_off"
+      ],
+      "file": "x.wav",
+      "heard": "Flagged part.",
+      "pitch_hz": 180.0
+     },
+     {
+      "i": 2,
+      "text": "A part.",
+      "status": "ok",
+      "issues": [],
+      "file": "x.wav",
+      "heard": "A part.",
+      "pitch_hz": 180.0
+     }
+    ]
+   },
+   "ci": 1,
+   "on": false,
+   "now": 1800001234.625,
+   "after": {
+    "result": {
+     "id": "s05rev",
+     "status": "done",
+     "flagged": [
+      1
+     ],
+     "message": "Done, needs review: part 2.",
+     "timeline": [
+      {
+       "i": 0,
+       "start": 0.0,
+       "end": 1.0
+      },
+      {
+       "i": 1,
+       "start": 1.2,
+       "end": 2.0
+      },
+      {
+       "i": 2,
+       "start": 2.4,
+       "end": 3.0
+      }
+     ],
+     "chunks": [
+      {
+       "i": 0,
+       "text": "A part.",
+       "status": "ok",
+       "issues": [],
+       "file": "x.wav",
+       "heard": "A part.",
+       "pitch_hz": 180.0
+      },
+      {
+       "i": 1,
+       "text": "Flagged part.",
+       "status": "flagged",
+       "issues": [
+        "cut_off"
+       ],
+       "file": "x.wav",
+       "heard": "Flagged part.",
+       "pitch_hz": 180.0,
+       "accepted": null
+      },
+      {
+       "i": 2,
+       "text": "A part.",
+       "status": "ok",
+       "issues": [],
+       "file": "x.wav",
+       "heard": "A part.",
+       "pitch_hz": 180.0
+      }
+     ]
+    }
+   }
+  },
+  {
+   "gen": {
+    "id": "s05rev",
+    "status": "done",
+    "flagged": [],
+    "message": "old",
+    "timeline": [
+     {
+      "i": 0,
+      "start": 0.0,
+      "end": 1.0
+     },
+     {
+      "i": 1,
+      "start": 1.2,
+      "end": 2.0
+     },
+     {
+      "i": 2,
+      "start": 2.4,
+      "end": 3.0
+     }
+    ],
+    "chunks": [
+     {
+      "i": 0,
+      "text": "A part.",
+      "status": "ok",
+      "issues": [],
+      "file": "x.wav",
+      "heard": "A part.",
+      "pitch_hz": 180.0
+     },
+     {
+      "i": 1,
+      "text": "Flagged part.",
+      "status": "flagged",
+      "issues": [
+       "cut_off"
+      ],
+      "file": "x.wav",
+      "heard": "Flagged part.",
+      "pitch_hz": 180.0,
+      "accepted": {
+       "by": "person",
+       "at": 1.5
+      }
+     },
+     {
+      "i": 2,
+      "text": "A part.",
+      "status": "ok",
+      "issues": [],
+      "file": "x.wav",
+      "heard": "A part.",
+      "pitch_hz": 180.0
+     }
+    ]
+   },
+   "ci": 1,
+   "on": false,
+   "now": 1800001234.75,
+   "after": {
+    "result": {
+     "id": "s05rev",
+     "status": "done",
+     "flagged": [
+      1
+     ],
+     "message": "Done, needs review: part 2.",
+     "timeline": [
+      {
+       "i": 0,
+       "start": 0.0,
+       "end": 1.0
+      },
+      {
+       "i": 1,
+       "start": 1.2,
+       "end": 2.0
+      },
+      {
+       "i": 2,
+       "start": 2.4,
+       "end": 3.0
+      }
+     ],
+     "chunks": [
+      {
+       "i": 0,
+       "text": "A part.",
+       "status": "ok",
+       "issues": [],
+       "file": "x.wav",
+       "heard": "A part.",
+       "pitch_hz": 180.0
+      },
+      {
+       "i": 1,
+       "text": "Flagged part.",
+       "status": "flagged",
+       "issues": [
+        "cut_off"
+       ],
+       "file": "x.wav",
+       "heard": "Flagged part.",
+       "pitch_hz": 180.0,
+       "accepted": null
+      },
+      {
+       "i": 2,
+       "text": "A part.",
+       "status": "ok",
+       "issues": [],
+       "file": "x.wav",
+       "heard": "A part.",
+       "pitch_hz": 180.0
+      }
+     ]
+    }
+   }
+  },
+  {
+   "gen": {
+    "id": "s05rev",
+    "status": "done",
+    "flagged": [],
+    "message": "old",
+    "timeline": [
+     {
+      "i": 0,
+      "start": 0.0,
+      "end": 1.0
+     },
+     {
+      "i": 1,
+      "start": 1.2,
+      "end": 2.0
+     },
+     {
+      "i": 2,
+      "start": 2.4,
+      "end": 3.0
+     }
+    ],
+    "chunks": [
+     {
+      "i": 0,
+      "text": "Flagged part.",
+      "status": "flagged",
+      "issues": [
+       "cut_off"
+      ],
+      "file": "x.wav",
+      "heard": "Flagged part.",
+      "pitch_hz": 180.0,
+      "accepted": {
+       "by": "person",
+       "at": 1.5
+      }
+     },
+     {
+      "i": 1,
+      "text": "Flagged part.",
+      "status": "flagged",
+      "issues": [
+       "cut_off"
+      ],
+      "file": "x.wav",
+      "heard": "Flagged part.",
+      "pitch_hz": 180.0,
+      "accepted": true
+     },
+     {
+      "i": 2,
+      "text": "A part.",
+      "status": "ok",
+      "issues": [],
+      "file": "x.wav",
+      "heard": "A part.",
+      "pitch_hz": 180.0
+     }
+    ]
+   },
+   "ci": 2,
+   "on": true,
+   "now": 1800001234.875,
+   "after": {
+    "result": {
+     "id": "s05rev",
+     "status": "done",
+     "flagged": [],
+     "message": "Done. You marked 3 parts as sounding fine; every other part passed the checks.",
+     "timeline": [
+      {
+       "i": 0,
+       "start": 0.0,
+       "end": 1.0
+      },
+      {
+       "i": 1,
+       "start": 1.2,
+       "end": 2.0
+      },
+      {
+       "i": 2,
+       "start": 2.4,
+       "end": 3.0
+      }
+     ],
+     "chunks": [
+      {
+       "i": 0,
+       "text": "Flagged part.",
+       "status": "flagged",
+       "issues": [
+        "cut_off"
+       ],
+       "file": "x.wav",
+       "heard": "Flagged part.",
+       "pitch_hz": 180.0,
+       "accepted": {
+        "by": "person",
+        "at": 1.5
+       }
+      },
+      {
+       "i": 1,
+       "text": "Flagged part.",
+       "status": "flagged",
+       "issues": [
+        "cut_off"
+       ],
+       "file": "x.wav",
+       "heard": "Flagged part.",
+       "pitch_hz": 180.0,
+       "accepted": true
+      },
+      {
+       "i": 2,
+       "text": "A part.",
+       "status": "ok",
+       "issues": [],
+       "file": "x.wav",
+       "heard": "A part.",
+       "pitch_hz": 180.0,
+       "accepted": {
+        "by": "person",
+        "at": 1800001234.875
+       }
+      }
+     ]
+    }
+   }
+  },
+  {
+   "gen": {
+    "id": "s05rev",
+    "status": "done",
+    "flagged": [],
+    "message": "old",
+    "timeline": [
+     {
+      "i": 0,
+      "start": 0.0,
+      "end": 1.0
+     },
+     {
+      "i": 1,
+      "start": 1.2,
+      "end": 2.0
+     },
+     {
+      "i": 2,
+      "start": 2.4,
+      "end": 3.0
+     }
+    ],
+    "final_scan": {
+     "remaining": [
+      2
+     ]
+    },
+    "chunks": [
+     {
+      "i": 0,
+      "text": "A part.",
+      "status": "ok",
+      "issues": [],
+      "file": "x.wav",
+      "heard": "A part.",
+      "pitch_hz": 180.0
+     },
+     {
+      "i": 1,
+      "text": "A part.",
+      "status": "ok",
+      "issues": [],
+      "file": "x.wav",
+      "heard": "A part.",
+      "pitch_hz": 180.0
+     },
+     {
+      "i": 2,
+      "text": "A part.",
+      "status": "ok",
+      "issues": [],
+      "file": "x.wav",
+      "heard": "A part.",
+      "pitch_hz": 180.0,
+      "final_issues": [
+       "processed_audio_missing"
+      ]
+     }
+    ]
+   },
+   "ci": 2,
+   "on": true,
+   "now": 1800001235.0,
+   "after": {
+    "result": {
+     "id": "s05rev",
+     "status": "done",
+     "flagged": [],
+     "message": "Done. You marked 1 part as sounding fine; every other part passed the checks.",
+     "timeline": [
+      {
+       "i": 0,
+       "start": 0.0,
+       "end": 1.0
+      },
+      {
+       "i": 1,
+       "start": 1.2,
+       "end": 2.0
+      },
+      {
+       "i": 2,
+       "start": 2.4,
+       "end": 3.0
+      }
+     ],
+     "final_scan": {
+      "remaining": [
+       2
+      ]
+     },
+     "chunks": [
+      {
+       "i": 0,
+       "text": "A part.",
+       "status": "ok",
+       "issues": [],
+       "file": "x.wav",
+       "heard": "A part.",
+       "pitch_hz": 180.0
+      },
+      {
+       "i": 1,
+       "text": "A part.",
+       "status": "ok",
+       "issues": [],
+       "file": "x.wav",
+       "heard": "A part.",
+       "pitch_hz": 180.0
+      },
+      {
+       "i": 2,
+       "text": "A part.",
+       "status": "ok",
+       "issues": [],
+       "file": "x.wav",
+       "heard": "A part.",
+       "pitch_hz": 180.0,
+       "final_issues": [
+        "processed_audio_missing"
+       ],
+       "accepted": {
+        "by": "person",
+        "at": 1800001235.0
+       }
+      }
+     ]
+    }
+   }
+  },
+  {
+   "gen": {
+    "id": "s05rev",
+    "status": "rendering",
+    "flagged": [],
+    "message": "old",
+    "timeline": [
+     {
+      "i": 0,
+      "start": 0.0,
+      "end": 1.0
+     },
+     {
+      "i": 1,
+      "start": 1.2,
+      "end": 2.0
+     },
+     {
+      "i": 2,
+      "start": 2.4,
+      "end": 3.0
+     }
+    ],
+    "chunks": [
+     {
+      "i": 0,
+      "text": "Flagged part.",
+      "status": "flagged",
+      "issues": [
+       "cut_off"
+      ],
+      "file": "x.wav",
+      "heard": "Flagged part.",
+      "pitch_hz": 180.0
+     },
+     {
+      "i": 1,
+      "text": "A part.",
+      "status": "ok",
+      "issues": [],
+      "file": "x.wav",
+      "heard": "A part.",
+      "pitch_hz": 180.0
+     }
+    ]
+   },
+   "ci": 0,
+   "on": true,
+   "now": 1800001235.125,
+   "after": {
+    "result": {
+     "id": "s05rev",
+     "status": "rendering",
+     "flagged": [],
+     "message": "old",
+     "timeline": [
+      {
+       "i": 0,
+       "start": 0.0,
+       "end": 1.0
+      },
+      {
+       "i": 1,
+       "start": 1.2,
+       "end": 2.0
+      },
+      {
+       "i": 2,
+       "start": 2.4,
+       "end": 3.0
+      }
+     ],
+     "chunks": [
+      {
+       "i": 0,
+       "text": "Flagged part.",
+       "status": "flagged",
+       "issues": [
+        "cut_off"
+       ],
+       "file": "x.wav",
+       "heard": "Flagged part.",
+       "pitch_hz": 180.0,
+       "accepted": {
+        "by": "person",
+        "at": 1800001235.125
+       }
+      },
+      {
+       "i": 1,
+       "text": "A part.",
+       "status": "ok",
+       "issues": [],
+       "file": "x.wav",
+       "heard": "A part.",
+       "pitch_hz": 180.0
+      }
+     ]
+    }
+   }
+  },
+  {
+   "gen": {
+    "id": "s05rev",
+    "status": "rendering",
+    "flagged": [],
+    "message": "old",
+    "timeline": [
+     {
+      "i": 0,
+      "start": 0.0,
+      "end": 1.0
+     },
+     {
+      "i": 1,
+      "start": 1.2,
+      "end": 2.0
+     },
+     {
+      "i": 2,
+      "start": 2.4,
+      "end": 3.0
+     }
+    ],
+    "chunks": [
+     {
+      "i": 0,
+      "text": "Flagged part.",
+      "status": "flagged",
+      "issues": [
+       "cut_off"
+      ],
+      "file": "x.wav",
+      "heard": "Flagged part.",
+      "pitch_hz": 180.0
+     },
+     {
+      "i": 1,
+      "text": "A part.",
+      "status": "ok",
+      "issues": [],
+      "file": "x.wav",
+      "heard": "A part.",
+      "pitch_hz": 180.0
+     }
+    ]
+   },
+   "ci": 0,
+   "on": false,
+   "now": 1800001235.25,
+   "after": {
+    "result": {
+     "id": "s05rev",
+     "status": "rendering",
+     "flagged": [],
+     "message": "old",
+     "timeline": [
+      {
+       "i": 0,
+       "start": 0.0,
+       "end": 1.0
+      },
+      {
+       "i": 1,
+       "start": 1.2,
+       "end": 2.0
+      },
+      {
+       "i": 2,
+       "start": 2.4,
+       "end": 3.0
+      }
+     ],
+     "chunks": [
+      {
+       "i": 0,
+       "text": "Flagged part.",
+       "status": "flagged",
+       "issues": [
+        "cut_off"
+       ],
+       "file": "x.wav",
+       "heard": "Flagged part.",
+       "pitch_hz": 180.0,
+       "accepted": null
+      },
+      {
+       "i": 1,
+       "text": "A part.",
+       "status": "ok",
+       "issues": [],
+       "file": "x.wav",
+       "heard": "A part.",
+       "pitch_hz": 180.0
+      }
+     ]
+    }
+   }
+  },
+  {
+   "gen": {
+    "id": "s05rev",
+    "status": "done",
+    "flagged": [],
+    "message": "old",
+    "timeline": [
+     {
+      "i": 0,
+      "start": 0.0,
+      "end": 1.0
+     },
+     {
+      "i": 1,
+      "start": 1.2,
+      "end": 2.0
+     },
+     {
+      "i": 2,
+      "start": 2.4,
+      "end": 3.0
+     }
+    ],
+    "chunks": [
+     {
+      "i": 0,
+      "text": "A part.",
+      "status": "ok",
+      "issues": [],
+      "file": "x.wav",
+      "heard": "A part.",
+      "pitch_hz": 180.0
+     },
+     {
+      "i": 1,
+      "text": "A part.",
+      "status": "ok",
+      "issues": [],
+      "file": "x.wav",
+      "heard": "A part.",
+      "pitch_hz": 180.0
+     },
+     {
+      "i": 2,
+      "text": "A part.",
+      "status": "ok",
+      "issues": [],
+      "file": "x.wav",
+      "heard": "A part.",
+      "pitch_hz": 180.0
+     }
+    ]
+   },
+   "ci": 0,
+   "on": true,
+   "now": 1800001235.375,
+   "after": {
+    "result": {
+     "id": "s05rev",
+     "status": "done",
+     "flagged": [],
+     "message": "Done. You marked 1 part as sounding fine; every other part passed the checks.",
+     "timeline": [
+      {
+       "i": 0,
+       "start": 0.0,
+       "end": 1.0
+      },
+      {
+       "i": 1,
+       "start": 1.2,
+       "end": 2.0
+      },
+      {
+       "i": 2,
+       "start": 2.4,
+       "end": 3.0
+      }
+     ],
+     "chunks": [
+      {
+       "i": 0,
+       "text": "A part.",
+       "status": "ok",
+       "issues": [],
+       "file": "x.wav",
+       "heard": "A part.",
+       "pitch_hz": 180.0,
+       "accepted": {
+        "by": "person",
+        "at": 1800001235.375
+       }
+      },
+      {
+       "i": 1,
+       "text": "A part.",
+       "status": "ok",
+       "issues": [],
+       "file": "x.wav",
+       "heard": "A part.",
+       "pitch_hz": 180.0
+      },
+      {
+       "i": 2,
+       "text": "A part.",
+       "status": "ok",
+       "issues": [],
+       "file": "x.wav",
+       "heard": "A part.",
+       "pitch_hz": 180.0
+      }
+     ]
+    }
+   }
+  },
+  {
+   "gen": {
+    "id": "s05rev",
+    "status": "done",
+    "flagged": [],
+    "message": "old",
+    "timeline": [
+     {
+      "i": 0,
+      "start": 0.0,
+      "end": 1.0
+     },
+     {
+      "i": 1,
+      "start": 1.2,
+      "end": 2.0
+     },
+     {
+      "i": 2,
+      "start": 2.4,
+      "end": 3.0
+     }
+    ],
+    "chunks": [
+     {
+      "i": 0,
+      "text": "A part.",
+      "status": "ok",
+      "issues": [],
+      "file": "x.wav",
+      "heard": "A part.",
+      "pitch_hz": 180.0
+     },
+     {
+      "i": 1,
+      "text": "Flagged part.",
+      "status": "flagged",
+      "issues": [
+       "cut_off"
+      ],
+      "file": "x.wav",
+      "heard": "Flagged part.",
+      "pitch_hz": 180.0
+     },
+     {
+      "i": 2,
+      "text": "A part.",
+      "status": "ok",
+      "issues": [],
+      "file": "x.wav",
+      "heard": "A part.",
+      "pitch_hz": 180.0
+     }
+    ]
+   },
+   "ci": -1,
+   "on": true,
+   "now": 1800001235.5,
+   "after": {
+    "result": {
+     "id": "s05rev",
+     "status": "done",
+     "flagged": [
+      1
+     ],
+     "message": "Done, needs review: part 2.",
+     "timeline": [
+      {
+       "i": 0,
+       "start": 0.0,
+       "end": 1.0
+      },
+      {
+       "i": 1,
+       "start": 1.2,
+       "end": 2.0
+      },
+      {
+       "i": 2,
+       "start": 2.4,
+       "end": 3.0
+      }
+     ],
+     "chunks": [
+      {
+       "i": 0,
+       "text": "A part.",
+       "status": "ok",
+       "issues": [],
+       "file": "x.wav",
+       "heard": "A part.",
+       "pitch_hz": 180.0
+      },
+      {
+       "i": 1,
+       "text": "Flagged part.",
+       "status": "flagged",
+       "issues": [
+        "cut_off"
+       ],
+       "file": "x.wav",
+       "heard": "Flagged part.",
+       "pitch_hz": 180.0
+      },
+      {
+       "i": 2,
+       "text": "A part.",
+       "status": "ok",
+       "issues": [],
+       "file": "x.wav",
+       "heard": "A part.",
+       "pitch_hz": 180.0,
+       "accepted": {
+        "by": "person",
+        "at": 1800001235.5
+       }
+      }
+     ]
+    }
+   }
+  },
+  {
+   "gen": {
+    "id": "s05rev",
+    "status": "done",
+    "flagged": [],
+    "message": "old",
+    "timeline": [
+     {
+      "i": 0,
+      "start": 0.0,
+      "end": 1.0
+     },
+     {
+      "i": 1,
+      "start": 1.2,
+      "end": 2.0
+     },
+     {
+      "i": 2,
+      "start": 2.4,
+      "end": 3.0
+     }
+    ],
+    "chunks": [
+     {
+      "i": 0,
+      "text": "A part.",
+      "status": "ok",
+      "issues": [],
+      "file": "x.wav",
+      "heard": "A part.",
+      "pitch_hz": 180.0
+     },
+     {
+      "i": 1,
+      "text": "Flagged part.",
+      "status": "flagged",
+      "issues": [
+       "cut_off"
+      ],
+      "file": "x.wav",
+      "heard": "Flagged part.",
+      "pitch_hz": 180.0
+     },
+     {
+      "i": 2,
+      "text": "A part.",
+      "status": "ok",
+      "issues": [],
+      "file": "x.wav",
+      "heard": "A part.",
+      "pitch_hz": 180.0
+     }
+    ]
+   },
+   "ci": 7,
+   "on": true,
+   "now": 1800001235.625,
+   "after": {
+    "error": "IndexError"
+   }
+  }
+ ],
+ "takes": [
+  {
+   "name": "all three files",
+   "gen_id": "s05take0",
+   "chunk": {
+    "i": 1,
+    "text": "Take me.",
+    "file": "chunk_001.wav",
+    "raw_file": "chunk_001.raw.wav",
+    "context_file": "chunk_001.ctx.wav",
+    "wer": 0.0,
+    "sim": 0.91,
+    "dur": 1.2,
+    "issues": [
+     "cut_off"
+    ],
+    "final_issues": [],
+    "heard": "Take me.",
+    "pitch_hz": 180.0,
+    "words": [
+     {
+      "word": "Take",
+      "start": 0.0,
+      "end": 0.3
+     }
+    ],
+    "ending": {
+     "ok": true
+    },
+    "status": "flagged",
+    "chosen_seed": 7,
+    "accepted": {
+     "by": "person",
+     "at": 1.0
+    },
+    "take": 2,
+    "pause_after": "end"
+   },
+   "files": {
+    "chunk_001.wav": "a1",
+    "chunk_001.raw.wav": "r1",
+    "chunk_001.ctx.wav": "c1"
+   },
+   "now": 1800001334.5,
+   "archived": {
+    "text": "Take me.",
+    "file": "chunk_001.wav",
+    "raw_file": "chunk_001.raw.wav",
+    "context_file": "chunk_001.ctx.wav",
+    "wer": 0.0,
+    "sim": 0.91,
+    "dur": 1.2,
+    "issues": [
+     "cut_off"
+    ],
+    "final_issues": [],
+    "heard": "Take me.",
+    "pitch_hz": 180.0,
+    "words": [
+     {
+      "word": "Take",
+      "start": 0.0,
+      "end": 0.3
+     }
+    ],
+    "ending": {
+     "ok": true
+    },
+    "status": "flagged",
+    "chosen_seed": 7,
+    "take": 2,
+    "archived": 1800001334.5
+   },
+   "trimmed": {
+    "i": 1,
+    "text": "Take me.",
+    "file": "chunk_001.wav",
+    "raw_file": "chunk_001.raw.wav",
+    "context_file": "chunk_001.ctx.wav",
+    "wer": 0.0,
+    "sim": 0.91,
+    "dur": 1.2,
+    "issues": [
+     "cut_off"
+    ],
+    "final_issues": [],
+    "heard": "Take me.",
+    "pitch_hz": 180.0,
+    "words": [
+     {
+      "word": "Take",
+      "start": 0.0,
+      "end": 0.3
+     }
+    ],
+    "ending": {
+     "ok": true
+    },
+    "status": "flagged",
+    "chosen_seed": 7,
+    "accepted": {
+     "by": "person",
+     "at": 1.0
+    },
+    "take": 2,
+    "pause_after": "end",
+    "takes": []
+   },
+   "tree": {
+    "chunk_001.ctx.wav": "c1",
+    "chunk_001.raw.wav": "r1",
+    "chunk_001.wav": "a1",
+    "takes/": null,
+    "takes/001-2/": null,
+    "takes/001-2/chunk_001.ctx.wav": "c1",
+    "takes/001-2/chunk_001.raw.wav": "r1",
+    "takes/001-2/chunk_001.wav": "a1"
+   },
+   "take_audio_ci": 1,
+   "take_audio": {
+    "0": null,
+    "1": null,
+    "2": "s05take0/chunk_001.wav",
+    "3": null,
+    "4": null,
+    "5": null,
+    "6": null,
+    "7": null
+   }
+  },
+  {
+   "name": "context file missing on disk",
+   "gen_id": "s05take1",
+   "chunk": {
+    "i": 1,
+    "text": "Take me.",
+    "file": "chunk_001.wav",
+    "raw_file": "chunk_001.raw.wav",
+    "context_file": "chunk_001.ctx.wav",
+    "wer": 0.0,
+    "sim": 0.91,
+    "dur": 1.2,
+    "issues": [
+     "cut_off"
+    ],
+    "final_issues": [],
+    "heard": "Take me.",
+    "pitch_hz": 180.0,
+    "words": [
+     {
+      "word": "Take",
+      "start": 0.0,
+      "end": 0.3
+     }
+    ],
+    "ending": {
+     "ok": true
+    },
+    "status": "flagged",
+    "chosen_seed": 7,
+    "accepted": {
+     "by": "person",
+     "at": 1.0
+    },
+    "take": 2,
+    "pause_after": "end"
+   },
+   "files": {
+    "chunk_001.wav": "a1",
+    "chunk_001.raw.wav": "r1"
+   },
+   "now": 1800001335.5,
+   "archived": {
+    "text": "Take me.",
+    "file": "chunk_001.wav",
+    "raw_file": "chunk_001.raw.wav",
+    "context_file": "chunk_001.ctx.wav",
+    "wer": 0.0,
+    "sim": 0.91,
+    "dur": 1.2,
+    "issues": [
+     "cut_off"
+    ],
+    "final_issues": [],
+    "heard": "Take me.",
+    "pitch_hz": 180.0,
+    "words": [
+     {
+      "word": "Take",
+      "start": 0.0,
+      "end": 0.3
+     }
+    ],
+    "ending": {
+     "ok": true
+    },
+    "status": "flagged",
+    "chosen_seed": 7,
+    "take": 2,
+    "archived": 1800001335.5
+   },
+   "trimmed": {
+    "i": 1,
+    "text": "Take me.",
+    "file": "chunk_001.wav",
+    "raw_file": "chunk_001.raw.wav",
+    "context_file": "chunk_001.ctx.wav",
+    "wer": 0.0,
+    "sim": 0.91,
+    "dur": 1.2,
+    "issues": [
+     "cut_off"
+    ],
+    "final_issues": [],
+    "heard": "Take me.",
+    "pitch_hz": 180.0,
+    "words": [
+     {
+      "word": "Take",
+      "start": 0.0,
+      "end": 0.3
+     }
+    ],
+    "ending": {
+     "ok": true
+    },
+    "status": "flagged",
+    "chosen_seed": 7,
+    "accepted": {
+     "by": "person",
+     "at": 1.0
+    },
+    "take": 2,
+    "pause_after": "end",
+    "takes": []
+   },
+   "tree": {
+    "chunk_001.raw.wav": "r1",
+    "chunk_001.wav": "a1",
+    "takes/": null,
+    "takes/001-2/": null,
+    "takes/001-2/chunk_001.raw.wav": "r1",
+    "takes/001-2/chunk_001.wav": "a1"
+   },
+   "take_audio_ci": 1,
+   "take_audio": {
+    "0": null,
+    "1": null,
+    "2": "s05take1/chunk_001.wav",
+    "3": null,
+    "4": null,
+    "5": null,
+    "6": null,
+    "7": null
+   }
+  },
+  {
+   "name": "audio file missing",
+   "gen_id": "s05take2",
+   "chunk": {
+    "i": 1,
+    "text": "Take me.",
+    "file": "chunk_001.wav",
+    "raw_file": "chunk_001.raw.wav",
+    "context_file": "chunk_001.ctx.wav",
+    "wer": 0.0,
+    "sim": 0.91,
+    "dur": 1.2,
+    "issues": [
+     "cut_off"
+    ],
+    "final_issues": [],
+    "heard": "Take me.",
+    "pitch_hz": 180.0,
+    "words": [
+     {
+      "word": "Take",
+      "start": 0.0,
+      "end": 0.3
+     }
+    ],
+    "ending": {
+     "ok": true
+    },
+    "status": "flagged",
+    "chosen_seed": 7,
+    "accepted": {
+     "by": "person",
+     "at": 1.0
+    },
+    "take": 2,
+    "pause_after": "end"
+   },
+   "files": {
+    "chunk_001.raw.wav": "r1"
+   },
+   "now": 1800001336.5,
+   "archived": null,
+   "trimmed": {
+    "i": 1,
+    "text": "Take me.",
+    "file": "chunk_001.wav",
+    "raw_file": "chunk_001.raw.wav",
+    "context_file": "chunk_001.ctx.wav",
+    "wer": 0.0,
+    "sim": 0.91,
+    "dur": 1.2,
+    "issues": [
+     "cut_off"
+    ],
+    "final_issues": [],
+    "heard": "Take me.",
+    "pitch_hz": 180.0,
+    "words": [
+     {
+      "word": "Take",
+      "start": 0.0,
+      "end": 0.3
+     }
+    ],
+    "ending": {
+     "ok": true
+    },
+    "status": "flagged",
+    "chosen_seed": 7,
+    "accepted": {
+     "by": "person",
+     "at": 1.0
+    },
+    "take": 2,
+    "pause_after": "end",
+    "takes": []
+   },
+   "tree": {
+    "chunk_001.raw.wav": "r1"
+   },
+   "take_audio_ci": 1,
+   "take_audio": {
+    "0": null,
+    "1": null,
+    "2": null,
+    "3": null,
+    "4": null,
+    "5": null,
+    "6": null,
+    "7": null
+   }
+  },
+  {
+   "name": "no file key",
+   "gen_id": "s05take3",
+   "chunk": {
+    "i": 1,
+    "text": "Take me.",
+    "raw_file": "chunk_001.raw.wav",
+    "context_file": "chunk_001.ctx.wav",
+    "wer": 0.0,
+    "sim": 0.91,
+    "dur": 1.2,
+    "issues": [
+     "cut_off"
+    ],
+    "final_issues": [],
+    "heard": "Take me.",
+    "pitch_hz": 180.0,
+    "words": [
+     {
+      "word": "Take",
+      "start": 0.0,
+      "end": 0.3
+     }
+    ],
+    "ending": {
+     "ok": true
+    },
+    "status": "flagged",
+    "chosen_seed": 7,
+    "accepted": {
+     "by": "person",
+     "at": 1.0
+    },
+    "take": 2,
+    "pause_after": "end"
+   },
+   "files": {
+    "chunk_001.wav": "a1",
+    "chunk_001.raw.wav": "r1",
+    "chunk_001.ctx.wav": "c1"
+   },
+   "now": 1800001337.5,
+   "archived": null,
+   "trimmed": {
+    "i": 1,
+    "text": "Take me.",
+    "raw_file": "chunk_001.raw.wav",
+    "context_file": "chunk_001.ctx.wav",
+    "wer": 0.0,
+    "sim": 0.91,
+    "dur": 1.2,
+    "issues": [
+     "cut_off"
+    ],
+    "final_issues": [],
+    "heard": "Take me.",
+    "pitch_hz": 180.0,
+    "words": [
+     {
+      "word": "Take",
+      "start": 0.0,
+      "end": 0.3
+     }
+    ],
+    "ending": {
+     "ok": true
+    },
+    "status": "flagged",
+    "chosen_seed": 7,
+    "accepted": {
+     "by": "person",
+     "at": 1.0
+    },
+    "take": 2,
+    "pause_after": "end",
+    "takes": []
+   },
+   "tree": {
+    "chunk_001.ctx.wav": "c1",
+    "chunk_001.raw.wav": "r1",
+    "chunk_001.wav": "a1"
+   },
+   "take_audio_ci": 1,
+   "take_audio": {
+    "0": null,
+    "1": null,
+    "2": "s05take3/chunk_001.wav",
+    "3": null,
+    "4": null,
+    "5": null,
+    "6": null,
+    "7": null
+   }
+  },
+  {
+   "name": "take missing, minimal part",
+   "gen_id": "s05take4",
+   "chunk": {
+    "i": 1,
+    "file": "chunk_001.wav"
+   },
+   "files": {
+    "chunk_001.wav": "a1"
+   },
+   "now": 1800001338.5,
+   "archived": {
+    "text": null,
+    "file": "chunk_001.wav",
+    "raw_file": null,
+    "context_file": null,
+    "wer": null,
+    "sim": null,
+    "dur": null,
+    "issues": null,
+    "final_issues": null,
+    "heard": null,
+    "pitch_hz": null,
+    "words": null,
+    "ending": null,
+    "status": null,
+    "chosen_seed": null,
+    "take": 1,
+    "archived": 1800001338.5
+   },
+   "trimmed": {
+    "i": 1,
+    "file": "chunk_001.wav",
+    "takes": []
+   },
+   "tree": {
+    "chunk_001.wav": "a1",
+    "takes/": null,
+    "takes/001-1/": null,
+    "takes/001-1/chunk_001.wav": "a1"
+   },
+   "take_audio_ci": 1,
+   "take_audio": {
+    "0": null,
+    "1": "s05take4/chunk_001.wav",
+    "2": null,
+    "3": null,
+    "4": null,
+    "5": null,
+    "6": null,
+    "7": null
+   }
+  },
+  {
+   "name": "take as float",
+   "gen_id": "s05take5",
+   "chunk": {
+    "i": 1,
+    "text": "Take me.",
+    "file": "chunk_001.wav",
+    "raw_file": null,
+    "context_file": "",
+    "wer": 0.0,
+    "sim": 0.91,
+    "dur": 1.2,
+    "issues": [
+     "cut_off"
+    ],
+    "final_issues": [],
+    "heard": "Take me.",
+    "pitch_hz": 180.0,
+    "words": [
+     {
+      "word": "Take",
+      "start": 0.0,
+      "end": 0.3
+     }
+    ],
+    "ending": {
+     "ok": true
+    },
+    "status": "flagged",
+    "chosen_seed": 7,
+    "accepted": {
+     "by": "person",
+     "at": 1.0
+    },
+    "take": 2.0,
+    "pause_after": "end"
+   },
+   "files": {
+    "chunk_001.wav": "a1",
+    "chunk_001.raw.wav": "r1",
+    "chunk_001.ctx.wav": "c1"
+   },
+   "now": 1800001339.5,
+   "archived": {
+    "text": "Take me.",
+    "file": "chunk_001.wav",
+    "raw_file": null,
+    "context_file": "",
+    "wer": 0.0,
+    "sim": 0.91,
+    "dur": 1.2,
+    "issues": [
+     "cut_off"
+    ],
+    "final_issues": [],
+    "heard": "Take me.",
+    "pitch_hz": 180.0,
+    "words": [
+     {
+      "word": "Take",
+      "start": 0.0,
+      "end": 0.3
+     }
+    ],
+    "ending": {
+     "ok": true
+    },
+    "status": "flagged",
+    "chosen_seed": 7,
+    "take": 2,
+    "archived": 1800001339.5
+   },
+   "trimmed": {
+    "i": 1,
+    "text": "Take me.",
+    "file": "chunk_001.wav",
+    "raw_file": null,
+    "context_file": "",
+    "wer": 0.0,
+    "sim": 0.91,
+    "dur": 1.2,
+    "issues": [
+     "cut_off"
+    ],
+    "final_issues": [],
+    "heard": "Take me.",
+    "pitch_hz": 180.0,
+    "words": [
+     {
+      "word": "Take",
+      "start": 0.0,
+      "end": 0.3
+     }
+    ],
+    "ending": {
+     "ok": true
+    },
+    "status": "flagged",
+    "chosen_seed": 7,
+    "accepted": {
+     "by": "person",
+     "at": 1.0
+    },
+    "take": 2.0,
+    "pause_after": "end",
+    "takes": []
+   },
+   "tree": {
+    "chunk_001.ctx.wav": "c1",
+    "chunk_001.raw.wav": "r1",
+    "chunk_001.wav": "a1",
+    "takes/": null,
+    "takes/001-2/": null,
+    "takes/001-2/chunk_001.wav": "a1"
+   },
+   "take_audio_ci": 1,
+   "take_audio": {
+    "0": null,
+    "1": null,
+    "2": "s05take5/chunk_001.wav",
+    "3": null,
+    "4": null,
+    "5": null,
+    "6": null,
+    "7": null
+   }
+  },
+  {
+   "name": "five old takes",
+   "gen_id": "s05take6",
+   "chunk": {
+    "i": 1,
+    "text": "Take me.",
+    "file": "chunk_001.wav",
+    "raw_file": "chunk_001.raw.wav",
+    "context_file": "chunk_001.ctx.wav",
+    "wer": 0.0,
+    "sim": 0.91,
+    "dur": 1.2,
+    "issues": [
+     "cut_off"
+    ],
+    "final_issues": [],
+    "heard": "Take me.",
+    "pitch_hz": 180.0,
+    "words": [
+     {
+      "word": "Take",
+      "start": 0.0,
+      "end": 0.3
+     }
+    ],
+    "ending": {
+     "ok": true
+    },
+    "status": "flagged",
+    "chosen_seed": 7,
+    "accepted": {
+     "by": "person",
+     "at": 1.0
+    },
+    "take": 6,
+    "pause_after": "end",
+    "takes": [
+     {
+      "take": 1,
+      "text": "take 1"
+     },
+     {
+      "take": 2,
+      "text": "take 2"
+     },
+     {
+      "take": 3,
+      "text": "take 3"
+     },
+     {
+      "take": 4,
+      "text": "take 4"
+     },
+     {
+      "take": 5,
+      "text": "take 5"
+     }
+    ]
+   },
+   "files": {
+    "chunk_001.wav": "a1",
+    "chunk_001.raw.wav": "r1",
+    "chunk_001.ctx.wav": "c1",
+    "takes/001-1/chunk_001.wav": "old 1",
+    "takes/001-2/chunk_001.wav": "old 2",
+    "takes/001-3/chunk_001.wav": "old 3",
+    "takes/001-4/chunk_001.wav": "old 4",
+    "takes/001-5/chunk_001.wav": "old 5"
+   },
+   "now": 1800001340.5,
+   "archived": {
+    "text": "Take me.",
+    "file": "chunk_001.wav",
+    "raw_file": "chunk_001.raw.wav",
+    "context_file": "chunk_001.ctx.wav",
+    "wer": 0.0,
+    "sim": 0.91,
+    "dur": 1.2,
+    "issues": [
+     "cut_off"
+    ],
+    "final_issues": [],
+    "heard": "Take me.",
+    "pitch_hz": 180.0,
+    "words": [
+     {
+      "word": "Take",
+      "start": 0.0,
+      "end": 0.3
+     }
+    ],
+    "ending": {
+     "ok": true
+    },
+    "status": "flagged",
+    "chosen_seed": 7,
+    "take": 6,
+    "archived": 1800001340.5
+   },
+   "trimmed": {
+    "i": 1,
+    "text": "Take me.",
+    "file": "chunk_001.wav",
+    "raw_file": "chunk_001.raw.wav",
+    "context_file": "chunk_001.ctx.wav",
+    "wer": 0.0,
+    "sim": 0.91,
+    "dur": 1.2,
+    "issues": [
+     "cut_off"
+    ],
+    "final_issues": [],
+    "heard": "Take me.",
+    "pitch_hz": 180.0,
+    "words": [
+     {
+      "word": "Take",
+      "start": 0.0,
+      "end": 0.3
+     }
+    ],
+    "ending": {
+     "ok": true
+    },
+    "status": "flagged",
+    "chosen_seed": 7,
+    "accepted": {
+     "by": "person",
+     "at": 1.0
+    },
+    "take": 6,
+    "pause_after": "end",
+    "takes": [
+     {
+      "take": 3,
+      "text": "take 3"
+     },
+     {
+      "take": 4,
+      "text": "take 4"
+     },
+     {
+      "take": 5,
+      "text": "take 5"
+     }
+    ]
+   },
+   "tree": {
+    "chunk_001.ctx.wav": "c1",
+    "chunk_001.raw.wav": "r1",
+    "chunk_001.wav": "a1",
+    "takes/": null,
+    "takes/001-3/": null,
+    "takes/001-3/chunk_001.wav": "old 3",
+    "takes/001-4/": null,
+    "takes/001-4/chunk_001.wav": "old 4",
+    "takes/001-5/": null,
+    "takes/001-5/chunk_001.wav": "old 5",
+    "takes/001-6/": null,
+    "takes/001-6/chunk_001.ctx.wav": "c1",
+    "takes/001-6/chunk_001.raw.wav": "r1",
+    "takes/001-6/chunk_001.wav": "a1"
+   },
+   "take_audio_ci": 1,
+   "take_audio": {
+    "0": null,
+    "1": null,
+    "2": null,
+    "3": "s05take6/takes/001-3/chunk_001.wav",
+    "4": "s05take6/takes/001-4/chunk_001.wav",
+    "5": "s05take6/takes/001-5/chunk_001.wav",
+    "6": "s05take6/chunk_001.wav",
+    "7": null
+   }
+  },
+  {
+   "name": "two old takes",
+   "gen_id": "s05take7",
+   "chunk": {
+    "i": 1,
+    "text": "Take me.",
+    "file": "chunk_001.wav",
+    "raw_file": "chunk_001.raw.wav",
+    "context_file": "chunk_001.ctx.wav",
+    "wer": 0.0,
+    "sim": 0.91,
+    "dur": 1.2,
+    "issues": [
+     "cut_off"
+    ],
+    "final_issues": [],
+    "heard": "Take me.",
+    "pitch_hz": 180.0,
+    "words": [
+     {
+      "word": "Take",
+      "start": 0.0,
+      "end": 0.3
+     }
+    ],
+    "ending": {
+     "ok": true
+    },
+    "status": "flagged",
+    "chosen_seed": 7,
+    "accepted": {
+     "by": "person",
+     "at": 1.0
+    },
+    "take": 3,
+    "pause_after": "end",
+    "takes": [
+     {
+      "take": 1,
+      "text": "take 1"
+     },
+     {
+      "take": 2,
+      "text": "take 2"
+     }
+    ]
+   },
+   "files": {
+    "chunk_001.wav": "a1",
+    "chunk_001.raw.wav": "r1",
+    "chunk_001.ctx.wav": "c1",
+    "takes/001-1/chunk_001.wav": "old 1",
+    "takes/001-2/chunk_001.wav": "old 2"
+   },
+   "now": 1800001341.5,
+   "archived": {
+    "text": "Take me.",
+    "file": "chunk_001.wav",
+    "raw_file": "chunk_001.raw.wav",
+    "context_file": "chunk_001.ctx.wav",
+    "wer": 0.0,
+    "sim": 0.91,
+    "dur": 1.2,
+    "issues": [
+     "cut_off"
+    ],
+    "final_issues": [],
+    "heard": "Take me.",
+    "pitch_hz": 180.0,
+    "words": [
+     {
+      "word": "Take",
+      "start": 0.0,
+      "end": 0.3
+     }
+    ],
+    "ending": {
+     "ok": true
+    },
+    "status": "flagged",
+    "chosen_seed": 7,
+    "take": 3,
+    "archived": 1800001341.5
+   },
+   "trimmed": {
+    "i": 1,
+    "text": "Take me.",
+    "file": "chunk_001.wav",
+    "raw_file": "chunk_001.raw.wav",
+    "context_file": "chunk_001.ctx.wav",
+    "wer": 0.0,
+    "sim": 0.91,
+    "dur": 1.2,
+    "issues": [
+     "cut_off"
+    ],
+    "final_issues": [],
+    "heard": "Take me.",
+    "pitch_hz": 180.0,
+    "words": [
+     {
+      "word": "Take",
+      "start": 0.0,
+      "end": 0.3
+     }
+    ],
+    "ending": {
+     "ok": true
+    },
+    "status": "flagged",
+    "chosen_seed": 7,
+    "accepted": {
+     "by": "person",
+     "at": 1.0
+    },
+    "take": 3,
+    "pause_after": "end",
+    "takes": [
+     {
+      "take": 1,
+      "text": "take 1"
+     },
+     {
+      "take": 2,
+      "text": "take 2"
+     }
+    ]
+   },
+   "tree": {
+    "chunk_001.ctx.wav": "c1",
+    "chunk_001.raw.wav": "r1",
+    "chunk_001.wav": "a1",
+    "takes/": null,
+    "takes/001-1/": null,
+    "takes/001-1/chunk_001.wav": "old 1",
+    "takes/001-2/": null,
+    "takes/001-2/chunk_001.wav": "old 2",
+    "takes/001-3/": null,
+    "takes/001-3/chunk_001.ctx.wav": "c1",
+    "takes/001-3/chunk_001.raw.wav": "r1",
+    "takes/001-3/chunk_001.wav": "a1"
+   },
+   "take_audio_ci": 1,
+   "take_audio": {
+    "0": null,
+    "1": "s05take7/takes/001-1/chunk_001.wav",
+    "2": "s05take7/takes/001-2/chunk_001.wav",
+    "3": "s05take7/chunk_001.wav",
+    "4": null,
+    "5": null,
+    "6": null,
+    "7": null
+   }
+  },
+  {
+   "name": "four old takes, part 0",
+   "gen_id": "s05take8",
+   "chunk": {
+    "i": 0,
+    "text": "Take me.",
+    "file": "chunk_000.wav",
+    "raw_file": "chunk_001.raw.wav",
+    "context_file": "chunk_001.ctx.wav",
+    "wer": 0.0,
+    "sim": 0.91,
+    "dur": 1.2,
+    "issues": [
+     "cut_off"
+    ],
+    "final_issues": [],
+    "heard": "Take me.",
+    "pitch_hz": 180.0,
+    "words": [
+     {
+      "word": "Take",
+      "start": 0.0,
+      "end": 0.3
+     }
+    ],
+    "ending": {
+     "ok": true
+    },
+    "status": "flagged",
+    "chosen_seed": 7,
+    "accepted": {
+     "by": "person",
+     "at": 1.0
+    },
+    "take": 5,
+    "pause_after": "end",
+    "takes": [
+     {
+      "take": 1,
+      "text": "take 1"
+     },
+     {
+      "take": 2,
+      "text": "take 2"
+     },
+     {
+      "take": 3,
+      "text": "take 3"
+     },
+     {
+      "take": 4,
+      "text": "take 4"
+     }
+    ]
+   },
+   "files": {
+    "chunk_000.wav": "z",
+    "takes/000-1/chunk_000.wav": "o1",
+    "takes/000-2/chunk_000.wav": "o2",
+    "takes/000-4/chunk_000.wav": "o4"
+   },
+   "now": 1800001342.5,
+   "archived": {
+    "text": "Take me.",
+    "file": "chunk_000.wav",
+    "raw_file": "chunk_001.raw.wav",
+    "context_file": "chunk_001.ctx.wav",
+    "wer": 0.0,
+    "sim": 0.91,
+    "dur": 1.2,
+    "issues": [
+     "cut_off"
+    ],
+    "final_issues": [],
+    "heard": "Take me.",
+    "pitch_hz": 180.0,
+    "words": [
+     {
+      "word": "Take",
+      "start": 0.0,
+      "end": 0.3
+     }
+    ],
+    "ending": {
+     "ok": true
+    },
+    "status": "flagged",
+    "chosen_seed": 7,
+    "take": 5,
+    "archived": 1800001342.5
+   },
+   "trimmed": {
+    "i": 0,
+    "text": "Take me.",
+    "file": "chunk_000.wav",
+    "raw_file": "chunk_001.raw.wav",
+    "context_file": "chunk_001.ctx.wav",
+    "wer": 0.0,
+    "sim": 0.91,
+    "dur": 1.2,
+    "issues": [
+     "cut_off"
+    ],
+    "final_issues": [],
+    "heard": "Take me.",
+    "pitch_hz": 180.0,
+    "words": [
+     {
+      "word": "Take",
+      "start": 0.0,
+      "end": 0.3
+     }
+    ],
+    "ending": {
+     "ok": true
+    },
+    "status": "flagged",
+    "chosen_seed": 7,
+    "accepted": {
+     "by": "person",
+     "at": 1.0
+    },
+    "take": 5,
+    "pause_after": "end",
+    "takes": [
+     {
+      "take": 2,
+      "text": "take 2"
+     },
+     {
+      "take": 3,
+      "text": "take 3"
+     },
+     {
+      "take": 4,
+      "text": "take 4"
+     }
+    ]
+   },
+   "tree": {
+    "chunk_000.wav": "z",
+    "takes/": null,
+    "takes/000-2/": null,
+    "takes/000-2/chunk_000.wav": "o2",
+    "takes/000-4/": null,
+    "takes/000-4/chunk_000.wav": "o4",
+    "takes/000-5/": null,
+    "takes/000-5/chunk_000.wav": "z"
+   },
+   "take_audio_ci": 0,
+   "take_audio": {
+    "0": null,
+    "1": null,
+    "2": "s05take8/takes/000-2/chunk_000.wav",
+    "3": null,
+    "4": "s05take8/takes/000-4/chunk_000.wav",
+    "5": "s05take8/chunk_000.wav",
+    "6": null,
+    "7": null
+   }
+  }
+ ]
+}
