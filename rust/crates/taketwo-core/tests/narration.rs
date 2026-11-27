@@ -568,3 +568,29 @@ fn a_deleted_voice_or_unknown_engine_is_a_clear_error() {
     let e = w.run(&fake(&[]), &nothing, |cx, m| narration::run_generation(cx, m, "ge", None)).unwrap_err();
     assert_eq!(e, RenderError::Value("Voice profile was deleted.".into()));
 }
+
+/// A model that answers the cancelled word itself (the flag never set).
+struct SaysCancelled;
+
+impl taketwo_core::render::models::Voice for SaysCancelled {
+    fn synthesize(&mut self, _: &str, _: &str, _: &std::path::Path, _: &str, _: &str, _: &Doc, _: u32, _: f64, _: &std::sync::atomic::AtomicBool)
+        -> Result<taketwo_core::render::models::Take, String> {
+        Err(taketwo_core::render::CANCELLED.into())
+    }
+}
+
+#[test]
+fn a_model_answering_cancelled_without_the_flag_is_a_stop() {
+    let w = World::new("cancelword");
+    w.narration("gw", 1, json!({}));
+    let fk = fake(&[]);
+    assert!(!fk.flag().load(std::sync::atomic::Ordering::SeqCst));
+    w.run(&fk, &nothing, |cx, m| {
+        m.voice = Box::leak(Box::new(SaysCancelled)); // outlives the Models borrow; a test-only leak
+        narration::run_generation(cx, m, "gw", None)
+    })
+    .unwrap();
+    let g = w.get("gw");
+    assert_eq!((g["status"].as_str(), g["message"].as_str()), (Some("cancelled"), Some(STOPPED)));
+    assert!(!fk.flag().load(std::sync::atomic::Ordering::SeqCst), "the flag stayed unset");
+}

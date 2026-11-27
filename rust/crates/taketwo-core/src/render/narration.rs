@@ -642,10 +642,13 @@ pub fn regenerate_chunk(cx: &mut Ctx, m: &mut Models, gid: &str, ci: i64, new_te
     // before anything is marked running, so a failure here leaves no stuck state
     let snap = snapshot(&gdir, &respeak_files(ci))?;
     doc.insert("status".into(), "running".into());
+    // the status read is inside Python's `try`: a failure there is a failed re-speak too
     let outcome = lib.put_generation_live(&mut doc).map_err(RenderError::from).and_then(|_| {
-        run_generation(cx, m, gid, Some(&[ci]))
+        run_generation(cx, m, gid, Some(&[ci]))?;
+        Ok(lib.get_generation(gid)?)
     });
     let mut stopped = true;
+    // no `?` below: Python's `finally` (discard, orphan take removal) runs on every exit
     let result = match outcome {
         Err(e) => {
             let r = restore(&gdir, &snap);
@@ -653,18 +656,19 @@ pub fn regenerate_chunk(cx: &mut Ctx, m: &mut Models, gid: &str, ci: i64, new_te
             let saved = lib.put_generation_live(&mut before);
             r.and(saved.map(|_| ()).map_err(RenderError::from)).and(Err(e))
         }
-        Ok(()) => {
-            let now = lib.get_generation(gid)?;
+        Ok(now) => {
             stopped = now.as_ref().and_then(|g| g.get("status")).and_then(Value::as_str) == Some("cancelled");
-            if stopped {
-                restore(&gdir, &snap)?;
-                before.insert("message".into(), RESPEAK_STOPPED.into());
-                lib.put_generation_live(&mut before)?;
-            } else if let Some(mut done) = now {
-                review::trim_takes(&lib.generations_dir(), gid, part(&mut done, ci)?)?;
-                lib.put_generation_live(&mut done)?;
-            }
-            Ok(())
+            (|| {
+                if stopped {
+                    restore(&gdir, &snap)?;
+                    before.insert("message".into(), RESPEAK_STOPPED.into());
+                    lib.put_generation_live(&mut before)?;
+                } else if let Some(mut done) = now {
+                    review::trim_takes(&lib.generations_dir(), gid, part(&mut done, ci)?)?;
+                    lib.put_generation_live(&mut done)?;
+                }
+                Ok(())
+            })()
         }
     };
     discard(&snap);

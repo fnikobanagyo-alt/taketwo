@@ -102,6 +102,15 @@ pub fn models_dir() -> PathBuf {
         .unwrap_or_else(|| dirs::data_local_dir().unwrap_or_default().join("TakeTwo").join("models"))
 }
 
+/// Sets its flag when dropped (also while a panic unwinds).
+struct SetOnDrop<'a>(&'a AtomicBool);
+
+impl Drop for SetOnDrop<'_> {
+    fn drop(&mut self) {
+        self.0.store(true, Ordering::SeqCst);
+    }
+}
+
 fn job_error(e: RenderError) -> Result<(), JobError> {
     match e {
         RenderError::Cancelled => Ok(()), // run_generation saves a stop as a status
@@ -173,6 +182,8 @@ impl RealRenderer {
         let flag = AtomicBool::new(false);
         let done = AtomicBool::new(false);
         let out = std::thread::scope(|sc| {
+            // set `done` on every exit, a panic included, so the watcher ends and the panic reaches the worker
+            let _done = SetOnDrop(&done);
             // the models read an AtomicBool; only another thread can flip it during a long take
             sc.spawn(|| {
                 while !done.load(Ordering::SeqCst) {
@@ -199,9 +210,7 @@ impl RealRenderer {
                 load: &mut load,
                 pitch_cache: &mut m.pitch_cache,
             };
-            let r = f(&mut cx, &mut models);
-            done.store(true, Ordering::SeqCst);
-            r
+            f(&mut cx, &mut models)
         });
         *self.last_job.lock().unwrap_or_else(|p| p.into_inner()) = Instant::now();
         out.or_else(job_error)
@@ -259,6 +268,18 @@ mod tests {
         for _ in 0..30 {
             say(&mut v).unwrap();
         }
+    }
+
+    #[test]
+    fn a_panic_in_the_step_ends_the_watcher_and_reaches_the_caller() {
+        let tmp = tempfile::tempdir().unwrap();
+        let lib = Library::open(tmp.path()).unwrap();
+        let r = RealRenderer::new(&tmp.path().join("models"), None, Duration::from_secs(300));
+        let never = || false;
+        let t = Instant::now();
+        let out = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| r.with_models(&lib, &never, |_, _| panic!("boom"))));
+        assert!(out.is_err(), "the panic is passed on");
+        assert!(t.elapsed() < Duration::from_secs(5), "the watcher ended without a cancel");
     }
 
     #[test]
