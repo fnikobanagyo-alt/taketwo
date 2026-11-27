@@ -7,7 +7,7 @@ The loop appends one entry per session at the bottom: date, step id, what was bu
 | Step | Status |
 |---|---|
 | S01 Workspace, safety rails, tools | done |
-| S02 Windows CUDA link proof | next |
+| S02 Windows CUDA link proof | done (G6 early evidence) |
 | S03 Text logic | todo |
 | S04 Library store, seeder, one-time copy | todo |
 | S05 Captions, timings, subtitles, review rules | todo |
@@ -37,7 +37,7 @@ The loop appends one entry per session at the bottom: date, step id, what was bu
 | G3 | not run | |
 | G4 | not run | |
 | G5 | not run | |
-| G6 | not run | |
+| G6 | early evidence (judge again on the final commit) | S02 entry below: run 45921171833 on `e28e7ba`, `build (cuda)` success, `g6.sh` exit 0 |
 | G7 | not run | |
 | G8 | pass so far (re-run at the end) | Lead decision 2 below: `g8.sh` exit 0; data/ 0 differences; App Support/VoiceForge differences attributed to Franz's running app (browser cache and storage files) |
 
@@ -210,3 +210,91 @@ Additions to the plan text for S02:
 - `g6.sh` matches the plain job by exact name.
 - Carry the long-paths fix over from `35c80d8`.
 - First push of this branch: check `git grep -nE "/Users/[A-Za-z]" HEAD` is empty before it.
+
+### 2026-11-27, builder (Opus), S02 Windows CUDA link proof
+Built:
+- `taketwo-voice` now links the three libraries:
+  - Vendored `qwen_tts` by path, plus `candle-core = "0.9"` (the locked 0.9.2). Features: `cuda` turns on `qwen_tts/cuda`, `flash-attn` turns on `cuda` and `qwen_tts/flash-attn`, `metal` turns on `qwen_tts/metal`. No GPU feature is on by default.
+  - whisper.cpp through a thin hand-written binding. `build.rs` builds the git submodule `rust/third_party/whisper.cpp` with the `cmake` crate: static libs; Release always; `GGML_NATIVE`, OpenMP, Metal and BLAS off; `GGML_CUDA=ON` and `CMAKE_CUDA_ARCHITECTURES=$CUDA_COMPUTE_CAP` (default 86) under `cuda`. On MSVC it uses the static CRT. Only `whisper_version` and `whisper_print_system_info` are declared for now; S13 adds the DTW API (`dtw_token_timestamps` is in `whisper.h` at this commit). Whisper stays on CPU on the Mac (no Metal) until S13 decides.
+  - `ort = "=2.0.0-rc.15"` (ONNX Runtime 1.31, CPU provider), `default-features = false` with `std, download-binaries, copy-dylibs, tls-native, api-31`.
+  - `link_report()` makes one real call into each: a 2-value CPU tensor from `qwen_tts::nn::mt_rng::MtBoxMullerRng`, plus Candle's cuda/metal availability; `whisper_version()` and `whisper_print_system_info()`; `ort::info()` (`OrtGetBuildInfoString`, a C API call). The whisper.cpp commit is stamped in at build time. One test checks that all three are named.
+- `taketwo-engine` and `taketwo-mcp` print `taketwo-engine 0.1.0` / `taketwo-mcp 0.1.0`, then the report, and exit 0. Each has `cuda` and `flash-attn` features that forward to `taketwo-voice`.
+- `Cargo.lock`: 17 packages added (`ort`, `ort-sys`, `cmake`, `ndarray`, `ureq` 3 and others). No existing version moved. The only removed lines are two `"ureq",` entries that became `"ureq 2.x"` because a second ureq now exists. No vendored source changed.
+- `.github/workflows/windows-cuda.yml` replaces `windows-cuda-build.yml`.
+  - Triggers: push to `rust/taketwo` with paths `rust/**`, `!rust/**/*.md`, `.gitmodules` and the workflow file, plus `workflow_dispatch`. `contents: read`.
+  - Job `build (${{ matrix.features }})`: windows-2022, 150 minutes, fail-fast false, matrix `cuda` and `cuda,flash-attn`. Setup is the prototype's: Jimver 0.2.21, CUDA 12.6.0, network, same sub-packages, `CUDA_COMPUTE_CAP=86`, msvc-dev-cmd, pwsh. Added: the long-paths step from `35c80d8`, `submodules: true`, `CMAKE_GENERATOR=Ninja` and the ONNX Runtime step below. The build log is uploaded.
+  - Job `check`: `cargo check --workspace`, then a no-GPU `cargo build --release` of both programs and both `--version` calls. It links and runs in about 9 minutes, so a link break shows long before the CUDA job ends.
+- `rust/.cargo/config.toml`: `+crt-static` for `x86_64-pc-windows-msvc` only. `CMAKE_POLICY_VERSION_MINIMUM` was not needed: whisper.cpp built with cmake 4.4.5 on the Mac.
+- `rust/scripts/g6.sh` (read-only):
+  - It takes the newest commit on `rust/taketwo` that changed anything other than `**/*.md`.
+  - It finds the run by workflow name `Windows CUDA build`, not by file. `gh run list --workflow windows-cuda.yml` returns 404 while the file is not on the default branch.
+  - A run counts when its head is the target commit, or a descendant that differs from it only in `.md` files. GitHub runs a push on its tip commit, and that tip can be a later PROGRESS.md commit.
+  - It judges only the job named exactly `build (cuda)`: success gives 0; queued, running or no run gives 75; anything else gives 1, as does a finished run with no such job. flash-attn and check are printed without judging. A `gh` failure exits non-zero, never 75.
+
+whisper.cpp commit and the PR #4170 evidence:
+- Submodule `rust/third_party/whisper.cpp` = `868e55578ea5f69550c046da22aefe11dc6e04c0`. `gh pr view 4170 -R ggml-org/whisper.cpp` gives `"mergeCommit":{"oid":"868e55578ea5f69550c046da22aefe11dc6e04c0"}`, `"mergedAt":"2026-11-25T17:23:28Z"`, `"state":"MERGED"`. The pinned commit is the merge commit itself.
+- Both runs print `whisper.cpp 1.9.6-dev (868e55578ea5)` in `--version`, the Mac and the Windows check job, so that commit is the one that got built. The version string alone would not prove it: v1.9.6 was tagged 2026-11-23, before the merge.
+- whisper-rs was rejected on dates. crates.io `whisper-rs-sys` 0.15.0 was last updated 2026-03-12. whisper-rs git HEAD `129b982` (2026-03-14) pins whisper.cpp `2eeeba5`. Both are months before #4170.
+
+ONNX Runtime strategy (fallback taken, not silent):
+- Mac: `download-binaries`, pyke's static build, linked into the exe (ORT 1.31.0, commit `402979a`). No dylib.
+- Windows: pyke's static Windows build is compiled `/MD`. The C++ in `esaxx-rs` (through `tokenizers`; its `build.rs` hard-codes `static_crt(true)`) and nvcc's kernels (candle's moe, flash-attn) are `/MT`. One exe cannot hold both.
+- Windows now uses one static CRT (`+crt-static`) and links ONNX Runtime 1.31.1 as a DLL through its import library.
+  - The DLL comes from Microsoft's NuGet package `Microsoft.ML.OnnxRuntime` 1.31.1, with its SHA-512 pinned from the nuget.org catalog. The `microsoft/onnxruntime` GitHub repository answered 404 here.
+  - The workflow sets `ORT_LIB_PATH` and `ORT_PREFER_DYNAMIC_LINK=1`, and ort-sys copies `onnxruntime.dll` next to the exe.
+  - This is not `load-dynamic`: the exe imports the DLL, so the link proof holds. Windows build type: `RelWithDebInfo`, commit `41d4d61`.
+
+Runs (GitHub, `fnikobanagyo-alt/taketwo`; 3 of the 5 push rounds used):
+| Run | Commit | build (cuda) | build (cuda,flash-attn) | check |
+|---|---|---|---|---|
+| 45913372450 | `818a45c` | failure, 37 min: LNK2038, whisper.cpp `/MD` against esaxx and moe `/MT` | failure, 72 min: same LNK2038, plus flash-attn's `/MT` objects. The long-paths fix worked: cutlass checked out and the crate compiled | success, 3 min (`cargo check` only) |
+| 45917033507 | `4af22ad` (whisper.cpp `/MT`) | failure, 36 min: LNK2038/LNK2005, ORT's `/MD` objects (`msvcprt`) against `libcpmt` | still in progress when last read | success, 3 min |
+| 45921171833 | `e28e7ba` (static CRT, ORT DLL) | **success, 35 min** (cargo `Finished` in 29m 43s) | in progress when this entry was written; not waited for | success, 9 min, both programs built and ran |
+
+- On the runner, the CUDA build's `taketwo-engine.exe --version` exited -1073741515 (`STATUS_DLL_NOT_FOUND`, very likely the missing NVIDIA driver DLL). The step listed the two programs instead: `taketwo-engine.exe 246426112`, `taketwo-mcp.exe 246426112` bytes.
+- The no-GPU Windows build in `check` ran both programs. Real output, from `taketwo-engine`; `taketwo-mcp` printed the same:
+```
+taketwo-engine 0.1.0
+candle (qwen_tts): ok, cpu tensor [2]; cuda available: false; metal available: false
+whisper.cpp 1.9.6-dev (868e55578ea5): WHISPER : VITISAI = 0 | COREML = 0 | OPENVINO = 0 | CPU : SSE3 = 1 | SSSE3 = 1 | AVX = 1 | AVX2 = 1 | F16C = 1 | FMA = 1 | BMI2 = 1 | REPACK = 1 |
+onnx runtime: ORT Build Info: git-branch=HEAD, git-commit-id=41d4d61, fp8-kv-cache=1, build type=RelWithDebInfo
+```
+
+Acceptance commands (Mac, real results):
+```
+$ cd rust && source scripts/env.sh && cargo test --workspace     # exit 0
+  116 + 14 + 1 (1 ignored = the child helper) + 1 (taketwo-voice link_report) + 12 doc-tests passed, 0 failed
+$ cargo build -p taketwo-engine -p taketwo-mcp && target/debug/taketwo-engine --version && target/debug/taketwo-mcp --version   # exit 0
+taketwo-engine 0.1.0
+candle (qwen_tts): ok, cpu tensor [2]; cuda available: false; metal available: false
+whisper.cpp 1.9.6-dev (868e55578ea5): WHISPER : VITISAI = 0 | COREML = 0 | OPENVINO = 0 | CPU : NEON = 1 | ARM_FMA = 1 | FP16_VA = 1 | DOTPROD = 1 | ACCELERATE = 1 | REPACK = 1 |
+onnx runtime: ORT Build Info: git-branch=rel-1.31.0, git-commit-id=402979a, fp8-kv-cache=1, build type=Release
+taketwo-mcp 0.1.0   (then the same three lines)
+$ cargo tree -p taketwo-engine -p taketwo-mcp --features cuda -e features > /dev/null    # exit 0
+$ test -f .github/workflows/windows-cuda.yml && test ! -e .github/workflows/windows-cuda-build.yml && git grep /Users/ count 0   # exit 0
+$ rust/scripts/g6.sh      # exit 0
+target: e28e7ba S02: one static C runtime on Windows, ONNX Runtime as a DLL there
+run 45921171833 on e28e7ba: in_progress  https://github.com/fnikobanagyo-alt/taketwo/actions/runs/45921171833
+info, not judged: build (cuda,flash-attn): in_progress  2026-11-27T01:11:54Z 0001-01-01T00:00:00Z
+info, not judged: check: completed success 2026-11-27T01:11:54Z 2026-11-27T01:20:36Z
+gate job: build (cuda): completed success 2026-11-27T01:11:54Z 2026-11-27T01:46:27Z
+G6 PASS
+$ rust/scripts/g8.sh      # exit 0, G8 PASS; main and origin/main still 4448aaa; 8766 health names TakeTwo
+data/: 0 added, 0 removed, 2 changed (size or mtime)  [changed (top-level file) other: 1; changed generations/ other: 1]
+App Support/VoiceForge: 8 added, 0 removed, 25 changed (size or mtime)
+```
+- This step never read or wrote data/, so the two data/ changes (neither of them audio) are for the lead to attribute, most likely to Franz's running app.
+- No engine was started, no port was bound and no model was run. Only `rust/taketwo` was pushed, after `git grep /Users/` on HEAD, the commit messages and the branch's full diff history each found 0.
+
+Not done / notes:
+- flash-attn on Windows: unknown for the fixed commit, still running. Round 1 showed that the long-paths fix works and that flash-attn compiles; it failed only at the same CRT link.
+- Whisper CUDA linked on Windows (`ggml-cuda` static plus `cudart`, `cublas`, `cublasLt`, `cuda`), so the CPU-Whisper fallback was not needed.
+- The CUDA exes are 246 MB each, above the 100 MB app goal, most likely from the embedded CUDA kernels (Candle PTX plus ggml-cuda fatbin). Nothing was trimmed.
+- The CUDA exe cannot start without the NVIDIA driver, not even for `--version`. Product question below.
+- A Windows build now needs `ORT_LIB_PATH` and `ORT_PREFER_DYNAMIC_LINK=1` set as in the workflow; `Cargo.toml` cannot express that. A Windows install must ship `onnxruntime.dll` (17 MB) next to the exes.
+- `scripts/check.py` was not run: no Python or React file changed.
+
+Questions for the lead:
+1. Should a CUDA build start and answer `--version` or `/api/health` on a PC without an NVIDIA driver (for example with a clear "needs an NVIDIA GPU" message)? That needs delay-loading `nvcuda.dll` or `cuda.lib`, or loading ggml-cuda dynamically.
+2. Is NuGet acceptable as the source of the Windows ONNX Runtime DLL from now on, or should a later step build ONNX Runtime `/MT` from source?
+3. Every later push step should keep the code commit as the tip, or rely on `g6.sh`'s ".md-only descendant" rule as built here.
