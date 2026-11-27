@@ -575,7 +575,8 @@ def cases(h):
     assert r["error"]["type"] == "ValueError" and r["files"]["chunk_000.wav"] == {"unchanged": True} and "raw_chunk_000.wav" not in r["files"]
 
     # --- cancel (guarded)
-    for nm, ca, tk, trs in (("cancel_guard_before_sentence", ("transcribe", 1), [s1], [sw1]),
+    for nm, ca, tk, trs in (("cancel_guard_before_first_sentence", ("clock", 1), [], []),
+                            ("cancel_guard_before_sentence", ("transcribe", 1), [s1], [sw1]),
                             ("cancel_guard_before_retry", ("transcribe", 2), [s1, s2], [sw1, sw2[:-1]]),
                             ("cancel_guard_after_synthesis", ("synthesize", 1), [s1], [])):
         r = h.run(nm, text=C, takes=[Rok(x) for x in tk], transcripts=[T(w) for w in trs], embeddings=[], voice=V1, s=G,

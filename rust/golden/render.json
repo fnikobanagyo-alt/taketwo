@@ -19870,6 +19870,135 @@
    "fired": "every take unsafe with an old part: ValueError"
   },
   {
+   "name": "cancel_guard_before_first_sentence",
+   "inputs": {
+    "gen": {
+     "id": "g_cancel_guard_before_first_sentence",
+     "profile_id": "rvoice",
+     "engine": "qwen3-tts-1.7b",
+     "language": "en",
+     "params": {},
+     "chunks": [
+      {
+       "i": 0,
+       "text": "Pull half. One nudge more.",
+       "pause_after": "end",
+       "status": "pending"
+      }
+     ]
+    },
+    "ci": 0,
+    "profile": {
+     "id": "rvoice",
+     "name": "Render voice",
+     "variants": [
+      {
+       "index": 0,
+       "file": "ref_0.wav",
+       "text": "Our voice reads a calm line of text here.",
+       "score": 0.9
+      }
+     ],
+     "self_similarity": 0.8,
+     "speech_rate_wps": 2.6
+    },
+    "settings": {
+     "default_engine": "qwen3-tts-1.7b",
+     "max_chunk_chars": 220,
+     "max_attempts": 4,
+     "compare_takes": 1,
+     "experimental_qwen_ending_guard": true,
+     "max_wer": 0.12,
+     "min_speaker_similarity": 0.85,
+     "max_internal_silence": 0.9,
+     "max_pitch_offset_st": 2.0,
+     "sentence_pause_ms": 300,
+     "inner_sentence_pause_ms": 0,
+     "paragraph_pause_ms": 700,
+     "target_lufs": -16.0,
+     "seed": 1234,
+     "pronunciations": [],
+     "strip_citations": true,
+     "custom_engines": [],
+     "check_updates": true,
+     "update_dismissed": ""
+    },
+    "nonce": 12345,
+    "regen_round": 0,
+    "clock": [
+     1000000.0,
+     0.75
+    ],
+    "cancel_after": [
+     "clock",
+     1
+    ],
+    "pre_files": {}
+   },
+   "script": {
+    "takes": [],
+    "transcripts": [],
+    "embeddings": []
+   },
+   "voice": {
+    "clean.wav": {
+     "file": "wav_f9854012b0732304.wav",
+     "len": 47360
+    },
+    "ref_0.wav": {
+     "file": "wav_28c39f7c43cede2c.wav",
+     "len": 52000
+    },
+    "fingerprint.npy": {
+     "file": "npy_1e788703ebe24963.npy",
+     "len": 2
+    }
+   },
+   "result": {
+    "error": {
+     "type": "Cancelled",
+     "message": ""
+    },
+    "calls": [],
+    "cosines": [],
+    "files": {},
+    "profile_after": {
+     "id": "rvoice",
+     "name": "Render voice",
+     "variants": [
+      {
+       "index": 0,
+       "file": "ref_0.wav",
+       "text": "Our voice reads a calm line of text here.",
+       "score": 0.9
+      }
+     ],
+     "self_similarity": 0.8,
+     "speech_rate_wps": 2.6,
+     "noise_baseline": 0.0
+    },
+    "put_profile": [
+     {
+      "id": "rvoice",
+      "name": "Render voice",
+      "variants": [
+       {
+        "index": 0,
+        "file": "ref_0.wav",
+        "text": "Our voice reads a calm line of text here.",
+        "score": 0.9
+       }
+      ],
+      "self_similarity": 0.8,
+      "speech_rate_wps": 2.6,
+      "noise_baseline": 0.0
+     }
+    ],
+    "clock_reads": 1
+   },
+   "fired": "guarded cancel ('clock', 1)"
+  },
+  {
    "name": "cancel_guard_before_sentence",
    "inputs": {
     "gen": {
